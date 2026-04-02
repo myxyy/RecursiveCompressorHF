@@ -8,6 +8,7 @@ dependencies = [
     "torch>=2.11.0",
     "torchaudio>=2.11.0",
     "torchvision>=0.26.0",
+    "transformers>=4.40.0",
 ]
 
 [[tool.uv.index]]
@@ -19,3 +20,8 @@ explicit = true
 torch = [{ index = "pytorch-cu128" }]
 torchvision = [{ index = "pytorch-cu128" }]
 torchaudio = [{ index = "pytorch-cu128" }]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.2",
+]
