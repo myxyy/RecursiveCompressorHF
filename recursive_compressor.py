@@ -56,16 +56,19 @@ class RecursiveCompressor(nn.Module):
         self.compress_size = compress_size
         self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
         self.compressor_query = nn.Parameter(torch.randn(compress_size, d_model))
+        self.norm_mha_encoder = nn.LayerNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
+        self.norm_ffn_encoder = nn.LayerNorm(d_model)
         self.ffn_encoder = FFNSwiGLU(d_model, d_ff)
+        self.norm_mha_decoder = nn.LayerNorm(d_model)
         self.mha_decoder = MultiHeadAttention(d_model, num_heads)
+        self.norm_ffn_decoder = nn.LayerNorm(d_model)
         self.ffn_decoder = FFNSwiGLU(d_model, d_ff)
         self.mha_compressor = MultiHeadAttention(d_model, num_heads)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
 
     def forward(self, x):
         batch_size, seq_len, d_model = x.size()
-        print(f"Input shape: {x.shape}")
         original_seq_len = seq_len
         if seq_len % self.chunk_size != 0:
             padding_len = self.chunk_size - (seq_len % self.chunk_size)
@@ -73,8 +76,16 @@ class RecursiveCompressor(nn.Module):
             seq_len += padding_len
 
         x = x.view(batch_size * (seq_len // self.chunk_size), self.chunk_size, d_model)
+
+        x_ = x
+        x = self.norm_mha_encoder(x)
         x = self.mha_encoder(x, x, x, mask=self.mask_tril)
+        x = x + x_
+
+        x_ = x
+        x = self.norm_ffn_encoder(x)
         x = self.ffn_encoder(x)
+        x = x + x_
 
         if seq_len // self.chunk_size > 1:
             compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
@@ -86,6 +97,14 @@ class RecursiveCompressor(nn.Module):
             compressed = compressed.view(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
             x = self.mha_decompressor(x, compressed, compressed)
 
+        x_ = x
+        x = self.norm_mha_decoder(x)
         x = self.mha_decoder(x, x, x, mask=self.mask_tril)
+        x = x + x_
+
+        x_ = x
+        x = self.norm_ffn_decoder(x)
         x = self.ffn_decoder(x)
+        x = x + x_
+
         return x.view(batch_size, seq_len, d_model)[:, :original_seq_len, :]
