@@ -64,7 +64,9 @@ class RecursiveCompressor(nn.Module):
         self.mha_decoder = MultiHeadAttention(d_model, num_heads)
         self.norm_ffn_decoder = nn.LayerNorm(d_model)
         self.ffn_decoder = FFNSwiGLU(d_model, d_ff)
+        self.norm_compressor = nn.LayerNorm(d_model)
         self.mha_compressor = MultiHeadAttention(d_model, num_heads)
+        self.norm_decompressor = nn.LayerNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
 
     def forward(self, x):
@@ -88,6 +90,8 @@ class RecursiveCompressor(nn.Module):
         x = x + x_
 
         if seq_len // self.chunk_size > 1:
+            x_ = x
+            x = self.norm_compressor(x)
             compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
             compressed = self.mha_compressor(compressor_query, x, x)
             compressed = compressed.view(batch_size, seq_len // self.chunk_size, self.compress_size, d_model).permute(0, 2, 1, 3).contiguous().view(batch_size * self.compress_size, seq_len // self.chunk_size, d_model)
@@ -95,7 +99,9 @@ class RecursiveCompressor(nn.Module):
             compressed = compressed.view(batch_size, self.compress_size, seq_len // self.chunk_size, d_model).permute(0, 2, 1, 3).contiguous()
             compressed = torch.cat([self.compressor_query[None, None, :, :].expand(batch_size, 1, self.compress_size, d_model), compressed[:, :-1, :, :]], dim=1)
             compressed = compressed.view(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
+            compressed = self.norm_decompressor(compressed)
             x = self.mha_decompressor(x, compressed, compressed)
+            x = x + x_
 
         x_ = x
         x = self.norm_mha_decoder(x)
