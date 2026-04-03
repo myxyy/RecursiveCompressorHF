@@ -9,8 +9,8 @@ def predict(prompt, context_length=1024, temperature=1.0, weights_path="recursiv
     d_model = 512
     num_heads = 8
     d_ff = 2048
-    chunk_size = 16
-    compress_size = 8
+    chunk_size = 8
+    compress_size = 4
     num_layers = 4
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

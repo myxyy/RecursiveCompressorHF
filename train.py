@@ -9,12 +9,12 @@ def train():
     # Hyperparameters
     text_dir = "text"
     tokenizer_name = "elyza/ELYZA-japanese-Llama-2-7b-fast"
-    context_length = 1024
+    context_length = 2048
     d_model = 512
     num_heads = 8
     d_ff = 2048
-    chunk_size = 16
-    compress_size = 8
+    chunk_size = 8
+    compress_size = 4
     num_layers = 4
     batch_size = 4
     num_epochs = 10
