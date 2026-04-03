@@ -1,3 +1,5 @@
+[English](README_en.md) | 日本語
+
 # RecursiveCompressor
 
 再帰的な圧縮機構を持つ独自アーキテクチャによる言語モデルの実装です。
