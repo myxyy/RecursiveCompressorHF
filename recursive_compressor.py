@@ -116,3 +116,68 @@ class RecursiveCompressor(nn.Module):
         x = x + x_
 
         return x.view(batch_size, seq_len, d_model)[:, :original_seq_len, :]
+
+    def predict(self, x, hidden: list[tuple[None | torch.Tensor, None | torch.Tensor]] | None):
+        batch_size, d_model = x.size()
+        if hidden is None:
+            hidden = []
+        hidden_self = hidden.pop() if hidden else (None, None)
+        inner_context, outer_context = hidden_self
+
+        if inner_context is None:
+            inner_context = x.unsqueeze(1)
+        else:
+            inner_context = torch.cat([inner_context, x.unsqueeze(1)], dim=1)
+
+        assert inner_context.size(1) <= self.chunk_size, "Chunk size exceeded in predict"
+        inner_context_original = inner_context
+        inner_context_length = inner_context.size(1)
+        if inner_context.size(1) < self.chunk_size:
+            padding_len = self.chunk_size - inner_context.size(1)
+            inner_context = torch.cat([inner_context, torch.zeros(batch_size, padding_len, d_model, device=x.device)], dim=1)
+
+        if outer_context is None:
+            outer_context = self.compressor_query.unsqueeze(0).expand(batch_size, self.compress_size, d_model)
+
+        inner_context_ = inner_context
+        inner_context = self.norm_mha_encoder(inner_context)
+        inner_context = self.mha_encoder(inner_context, inner_context, inner_context, mask=self.mask_tril)
+        inner_context = inner_context + inner_context_
+
+        inner_context_ = inner_context
+        inner_context = self.norm_ffn_encoder(inner_context)
+        inner_context = self.ffn_encoder(inner_context)
+        inner_context = inner_context + inner_context_
+
+        inner_context = self.norm_compressor(inner_context)
+        if inner_context_length == self.chunk_size:
+            compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size, self.compress_size, d_model)
+            compressed = self.mha_compressor(compressor_query, inner_context, inner_context)
+            compressed = compressed.view(batch_size * self.compress_size, d_model)
+            compressed, hidden = self.predict(compressed, hidden)
+            outer_context = compressed.view(batch_size, self.compress_size, d_model)
+        compressed = self.norm_decompressor(outer_context)
+        inner_context = self.mha_decompressor(inner_context, compressed, compressed)
+        inner_context = inner_context + inner_context_
+
+        inner_context_ = inner_context
+        inner_context = self.norm_mha_decoder(inner_context)
+        inner_context = self.mha_decoder(inner_context, inner_context, inner_context, mask=self.mask_tril)
+        inner_context = inner_context + inner_context_
+
+        inner_context_ = inner_context
+        inner_context = self.norm_ffn_decoder(inner_context)
+        inner_context = self.ffn_decoder(inner_context)
+        inner_context = inner_context + inner_context_
+
+        x = inner_context[:, inner_context_length - 1, :]
+        if inner_context_length == self.chunk_size:
+            inner_context = None
+        else:
+            inner_context = inner_context_original
+        hidden_self = (inner_context, outer_context)
+        if hidden is None:
+            hidden = []
+        hidden.append(hidden_self)
+        return x, hidden
+

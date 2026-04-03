@@ -21,3 +21,14 @@ class RecursiveCompressorLM(nn.Module):
         x = self.norm(x)
         logits = self.head(x)
         return logits
+
+    def predict(self, input_ids, hidden: list[list[tuple[None | torch.Tensor, None | torch.Tensor]] | None] | None):
+        x = self.embedding(input_ids)
+        for i, layer in enumerate(self.layers):
+            hidden_layer = hidden[i] if hidden is not None else None
+            x, hidden_layer = layer.predict(x, hidden_layer)
+            if hidden is not None:
+                hidden[i] = hidden_layer
+        x = self.norm(x)
+        logits = self.head(x)
+        return logits, hidden
