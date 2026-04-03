@@ -90,8 +90,8 @@ class RecursiveCompressor(nn.Module):
         x = x + x_
 
         x_ = x
+        x = self.norm_compressor(x)
         if seq_len // self.chunk_size > 1:
-            x = self.norm_compressor(x)
             compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
             compressed = self.mha_compressor(compressor_query, x, x)
             compressed = compressed.view(batch_size, seq_len // self.chunk_size, self.compress_size, d_model).permute(0, 2, 1, 3).contiguous().view(batch_size * self.compress_size, seq_len // self.chunk_size, d_model)
@@ -149,13 +149,15 @@ class RecursiveCompressor(nn.Module):
         inner_context = self.ffn_encoder(inner_context)
         inner_context = inner_context + inner_context_
 
+        inner_context_ = inner_context
         inner_context = self.norm_compressor(inner_context)
+        next_outer_context = outer_context
         if inner_context_length == self.chunk_size:
             compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size, self.compress_size, d_model)
             compressed = self.mha_compressor(compressor_query, inner_context, inner_context)
             compressed = compressed.view(batch_size * self.compress_size, d_model)
             compressed, hidden = self.predict(compressed, hidden)
-            outer_context = compressed.view(batch_size, self.compress_size, d_model)
+            next_outer_context = compressed.view(batch_size, self.compress_size, d_model)
         compressed = self.norm_decompressor(outer_context)
         inner_context = self.mha_decompressor(inner_context, compressed, compressed)
         inner_context = inner_context + inner_context_
@@ -175,7 +177,7 @@ class RecursiveCompressor(nn.Module):
             inner_context = None
         else:
             inner_context = inner_context_original
-        hidden_self = (inner_context, outer_context)
+        hidden_self = (inner_context, next_outer_context)
         if hidden is None:
             hidden = []
         hidden.append(hidden_self)

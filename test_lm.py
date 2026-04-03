@@ -69,6 +69,27 @@ class TestRecursiveCompressorLM:
         model = RecursiveCompressorLM(**model_params)
         assert len(model.layers) == model_params["num_layers"]
 
+    @pytest.mark.parametrize("seq_len", [1, 7, 8, 16, 24, 32])
+    def test_predict_matches_forward(self, model_params, seq_len):
+        """predictを1トークンずつ呼んだ結果がforwardと一致する"""
+        model = RecursiveCompressorLM(**model_params)
+        model.eval()
+
+        input_ids = torch.randint(0, model_params["vocab_size"], (1, seq_len))
+
+        with torch.no_grad():
+            forward_logits = model(input_ids)
+
+            hidden = None
+            predict_logits_list = []
+            for t in range(seq_len):
+                token = input_ids[:, t]
+                logits, hidden = model.predict(token, hidden)
+                predict_logits_list.append(logits)
+            predict_logits = torch.stack(predict_logits_list, dim=1)
+
+        torch.testing.assert_close(predict_logits, forward_logits, atol=1e-4, rtol=1e-4)
+
 
 class TestTextDataset:
     @pytest.fixture

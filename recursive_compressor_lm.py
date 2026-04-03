@@ -24,11 +24,10 @@ class RecursiveCompressorLM(nn.Module):
 
     def predict(self, input_ids, hidden: list[list[tuple[None | torch.Tensor, None | torch.Tensor]] | None] | None):
         x = self.embedding(input_ids)
+        if hidden is None:
+            hidden = [None] * len(self.layers)
         for i, layer in enumerate(self.layers):
-            hidden_layer = hidden[i] if hidden is not None else None
-            x, hidden_layer = layer.predict(x, hidden_layer)
-            if hidden is not None:
-                hidden[i] = hidden_layer
+            x, hidden[i] = layer.predict(x, hidden[i])
         x = self.norm(x)
         logits = self.head(x)
         return logits, hidden
