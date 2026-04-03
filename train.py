@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader
+from tqdm import tqdm
 from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import TextDataset
 
@@ -24,7 +25,8 @@ def train():
 
     # Dataset
     dataset = TextDataset(text_dir, tokenizer_name, context_length)
-    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+    shuffle_generator = torch.Generator()
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=2, generator=shuffle_generator)
 
     print(f"Vocab size: {dataset.vocab_size}")
     print(f"Number of samples: {len(dataset)}")
@@ -50,10 +52,12 @@ def train():
     # Training loop
     for epoch in range(num_epochs):
         model.train()
-        total_loss = 0.0
-        num_batches = 0
+        shuffle_generator.manual_seed(epoch)
+        ema_loss = None
+        ema_beta = 0.99
 
-        for batch_idx, (x, y) in enumerate(dataloader):
+        pbar = tqdm(dataloader, desc=f"Epoch {epoch+1}/{num_epochs}")
+        for x, y in pbar:
             x, y = x.to(device), y.to(device)
 
             logits = model(x)
@@ -64,15 +68,11 @@ def train():
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             optimizer.step()
 
-            total_loss += loss.item()
-            num_batches += 1
+            batch_loss = loss.item()
+            ema_loss = batch_loss if ema_loss is None else ema_beta * ema_loss + (1 - ema_beta) * batch_loss
+            pbar.set_postfix(loss=f"{batch_loss:.4f}", ema=f"{ema_loss:.4f}")
 
-            if (batch_idx + 1) % 100 == 0:
-                avg_loss = total_loss / num_batches
-                print(f"Epoch {epoch+1}/{num_epochs}, Batch {batch_idx+1}, Loss: {avg_loss:.4f}")
-
-        avg_loss = total_loss / num_batches
-        print(f"Epoch {epoch+1}/{num_epochs}, Average Loss: {avg_loss:.4f}")
+        print(f"Epoch {epoch+1}/{num_epochs}, EMA Loss: {ema_loss:.4f}")
 
     torch.save(model.state_dict(), "recursive_compressor_lm.pth")
     print("Model saved to recursive_compressor_lm.pth")
