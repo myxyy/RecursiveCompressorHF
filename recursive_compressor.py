@@ -89,8 +89,8 @@ class RecursiveCompressor(nn.Module):
         x = self.ffn_encoder(x)
         x = x + x_
 
+        x_ = x
         if seq_len // self.chunk_size > 1:
-            x_ = x
             x = self.norm_compressor(x)
             compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
             compressed = self.mha_compressor(compressor_query, x, x)
@@ -99,9 +99,11 @@ class RecursiveCompressor(nn.Module):
             compressed = compressed.view(batch_size, self.compress_size, seq_len // self.chunk_size, d_model).permute(0, 2, 1, 3).contiguous()
             compressed = torch.cat([self.compressor_query[None, None, :, :].expand(batch_size, 1, self.compress_size, d_model), compressed[:, :-1, :, :]], dim=1)
             compressed = compressed.view(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
-            compressed = self.norm_decompressor(compressed)
-            x = self.mha_decompressor(x, compressed, compressed)
-            x = x + x_
+        else:
+            compressed = self.compressor_query[None, :, :].expand(batch_size, self.compress_size, d_model)
+        compressed = self.norm_decompressor(compressed)
+        x = self.mha_decompressor(x, compressed, compressed)
+        x = x + x_
 
         x_ = x
         x = self.norm_mha_decoder(x)
