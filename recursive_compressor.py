@@ -69,117 +69,128 @@ class RecursiveCompressor(nn.Module):
         self.norm_decompressor = nn.LayerNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
 
-    def forward(self, x):
+    def step(self, x, hidden):
         batch_size, seq_len, d_model = x.size()
-        original_seq_len = seq_len
-        if seq_len % self.chunk_size != 0:
-            padding_len = self.chunk_size - (seq_len % self.chunk_size)
-            x = torch.cat([x, torch.zeros(batch_size, padding_len, d_model, device=x.device)], dim=1)
-            seq_len += padding_len
 
-        x = x.view(batch_size * (seq_len // self.chunk_size), self.chunk_size, d_model)
-
-        x_ = x
-        x = self.norm_mha_encoder(x)
-        x = self.mha_encoder(x, x, x, mask=self.mask_tril)
-        x = x + x_
-
-        x_ = x
-        x = self.norm_ffn_encoder(x)
-        x = self.ffn_encoder(x)
-        x = x + x_
-
-        x_ = x
-        x = self.norm_compressor(x)
-        if seq_len // self.chunk_size > 1:
-            compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
-            compressed = self.mha_compressor(compressor_query, x, x)
-            compressed = compressed.view(batch_size, seq_len // self.chunk_size, self.compress_size, d_model).permute(0, 2, 1, 3).contiguous().view(batch_size * self.compress_size, seq_len // self.chunk_size, d_model)
-            compressed = self.forward(compressed)
-            compressed = compressed.view(batch_size, self.compress_size, seq_len // self.chunk_size, d_model).permute(0, 2, 1, 3).contiguous()
-            compressed = torch.cat([self.compressor_query[None, None, :, :].expand(batch_size, 1, self.compress_size, d_model), compressed[:, :-1, :, :]], dim=1)
-            compressed = compressed.view(batch_size * (seq_len // self.chunk_size), self.compress_size, d_model)
-        else:
-            compressed = self.compressor_query[None, :, :].expand(batch_size, self.compress_size, d_model)
-        compressed = self.norm_decompressor(compressed)
-        x = self.mha_decompressor(x, compressed, compressed)
-        x = x + x_
-
-        x_ = x
-        x = self.norm_mha_decoder(x)
-        x = self.mha_decoder(x, x, x, mask=self.mask_tril)
-        x = x + x_
-
-        x_ = x
-        x = self.norm_ffn_decoder(x)
-        x = self.ffn_decoder(x)
-        x = x + x_
-
-        return x.view(batch_size, seq_len, d_model)[:, :original_seq_len, :]
-
-    def predict(self, x, hidden: list[tuple[None | torch.Tensor, None | torch.Tensor]] | None):
-        batch_size, d_model = x.size()
+        # Pop current level's hidden state
         if hidden is None:
             hidden = []
         hidden_self = hidden.pop() if hidden else (None, None)
-        inner_context, outer_context = hidden_self
+        prev_inner, prev_outer = hidden_self
 
-        if inner_context is None:
-            inner_context = x.unsqueeze(1)
+        if prev_outer is None:
+            prev_outer = self.compressor_query[None, :, :].expand(batch_size, self.compress_size, d_model)
+
+        # Combine with previous partial chunk
+        if prev_inner is not None:
+            combined = torch.cat([prev_inner, x], dim=1)
+            offset = prev_inner.size(1)
         else:
-            inner_context = torch.cat([inner_context, x.unsqueeze(1)], dim=1)
+            combined = x
+            offset = 0
 
-        assert inner_context.size(1) <= self.chunk_size, "Chunk size exceeded in predict"
-        inner_context_original = inner_context
-        inner_context_length = inner_context.size(1)
-        if inner_context.size(1) < self.chunk_size:
-            padding_len = self.chunk_size - inner_context.size(1)
-            inner_context = torch.cat([inner_context, torch.zeros(batch_size, padding_len, d_model, device=x.device)], dim=1)
+        total_len = combined.size(1)
+        num_full = total_len // self.chunk_size
+        rem = total_len % self.chunk_size
+        full_len = num_full * self.chunk_size
 
-        if outer_context is None:
-            outer_context = self.compressor_query.unsqueeze(0).expand(batch_size, self.compress_size, d_model)
+        # Prepare chunks: full chunks first, then remainder (if any)
+        # Kept separate (not interleaved by batch) so we can slice by dim=0 later
+        parts = []
+        if num_full > 0:
+            full_part = combined[:, :full_len].reshape(batch_size * num_full, self.chunk_size, d_model)
+            parts.append(full_part)
+        if rem > 0:
+            rem_part = combined[:, full_len:]
+            padding_len = self.chunk_size - rem
+            rem_padded = torch.cat([rem_part, torch.zeros(batch_size, padding_len, d_model, device=x.device)], dim=1)
+            parts.append(rem_padded)
 
-        inner_context_ = inner_context
-        inner_context = self.norm_mha_encoder(inner_context)
-        inner_context = self.mha_encoder(inner_context, inner_context, inner_context, mask=self.mask_tril)
-        inner_context = inner_context + inner_context_
+        all_chunks = torch.cat(parts, dim=0)
 
-        inner_context_ = inner_context
-        inner_context = self.norm_ffn_encoder(inner_context)
-        inner_context = self.ffn_encoder(inner_context)
-        inner_context = inner_context + inner_context_
+        # Encoder: causal self-attention + FFN (independent per chunk)
+        ac = all_chunks
+        all_chunks = self.norm_mha_encoder(all_chunks)
+        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
+        all_chunks = all_chunks + ac
 
-        inner_context_ = inner_context
-        inner_context = self.norm_compressor(inner_context)
-        next_outer_context = outer_context
-        if inner_context_length == self.chunk_size:
-            compressor_query = self.compressor_query.unsqueeze(0).expand(batch_size, self.compress_size, d_model)
-            compressed = self.mha_compressor(compressor_query, inner_context, inner_context)
-            compressed = compressed.view(batch_size * self.compress_size, d_model)
-            compressed, hidden = self.predict(compressed, hidden)
-            next_outer_context = compressed.view(batch_size, self.compress_size, d_model)
-        compressed = self.norm_decompressor(outer_context)
-        inner_context = self.mha_decompressor(inner_context, compressed, compressed)
-        inner_context = inner_context + inner_context_
+        ac = all_chunks
+        all_chunks = self.norm_ffn_encoder(all_chunks)
+        all_chunks = self.ffn_encoder(all_chunks)
+        all_chunks = all_chunks + ac
 
-        inner_context_ = inner_context
-        inner_context = self.norm_mha_decoder(inner_context)
-        inner_context = self.mha_decoder(inner_context, inner_context, inner_context, mask=self.mask_tril)
-        inner_context = inner_context + inner_context_
+        # Compression / Decompression
+        all_pre_norm = all_chunks
+        all_normed = self.norm_compressor(all_chunks)
 
-        inner_context_ = inner_context
-        inner_context = self.norm_ffn_decoder(inner_context)
-        inner_context = self.ffn_decoder(inner_context)
-        inner_context = inner_context + inner_context_
+        if num_full > 0:
+            full_normed = all_normed[:batch_size * num_full]
 
-        x = inner_context[:, inner_context_length - 1, :]
-        if inner_context_length == self.chunk_size:
-            inner_context = None
+            comp_query = self.compressor_query[None, :, :].expand(batch_size * num_full, self.compress_size, d_model)
+            compressed = self.mha_compressor(comp_query, full_normed, full_normed)
+
+            # Reshape for recursion: each of compress_size streams processed independently
+            compressed = compressed.view(batch_size, num_full, self.compress_size, d_model)
+            compressed = compressed.permute(0, 2, 1, 3).contiguous()
+            compressed = compressed.view(batch_size * self.compress_size, num_full, d_model)
+
+            # Recursive step
+            compressed, hidden = self.step(compressed, hidden)
+
+            compressed = compressed.view(batch_size, self.compress_size, num_full, d_model)
+            compressed = compressed.permute(0, 2, 1, 3).contiguous()
+            # (batch, num_full, compress_size, d_model)
+
+            # Shift: chunk i uses outer context from chunks 0..i-1
+            full_outer = torch.cat([prev_outer.unsqueeze(1), compressed[:, :-1]], dim=1)
+            new_outer = compressed[:, -1]
+
+            full_outer = full_outer.view(batch_size * num_full, self.compress_size, d_model)
+
+            if rem > 0:
+                all_outer = torch.cat([full_outer, new_outer], dim=0)
+            else:
+                all_outer = full_outer
         else:
-            inner_context = inner_context_original
-        hidden_self = (inner_context, next_outer_context)
-        if hidden is None:
-            hidden = []
-        hidden.append(hidden_self)
-        return x, hidden
+            new_outer = prev_outer
+            all_outer = prev_outer
+
+        all_outer_normed = self.norm_decompressor(all_outer)
+        all_chunks = self.mha_decompressor(all_normed, all_outer_normed, all_outer_normed)
+        all_chunks = all_chunks + all_pre_norm
+
+        # Decoder: causal self-attention + FFN (independent per chunk)
+        ac = all_chunks
+        all_chunks = self.norm_mha_decoder(all_chunks)
+        all_chunks = self.mha_decoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
+        all_chunks = all_chunks + ac
+
+        ac = all_chunks
+        all_chunks = self.norm_ffn_decoder(all_chunks)
+        all_chunks = self.ffn_decoder(all_chunks)
+        all_chunks = all_chunks + ac
+
+        # Reconstruct output
+        output_parts = []
+        if num_full > 0:
+            output_parts.append(all_chunks[:batch_size * num_full].view(batch_size, full_len, d_model))
+        if rem > 0:
+            rem_start = batch_size * num_full
+            output_parts.append(all_chunks[rem_start:rem_start + batch_size, :rem, :])
+        total_output = torch.cat(output_parts, dim=1)
+        output = total_output[:, offset:offset + seq_len, :]
+
+        # Update hidden state
+        new_inner = combined[:, full_len:] if rem > 0 else None
+        hidden.append((new_inner, new_outer))
+
+        return output, hidden
+
+    def forward(self, x):
+        output, _ = self.step(x, None)
+        return output
+
+    def predict(self, x, hidden):
+        output, hidden = self.step(x.unsqueeze(1), hidden)
+        return output.squeeze(1), hidden
 

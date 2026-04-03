@@ -14,20 +14,20 @@ class RecursiveCompressorLM(nn.Module):
         self.norm = nn.LayerNorm(d_model)
         self.head = nn.Linear(d_model, vocab_size, bias=False)
 
-    def forward(self, input_ids):
-        x = self.embedding(input_ids)
-        for layer in self.layers:
-            x = layer(x)
-        x = self.norm(x)
-        logits = self.head(x)
-        return logits
-
-    def predict(self, input_ids, hidden: list[list[tuple[None | torch.Tensor, None | torch.Tensor]] | None] | None):
+    def step(self, input_ids, hidden):
         x = self.embedding(input_ids)
         if hidden is None:
             hidden = [None] * len(self.layers)
         for i, layer in enumerate(self.layers):
-            x, hidden[i] = layer.predict(x, hidden[i])
+            x, hidden[i] = layer.step(x, hidden[i])
         x = self.norm(x)
         logits = self.head(x)
         return logits, hidden
+
+    def forward(self, input_ids):
+        logits, _ = self.step(input_ids, None)
+        return logits
+
+    def predict(self, input_ids, hidden):
+        logits, hidden = self.step(input_ids.unsqueeze(-1), hidden)
+        return logits.squeeze(1), hidden

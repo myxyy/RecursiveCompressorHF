@@ -28,3 +28,34 @@
 多分理論的には可能だろうという直観はありつつ、だいぶ考えるのが面倒そう
 無理そうであれば相談ください
 
+## 実装結果
+
+### 追加メソッド
+`RecursiveCompressor.step(x, hidden)` および `RecursiveCompressorLM.step(input_ids, hidden)` を実装。
+- 入力: `x (batch, seq_len, d_model)` + `hidden`（隠れ状態、Noneで初期化）
+- 出力: `(batch, seq_len, d_model)` + 更新された `hidden`
+
+### アルゴリズム概要
+1. 前回の未完了チャンク (`inner_context`) と新入力を結合
+2. 完了チャンク群とはみ出し部分に分割
+3. 全チャンクをバッチとしてエンコーダ処理（チャンク内causal attention）
+4. 完了チャンクのみ圧縮→再帰的に `step` →シフトして各チャンクの外部コンテキストを構成
+5. はみ出し部分は直前の外部コンテキストで展開
+6. 全チャンクをバッチとしてデコーダ処理
+7. 新入力に対応する位置のみ出力として返却
+
+### リファクタリング
+`forward` と `predict` は `step` を呼ぶだけの薄いラッパーに置き換え済み:
+- `forward(x)` → `step(x, None)` の出力のみ返却
+- `predict(x, hidden)` → `step(x.unsqueeze(1), hidden)` + squeeze
+
+### 一貫性の根拠
+causal maskにより、各位置の出力はそれ以前の位置にのみ依存する。そのため:
+- どの位置で分割しても同じ結果になる
+- 圧縮のシフト構造により、チャンク i は チャンク 0..i-1 の圧縮結果のみを参照する
+- 再帰呼び出し内部でも同様のcausal性が保たれる
+
+### テスト
+`test_step_split_consistency`: 同一シーケンスを `[3,4]`, `[4,3]`, `[10,14]`, `[14,10]`, `[8,8,8]`, `[5,11,8]`, `[11,5,8]`, `[1,1,1,21]` の各分割でstepした結果がforwardと一致することを検証。
+`test_step_matches_predict_token_by_token`: stepを1トークンずつ呼んだ結果がpredictと一致。
+

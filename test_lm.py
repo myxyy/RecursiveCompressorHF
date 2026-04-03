@@ -90,6 +90,67 @@ class TestRecursiveCompressorLM:
 
         torch.testing.assert_close(predict_logits, forward_logits, atol=1e-4, rtol=1e-4)
 
+    @pytest.mark.parametrize("splits", [
+        ([3, 4],),          # chunk_size未満の分割
+        ([4, 3],),
+        ([10, 14],),        # chunk_sizeをまたぐ分割
+        ([14, 10],),
+        ([8, 8, 8],),       # chunk_size境界ぴったり
+        ([5, 11, 8],),      # 不均等な3分割
+        ([11, 5, 8],),
+        ([1, 1, 1, 21],),   # 1トークンずつ + まとめて
+    ])
+    def test_step_split_consistency(self, model_params, splits):
+        """異なる分割でstepを呼んだ結果がforwardと一致する"""
+        splits = splits[0]
+        total_len = sum(splits)
+        model = RecursiveCompressorLM(**model_params)
+        model.eval()
+
+        input_ids = torch.randint(0, model_params["vocab_size"], (1, total_len))
+
+        with torch.no_grad():
+            forward_logits = model(input_ids)
+
+            hidden = None
+            step_logits_list = []
+            pos = 0
+            for length in splits:
+                chunk = input_ids[:, pos:pos + length]
+                logits, hidden = model.step(chunk, hidden)
+                step_logits_list.append(logits)
+                pos += length
+            step_logits = torch.cat(step_logits_list, dim=1)
+
+        torch.testing.assert_close(step_logits, forward_logits, atol=1e-4, rtol=1e-4)
+
+    def test_step_matches_predict_token_by_token(self, model_params):
+        """stepを1トークンずつ呼んだ結果がpredictと一致する"""
+        seq_len = 24
+        model = RecursiveCompressorLM(**model_params)
+        model.eval()
+
+        input_ids = torch.randint(0, model_params["vocab_size"], (1, seq_len))
+
+        with torch.no_grad():
+            hidden_p = None
+            predict_logits_list = []
+            for t in range(seq_len):
+                token = input_ids[:, t]
+                logits, hidden_p = model.predict(token, hidden_p)
+                predict_logits_list.append(logits)
+            predict_logits = torch.stack(predict_logits_list, dim=1)
+
+            hidden_s = None
+            step_logits_list = []
+            for t in range(seq_len):
+                chunk = input_ids[:, t:t + 1]
+                logits, hidden_s = model.step(chunk, hidden_s)
+                step_logits_list.append(logits)
+            step_logits = torch.cat(step_logits_list, dim=1)
+
+        torch.testing.assert_close(step_logits, predict_logits, atol=1e-4, rtol=1e-4)
+
 
 class TestTextDataset:
     @pytest.fixture
