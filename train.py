@@ -59,17 +59,32 @@ def log(msg):
         print(msg, flush=True)
 
 
-def read_control_command():
-    """Read and clear the control file."""
-    if not os.path.exists(CONTROL_FILE):
-        return None
-    try:
-        with open(CONTROL_FILE, "r") as f:
-            cmd = f.read().strip()
-        os.remove(CONTROL_FILE)
-        return cmd
-    except (OSError, IOError):
-        return None
+CMD_NONE = 0
+CMD_PAUSE = 1
+CMD_RESUME = 2
+CMD_SAVE_AND_EXIT = 3
+_CMD_MAP = {"pause": CMD_PAUSE, "resume": CMD_RESUME, "save_and_exit": CMD_SAVE_AND_EXIT}
+
+
+def read_control_command_synced(device, distributed):
+    """Read control command on rank 0, broadcast to all ranks.
+    Returns one of CMD_NONE, CMD_PAUSE, CMD_RESUME, CMD_SAVE_AND_EXIT."""
+    cmd_tensor = torch.zeros(1, dtype=torch.long, device=device)
+
+    if not distributed or dist.get_rank() == 0:
+        if os.path.exists(CONTROL_FILE):
+            try:
+                with open(CONTROL_FILE, "r") as f:
+                    cmd_str = f.read().strip()
+                os.remove(CONTROL_FILE)
+                cmd_tensor[0] = _CMD_MAP.get(cmd_str, CMD_NONE)
+            except (OSError, IOError):
+                pass
+
+    if distributed:
+        dist.broadcast(cmd_tensor, src=0)
+
+    return cmd_tensor.item()
 
 
 def save_checkpoint(model, optimizer, step, epoch, checkpoint_dir):
@@ -247,15 +262,14 @@ def train():
             if epoch == start_epoch and batch_idx < start_step:
                 continue
 
-            # Check control commands
-            cmd = read_control_command()
-            if cmd == "pause":
+            # Check control commands (synced across all ranks)
+            cmd = read_control_command_synced(device, distributed)
+            if cmd == CMD_PAUSE:
                 log("Training paused. Write 'resume' to control.cmd to continue.")
                 paused = True
-            elif cmd == "resume":
-                log("Training resumed.")
+            elif cmd == CMD_RESUME:
                 paused = False
-            elif cmd == "save_and_exit":
+            elif cmd == CMD_SAVE_AND_EXIT:
                 log("Save and exit requested.")
                 if is_main_process():
                     save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
@@ -266,11 +280,11 @@ def train():
 
             while paused:
                 time.sleep(1)
-                cmd = read_control_command()
-                if cmd == "resume":
+                cmd = read_control_command_synced(device, distributed)
+                if cmd == CMD_RESUME:
                     log("Training resumed.")
                     paused = False
-                elif cmd == "save_and_exit":
+                elif cmd == CMD_SAVE_AND_EXIT:
                     log("Save and exit requested.")
                     if is_main_process():
                         save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
