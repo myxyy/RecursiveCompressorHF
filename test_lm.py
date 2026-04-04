@@ -1,9 +1,11 @@
 import pytest
 import torch
-from unittest.mock import patch, MagicMock
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
-from dataset import TextDataset
+from dataset import (
+    format_document, format_conversation, tokenize_with_bos,
+    _extract_turns_sharegpt, _extract_turns_messages,
+)
 
 
 class TestRecursiveCompressorLM:
@@ -173,59 +175,66 @@ class TestRecursiveCompressorLM:
         torch.testing.assert_close(step_logits, predict_logits, atol=1e-4, rtol=1e-4)
 
 
-class TestTextDataset:
-    @pytest.fixture
-    def mock_tokenizer(self):
+class TestDataFormatting:
+    def test_format_document(self):
+        assert format_document("本日は晴天なり") == "[DOC]本日は晴天なり"
+
+    def test_format_conversation(self):
+        turns = [("質問1", "回答1"), ("質問2", "回答2")]
+        result = format_conversation(turns)
+        assert result == "[QUERY]質問1[ANSWER]回答1[QUERY]質問2[ANSWER]回答2"
+
+    def test_extract_turns_sharegpt(self):
+        conversations = [
+            {"from": "human", "value": "Q1"},
+            {"from": "gpt", "value": "A1"},
+            {"from": "human", "value": "Q2"},
+            {"from": "gpt", "value": "A2"},
+        ]
+        turns = _extract_turns_sharegpt(conversations)
+        assert turns == [("Q1", "A1"), ("Q2", "A2")]
+
+    def test_extract_turns_messages(self):
+        messages = [
+            {"role": "user", "content": "Q1"},
+            {"role": "assistant", "content": "A1"},
+            {"role": "user", "content": "Q2"},
+            {"role": "assistant", "content": "A2"},
+        ]
+        turns = _extract_turns_messages(messages)
+        assert turns == [("Q1", "A1"), ("Q2", "A2")]
+
+    def test_tokenize_with_bos_short(self):
+        """短いテキストはBOS+text+BOS, PADで埋める"""
+        from unittest.mock import MagicMock
         tokenizer = MagicMock()
-        tokenizer.vocab_size = 100
-        # 200 tokens -> (200-1)//32 = 6 samples for context_length=32
-        tokenizer.encode.return_value = list(range(200))
-        return tokenizer
+        tokenizer.bos_token_id = 1
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.return_value = [10, 11, 12]  # 3 tokens
 
-    def test_dataset_length(self, mock_tokenizer, tmp_path):
-        text_file = tmp_path / "test.txt"
-        text_file.write_text("テスト文章です。" * 100)
-        context_length = 32
+        input_ids, labels = tokenize_with_bos(tokenizer, "test", context_length=10)
+        # seq = [1, 10, 11, 12, 1] (len=5)
+        # input = [1, 10, 11, 12], labels = [10, 11, 12, 1]
+        # pad to 9: input = [1,10,11,12,0,0,0,0,0], labels = [10,11,12,1,-100,-100,-100,-100,-100]
+        assert input_ids[:4] == [1, 10, 11, 12]
+        assert labels[:4] == [10, 11, 12, 1]
+        assert all(x == 0 for x in input_ids[4:])
+        assert all(x == -100 for x in labels[4:])
+        assert len(input_ids) == 9
+        assert len(labels) == 9
 
-        with patch("dataset.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
-            dataset = TextDataset(str(tmp_path), "dummy", context_length)
+    def test_tokenize_with_bos_long(self):
+        """長いテキストは末尾BOSなし、truncateされる"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.return_value = list(range(10, 25))  # 15 tokens
 
-        expected_samples = (200 - 1) // context_length
-        assert len(dataset) == expected_samples
-
-    def test_dataset_item_shape(self, mock_tokenizer, tmp_path):
-        text_file = tmp_path / "test.txt"
-        text_file.write_text("テスト文章です。" * 100)
-        context_length = 32
-
-        with patch("dataset.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
-            dataset = TextDataset(str(tmp_path), "dummy", context_length)
-
-        x, y = dataset[0]
-        assert x.shape == (context_length,)
-        assert y.shape == (context_length,)
-
-    def test_dataset_target_shift(self, mock_tokenizer, tmp_path):
-        """ターゲットが入力を1トークンずらしたものになっている"""
-        text_file = tmp_path / "test.txt"
-        text_file.write_text("テスト")
-        context_length = 32
-
-        with patch("dataset.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
-            dataset = TextDataset(str(tmp_path), "dummy", context_length)
-
-        x, y = dataset[0]
-        assert x[0].item() == 0
-        assert y[0].item() == 1
-        assert x[-1].item() == context_length - 1
-        assert y[-1].item() == context_length
-
-    def test_vocab_size(self, mock_tokenizer, tmp_path):
-        text_file = tmp_path / "test.txt"
-        text_file.write_text("テスト")
-        context_length = 32
-
-        with patch("dataset.AutoTokenizer.from_pretrained", return_value=mock_tokenizer):
-            dataset = TextDataset(str(tmp_path), "dummy", context_length)
-
-        assert dataset.vocab_size == 100
+        input_ids, labels = tokenize_with_bos(tokenizer, "test", context_length=10)
+        # seq = [1, 10, 11, ..., 18] truncated to 10
+        # input = [1,10,...,17] (9), labels = [10,11,...,18] (9)
+        assert len(input_ids) == 9
+        assert len(labels) == 9
+        assert input_ids[0] == 1
+        assert labels[0] == 10
