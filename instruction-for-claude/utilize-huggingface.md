@@ -94,3 +94,49 @@ GPU並列で学習を行う
 進捗は適宜コミットを積んでください  
 このドキュメントは適宜追記お願いします  
 以上の記述において不適切と思われる点や不明点あったら質問ください  
+
+---
+
+## 実装結果
+
+### ファイル構成
+| ファイル | 役割 |
+|---|---|
+| `configuration_recursive_compressor.py` | `RecursiveCompressorConfig` (PretrainedConfig) — モデルパラメータを一元管理 |
+| `recursive_compressor_lm.py` | `RecursiveCompressorLM` (PreTrainedModel) — `save_pretrained`/`from_pretrained`/`push_to_hub`対応 |
+| `dataset.py` | HFデータセット読み込み、フォーマット(`[DOC]`/`[QUERY]`/`[ANSWER]`)、トークナイズ、PADマスク |
+| `train.py` | DDP学習スクリプト — `torchrun`対応、RAdamScheduleFree、チェックポイント、制御コマンド |
+| `predict.py` | 推論スクリプト — `from_pretrained`でモデルロード、`step`でプロンプト一括処理 |
+| `.env.example` | データディレクトリ設定例 (`DATA_DIR=./data`) |
+
+### パラメータの一元管理
+`RecursiveCompressorConfig` に全モデルパラメータを集約。`config.json`として保存され、`from_pretrained`で自動復元される。trainとpredictのパラメータ分散は解消。
+
+### データセットフォーマット
+- 文章: `<s>[DOC]text<s>` (コンテキスト長超過時は末尾`<s>`省略)
+- 対話: `<s>[QUERY]q[ANSWER]a<s>[QUERY]q[ANSWER]a<s>`
+- PAD部分のlabelsは`-100`で勾配が流れない
+
+### 制御コマンド
+`control.cmd`ファイルに書き込むことで学習を制御:
+```bash
+echo "pause"         > control.cmd   # 一時停止
+echo "resume"        > control.cmd   # 再開
+echo "save_and_exit" > control.cmd   # 保存して終了
+```
+
+### データの置き場所
+`.env`ファイルで`DATA_DIR`を設定（例: `DATA_DIR=/mnt/raid0/recursive_compressor`）。
+`.env`は`.gitignore`に追加済み、`.env.example`をリポジトリに含む。
+
+### 実行方法
+```bash
+# .envを作成
+echo "DATA_DIR=/mnt/raid0/recursive_compressor" > .env
+
+# 6GPU学習
+uv run torchrun --nproc_per_node=6 train.py
+
+# 推論
+uv run python predict.py "吾輩は猫である。" --model-dir /mnt/raid0/recursive_compressor/final_model
+```
