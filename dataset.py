@@ -1,7 +1,9 @@
+import json
 import os
+import numpy as np
 import torch
 from torch.utils.data import Dataset, ConcatDataset
-from datasets import load_dataset, concatenate_datasets
+from datasets import load_dataset
 from transformers import AutoTokenizer
 
 
@@ -84,100 +86,183 @@ def tokenize_with_bos(tokenizer, text, context_length):
     return input_ids, labels
 
 
-class TokenizedDataset(Dataset):
-    """事前トークナイズ済みデータセット。各サンプルは (input_ids, labels) のペア。"""
+def _tokenize_to_seq(tokenizer, text, context_length):
+    """トークナイズしてcontext_length長のシーケンス(PAD埋め)を返す。memmap保存用。"""
+    bos = tokenizer.bos_token_id
+    pad = tokenizer.pad_token_id
+    tokens = tokenizer.encode(text, add_special_tokens=False)
 
-    def __init__(self, data):
-        self.data = data
+    if len(tokens) + 2 <= context_length:
+        seq = [bos] + tokens + [bos]
+    else:
+        seq = [bos] + tokens
+
+    seq = seq[:context_length]
+    pad_len = context_length - len(seq)
+    if pad_len > 0:
+        seq = seq + [pad] * pad_len
+
+    return seq
+
+
+class MemmapDataset(Dataset):
+    """numpy memmapファイルからサンプルを読み出すデータセット。
+    各サンプルはcontext_length長のトークン列で、__getitem__で(input_ids, labels)に変換。"""
+
+    def __init__(self, cache_path, pad_token_id):
+        with open(cache_path + ".meta.json", "r") as f:
+            meta = json.load(f)
+        self.num_samples = meta["num_samples"]
+        self.context_length = meta["context_length"]
+        self.pad_token_id = pad_token_id
+        self.data = np.memmap(
+            cache_path, dtype=np.uint16, mode="r",
+            shape=(self.num_samples, self.context_length),
+        )
 
     def __len__(self):
-        return len(self.data)
+        return self.num_samples
 
     def __getitem__(self, idx):
-        input_ids, labels = self.data[idx]
-        return torch.tensor(input_ids, dtype=torch.long), torch.tensor(labels, dtype=torch.long)
+        seq = torch.from_numpy(self.data[idx].astype(np.int64))
+        input_ids = seq[:-1]
+        labels = seq[1:].clone()
+        labels[labels == self.pad_token_id] = -100
+        return input_ids, labels
 
 
-def prepare_document_dataset(dataset_name, subset, split, tokenizer, context_length, cache_dir=None):
-    """文章データセットを読み込みトークナイズする"""
-    if subset:
-        ds = load_dataset(dataset_name, subset, split=split, cache_dir=cache_dir)
+def _build_memmap(cache_path, items, tokenizer, context_length, format_fn):
+    """イテレータからmemmapキャッシュを構築する。
+    format_fn: item -> formatted text string (or None to skip)"""
+    os.makedirs(os.path.dirname(cache_path), exist_ok=True)
+
+    # First pass: count valid samples
+    count = 0
+    for item in items:
+        text = format_fn(item)
+        if text is not None:
+            count += 1
+
+    if count == 0:
+        with open(cache_path + ".meta.json", "w") as f:
+            json.dump({"num_samples": 0, "context_length": context_length}, f)
+        return
+
+    # Create memmap
+    mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(count, context_length))
+
+    # Second pass: tokenize and write
+    idx = 0
+    for item in items:
+        text = format_fn(item)
+        if text is None:
+            continue
+        seq = _tokenize_to_seq(tokenizer, text, context_length)
+        mmap[idx] = np.array(seq, dtype=np.uint16)
+        idx += 1
+        if idx % 10000 == 0:
+            mmap.flush()
+            print(f"  {idx}/{count}", flush=True)
+
+    mmap.flush()
+    del mmap
+
+    with open(cache_path + ".meta.json", "w") as f:
+        json.dump({"num_samples": count, "context_length": context_length}, f)
+
+
+def _format_doc_item(item):
+    return format_document(item["text"])
+
+
+def _format_sharegpt_item(item):
+    turns = _extract_turns_sharegpt(item["conversations"])
+    if not turns:
+        return None
+    return format_conversation(turns)
+
+
+def _format_messages_item(item):
+    turns = _extract_turns_messages(item["messages"])
+    if not turns:
+        return None
+    return format_conversation(turns)
+
+
+def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, format_fn):
+    """キャッシュがあればロード、なければ構築して返す"""
+    if os.path.exists(cache_path + ".meta.json"):
+        print(f"  Using cache: {cache_path}")
     else:
-        ds = load_dataset(dataset_name, split=split, cache_dir=cache_dir)
+        print(f"  Building cache: {cache_path}")
+        ds = load_fn()
+        _build_memmap(cache_path, ds, tokenizer, context_length, format_fn)
 
-    data = []
-    for item in ds:
-        text = format_document(item["text"])
-        input_ids, labels = tokenize_with_bos(tokenizer, text, context_length)
-        data.append((input_ids, labels))
+    with open(cache_path + ".meta.json", "r") as f:
+        meta = json.load(f)
+    if meta["num_samples"] == 0:
+        return None
 
-    return TokenizedDataset(data)
-
-
-def prepare_conversation_dataset_sharegpt(dataset_name, split, tokenizer, context_length, cache_dir=None):
-    """ShareGPT形式の対話データセットを読み込みトークナイズする"""
-    ds = load_dataset(dataset_name, split=split, cache_dir=cache_dir)
-
-    data = []
-    for item in ds:
-        turns = _extract_turns_sharegpt(item["conversations"])
-        if not turns:
-            continue
-        text = format_conversation(turns)
-        input_ids, labels = tokenize_with_bos(tokenizer, text, context_length)
-        data.append((input_ids, labels))
-
-    return TokenizedDataset(data)
-
-
-def prepare_conversation_dataset_messages(dataset_name, split, tokenizer, context_length, cache_dir=None):
-    """messages形式の対話データセットを読み込みトークナイズする"""
-    ds = load_dataset(dataset_name, split=split, cache_dir=cache_dir)
-
-    data = []
-    for item in ds:
-        turns = _extract_turns_messages(item["messages"])
-        if not turns:
-            continue
-        text = format_conversation(turns)
-        input_ids, labels = tokenize_with_bos(tokenizer, text, context_length)
-        data.append((input_ids, labels))
-
-    return TokenizedDataset(data)
+    return MemmapDataset(cache_path, tokenizer.pad_token_id)
 
 
 def prepare_all_datasets(context_length, cache_dir=None):
     """全データセットを準備して結合する"""
     tokenizer = get_tokenizer()
+    if cache_dir is None:
+        cache_dir = "./data/hf_cache"
+    mmap_dir = os.path.join(cache_dir, "mmap")
+
+    sources = [
+        {
+            "name": "wikimedia/wikipedia (ja)",
+            "cache_name": "wiki_ja",
+            "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
+            "format": _format_doc_item,
+        },
+        {
+            "name": "wikimedia/wikipedia (en)",
+            "cache_name": "wiki_en",
+            "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.en", split="train", cache_dir=cache_dir),
+            "format": _format_doc_item,
+        },
+        {
+            "name": "JeanKaddour/minipile",
+            "cache_name": "minipile",
+            "load": lambda: load_dataset("JeanKaddour/minipile", split="train", cache_dir=cache_dir),
+            "format": _format_doc_item,
+        },
+        {
+            "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
+            "cache_name": "shi3z_llama2pro",
+            "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
+            "format": _format_sharegpt_item,
+        },
+        {
+            "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
+            "cache_name": "shi3z_orion14b",
+            "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
+            "format": _format_sharegpt_item,
+        },
+        {
+            "name": "HuggingFaceH4/ultrachat_200k",
+            "cache_name": "ultrachat",
+            "load": lambda: load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft", cache_dir=cache_dir),
+            "format": _format_messages_item,
+        },
+    ]
 
     datasets = []
-
-    # Document datasets
-    print("Loading wikimedia/wikipedia (ja)...")
-    datasets.append(prepare_document_dataset(
-        "wikimedia/wikipedia", "20231101.ja", "train", tokenizer, context_length, cache_dir))
-
-    print("Loading wikimedia/wikipedia (en)...")
-    datasets.append(prepare_document_dataset(
-        "wikimedia/wikipedia", "20231101.en", "train", tokenizer, context_length, cache_dir))
-
-    print("Loading JeanKaddour/minipile...")
-    datasets.append(prepare_document_dataset(
-        "JeanKaddour/minipile", None, "train", tokenizer, context_length, cache_dir))
-
-    # Conversation datasets (ShareGPT format)
-    print("Loading shi3z/ja_conv_wikipedia_llama2pro8b_30k...")
-    datasets.append(prepare_conversation_dataset_sharegpt(
-        "shi3z/ja_conv_wikipedia_llama2pro8b_30k", "train", tokenizer, context_length, cache_dir))
-
-    print("Loading shi3z/ja_conv_wikipedia_orion14B_100K...")
-    datasets.append(prepare_conversation_dataset_sharegpt(
-        "shi3z/ja_conv_wikipedia_orion14B_100K", "train", tokenizer, context_length, cache_dir))
-
-    # Conversation datasets (messages format)
-    print("Loading HuggingFaceH4/ultrachat_200k...")
-    datasets.append(prepare_conversation_dataset_messages(
-        "HuggingFaceH4/ultrachat_200k", "train_sft", tokenizer, context_length, cache_dir))
+    for src in sources:
+        print(f"Loading {src['name']}...")
+        cache_path = os.path.join(mmap_dir, f"{src['cache_name']}.mmap")
+        ds = _prepare_cached_dataset(
+            src["name"], cache_path, tokenizer, context_length,
+            src["load"], src["format"],
+        )
+        if ds is not None:
+            datasets.append(ds)
+            print(f"  Samples: {len(ds)}")
 
     combined = ConcatDataset(datasets)
     print(f"Total samples: {len(combined)}")

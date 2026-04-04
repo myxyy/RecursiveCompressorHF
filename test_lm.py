@@ -1,3 +1,5 @@
+import json
+import numpy as np
 import pytest
 import torch
 from configuration_recursive_compressor import RecursiveCompressorConfig
@@ -5,6 +7,7 @@ from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import (
     format_document, format_conversation, tokenize_with_bos,
     _extract_turns_sharegpt, _extract_turns_messages,
+    _build_memmap, _format_doc_item, MemmapDataset,
 )
 
 
@@ -222,6 +225,46 @@ class TestDataFormatting:
         assert all(x == -100 for x in labels[4:])
         assert len(input_ids) == 9
         assert len(labels) == 9
+
+    def test_memmap_dataset(self, tmp_path):
+        """MemmapDatasetの構築と読み出し"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.return_value = [10, 11, 12]
+
+        items = [{"text": "hello"}, {"text": "world"}]
+        cache_path = str(tmp_path / "test.mmap")
+
+        _build_memmap(cache_path, items, tokenizer, context_length=8, format_fn=_format_doc_item)
+
+        ds = MemmapDataset(cache_path, pad_token_id=0)
+        assert len(ds) == 2
+
+        input_ids, labels = ds[0]
+        assert input_ids.shape == (7,)
+        assert labels.shape == (7,)
+        # seq = [1, 10, 11, 12, 1, 0, 0, 0] -> input=[1,10,11,12,1,0,0], labels=[10,11,12,1,0,0,0]
+        assert input_ids[0].item() == 1  # BOS
+        assert labels[0].item() == 10
+        # PAD positions in labels should be -100
+        assert labels[-1].item() == -100
+
+    def test_memmap_cache_reuse(self, tmp_path):
+        """キャッシュが存在する場合は再構築しない"""
+        cache_path = str(tmp_path / "test.mmap")
+        context_length = 8
+        # Create a dummy cache
+        data = np.zeros((3, context_length), dtype=np.uint16)
+        mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(3, context_length))
+        mmap[:] = data
+        mmap.flush()
+        with open(cache_path + ".meta.json", "w") as f:
+            json.dump({"num_samples": 3, "context_length": context_length}, f)
+
+        ds = MemmapDataset(cache_path, pad_token_id=0)
+        assert len(ds) == 3
 
     def test_tokenize_with_bos_long(self):
         """長いテキストは末尾BOSなし、truncateされる"""
