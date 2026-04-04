@@ -11,3 +11,6 @@ wheels/
 
 text/*.txt
 *.pth
+
+# Environment config
+.env

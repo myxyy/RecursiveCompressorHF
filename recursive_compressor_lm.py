@@ -1,18 +1,25 @@
 import torch
 import torch.nn as nn
+from transformers import PreTrainedModel
+from transformers.modeling_outputs import CausalLMOutput
+
+from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor import RecursiveCompressor
 
 
-class RecursiveCompressorLM(nn.Module):
-    def __init__(self, vocab_size, d_model, num_heads, d_ff, chunk_size, compress_size, num_layers):
-        super(RecursiveCompressorLM, self).__init__()
-        self.embedding = nn.Embedding(vocab_size, d_model)
+class RecursiveCompressorLM(PreTrainedModel):
+    config_class = RecursiveCompressorConfig
+
+    def __init__(self, config: RecursiveCompressorConfig):
+        super().__init__(config)
+        self.embedding = nn.Embedding(config.vocab_size, config.d_model)
         self.layers = nn.ModuleList([
-            RecursiveCompressor(d_model, num_heads, d_ff, chunk_size, compress_size)
-            for _ in range(num_layers)
+            RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
+            for _ in range(config.num_layers)
         ])
-        self.norm = nn.LayerNorm(d_model)
-        self.head = nn.Linear(d_model, vocab_size, bias=False)
+        self.norm = nn.LayerNorm(config.d_model)
+        self.head = nn.Linear(config.d_model, config.vocab_size, bias=False)
+        self.post_init()
 
     def step(self, input_ids, hidden):
         x = self.embedding(input_ids)
@@ -24,9 +31,12 @@ class RecursiveCompressorLM(nn.Module):
         logits = self.head(x)
         return logits, hidden
 
-    def forward(self, input_ids):
+    def forward(self, input_ids, labels=None, **kwargs):
         logits, _ = self.step(input_ids, None)
-        return logits
+        loss = None
+        if labels is not None:
+            loss = nn.CrossEntropyLoss()(logits.view(-1, self.config.vocab_size), labels.view(-1))
+        return CausalLMOutput(loss=loss, logits=logits)
 
     def predict(self, input_ids, hidden):
         logits, hidden = self.step(input_ids.unsqueeze(-1), hidden)

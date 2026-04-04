@@ -1,14 +1,15 @@
 import pytest
 import torch
 from unittest.mock import patch, MagicMock
+from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import TextDataset
 
 
 class TestRecursiveCompressorLM:
     @pytest.fixture
-    def model_params(self):
-        return dict(
+    def config(self):
+        return RecursiveCompressorConfig(
             vocab_size=100,
             d_model=64,
             num_heads=4,
@@ -19,66 +20,86 @@ class TestRecursiveCompressorLM:
         )
 
     @pytest.fixture
-    def model(self, model_params):
-        return RecursiveCompressorLM(**model_params)
+    def model(self, config):
+        return RecursiveCompressorLM(config)
 
-    def test_output_shape(self, model, model_params):
+    def test_output_shape(self, model, config):
         batch_size, seq_len = 2, 32
-        input_ids = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        logits = model(input_ids)
-        assert logits.shape == (batch_size, seq_len, model_params["vocab_size"])
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        output = model(input_ids)
+        assert output.logits.shape == (batch_size, seq_len, config.vocab_size)
 
-    def test_output_shape_non_divisible_seq_len(self, model, model_params):
+    def test_output_shape_non_divisible_seq_len(self, model, config):
         """chunk_sizeで割り切れないシーケンス長でも正しく動作する"""
-        batch_size, seq_len = 2, 30  # 30 is not divisible by chunk_size=8
-        input_ids = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        logits = model(input_ids)
-        assert logits.shape == (batch_size, seq_len, model_params["vocab_size"])
+        batch_size, seq_len = 2, 30
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        output = model(input_ids)
+        assert output.logits.shape == (batch_size, seq_len, config.vocab_size)
 
-    def test_single_chunk(self, model, model_params):
+    def test_single_chunk(self, model, config):
         """チャンクが1つだけの場合（再帰なし）"""
         batch_size = 2
-        seq_len = model_params["chunk_size"]
-        input_ids = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        logits = model(input_ids)
-        assert logits.shape == (batch_size, seq_len, model_params["vocab_size"])
+        seq_len = config.chunk_size
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        output = model(input_ids)
+        assert output.logits.shape == (batch_size, seq_len, config.vocab_size)
 
-    def test_loss_computation(self, model, model_params):
-        """CrossEntropyLossが正常に計算できる"""
+    def test_loss_computation(self, model, config):
+        """labelsを渡すとlossが計算される"""
         batch_size, seq_len = 2, 32
-        input_ids = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        target = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        logits = model(input_ids)
-        loss = torch.nn.CrossEntropyLoss()(logits.view(-1, model_params["vocab_size"]), target.view(-1))
-        assert loss.item() > 0
-        loss.backward()
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        labels = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        output = model(input_ids, labels=labels)
+        assert output.loss is not None
+        assert output.loss.item() > 0
+        output.loss.backward()
 
-    def test_gradient_flow(self, model, model_params):
+    def test_no_loss_without_labels(self, model, config):
+        """labelsなしではlossはNone"""
+        input_ids = torch.randint(0, config.vocab_size, (2, 32))
+        output = model(input_ids)
+        assert output.loss is None
+
+    def test_gradient_flow(self, model, config):
         """全パラメータに勾配が流れる"""
         batch_size, seq_len = 2, 32
-        input_ids = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        target = torch.randint(0, model_params["vocab_size"], (batch_size, seq_len))
-        logits = model(input_ids)
-        loss = torch.nn.CrossEntropyLoss()(logits.view(-1, model_params["vocab_size"]), target.view(-1))
-        loss.backward()
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        labels = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        output = model(input_ids, labels=labels)
+        output.loss.backward()
         for name, param in model.named_parameters():
             assert param.grad is not None, f"No gradient for {name}"
 
-    def test_num_layers(self, model_params):
+    def test_num_layers(self, config):
         """レイヤー数が正しい"""
-        model = RecursiveCompressorLM(**model_params)
-        assert len(model.layers) == model_params["num_layers"]
+        model = RecursiveCompressorLM(config)
+        assert len(model.layers) == config.num_layers
+
+    def test_save_and_load(self, model, config, tmp_path):
+        """save_pretrained / from_pretrained の動作確認"""
+        model.save_pretrained(tmp_path)
+        loaded = RecursiveCompressorLM.from_pretrained(tmp_path)
+        assert loaded.config.d_model == config.d_model
+        assert loaded.config.num_layers == config.num_layers
+
+        input_ids = torch.randint(0, config.vocab_size, (1, 16))
+        model.eval()
+        loaded.eval()
+        with torch.no_grad():
+            orig = model(input_ids).logits
+            reloaded = loaded(input_ids).logits
+        torch.testing.assert_close(orig, reloaded)
 
     @pytest.mark.parametrize("seq_len", [1, 7, 8, 16, 24, 32])
-    def test_predict_matches_forward(self, model_params, seq_len):
+    def test_predict_matches_forward(self, config, seq_len):
         """predictを1トークンずつ呼んだ結果がforwardと一致する"""
-        model = RecursiveCompressorLM(**model_params)
+        model = RecursiveCompressorLM(config)
         model.eval()
 
-        input_ids = torch.randint(0, model_params["vocab_size"], (1, seq_len))
+        input_ids = torch.randint(0, config.vocab_size, (1, seq_len))
 
         with torch.no_grad():
-            forward_logits = model(input_ids)
+            forward_logits = model(input_ids).logits
 
             hidden = None
             predict_logits_list = []
@@ -91,26 +112,26 @@ class TestRecursiveCompressorLM:
         torch.testing.assert_close(predict_logits, forward_logits, atol=1e-4, rtol=1e-4)
 
     @pytest.mark.parametrize("splits", [
-        ([3, 4],),          # chunk_size未満の分割
+        ([3, 4],),
         ([4, 3],),
-        ([10, 14],),        # chunk_sizeをまたぐ分割
+        ([10, 14],),
         ([14, 10],),
-        ([8, 8, 8],),       # chunk_size境界ぴったり
-        ([5, 11, 8],),      # 不均等な3分割
+        ([8, 8, 8],),
+        ([5, 11, 8],),
         ([11, 5, 8],),
-        ([1, 1, 1, 21],),   # 1トークンずつ + まとめて
+        ([1, 1, 1, 21],),
     ])
-    def test_step_split_consistency(self, model_params, splits):
+    def test_step_split_consistency(self, config, splits):
         """異なる分割でstepを呼んだ結果がforwardと一致する"""
         splits = splits[0]
         total_len = sum(splits)
-        model = RecursiveCompressorLM(**model_params)
+        model = RecursiveCompressorLM(config)
         model.eval()
 
-        input_ids = torch.randint(0, model_params["vocab_size"], (1, total_len))
+        input_ids = torch.randint(0, config.vocab_size, (1, total_len))
 
         with torch.no_grad():
-            forward_logits = model(input_ids)
+            forward_logits = model(input_ids).logits
 
             hidden = None
             step_logits_list = []
@@ -124,13 +145,13 @@ class TestRecursiveCompressorLM:
 
         torch.testing.assert_close(step_logits, forward_logits, atol=1e-4, rtol=1e-4)
 
-    def test_step_matches_predict_token_by_token(self, model_params):
+    def test_step_matches_predict_token_by_token(self, config):
         """stepを1トークンずつ呼んだ結果がpredictと一致する"""
         seq_len = 24
-        model = RecursiveCompressorLM(**model_params)
+        model = RecursiveCompressorLM(config)
         model.eval()
 
-        input_ids = torch.randint(0, model_params["vocab_size"], (1, seq_len))
+        input_ids = torch.randint(0, config.vocab_size, (1, seq_len))
 
         with torch.no_grad():
             hidden_p = None
@@ -194,7 +215,6 @@ class TestTextDataset:
             dataset = TextDataset(str(tmp_path), "dummy", context_length)
 
         x, y = dataset[0]
-        # x = [0, 1, ..., 31], y = [1, 2, ..., 32]
         assert x[0].item() == 0
         assert y[0].item() == 1
         assert x[-1].item() == context_length - 1
