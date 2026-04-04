@@ -327,8 +327,9 @@ def train():
                     eta_str = "..."
                 log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Step {global_step}/{total_steps}, Loss: {avg_loss:.4f}, ETA: {eta_str}")
 
-            if global_step % CHECKPOINT_INTERVAL == 0 and is_main_process():
-                save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
+            if global_step % CHECKPOINT_INTERVAL == 0:
+                if is_main_process():
+                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
                 if distributed:
                     dist.barrier()
 
