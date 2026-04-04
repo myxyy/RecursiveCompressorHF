@@ -133,6 +133,7 @@ def train():
     # Determine rank before init_process_group (torchrun sets these env vars)
     distributed = "RANK" in os.environ
     rank = int(os.environ.get("RANK", 0))
+    local_rank = int(os.environ.get("LOCAL_RANK", 0))
 
     data_dir = get_data_dir()
     checkpoint_dir = get_checkpoint_dir()
@@ -143,29 +144,37 @@ def train():
     sentinel_path = os.path.join(cache_dir, "mmap", ".cache_ready")
     if rank == 0:
         print("Preparing datasets...", flush=True)
-        prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
-        os.makedirs(os.path.dirname(sentinel_path), exist_ok=True)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
         with open(sentinel_path, "w") as f:
             f.write("ready")
         print("Cache ready.", flush=True)
     else:
+        print(f"[rank {rank}] Waiting for cache...", flush=True)
         while not os.path.exists(sentinel_path):
-            time.sleep(5)
+            time.sleep(2)
+        print(f"[rank {rank}] Loading cached datasets...", flush=True)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+        print(f"[rank {rank}] Datasets loaded.", flush=True)
 
-    # Now safe to init process group — all ranks have cache ready
+    # All ranks have datasets loaded — now safe to init process group
+    print(f"[rank {rank}] Initializing process group...", flush=True)
     if distributed:
         dist.init_process_group("nccl")
         world_size = dist.get_world_size()
-        device = torch.device(f"cuda:{rank}")
+        device = torch.device(f"cuda:{local_rank}")
         torch.cuda.set_device(device)
     else:
         world_size = 1
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # Remove sentinel after all ranks have initialized
+    if distributed:
+        dist.barrier()
+    if rank == 0 and os.path.exists(sentinel_path):
+        os.remove(sentinel_path)
+
     batch_size_per_gpu = 1
 
-    # Tokenizer and config
-    tokenizer = get_tokenizer()
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
         d_model=1024,
@@ -178,12 +187,6 @@ def train():
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
     )
-
-    # Load cached datasets (all ranks — fast, just opens memmaps)
-    full_dataset, _ = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
-    # Remove sentinel so next run rebuilds if needed
-    if rank == 0 and os.path.exists(sentinel_path):
-        os.remove(sentinel_path)
 
     val_size = max(1, int(len(full_dataset) * VALIDATION_RATIO))
     train_size = len(full_dataset) - val_size
