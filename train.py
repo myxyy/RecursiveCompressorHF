@@ -258,9 +258,14 @@ def train():
         num_batches = 0
         paused = False
         total_steps = len(train_loader)
+        skip_batches = start_step if epoch == start_epoch else 0
+        if skip_batches > 0:
+            log(f"Skipping {skip_batches} batches to resume...")
         train_start_time = time.time()
 
         for batch_idx, (input_ids, labels) in enumerate(train_loader):
+            if batch_idx < skip_batches:
+                continue
 
             # Check control commands (synced across all ranks)
             cmd = read_control_command_synced(device, distributed)
