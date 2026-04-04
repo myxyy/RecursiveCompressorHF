@@ -132,13 +132,14 @@ def load_latest_checkpoint(model, optimizer, checkpoint_dir):
     latest = os.path.join(checkpoint_dir, checkpoints[-1])
     log(f"Resuming from checkpoint: {latest}")
 
-    # Load model weights
+    # Load model weights via from_pretrained (reads safetensors correctly)
     unwrapped = model.module if isinstance(model, DDP) else model
-    state_dict = torch.load(os.path.join(latest, "model.safetensors"), map_location="cpu", weights_only=True)
-    unwrapped.load_state_dict(state_dict)
+    loaded = RecursiveCompressorLM.from_pretrained(latest)
+    unwrapped.load_state_dict(loaded.state_dict())
+    del loaded
 
-    # Load training state
-    training_state = torch.load(os.path.join(latest, "training_state.pt"), map_location="cpu", weights_only=True)
+    # Load training state (weights_only=False needed for schedule_free optimizer state)
+    training_state = torch.load(os.path.join(latest, "training_state.pt"), map_location="cpu", weights_only=False)
     optimizer.load_state_dict(training_state["optimizer_state_dict"])
 
     return training_state["step"], training_state["epoch"]
