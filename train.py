@@ -261,9 +261,6 @@ def train():
         train_start_time = time.time()
 
         for batch_idx, (input_ids, labels) in enumerate(train_loader):
-            # Skip already-processed batches on resume
-            if epoch == start_epoch and batch_idx < start_step:
-                continue
 
             # Check control commands (synced across all ranks)
             cmd = read_control_command_synced(device, distributed)
@@ -314,17 +311,16 @@ def train():
             if global_step % 100 == 0:
                 avg_loss = total_loss / num_batches
                 elapsed = time.time() - train_start_time
-                steps_done = num_batches
-                if steps_done > 0:
-                    secs_per_step = elapsed / steps_done
-                    remaining_steps = total_steps - steps_done
+                if num_batches > 0:
+                    secs_per_step = elapsed / num_batches
+                    remaining_steps = total_steps - batch_idx - 1
                     eta_secs = secs_per_step * remaining_steps
                     eta_h = int(eta_secs // 3600)
                     eta_m = int((eta_secs % 3600) // 60)
                     eta_str = f"{eta_h}h{eta_m:02d}m"
                 else:
                     eta_str = "..."
-                log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Step {steps_done}/{total_steps}, Loss: {avg_loss:.4f}, ETA: {eta_str}")
+                log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Step {global_step}/{total_steps}, Loss: {avg_loss:.4f}, ETA: {eta_str}")
 
             if global_step % CHECKPOINT_INTERVAL == 0 and is_main_process():
                 save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
