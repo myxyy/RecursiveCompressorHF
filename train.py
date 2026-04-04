@@ -164,8 +164,14 @@ def train():
         eos_token_id=tokenizer.eos_token_id,
     )
 
-    # Dataset
-    log("Preparing datasets...")
+    # Dataset - rank 0 builds cache, others wait
+    if rank == 0:
+        log("Preparing datasets...")
+        prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+    if distributed:
+        dist.barrier()
+    if rank != 0:
+        log("Loading cached datasets...")
     full_dataset, _ = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
 
     val_size = max(1, int(len(full_dataset) * VALIDATION_RATIO))

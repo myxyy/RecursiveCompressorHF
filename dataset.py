@@ -132,43 +132,65 @@ class MemmapDataset(Dataset):
 
 
 def _build_memmap(cache_path, items, tokenizer, context_length, format_fn):
-    """イテレータからmemmapキャッシュを構築する。
-    format_fn: item -> formatted text string (or None to skip)"""
+    """イテレータからmemmapキャッシュを構築する（1パス）。
+    format_fn: item -> formatted text string (or None to skip)
+    まずチャンク単位でnpyファイルに書き出し、最後に1つのmemmapに結合する。"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
-    # First pass: count valid samples
-    count = 0
-    for item in items:
-        text = format_fn(item)
-        if text is not None:
-            count += 1
+    CHUNK_SIZE = 50000
+    chunk_dir = cache_path + ".chunks"
+    os.makedirs(chunk_dir, exist_ok=True)
 
-    if count == 0:
-        with open(cache_path + ".meta.json", "w") as f:
-            json.dump({"num_samples": 0, "context_length": context_length}, f)
-        return
+    chunk_files = []
+    buf = []
+    total = 0
 
-    # Create memmap
-    mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(count, context_length))
-
-    # Second pass: tokenize and write
-    idx = 0
     for item in items:
         text = format_fn(item)
         if text is None:
             continue
         seq = _tokenize_to_seq(tokenizer, text, context_length)
-        mmap[idx] = np.array(seq, dtype=np.uint16)
-        idx += 1
-        if idx % 10000 == 0:
-            mmap.flush()
-            print(f"  {idx}/{count}", flush=True)
+        buf.append(np.array(seq, dtype=np.uint16))
+        if len(buf) >= CHUNK_SIZE:
+            chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
+            np.save(chunk_path, np.stack(buf))
+            total += len(buf)
+            print(f"  {total} samples processed", flush=True)
+            chunk_files.append(chunk_path)
+            buf = []
 
+    # Flush remaining
+    if buf:
+        chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
+        np.save(chunk_path, np.stack(buf))
+        total += len(buf)
+        chunk_files.append(chunk_path)
+        buf = []
+
+    if total == 0:
+        with open(cache_path + ".meta.json", "w") as f:
+            json.dump({"num_samples": 0, "context_length": context_length}, f)
+        import shutil
+        shutil.rmtree(chunk_dir, ignore_errors=True)
+        return
+
+    # Merge chunks into a single memmap
+    mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(total, context_length))
+    offset = 0
+    for chunk_path in chunk_files:
+        chunk = np.load(chunk_path)
+        mmap[offset:offset + len(chunk)] = chunk
+        offset += len(chunk)
     mmap.flush()
     del mmap
 
     with open(cache_path + ".meta.json", "w") as f:
-        json.dump({"num_samples": count, "context_length": context_length}, f)
+        json.dump({"num_samples": total, "context_length": context_length}, f)
+
+    # Clean up chunk files
+    import shutil
+    shutil.rmtree(chunk_dir, ignore_errors=True)
+    print(f"  Cache built: {total} samples", flush=True)
 
 
 def _format_doc_item(item):
