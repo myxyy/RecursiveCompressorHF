@@ -130,24 +130,39 @@ def load_latest_checkpoint(model, optimizer, checkpoint_dir):
 
 
 def train():
-    # Distributed setup
+    # Determine rank before init_process_group (torchrun sets these env vars)
     distributed = "RANK" in os.environ
-    if distributed:
-        dist.init_process_group("nccl")
-        rank = dist.get_rank()
-        world_size = dist.get_world_size()
-        device = torch.device(f"cuda:{rank}")
-        torch.cuda.set_device(device)
-    else:
-        rank = 0
-        world_size = 1
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    batch_size_per_gpu = 1
+    rank = int(os.environ.get("RANK", 0))
 
     data_dir = get_data_dir()
     checkpoint_dir = get_checkpoint_dir()
     cache_dir = os.path.join(data_dir, "hf_cache")
+
+    # Build dataset cache BEFORE init_process_group to avoid NCCL timeout.
+    # Rank 0 builds, others poll for completion via sentinel file.
+    sentinel_path = os.path.join(cache_dir, "mmap", ".cache_ready")
+    if rank == 0:
+        print("Preparing datasets...", flush=True)
+        prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+        os.makedirs(os.path.dirname(sentinel_path), exist_ok=True)
+        with open(sentinel_path, "w") as f:
+            f.write("ready")
+        print("Cache ready.", flush=True)
+    else:
+        while not os.path.exists(sentinel_path):
+            time.sleep(5)
+
+    # Now safe to init process group — all ranks have cache ready
+    if distributed:
+        dist.init_process_group("nccl")
+        world_size = dist.get_world_size()
+        device = torch.device(f"cuda:{rank}")
+        torch.cuda.set_device(device)
+    else:
+        world_size = 1
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    batch_size_per_gpu = 1
 
     # Tokenizer and config
     tokenizer = get_tokenizer()
@@ -164,15 +179,11 @@ def train():
         eos_token_id=tokenizer.eos_token_id,
     )
 
-    # Dataset - rank 0 builds cache, others wait
-    if rank == 0:
-        log("Preparing datasets...")
-        prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
-    if distributed:
-        dist.barrier()
-    if rank != 0:
-        log("Loading cached datasets...")
+    # Load cached datasets (all ranks — fast, just opens memmaps)
     full_dataset, _ = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+    # Remove sentinel so next run rebuilds if needed
+    if rank == 0 and os.path.exists(sentinel_path):
+        os.remove(sentinel_path)
 
     val_size = max(1, int(len(full_dataset) * VALIDATION_RATIO))
     train_size = len(full_dataset) - val_size
