@@ -6,12 +6,12 @@ from recursive_compressor_lm import RecursiveCompressorLM
 
 def predict(prompt, context_length=1024, temperature=1.0, weights_path="recursive_compressor_lm.pth"):
     tokenizer_name = "elyza/ELYZA-japanese-Llama-2-7b-fast"
-    d_model = 512
+    d_model = 1024
     num_heads = 8
     d_ff = 2048
     chunk_size = 8
     compress_size = 4
-    num_layers = 4
+    num_layers = 8
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     tokenizer = AutoTokenizer.from_pretrained(tokenizer_name)

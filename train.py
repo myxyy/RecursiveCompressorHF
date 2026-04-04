@@ -10,16 +10,16 @@ def train():
     # Hyperparameters
     text_dir = "text"
     tokenizer_name = "elyza/ELYZA-japanese-Llama-2-7b-fast"
-    context_length = 2048
-    d_model = 512
+    context_length = 4096
+    d_model = 1024
     num_heads = 8
     d_ff = 2048
     chunk_size = 8
     compress_size = 4
-    num_layers = 4
-    batch_size = 4
+    num_layers = 8
+    batch_size = 1
     num_epochs = 10
-    learning_rate = 3e-4
+    learning_rate = 1e-4
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
