@@ -103,7 +103,7 @@ class RecursiveCompressor(nn.Module):
         if rem > 0:
             rem_part = combined[:, full_len:]
             padding_len = self.chunk_size - rem
-            rem_padded = torch.cat([rem_part, torch.zeros(batch_size, padding_len, d_model, device=x.device)], dim=1)
+            rem_padded = torch.cat([rem_part, torch.zeros(batch_size, padding_len, d_model, dtype=x.dtype, device=x.device)], dim=1)
             parts.append(rem_padded)
 
         all_chunks = torch.cat(parts, dim=0)
