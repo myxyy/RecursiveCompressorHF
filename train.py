@@ -265,7 +265,8 @@ def train():
             train_sampler.set_epoch(epoch)
 
         accum_loss = 0.0
-        total_loss = 0.0
+        ema_loss = None
+        EMA_BETA = 0.99
         num_optimizer_steps = 0
         paused = False
         skip_batches = start_step * GRAD_ACCUM_STEPS if epoch == start_epoch else 0
@@ -332,10 +333,10 @@ def train():
 
                 global_step += 1
                 num_optimizer_steps += 1
-                total_loss += accum_loss / GRAD_ACCUM_STEPS
+                step_loss = accum_loss / GRAD_ACCUM_STEPS
+                ema_loss = step_loss if ema_loss is None else EMA_BETA * ema_loss + (1 - EMA_BETA) * step_loss
 
                 if global_step % LOG_INTERVAL == 0:
-                    avg_loss = total_loss / num_optimizer_steps
                     elapsed = time.time() - train_start_time
                     step_time = time.time() - step_start_time
                     tokens_per_sec = (CONTEXT_LENGTH * batch_size_per_gpu * world_size * GRAD_ACCUM_STEPS * LOG_INTERVAL) / step_time
@@ -350,7 +351,7 @@ def train():
                         eta_str = "..."
                     log(
                         f"Step {global_step}/{total_optimizer_steps} | "
-                        f"Loss: {avg_loss:.4f} | "
+                        f"Loss: {ema_loss:.4f} | "
                         f"GradNorm: {grad_norm:.4f} | "
                         f"Tok/s: {tokens_per_sec:.0f} | "
                         f"ETA: {eta_str}"
