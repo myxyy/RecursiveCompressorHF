@@ -7,7 +7,8 @@ from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import (
     format_document, format_conversation, tokenize_with_bos,
     _extract_turns_sharegpt, _extract_turns_messages,
-    _build_memmap, _format_doc_item, MemmapDataset,
+    _build_memmap, _build_memmap_packed, _format_doc_item,
+    _pack_sequences, MemmapDataset,
 )
 
 
@@ -226,8 +227,49 @@ class TestDataFormatting:
         assert len(input_ids) == 9
         assert len(labels) == 9
 
+    def test_pack_sequences_short_docs(self):
+        """短い文書が結合される"""
+        seqs = [[1, 10, 11, 1], [1, 20, 21, 1], [1, 30, 1]]
+        # total: 4+4+3=11, context_length=10
+        # first pack: [1,10,11,1,1,20,21,1,0,0] (8 tokens + 2 pad)
+        # second pack: [1,30,1,0,0,0,0,0,0,0]
+        packed = _pack_sequences(seqs, context_length=10, pad_token_id=0)
+        assert len(packed) == 2
+        assert len(packed[0]) == 10
+        assert len(packed[1]) == 10
+        assert packed[0][:8] == [1, 10, 11, 1, 1, 20, 21, 1]
+        assert packed[1][:3] == [1, 30, 1]
+
+    def test_pack_sequences_long_doc(self):
+        """長い文書はtruncateされる"""
+        seqs = [list(range(20))]
+        packed = _pack_sequences(seqs, context_length=10, pad_token_id=0)
+        assert len(packed) == 1
+        assert packed[0] == list(range(10))
+
+    def test_memmap_packed(self, tmp_path):
+        """パック付きMemmapDatasetの構築と読み出し"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.return_value = [10, 11, 12]
+
+        items = [{"text": "hello"}, {"text": "world"}]
+        cache_path = str(tmp_path / "test.mmap")
+
+        _build_memmap_packed(cache_path, items, tokenizer, context_length=16, format_fn=_format_doc_item)
+
+        ds = MemmapDataset(cache_path, pad_token_id=0)
+        # Two short docs (5 tokens each with BOS) should pack into 1 sample
+        assert len(ds) == 1
+
+        input_ids, labels = ds[0]
+        assert input_ids.shape == (15,)
+        assert input_ids[0].item() == 1  # BOS
+
     def test_memmap_dataset(self, tmp_path):
-        """MemmapDatasetの構築と読み出し"""
+        """MemmapDatasetの構築と読み出し（パック有り）"""
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
@@ -240,14 +282,11 @@ class TestDataFormatting:
         _build_memmap(cache_path, items, tokenizer, context_length=8, format_fn=_format_doc_item)
 
         ds = MemmapDataset(cache_path, pad_token_id=0)
-        assert len(ds) == 2
 
         input_ids, labels = ds[0]
         assert input_ids.shape == (7,)
         assert labels.shape == (7,)
-        # seq = [1, 10, 11, 12, 1, 0, 0, 0] -> input=[1,10,11,12,1,0,0], labels=[10,11,12,1,0,0,0]
         assert input_ids[0].item() == 1  # BOS
-        assert labels[0].item() == 10
         # PAD positions in labels should be -100
         assert labels[-1].item() == -100
 

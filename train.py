@@ -16,6 +16,7 @@ Control commands (write to control.cmd file during training):
 
 import os
 import time
+from contextlib import nullcontext
 import torch
 import torch.nn as nn
 import torch.distributed as dist
@@ -32,14 +33,16 @@ from dataset import prepare_all_datasets, get_tokenizer
 load_dotenv()
 
 # Hyperparameters
-CONTEXT_LENGTH = 4096
+CONTEXT_LENGTH = 2048
 LEARNING_RATE = 3e-4
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
-CHECKPOINT_INTERVAL = 1000  # Save every N steps
+GRAD_ACCUM_STEPS = 4
+CHECKPOINT_INTERVAL = 1000  # Save every N optimizer steps
 MAX_CHECKPOINTS = 2
 VALIDATION_RATIO = 0.001
 CONTROL_FILE = "control.cmd"
+LOG_INTERVAL = 10  # Log every N optimizer steps
 
 
 def get_data_dir():
@@ -138,7 +141,7 @@ def load_latest_checkpoint(model, optimizer, checkpoint_dir):
 
     # Load model weights via from_pretrained (reads safetensors correctly)
     unwrapped = model.module if isinstance(model, DDP) else model
-    loaded = RecursiveCompressorLM.from_pretrained(latest)
+    loaded = RecursiveCompressorLM.from_pretrained(latest, torch_dtype=torch.bfloat16)
     unwrapped.load_state_dict(loaded.state_dict())
     del loaded
 
@@ -194,6 +197,7 @@ def train():
         os.remove(sentinel_path)
 
     batch_size_per_gpu = 1
+    effective_batch_size = batch_size_per_gpu * world_size * GRAD_ACCUM_STEPS
 
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
@@ -202,7 +206,7 @@ def train():
         d_ff=2048,
         chunk_size=8,
         compress_size=4,
-        num_layers=8,
+        num_layers=32,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
@@ -235,14 +239,15 @@ def train():
         num_workers=2, pin_memory=True,
     )
 
-    # Model
-    model = RecursiveCompressorLM(config).to(device)
+    # Model (bfloat16)
+    model = RecursiveCompressorLM(config).to(dtype=torch.bfloat16, device=device)
     if distributed:
-        model = DDP(model, device_ids=[rank])
+        model = DDP(model, device_ids=[local_rank])
 
     num_params = sum(p.numel() for p in model.parameters())
     log(f"Parameters: {num_params:,}")
-    log(f"Device: {device}, World size: {world_size}")
+    log(f"Device: {device}, World size: {world_size}, Effective batch size: {effective_batch_size}")
+    log(f"Context length: {CONTEXT_LENGTH}, Grad accum steps: {GRAD_ACCUM_STEPS}, dtype: bfloat16")
 
     # Optimizer
     optimizer = RAdamScheduleFree(model.parameters(), lr=LEARNING_RATE)
@@ -252,46 +257,36 @@ def train():
     global_step = start_step
 
     # Training loop
+    total_optimizer_steps = len(train_loader) // GRAD_ACCUM_STEPS
     for epoch in range(start_epoch, NUM_EPOCHS):
         model.train()
         optimizer.train()
         if distributed:
             train_sampler.set_epoch(epoch)
 
+        accum_loss = 0.0
         total_loss = 0.0
-        num_batches = 0
+        num_optimizer_steps = 0
         paused = False
-        total_steps = len(train_loader)
-        skip_batches = start_step if epoch == start_epoch else 0
+        skip_batches = start_step * GRAD_ACCUM_STEPS if epoch == start_epoch else 0
         if skip_batches > 0:
             log(f"Skipping {skip_batches} batches to resume...")
         train_start_time = time.time()
+        step_start_time = time.time()
 
         for batch_idx, (input_ids, labels) in enumerate(train_loader):
             if batch_idx < skip_batches:
                 continue
 
-            # Check control commands (synced across all ranks)
-            cmd = read_control_command_synced(device, distributed)
-            if cmd == CMD_PAUSE:
-                log("Training paused. Write 'resume' to control.cmd to continue.")
-                paused = True
-            elif cmd == CMD_RESUME:
-                paused = False
-            elif cmd == CMD_SAVE_AND_EXIT:
-                log("Save and exit requested.")
-                if is_main_process():
-                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
-                if distributed:
-                    dist.barrier()
-                    dist.destroy_process_group()
-                return
+            micro_step = batch_idx % GRAD_ACCUM_STEPS
 
-            while paused:
-                time.sleep(1)
+            # Check control commands at the start of each accumulation cycle
+            if micro_step == 0:
                 cmd = read_control_command_synced(device, distributed)
-                if cmd == CMD_RESUME:
-                    log("Training resumed.")
+                if cmd == CMD_PAUSE:
+                    log("Training paused. Write 'resume' to control.cmd to continue.")
+                    paused = True
+                elif cmd == CMD_RESUME:
                     paused = False
                 elif cmd == CMD_SAVE_AND_EXIT:
                     log("Save and exit requested.")
@@ -302,40 +297,73 @@ def train():
                         dist.destroy_process_group()
                     return
 
+                while paused:
+                    time.sleep(1)
+                    cmd = read_control_command_synced(device, distributed)
+                    if cmd == CMD_RESUME:
+                        log("Training resumed.")
+                        paused = False
+                    elif cmd == CMD_SAVE_AND_EXIT:
+                        log("Save and exit requested.")
+                        if is_main_process():
+                            save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
+                        if distributed:
+                            dist.barrier()
+                            dist.destroy_process_group()
+                        return
+
             input_ids = input_ids.to(device)
             labels = labels.to(device)
 
-            output = model(input_ids, labels=labels)
-            loss = output.loss
+            # Disable gradient sync for accumulation steps (except the last)
+            context = model.no_sync() if (distributed and micro_step < GRAD_ACCUM_STEPS - 1) else nullcontext()
+            with context:
+                output = model(input_ids, labels=labels)
+                loss = output.loss / GRAD_ACCUM_STEPS
+                loss.backward()
 
-            optimizer.zero_grad()
-            loss.backward()
-            nn.utils.clip_grad_norm_(model.parameters(), GRAD_CLIP)
-            optimizer.step()
+            accum_loss += output.loss.item()
 
-            total_loss += loss.item()
-            num_batches += 1
-            global_step += 1
+            # Optimizer step at the end of accumulation
+            if micro_step == GRAD_ACCUM_STEPS - 1:
+                grad_norm = nn.utils.clip_grad_norm_(model.parameters(), GRAD_CLIP).item()
+                optimizer.step()
+                optimizer.zero_grad()
 
-            if global_step % 100 == 0:
-                avg_loss = total_loss / num_batches
-                elapsed = time.time() - train_start_time
-                if num_batches > 0:
-                    secs_per_step = elapsed / num_batches
-                    remaining_steps = total_steps - batch_idx - 1
-                    eta_secs = secs_per_step * remaining_steps
-                    eta_h = int(eta_secs // 3600)
-                    eta_m = int((eta_secs % 3600) // 60)
-                    eta_str = f"{eta_h}h{eta_m:02d}m"
-                else:
-                    eta_str = "..."
-                log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Step {global_step}/{total_steps}, Loss: {avg_loss:.4f}, ETA: {eta_str}")
+                global_step += 1
+                num_optimizer_steps += 1
+                total_loss += accum_loss / GRAD_ACCUM_STEPS
 
-            if global_step % CHECKPOINT_INTERVAL == 0:
-                if is_main_process():
-                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
-                if distributed:
-                    dist.barrier()
+                if global_step % LOG_INTERVAL == 0:
+                    avg_loss = total_loss / num_optimizer_steps
+                    elapsed = time.time() - train_start_time
+                    step_time = time.time() - step_start_time
+                    tokens_per_sec = (CONTEXT_LENGTH * batch_size_per_gpu * world_size * GRAD_ACCUM_STEPS * LOG_INTERVAL) / step_time
+                    remaining_steps = total_optimizer_steps - num_optimizer_steps
+                    if num_optimizer_steps > 0:
+                        secs_per_step = elapsed / num_optimizer_steps
+                        eta_secs = secs_per_step * remaining_steps
+                        eta_h = int(eta_secs // 3600)
+                        eta_m = int((eta_secs % 3600) // 60)
+                        eta_str = f"{eta_h}h{eta_m:02d}m"
+                    else:
+                        eta_str = "..."
+                    log(
+                        f"Step {global_step}/{total_optimizer_steps} | "
+                        f"Loss: {avg_loss:.4f} | "
+                        f"GradNorm: {grad_norm:.4f} | "
+                        f"Tok/s: {tokens_per_sec:.0f} | "
+                        f"ETA: {eta_str}"
+                    )
+                    step_start_time = time.time()
+
+                if global_step % CHECKPOINT_INTERVAL == 0:
+                    if is_main_process():
+                        save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
+                    if distributed:
+                        dist.barrier()
+
+                accum_loss = 0.0
 
         # Epoch-end validation
         model.eval()
@@ -360,7 +388,7 @@ def train():
 
         # Epoch-end checkpoint
         if is_main_process():
-            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir)
+            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir, tokenizer)
         if distributed:
             dist.barrier()
 

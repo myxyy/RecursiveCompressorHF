@@ -86,23 +86,39 @@ def tokenize_with_bos(tokenizer, text, context_length):
     return input_ids, labels
 
 
-def _tokenize_to_seq(tokenizer, text, context_length):
-    """トークナイズしてcontext_length長のシーケンス(PAD埋め)を返す。memmap保存用。"""
+def _tokenize_single(tokenizer, text):
+    """テキストをBOS付きでトークナイズ。末尾BOSも付ける。パディングなし。"""
     bos = tokenizer.bos_token_id
-    pad = tokenizer.pad_token_id
     tokens = tokenizer.encode(text, add_special_tokens=False)
+    return [bos] + tokens + [bos]
 
-    if len(tokens) + 2 <= context_length:
-        seq = [bos] + tokens + [bos]
-    else:
-        seq = [bos] + tokens
 
-    seq = seq[:context_length]
-    pad_len = context_length - len(seq)
-    if pad_len > 0:
-        seq = seq + [pad] * pad_len
+def _pack_sequences(token_seqs, context_length, pad_token_id):
+    """複数のトークン列をcontext_length長のシーケンスに詰め込む。
+    短い文書を連結してPADの無駄を減らす。"""
+    packed = []
+    current = []
 
-    return seq
+    for seq in token_seqs:
+        if len(seq) >= context_length:
+            # 長い文書はそのままtruncateして1サンプルに
+            packed.append(seq[:context_length])
+            continue
+
+        if len(current) + len(seq) <= context_length:
+            current.extend(seq)
+        else:
+            # 現在のバッファをPAD埋めして確定
+            pad_len = context_length - len(current)
+            packed.append(current + [pad_token_id] * pad_len)
+            current = list(seq)
+
+    # 残りのバッファ
+    if current:
+        pad_len = context_length - len(current)
+        packed.append(current + [pad_token_id] * pad_len)
+
+    return packed
 
 
 class MemmapDataset(Dataset):
@@ -131,51 +147,56 @@ class MemmapDataset(Dataset):
         return input_ids, labels
 
 
-def _build_memmap(cache_path, items, tokenizer, context_length, format_fn):
-    """イテレータからmemmapキャッシュを構築する（1パス）。
-    format_fn: item -> formatted text string (or None to skip)
-    まずチャンク単位でnpyファイルに書き出し、最後に1つのmemmapに結合する。"""
+def _build_memmap_packed(cache_path, items, tokenizer, context_length, format_fn):
+    """イテレータからmemmapキャッシュを構築する（短文結合あり）。
+    format_fn: item -> formatted text string (or None to skip)"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
+    pad = tokenizer.pad_token_id
+
+    # Phase 1: tokenize all items into variable-length sequences
     CHUNK_SIZE = 50000
     chunk_dir = cache_path + ".chunks"
     os.makedirs(chunk_dir, exist_ok=True)
 
+    token_seqs = []
     chunk_files = []
-    buf = []
-    total = 0
+    total_items = 0
 
     for item in items:
         text = format_fn(item)
         if text is None:
             continue
-        seq = _tokenize_to_seq(tokenizer, text, context_length)
-        buf.append(np.array(seq, dtype=np.uint16))
-        if len(buf) >= CHUNK_SIZE:
+        seq = _tokenize_single(tokenizer, text)
+        token_seqs.append(seq)
+        total_items += 1
+
+        if len(token_seqs) >= CHUNK_SIZE:
+            # Pack and save chunk
+            packed = _pack_sequences(token_seqs, context_length, pad)
             chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
-            np.save(chunk_path, np.stack(buf))
-            total += len(buf)
-            print(f"  {total} samples processed", flush=True)
+            np.save(chunk_path, np.array(packed, dtype=np.uint16))
             chunk_files.append(chunk_path)
-            buf = []
+            print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
+            token_seqs = []
 
     # Flush remaining
-    if buf:
+    if token_seqs:
+        packed = _pack_sequences(token_seqs, context_length, pad)
         chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
-        np.save(chunk_path, np.stack(buf))
-        total += len(buf)
+        np.save(chunk_path, np.array(packed, dtype=np.uint16))
         chunk_files.append(chunk_path)
-        buf = []
 
-    if total == 0:
+    if not chunk_files:
         with open(cache_path + ".meta.json", "w") as f:
             json.dump({"num_samples": 0, "context_length": context_length}, f)
         import shutil
         shutil.rmtree(chunk_dir, ignore_errors=True)
         return
 
-    # Merge chunks into a single memmap
-    mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(total, context_length))
+    # Phase 2: merge chunks into a single memmap
+    total_samples = sum(len(np.load(f)) for f in chunk_files)
+    mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(total_samples, context_length))
     offset = 0
     for chunk_path in chunk_files:
         chunk = np.load(chunk_path)
@@ -185,12 +206,15 @@ def _build_memmap(cache_path, items, tokenizer, context_length, format_fn):
     del mmap
 
     with open(cache_path + ".meta.json", "w") as f:
-        json.dump({"num_samples": total, "context_length": context_length}, f)
+        json.dump({"num_samples": total_samples, "context_length": context_length}, f)
 
-    # Clean up chunk files
     import shutil
     shutil.rmtree(chunk_dir, ignore_errors=True)
-    print(f"  Cache built: {total} samples", flush=True)
+    print(f"  Cache built: {total_items} items -> {total_samples} packed samples", flush=True)
+
+
+# Keep old name for compatibility
+_build_memmap = _build_memmap_packed
 
 
 def _format_doc_item(item):
@@ -218,7 +242,7 @@ def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn
     else:
         print(f"  Building cache: {cache_path}")
         ds = load_fn()
-        _build_memmap(cache_path, ds, tokenizer, context_length, format_fn)
+        _build_memmap_packed(cache_path, ds, tokenizer, context_length, format_fn)
 
     with open(cache_path + ".meta.json", "r") as f:
         meta = json.load(f)
@@ -229,7 +253,7 @@ def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn
 
 
 def prepare_all_datasets(context_length, cache_dir=None):
-    """全データセットを準備して結合する"""
+    """全データセットを準備して結合する（日本語のみ）"""
     tokenizer = get_tokenizer()
     if cache_dir is None:
         cache_dir = "./data/hf_cache"
@@ -238,39 +262,21 @@ def prepare_all_datasets(context_length, cache_dir=None):
     sources = [
         {
             "name": "wikimedia/wikipedia (ja)",
-            "cache_name": "wiki_ja",
+            "cache_name": "wiki_ja_packed",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
             "format": _format_doc_item,
         },
         {
-            "name": "wikimedia/wikipedia (en)",
-            "cache_name": "wiki_en",
-            "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.en", split="train", cache_dir=cache_dir),
-            "format": _format_doc_item,
-        },
-        {
-            "name": "JeanKaddour/minipile",
-            "cache_name": "minipile",
-            "load": lambda: load_dataset("JeanKaddour/minipile", split="train", cache_dir=cache_dir),
-            "format": _format_doc_item,
-        },
-        {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
-            "cache_name": "shi3z_llama2pro",
+            "cache_name": "shi3z_llama2pro_packed",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
             "format": _format_sharegpt_item,
         },
         {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
-            "cache_name": "shi3z_orion14b",
+            "cache_name": "shi3z_orion14b_packed",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
             "format": _format_sharegpt_item,
-        },
-        {
-            "name": "HuggingFaceH4/ultrachat_200k",
-            "cache_name": "ultrachat",
-            "load": lambda: load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft", cache_dir=cache_dir),
-            "format": _format_messages_item,
         },
     ]
 
