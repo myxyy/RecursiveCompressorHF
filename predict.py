@@ -11,9 +11,11 @@ Usage:
 """
 
 import argparse
+import os
 import torch
 from transformers import AutoTokenizer
 
+from dataset import TOKENIZER_NAME
 from recursive_compressor_lm import RecursiveCompressorLM
 
 
@@ -23,7 +25,11 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0):
     model = RecursiveCompressorLM.from_pretrained(model_dir).to(device)
     model.eval()
 
-    tokenizer = AutoTokenizer.from_pretrained(model_dir)
+    # Use tokenizer from model dir if available, otherwise fall back to default
+    if os.path.exists(os.path.join(model_dir, "tokenizer_config.json")):
+        tokenizer = AutoTokenizer.from_pretrained(model_dir)
+    else:
+        tokenizer = AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 
     token_ids = tokenizer.encode(prompt)
     generated = list(token_ids)

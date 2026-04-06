@@ -87,7 +87,7 @@ def read_control_command_synced(device, distributed):
     return cmd_tensor.item()
 
 
-def save_checkpoint(model, optimizer, step, epoch, checkpoint_dir):
+def save_checkpoint(model, optimizer, step, epoch, checkpoint_dir, tokenizer=None):
     """Save checkpoint, keeping only the latest MAX_CHECKPOINTS."""
     os.makedirs(checkpoint_dir, exist_ok=True)
     path = os.path.join(checkpoint_dir, f"checkpoint-{step}")
@@ -95,6 +95,10 @@ def save_checkpoint(model, optimizer, step, epoch, checkpoint_dir):
     # Save model (unwrap DDP if needed)
     unwrapped = model.module if isinstance(model, DDP) else model
     unwrapped.save_pretrained(path)
+
+    # Save tokenizer alongside model for predict.py compatibility
+    if tokenizer is not None:
+        tokenizer.save_pretrained(path)
 
     # Save optimizer and training state
     torch.save({
@@ -277,7 +281,7 @@ def train():
             elif cmd == CMD_SAVE_AND_EXIT:
                 log("Save and exit requested.")
                 if is_main_process():
-                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
+                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
                 if distributed:
                     dist.barrier()
                     dist.destroy_process_group()
@@ -292,7 +296,7 @@ def train():
                 elif cmd == CMD_SAVE_AND_EXIT:
                     log("Save and exit requested.")
                     if is_main_process():
-                        save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
+                        save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
                     if distributed:
                         dist.barrier()
                         dist.destroy_process_group()
@@ -329,7 +333,7 @@ def train():
 
             if global_step % CHECKPOINT_INTERVAL == 0:
                 if is_main_process():
-                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir)
+                    save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
                 if distributed:
                     dist.barrier()
 
