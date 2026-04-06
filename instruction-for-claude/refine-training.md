@@ -104,4 +104,21 @@ RecursiveCompressorの積層数を4倍にするのがよさそう
 のように1データずつパディングするのではなく
 `<s>[DOC]いろはにほへと<s>[DOC]ちりぬるを<s>[DOC]わかよたれそ...`  
 みたいにまとめちゃってますか？参考としてお見せしたレポジトリが確かそんな感じの実装だったので…単に末尾の`<s>`のあとに`[DOC]`を予測しているだけかもですが念のため確認です
-回答：
+回答：結合はしていません。`dataset.py`の`_tokenize_to_seq`で1サンプルずつ`<s>[DOC]テキスト<s>`の形にトークナイズし、残りをPADで埋めています。`MemmapDataset.__getitem__`でPAD位置のlabelsは-100にマスクされるので、PAD部分からは勾配が流れません。  
+出力例の`出力1<s>[DOC]出力2<s>[DOC]...`パターンは、モデルが末尾の`<s>`の次に`[DOC]`が来るパターンを学習した結果、生成時にそれを繰り返しているだけです。
+
+## Claudeからの追加改善案
+
+### bfloat16対応
+モデルサイズ拡大に伴いVRAM消費を抑えるため、bfloat16での学習は有効。`RecursiveCompressorConfig`に`torch_dtype`を設定し、モデル初期化時に`model.to(dtype=torch.bfloat16)`とする。
+
+### gradient accumulation
+バッチサイズを大きくする代わりに、gradient accumulationで実効バッチサイズを増やすことも検討可能。現状バッチサイズ1/GPUだが、accumulation_steps=4にすれば実効バッチサイズ24（6GPU×4）になり、学習が安定する可能性がある。
+
+### PAD割合の問題
+context_length=4096に対してWikipediaの1記事が短い場合、大半がPADになり計算効率が悪い。対策として:
+- 短い文書を複数結合してcontext_lengthを埋める（ただし現状の要件と矛盾するため要検討）
+- context_lengthを文書長の分布に合わせて調整
+
+### ログにloss以外の指標を追加
+学習率、勾配ノルム、スループット（tokens/sec）等を表示すると学習状況の把握に役立つ。
