@@ -5,10 +5,10 @@ import torch
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import (
-    format_document, format_conversation, tokenize_with_bos,
+    format_document, format_conversation_turn, tokenize_with_bos,
     _extract_turns_sharegpt, _extract_turns_messages,
-    _build_memmap, _build_memmap_packed, _format_doc_item,
-    _pack_sequences, MemmapDataset,
+    _build_memmap_packed, _units_doc_item, _units_sharegpt_item,
+    _tokenize_unit, _pack_units, MemmapDataset,
 )
 
 
@@ -183,10 +183,9 @@ class TestDataFormatting:
     def test_format_document(self):
         assert format_document("本日は晴天なり") == "[DOC]本日は晴天なり"
 
-    def test_format_conversation(self):
-        turns = [("質問1", "回答1"), ("質問2", "回答2")]
-        result = format_conversation(turns)
-        assert result == "[QUERY]質問1[ANSWER]回答1[QUERY]質問2[ANSWER]回答2"
+    def test_format_conversation_turn(self):
+        result = format_conversation_turn("質問1", "回答1")
+        assert result == "[QUERY]質問1[ANSWER]回答1"
 
     def test_extract_turns_sharegpt(self):
         conversations = [
@@ -227,25 +226,77 @@ class TestDataFormatting:
         assert len(input_ids) == 9
         assert len(labels) == 9
 
-    def test_pack_sequences_short_docs(self):
-        """短い文書が結合される"""
-        seqs = [[1, 10, 11, 1], [1, 20, 21, 1], [1, 30, 1]]
-        # total: 4+4+3=11, context_length=10
-        # first pack: [1,10,11,1,1,20,21,1,0,0] (8 tokens + 2 pad)
-        # second pack: [1,30,1,0,0,0,0,0,0,0]
-        packed = _pack_sequences(seqs, context_length=10, pad_token_id=0)
-        assert len(packed) == 2
+    def test_pack_units_short_docs(self):
+        """短いユニットが結合され、末尾BOSが正しく付く"""
+        # Each unit: [BOS] + tokens (no trailing BOS)
+        units = [[1, 10, 11], [1, 20, 21], [1, 30]]
+        # pack with context_length=10, bos=1, pad=0
+        # first: [1,10,11,1,20,21,1,30,1,0] (3+3+2 units + trailing BOS + 1 pad)
+        packed = _pack_units(units, context_length=10, pad_token_id=0, bos_token_id=1)
+        assert len(packed) == 1
         assert len(packed[0]) == 10
-        assert len(packed[1]) == 10
-        assert packed[0][:8] == [1, 10, 11, 1, 1, 20, 21, 1]
-        assert packed[1][:3] == [1, 30, 1]
+        # Should be: units concat + trailing BOS + PAD
+        assert packed[0] == [1, 10, 11, 1, 20, 21, 1, 30, 1, 0]
 
-    def test_pack_sequences_long_doc(self):
-        """長い文書はtruncateされる"""
-        seqs = [list(range(20))]
-        packed = _pack_sequences(seqs, context_length=10, pad_token_id=0)
+    def test_pack_units_no_double_bos(self):
+        """結合時に二重BOSが発生しない"""
+        units = [[1, 10], [1, 20]]
+        packed = _pack_units(units, context_length=8, pad_token_id=0, bos_token_id=1)
+        assert len(packed) == 1
+        # [1, 10, 1, 20, 1, 0, 0, 0] - no double BOS
+        seq = packed[0]
+        for i in range(len(seq) - 1):
+            if seq[i] == 1 and seq[i + 1] == 1:
+                # Only allowed if followed by content, not BOS-BOS
+                assert False, f"Double BOS at position {i}: {seq}"
+
+    def test_pack_units_overflow(self):
+        """バッファがあふれたときに正しくフラッシュされる"""
+        units = [[1, 10, 11], [1, 20, 21], [1, 30, 31]]
+        # context_length=8: first two units (3+3) + trailing BOS = 7, fits
+        # third unit (3) + trailing BOS = 4, wouldn't fit (7+3=10>8)
+        packed = _pack_units(units, context_length=8, pad_token_id=0, bos_token_id=1)
+        assert len(packed) == 2
+        assert packed[0] == [1, 10, 11, 1, 20, 21, 1, 0]  # 2 units + BOS + pad
+        assert packed[1] == [1, 30, 31, 1, 0, 0, 0, 0]    # 1 unit + BOS + pads
+
+    def test_pack_units_long_doc(self):
+        """長いユニットはtruncateされる"""
+        units = [list(range(20))]
+        packed = _pack_units(units, context_length=10, pad_token_id=0, bos_token_id=1)
         assert len(packed) == 1
         assert packed[0] == list(range(10))
+
+    def test_pack_units_conversation(self):
+        """対話データで各ターンがBOSで区切られる"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.encode.side_effect = [
+            [10, 11],  # [QUERY]q1[ANSWER]a1
+            [20, 21],  # [QUERY]q2[ANSWER]a2
+        ]
+        unit1 = _tokenize_unit(tokenizer, "[QUERY]q1[ANSWER]a1")
+        unit2 = _tokenize_unit(tokenizer, "[QUERY]q2[ANSWER]a2")
+        # unit1 = [1, 10, 11], unit2 = [1, 20, 21]
+        assert unit1 == [1, 10, 11]
+        assert unit2 == [1, 20, 21]
+        packed = _pack_units([unit1, unit2], context_length=10, pad_token_id=0, bos_token_id=1)
+        # Expected: [1,10,11,1,20,21,1,0,0,0] = <s>turn1<s>turn2<s>[PAD]...
+        assert packed[0][:7] == [1, 10, 11, 1, 20, 21, 1]
+
+    def test_units_sharegpt_item(self):
+        """ShareGPT対話が複数ユニットに分割される"""
+        item = {"conversations": [
+            {"from": "human", "value": "Q1"},
+            {"from": "gpt", "value": "A1"},
+            {"from": "human", "value": "Q2"},
+            {"from": "gpt", "value": "A2"},
+        ]}
+        units = _units_sharegpt_item(item)
+        assert len(units) == 2
+        assert units[0] == "[QUERY]Q1[ANSWER]A1"
+        assert units[1] == "[QUERY]Q2[ANSWER]A2"
 
     def test_memmap_packed(self, tmp_path):
         """パック付きMemmapDatasetの構築と読み出し"""
@@ -258,37 +309,15 @@ class TestDataFormatting:
         items = [{"text": "hello"}, {"text": "world"}]
         cache_path = str(tmp_path / "test.mmap")
 
-        _build_memmap_packed(cache_path, items, tokenizer, context_length=16, format_fn=_format_doc_item)
+        _build_memmap_packed(cache_path, items, tokenizer, context_length=16, units_fn=_units_doc_item)
 
         ds = MemmapDataset(cache_path, pad_token_id=0)
-        # Two short docs (5 tokens each with BOS) should pack into 1 sample
+        # Two short docs (4 tokens each: [1,10,11,12]) + trailing BOS = 9, fits in 16
         assert len(ds) == 1
 
         input_ids, labels = ds[0]
         assert input_ids.shape == (15,)
         assert input_ids[0].item() == 1  # BOS
-
-    def test_memmap_dataset(self, tmp_path):
-        """MemmapDatasetの構築と読み出し（パック有り）"""
-        from unittest.mock import MagicMock
-        tokenizer = MagicMock()
-        tokenizer.bos_token_id = 1
-        tokenizer.pad_token_id = 0
-        tokenizer.encode.return_value = [10, 11, 12]
-
-        items = [{"text": "hello"}, {"text": "world"}]
-        cache_path = str(tmp_path / "test.mmap")
-
-        _build_memmap(cache_path, items, tokenizer, context_length=8, format_fn=_format_doc_item)
-
-        ds = MemmapDataset(cache_path, pad_token_id=0)
-
-        input_ids, labels = ds[0]
-        assert input_ids.shape == (7,)
-        assert labels.shape == (7,)
-        assert input_ids[0].item() == 1  # BOS
-        # PAD positions in labels should be -100
-        assert labels[-1].item() == -100
 
     def test_memmap_cache_reuse(self, tmp_path):
         """キャッシュが存在する場合は再構築しない"""

@@ -22,12 +22,9 @@ def format_document(text):
     return f"[DOC]{text}"
 
 
-def format_conversation(turns):
-    """対話データのフォーマット: [QUERY]q[ANSWER]a"""
-    parts = []
-    for query, answer in turns:
-        parts.append(f"[QUERY]{query}[ANSWER]{answer}")
-    return "".join(parts)
+def format_conversation_turn(query, answer):
+    """対話の1ターン: [QUERY]q[ANSWER]a"""
+    return f"[QUERY]{query}[ANSWER]{answer}"
 
 
 def _extract_turns_sharegpt(conversations):
@@ -86,37 +83,46 @@ def tokenize_with_bos(tokenizer, text, context_length):
     return input_ids, labels
 
 
-def _tokenize_single(tokenizer, text):
-    """テキストをBOS付きでトークナイズ。末尾BOSも付ける。パディングなし。"""
+def _tokenize_unit(tokenizer, text):
+    """テキストを1ユニットとしてトークナイズ。先頭BOSのみ、末尾BOSなし。
+    ユニット = [BOS] + encode(text)"""
     bos = tokenizer.bos_token_id
     tokens = tokenizer.encode(text, add_special_tokens=False)
-    return [bos] + tokens + [bos]
+    return [bos] + tokens
 
 
-def _pack_sequences(token_seqs, context_length, pad_token_id):
-    """複数のトークン列をcontext_length長のシーケンスに詰め込む。
-    短い文書を連結してPADの無駄を減らす。"""
+def _pack_units(units, context_length, pad_token_id, bos_token_id):
+    """ユニットのリストをcontext_length長のシーケンスに詰め込む。
+    各ユニットは[BOS]+tokensの形。パック結果は末尾にBOSを付加。
+    結果: <s>unit1<s>unit2<s>[PAD]..."""
     packed = []
     current = []
 
-    for seq in token_seqs:
-        if len(seq) >= context_length:
-            # 長い文書はそのままtruncateして1サンプルに
-            packed.append(seq[:context_length])
+    for unit in units:
+        # +1 for trailing BOS that will be appended
+        if len(unit) + 1 >= context_length:
+            # Long unit: truncate to context_length (no trailing BOS)
+            packed.append(unit[:context_length])
             continue
 
-        if len(current) + len(seq) <= context_length:
-            current.extend(seq)
+        if len(current) + len(unit) + 1 <= context_length:
+            # Fits in current buffer
+            current.extend(unit)
         else:
-            # 現在のバッファをPAD埋めして確定
+            # Flush current buffer: add trailing BOS + PAD
+            current.append(bos_token_id)
             pad_len = context_length - len(current)
             packed.append(current + [pad_token_id] * pad_len)
-            current = list(seq)
+            current = list(unit)
 
-    # 残りのバッファ
+    # Flush remaining buffer
     if current:
+        current.append(bos_token_id)
         pad_len = context_length - len(current)
-        packed.append(current + [pad_token_id] * pad_len)
+        if pad_len > 0:
+            packed.append(current + [pad_token_id] * pad_len)
+        else:
+            packed.append(current[:context_length])
 
     return packed
 
@@ -147,42 +153,42 @@ class MemmapDataset(Dataset):
         return input_ids, labels
 
 
-def _build_memmap_packed(cache_path, items, tokenizer, context_length, format_fn):
+def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn):
     """イテレータからmemmapキャッシュを構築する（短文結合あり）。
-    format_fn: item -> formatted text string (or None to skip)"""
+    units_fn: item -> list of unit strings (or None to skip)
+    各unitは_tokenize_unitでトークナイズされユニットのリストとして蓄積。"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
+    bos = tokenizer.bos_token_id
     pad = tokenizer.pad_token_id
 
-    # Phase 1: tokenize all items into variable-length sequences
     CHUNK_SIZE = 50000
     chunk_dir = cache_path + ".chunks"
     os.makedirs(chunk_dir, exist_ok=True)
 
-    token_seqs = []
+    all_units = []
     chunk_files = []
     total_items = 0
 
     for item in items:
-        text = format_fn(item)
-        if text is None:
+        texts = units_fn(item)
+        if texts is None:
             continue
-        seq = _tokenize_single(tokenizer, text)
-        token_seqs.append(seq)
+        for text in texts:
+            all_units.append(_tokenize_unit(tokenizer, text))
         total_items += 1
 
-        if len(token_seqs) >= CHUNK_SIZE:
-            # Pack and save chunk
-            packed = _pack_sequences(token_seqs, context_length, pad)
+        if len(all_units) >= CHUNK_SIZE:
+            packed = _pack_units(all_units, context_length, pad, bos)
             chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
             np.save(chunk_path, np.array(packed, dtype=np.uint16))
             chunk_files.append(chunk_path)
             print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
-            token_seqs = []
+            all_units = []
 
     # Flush remaining
-    if token_seqs:
-        packed = _pack_sequences(token_seqs, context_length, pad)
+    if all_units:
+        packed = _pack_units(all_units, context_length, pad, bos)
         chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
         np.save(chunk_path, np.array(packed, dtype=np.uint16))
         chunk_files.append(chunk_path)
@@ -194,7 +200,7 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, format_fn
         shutil.rmtree(chunk_dir, ignore_errors=True)
         return
 
-    # Phase 2: merge chunks into a single memmap
+    # Merge chunks into a single memmap
     total_samples = sum(len(np.load(f)) for f in chunk_files)
     mmap = np.memmap(cache_path, dtype=np.uint16, mode="w+", shape=(total_samples, context_length))
     offset = 0
@@ -217,32 +223,35 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, format_fn
 _build_memmap = _build_memmap_packed
 
 
-def _format_doc_item(item):
-    return format_document(item["text"])
+def _units_doc_item(item):
+    """文書アイテム → 1ユニット"""
+    return [format_document(item["text"])]
 
 
-def _format_sharegpt_item(item):
+def _units_sharegpt_item(item):
+    """ShareGPT対話 → ターン数ぶんのユニット"""
     turns = _extract_turns_sharegpt(item["conversations"])
     if not turns:
         return None
-    return format_conversation(turns)
+    return [format_conversation_turn(q, a) for q, a in turns]
 
 
-def _format_messages_item(item):
+def _units_messages_item(item):
+    """messages対話 → ターン数ぶんのユニット"""
     turns = _extract_turns_messages(item["messages"])
     if not turns:
         return None
-    return format_conversation(turns)
+    return [format_conversation_turn(q, a) for q, a in turns]
 
 
-def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, format_fn):
+def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, units_fn):
     """キャッシュがあればロード、なければ構築して返す"""
     if os.path.exists(cache_path + ".meta.json"):
         print(f"  Using cache: {cache_path}")
     else:
         print(f"  Building cache: {cache_path}")
         ds = load_fn()
-        _build_memmap_packed(cache_path, ds, tokenizer, context_length, format_fn)
+        _build_memmap_packed(cache_path, ds, tokenizer, context_length, units_fn)
 
     with open(cache_path + ".meta.json", "r") as f:
         meta = json.load(f)
@@ -262,21 +271,21 @@ def prepare_all_datasets(context_length, cache_dir=None):
     sources = [
         {
             "name": "wikimedia/wikipedia (ja)",
-            "cache_name": "wiki_ja_packed",
+            "cache_name": "wiki_ja_v2",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
-            "format": _format_doc_item,
+            "units": _units_doc_item,
         },
         {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
-            "cache_name": "shi3z_llama2pro_packed",
+            "cache_name": "shi3z_llama2pro_v2",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
-            "format": _format_sharegpt_item,
+            "units": _units_sharegpt_item,
         },
         {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
-            "cache_name": "shi3z_orion14b_packed",
+            "cache_name": "shi3z_orion14b_v2",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
-            "format": _format_sharegpt_item,
+            "units": _units_sharegpt_item,
         },
     ]
 
@@ -286,7 +295,7 @@ def prepare_all_datasets(context_length, cache_dir=None):
         cache_path = os.path.join(mmap_dir, f"{src['cache_name']}.mmap")
         ds = _prepare_cached_dataset(
             src["name"], cache_path, tokenizer, context_length,
-            src["load"], src["format"],
+            src["load"], src["units"],
         )
         if ds is not None:
             datasets.append(ds)
