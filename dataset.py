@@ -125,6 +125,8 @@ def _pack_units(units, context_length, pad_token_id, bos_token_id):
     if current:
         _flush(current)
 
+    assert all(len(s) == context_length for s in packed), \
+        f"Pack length mismatch: {set(len(s) for s in packed)}, expected {context_length}"
     return packed
 
 
@@ -181,8 +183,9 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn)
 
         if len(all_units) >= CHUNK_SIZE:
             packed = _pack_units(all_units, context_length, pad, bos)
+            chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
             chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
-            np.save(chunk_path, np.array(packed, dtype=np.uint16))
+            np.save(chunk_path, chunk_arr)
             chunk_files.append(chunk_path)
             print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
             all_units = []
@@ -190,8 +193,9 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn)
     # Flush remaining
     if all_units:
         packed = _pack_units(all_units, context_length, pad, bos)
+        chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
         chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
-        np.save(chunk_path, np.array(packed, dtype=np.uint16))
+        np.save(chunk_path, chunk_arr)
         chunk_files.append(chunk_path)
 
     if not chunk_files:
