@@ -206,7 +206,7 @@ def train():
         d_ff=4096,
         chunk_size=8,
         compress_size=4,
-        num_layers=32,
+        num_layers=8,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,

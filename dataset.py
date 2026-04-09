@@ -282,6 +282,12 @@ def prepare_all_datasets(context_length, cache_dir=None):
             "units": _units_doc_item,
         },
         {
+            "name": "hotchpotch/cc100-ja-documents",
+            "cache_name": "cc100_ja_v2",
+            "load": lambda: load_dataset("hotchpotch/cc100-ja-documents", split="train", cache_dir=cache_dir),
+            "units": _units_doc_item,
+        },
+        {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
             "cache_name": "shi3z_llama2pro_v2",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
