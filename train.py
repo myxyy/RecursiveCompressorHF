@@ -340,7 +340,7 @@ def train():
                     elapsed = time.time() - train_start_time
                     step_time = time.time() - step_start_time
                     tokens_per_sec = (CONTEXT_LENGTH * batch_size_per_gpu * world_size * GRAD_ACCUM_STEPS * LOG_INTERVAL) / step_time
-                    remaining_steps = total_optimizer_steps - num_optimizer_steps
+                    remaining_steps = total_optimizer_steps - (start_step + num_optimizer_steps)
                     if num_optimizer_steps > 0:
                         secs_per_step = elapsed / num_optimizer_steps
                         eta_secs = secs_per_step * remaining_steps
