@@ -366,9 +366,14 @@ def train():
 
                 accum_loss = 0.0
 
+        # Epoch-end checkpoint (save BEFORE optimizer.eval() to keep training params)
+        if is_main_process():
+            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir, tokenizer)
+        if distributed:
+            dist.barrier()
+
         # Epoch-end validation
         model.eval()
-        optimizer.eval()
         val_loss = 0.0
         val_batches = 0
         with torch.no_grad():
@@ -387,13 +392,7 @@ def train():
         if val_batches > 0:
             log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Validation Loss: {val_loss / val_batches:.4f}")
 
-        # Epoch-end checkpoint
-        if is_main_process():
-            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir, tokenizer)
-        if distributed:
-            dist.barrier()
-
-    # Save final model
+    # Save final model (training params, not averaged)
     if is_main_process():
         final_path = os.path.join(data_dir, "final_model")
         unwrapped = model.module if isinstance(model, DDP) else model
