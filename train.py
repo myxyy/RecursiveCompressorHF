@@ -201,9 +201,9 @@ def train():
 
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
-        d_model=1024,
-        num_heads=8,
-        d_ff=2048,
+        d_model=2048,
+        num_heads=16,
+        d_ff=4096,
         chunk_size=8,
         compress_size=4,
         num_layers=32,
