@@ -106,14 +106,15 @@ def _pack_units(units, context_length, pad_token_id, bos_token_id):
         packed.append(seq)
 
     for unit in units:
-        # +1 for trailing BOS that will be appended
+        # +1 for trailing BOS that will be appended by _flush
         if len(unit) + 1 >= context_length:
             # Flush current buffer first
             if current:
                 _flush(current)
                 current = []
-            # Long unit: truncate to exactly context_length
-            packed.append(unit[:context_length])
+            # Long unit: truncate and pad to exactly context_length
+            seq = (unit + [pad_token_id] * context_length)[:context_length]
+            packed.append(seq)
             continue
 
         if len(current) + len(unit) + 1 <= context_length:
