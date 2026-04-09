@@ -94,41 +94,36 @@ def _tokenize_unit(tokenizer, text):
 def _pack_units(units, context_length, pad_token_id, bos_token_id):
     """ユニットのリストをcontext_length長のシーケンスに詰め込む。
     各ユニットは[BOS]+tokensの形。パック結果は末尾にBOSを付加。
-    結果: <s>unit1<s>unit2<s>[PAD]..."""
+    結果: <s>unit1<s>unit2<s>[PAD]...
+    返すリストの全要素は必ずcontext_length長。"""
     packed = []
     current = []
+
+    def _flush(buf):
+        """バッファに末尾BOSを付加し、context_length長にPAD/truncateして確定"""
+        buf.append(bos_token_id)
+        seq = (buf + [pad_token_id] * context_length)[:context_length]
+        packed.append(seq)
 
     for unit in units:
         # +1 for trailing BOS that will be appended
         if len(unit) + 1 >= context_length:
             # Flush current buffer first
             if current:
-                current.append(bos_token_id)
-                pad_len = context_length - len(current)
-                packed.append(current + [pad_token_id] * pad_len)
+                _flush(current)
                 current = []
             # Long unit: truncate to exactly context_length
             packed.append(unit[:context_length])
             continue
 
         if len(current) + len(unit) + 1 <= context_length:
-            # Fits in current buffer
             current.extend(unit)
         else:
-            # Flush current buffer: add trailing BOS + PAD
-            current.append(bos_token_id)
-            pad_len = context_length - len(current)
-            packed.append(current + [pad_token_id] * pad_len)
+            _flush(current)
             current = list(unit)
 
-    # Flush remaining buffer
     if current:
-        current.append(bos_token_id)
-        pad_len = context_length - len(current)
-        if pad_len > 0:
-            packed.append(current + [pad_token_id] * pad_len)
-        else:
-            packed.append(current[:context_length])
+        _flush(current)
 
     return packed
 
