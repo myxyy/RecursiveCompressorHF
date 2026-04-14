@@ -56,6 +56,7 @@ class RecursiveCompressor(nn.Module):
         self.chunk_size = chunk_size
         self.compress_size = compress_size
         self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
+        self.initial_context = nn.Parameter(torch.randn(compress_size, d_model))
         self.norm_mha_encoder = nn.LayerNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
         self.norm_ffn_encoder = nn.LayerNorm(d_model)
@@ -92,9 +93,9 @@ class RecursiveCompressor(nn.Module):
         hidden_self = hidden.pop() if hidden else (None, None)
         prev_inner, prev_outer = hidden_self
 
-        # Initial outer context: zero tensor (data-independent to preserve predict==forward)
-        if prev_outer is None and comp_query is not None:
-            prev_outer = torch.zeros_like(comp_query)
+        # Initial outer context: learnable parameter (data-independent to preserve predict==forward)
+        if prev_outer is None:
+            prev_outer = self.initial_context[None, :, :].expand(batch_size, -1, -1)
 
         # Combine with previous partial chunk
         if prev_inner is not None:
