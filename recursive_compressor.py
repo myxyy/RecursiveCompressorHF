@@ -92,9 +92,9 @@ class RecursiveCompressor(nn.Module):
         hidden_self = hidden.pop() if hidden else (None, None)
         prev_inner, prev_outer = hidden_self
 
-        # Initial outer context from compressor query
+        # Initial outer context: zero tensor (data-independent to preserve predict==forward)
         if prev_outer is None and comp_query is not None:
-            prev_outer = comp_query
+            prev_outer = torch.zeros_like(comp_query)
 
         # Combine with previous partial chunk
         if prev_inner is not None:
