@@ -19,15 +19,24 @@
 ## 実装結果
 
 ### 変更概要
-- `compressor_query`を`RecursiveCompressor`から`RecursiveCompressorLM`に移動
-- `RecursiveCompressor.step(xs, hidden)`がリスト入力を受け付けるように変更
+- `compressor_query`を`RecursiveCompressor`から`RecursiveCompressorLM`に移動（全レイヤー共有パラメータ）
+- `RecursiveCompressor.step(xs, hidden)`がリスト入力`[data, comp_query, deeper_queries...]`を受け付けるように変更
 - 再帰時にdeeper queriesを`compress_size`倍にexpandし、帰還時にmeanでcollapse
+- 各`RecursiveCompressor`に`initial_context`パラメータを追加（初期outer context用、レイヤーごとに独立）
+
+### パラメータ配置
+| パラメータ | 所在 | 役割 |
+|---|---|---|
+| `compressor_query` | `RecursiveCompressorLM` | 圧縮cross-attentionのクエリ。全レイヤー共有、`xs[1:]`として渡される |
+| `initial_context` | `RecursiveCompressor`（各レイヤー） | 初期outer context。最初のチャンクのdecompressionに使用 |
 
 ### アーキテクチャ上の変更
-旧設計: 各レイヤーが独立した`compressor_query`を保持。レイヤー間でクエリは伝播しない。  
-新設計: `compressor_query`は`RecursiveCompressorLM`が保持。各レイヤーを通過する際にクエリが進化し、前段の再帰階層情報を後段に引き継ぐ。
+旧設計: 各レイヤーが独立した`compressor_query`を保持し、圧縮クエリと初期outer contextの両方に使用。  
+新設計:
+- `compressor_query`は`RecursiveCompressorLM`が保持。各レイヤーに`xs`リストとして渡される
+- レイヤー間でクエリが進化し、前段の再帰階層情報を後段に引き継ぐ
+- `initial_context`は各レイヤーが個別に保持。データ非依存のためpredict==forwardが維持される
 
-### predict != forward について
-新設計ではクエリがレイヤー間で進化するため、部分チャンク（predict時）と完全チャンク（forward時）でクエリの進化度合いが異なる。  
-これは設計意図通りの動作であり、旧設計の`predict == forward`等価性は新設計には適用されない。  
-`predict`は自己回帰生成用として独立に正しく動作する（決定的、step==predict一致）。
+### predict == forward の維持
+初期outer contextにデータ依存の値（進化したクエリ等）を使うとpredict!=forwardになる。  
+`initial_context`はレイヤー固有の学習可能パラメータでデータ非依存なため、predict==forwardが維持される。
