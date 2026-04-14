@@ -42,7 +42,7 @@ class FFNSwiGLU(nn.Module):
         super(FFNSwiGLU, self).__init__()
         self.linear1 = nn.Linear(d_model, d_ff * 2)
         self.linear2 = nn.Linear(d_ff, d_model)
-    
+
     def forward(self, x):
         x_proj = self.linear1(x)
         x_proj1, x_proj2 = x_proj.chunk(2, dim=-1)
@@ -56,7 +56,6 @@ class RecursiveCompressor(nn.Module):
         self.chunk_size = chunk_size
         self.compress_size = compress_size
         self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
-        self.compressor_query = nn.Parameter(torch.randn(compress_size, d_model))
         self.norm_mha_encoder = nn.LayerNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
         self.norm_ffn_encoder = nn.LayerNorm(d_model)
@@ -70,7 +69,21 @@ class RecursiveCompressor(nn.Module):
         self.norm_decompressor = nn.LayerNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
 
-    def step(self, x, hidden):
+    def step(self, xs, hidden):
+        """
+        xs: list of tensors
+            xs[0]: (batch, seq_len, d_model) - main data
+            xs[1]: (batch, compress_size, d_model) - compressor query for this level
+            xs[2:]: deeper compressor queries (same shape as xs[1])
+        hidden: list of (inner_context, outer_context) tuples
+
+        Returns: (output_xs, hidden)
+            output_xs: list matching xs structure with same shapes
+        """
+        x = xs[0]
+        comp_query = xs[1] if len(xs) >= 2 else None
+        deeper_qs = xs[2:]
+
         batch_size, seq_len, d_model = x.size()
 
         # Pop current level's hidden state
@@ -79,8 +92,9 @@ class RecursiveCompressor(nn.Module):
         hidden_self = hidden.pop() if hidden else (None, None)
         prev_inner, prev_outer = hidden_self
 
-        if prev_outer is None:
-            prev_outer = self.compressor_query[None, :, :].expand(batch_size, self.compress_size, d_model)
+        # Initial outer context from compressor query
+        if prev_outer is None and comp_query is not None:
+            prev_outer = comp_query
 
         # Combine with previous partial chunk
         if prev_inner is not None:
@@ -96,7 +110,6 @@ class RecursiveCompressor(nn.Module):
         full_len = num_full * self.chunk_size
 
         # Prepare chunks: full chunks first, then remainder (if any)
-        # Kept separate (not interleaved by batch) so we can slice by dim=0 later
         parts = []
         if num_full > 0:
             full_part = combined[:, :full_len].reshape(batch_size * num_full, self.chunk_size, d_model)
@@ -124,27 +137,45 @@ class RecursiveCompressor(nn.Module):
         all_pre_norm = all_chunks
         all_normed = self.norm_compressor(all_chunks)
 
-        if num_full > 0:
+        comp_query_out = comp_query
+        collapsed_dqs = list(deeper_qs)
+
+        if num_full > 0 and comp_query is not None:
             full_normed = all_normed[:batch_size * num_full]
 
-            comp_query = self.compressor_query[None, :, :].expand(batch_size * num_full, self.compress_size, d_model)
-            compressed = self.mha_compressor(comp_query, full_normed, full_normed)
+            # Use comp_query for compression (expanded per chunk)
+            cq_expanded = comp_query.unsqueeze(1).expand(batch_size, num_full, self.compress_size, d_model)
+            cq_expanded = cq_expanded.reshape(batch_size * num_full, self.compress_size, d_model)
+            compressed = self.mha_compressor(cq_expanded, full_normed, full_normed)
 
             # Reshape for recursion: each of compress_size streams processed independently
             compressed = compressed.view(batch_size, num_full, self.compress_size, d_model)
             compressed = compressed.permute(0, 2, 1, 3).contiguous()
             compressed = compressed.view(batch_size * self.compress_size, num_full, d_model)
 
-            # Recursive step
-            compressed, hidden = self.step(compressed, hidden)
+            # Expand deeper queries for recursive call
+            expanded_dqs = []
+            for dq in deeper_qs:
+                exp = dq.unsqueeze(1).expand(batch_size, self.compress_size, self.compress_size, d_model)
+                exp = exp.reshape(batch_size * self.compress_size, self.compress_size, d_model)
+                expanded_dqs.append(exp)
 
-            compressed = compressed.view(batch_size, self.compress_size, num_full, d_model)
-            compressed = compressed.permute(0, 2, 1, 3).contiguous()
+            # Recursive step
+            recursive_xs = [compressed] + expanded_dqs
+            recursive_output, hidden = self.step(recursive_xs, hidden)
+
+            # Extract results
+            compressed_out = recursive_output[0]  # (batch*compress_size, num_full, d_model)
+            deeper_out = recursive_output[1:]      # list of (batch*compress_size, compress_size, d_model)
+
+            # Reshape compressed back
+            compressed_out = compressed_out.view(batch_size, self.compress_size, num_full, d_model)
+            compressed_out = compressed_out.permute(0, 2, 1, 3).contiguous()
             # (batch, num_full, compress_size, d_model)
 
             # Shift: chunk i uses outer context from chunks 0..i-1
-            full_outer = torch.cat([prev_outer.unsqueeze(1), compressed[:, :-1]], dim=1)
-            new_outer = compressed[:, -1]
+            full_outer = torch.cat([prev_outer.unsqueeze(1), compressed_out[:, :-1]], dim=1)
+            new_outer = compressed_out[:, -1]
 
             full_outer = full_outer.view(batch_size * num_full, self.compress_size, d_model)
 
@@ -152,13 +183,30 @@ class RecursiveCompressor(nn.Module):
                 all_outer = torch.cat([full_outer, new_outer], dim=0)
             else:
                 all_outer = full_outer
-        else:
-            new_outer = prev_outer
-            all_outer = prev_outer
 
-        all_outer_normed = self.norm_decompressor(all_outer)
-        all_chunks = self.mha_decompressor(all_normed, all_outer_normed, all_outer_normed)
-        all_chunks = all_chunks + all_pre_norm
+            # comp_query output: the last chunk's compressed result (carries processed info)
+            comp_query_out = new_outer
+
+            # Collapse deeper results from (batch*compress_size, S, D) to (batch, S, D)
+            collapsed_dqs = []
+            for dq_out in deeper_out:
+                dq_collapsed = dq_out.view(batch_size, self.compress_size, self.compress_size, d_model).mean(dim=1)
+                collapsed_dqs.append(dq_collapsed)
+        else:
+            if prev_outer is not None:
+                new_outer = prev_outer
+                all_outer = prev_outer
+            else:
+                # No compressor query at all - skip decompression
+                new_outer = None
+                all_chunks = all_pre_norm
+                # Skip decompression block below
+                all_outer = None
+
+        if all_outer is not None:
+            all_outer_normed = self.norm_decompressor(all_outer)
+            all_chunks = self.mha_decompressor(all_normed, all_outer_normed, all_outer_normed)
+            all_chunks = all_chunks + all_pre_norm
 
         # Decoder: causal self-attention + FFN (independent per chunk)
         ac = all_chunks
@@ -185,13 +233,20 @@ class RecursiveCompressor(nn.Module):
         new_inner = combined[:, full_len:] if rem > 0 else None
         hidden.append((new_inner, new_outer))
 
-        return output, hidden
+        # Build output list: [processed_data, comp_query_out, *collapsed_deeper_queries]
+        output_xs = [output]
+        if comp_query_out is not None:
+            output_xs.append(comp_query_out)
+        output_xs.extend(collapsed_dqs)
 
-    def forward(self, x):
-        output, _ = self.step(x, None)
-        return output
+        return output_xs, hidden
 
-    def predict(self, x, hidden):
-        output, hidden = self.step(x.unsqueeze(1), hidden)
-        return output.squeeze(1), hidden
+    def forward(self, xs):
+        output_xs, _ = self.step(xs, None)
+        return output_xs
 
+    def predict(self, xs, hidden):
+        xs_expanded = [xs[0].unsqueeze(1)] + xs[1:]
+        output_xs, hidden = self.step(xs_expanded, hidden)
+        output_xs[0] = output_xs[0].squeeze(1)
+        return output_xs, hidden

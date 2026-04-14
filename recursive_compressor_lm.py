@@ -1,3 +1,4 @@
+import math
 import torch
 import torch.nn as nn
 from transformers import PreTrainedModel
@@ -13,6 +14,7 @@ class RecursiveCompressorLM(PreTrainedModel):
     def __init__(self, config: RecursiveCompressorConfig):
         super().__init__(config)
         self.embedding = nn.Embedding(config.vocab_size, config.d_model)
+        self.compressor_query = nn.Parameter(torch.randn(config.compress_size, config.d_model))
         self.layers = nn.ModuleList([
             RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
             for _ in range(config.num_layers)
@@ -21,12 +23,25 @@ class RecursiveCompressorLM(PreTrainedModel):
         self.head = nn.Linear(config.d_model, config.vocab_size, bias=False)
         self.post_init()
 
+    def _num_queries(self):
+        """Maximum number of compressor queries needed for recursion depth + 1."""
+        return math.ceil(math.log(65536) / math.log(self.config.chunk_size)) + 1
+
+    def _make_xs(self, x):
+        """Create xs list: [data, q, q, q, ...] with enough queries for max recursion."""
+        batch_size = x.size(0)
+        n = self._num_queries()
+        q = self.compressor_query[None, :, :].expand(batch_size, -1, -1)
+        return [x] + [q for _ in range(n)]
+
     def step(self, input_ids, hidden):
         x = self.embedding(input_ids)
+        xs = self._make_xs(x)
         if hidden is None:
             hidden = [None] * len(self.layers)
         for i, layer in enumerate(self.layers):
-            x, hidden[i] = layer.step(x, hidden[i])
+            xs, hidden[i] = layer.step(xs, hidden[i])
+        x = xs[0]
         x = self.norm(x)
         logits = self.head(x)
         return logits, hidden
