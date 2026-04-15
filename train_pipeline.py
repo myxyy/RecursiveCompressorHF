@@ -309,11 +309,12 @@ def train():
             )
             schedule = ScheduleGPipe(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
-            # Execute pipeline
+            # Execute pipeline (losses are collected via the losses list arg)
+            microbatch_losses = []
             if rank == 0:
                 schedule.step(input_ids)
             elif rank == world_size - 1:
-                losses = schedule.step(target=labels)
+                schedule.step(target=labels, losses=microbatch_losses)
             else:
                 schedule.step()
 
@@ -322,13 +323,10 @@ def train():
             optimizer.step()
             optimizer.zero_grad()
 
-            # Loss tracking (last rank computes loss, broadcasts to rank 0)
+            # Loss tracking (last rank collects microbatch losses, broadcasts to rank 0)
             loss_tensor = torch.zeros(1, device=device)
-            if rank == world_size - 1:
-                if isinstance(losses, list):
-                    loss_tensor[0] = sum(l.item() for l in losses) / len(losses)
-                else:
-                    loss_tensor[0] = losses.item()
+            if rank == world_size - 1 and microbatch_losses:
+                loss_tensor[0] = sum(l.item() for l in microbatch_losses) / len(microbatch_losses)
             dist.broadcast(loss_tensor, src=world_size - 1)
             batch_loss = loss_tensor.item()
 
@@ -369,32 +367,29 @@ def train():
         optimizer.eval()
         val_loss = 0.0
         val_batches = 0
-        with torch.no_grad():
-            for input_ids, labels in val_loader:
-                input_ids = input_ids.to(device)
-                labels = labels.to(device)
+        for input_ids, labels in val_loader:
+            input_ids = input_ids.to(device)
+            labels = labels.to(device)
 
-                pipe_stage = PipelineStage(
-                    stage_module, stage_index=rank, num_stages=world_size, device=device,
-                )
-                schedule = ScheduleGPipe(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
+            pipe_stage = PipelineStage(
+                stage_module, stage_index=rank, num_stages=world_size, device=device,
+            )
+            schedule = ScheduleGPipe(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
-                if rank == 0:
-                    schedule.step(input_ids)
-                elif rank == world_size - 1:
-                    losses = schedule.step(target=labels)
-                else:
-                    schedule.step()
+            microbatch_losses = []
+            if rank == 0:
+                schedule.step(input_ids)
+            elif rank == world_size - 1:
+                schedule.step(target=labels, losses=microbatch_losses)
+            else:
+                schedule.step()
 
-                loss_tensor = torch.zeros(1, device=device)
-                if rank == world_size - 1:
-                    if isinstance(losses, list):
-                        loss_tensor[0] = sum(l.item() for l in losses) / len(losses)
-                    else:
-                        loss_tensor[0] = losses.item()
-                dist.broadcast(loss_tensor, src=world_size - 1)
-                val_loss += loss_tensor.item()
-                val_batches += 1
+            loss_tensor = torch.zeros(1, device=device)
+            if rank == world_size - 1 and microbatch_losses:
+                loss_tensor[0] = sum(l.item() for l in microbatch_losses) / len(microbatch_losses)
+            dist.broadcast(loss_tensor, src=world_size - 1)
+            val_loss += loss_tensor.item()
+            val_batches += 1
 
         if val_batches > 0:
             log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Validation Loss: {val_loss / val_batches:.4f}")
