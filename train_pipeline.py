@@ -33,7 +33,7 @@ load_dotenv()
 
 # Hyperparameters
 CONTEXT_LENGTH = 2048
-LEARNING_RATE = 3e-4
+LEARNING_RATE = 1e-4
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
 N_MICROBATCHES = 6
@@ -205,7 +205,7 @@ def train():
         d_ff=4096,
         chunk_size=4,
         compress_size=1,
-        num_layers=12,
+        num_layers=16,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
