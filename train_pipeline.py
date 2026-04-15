@@ -82,7 +82,7 @@ def log(msg):
 
 
 def save_stage_checkpoint(stage_module, optimizer, step, epoch, checkpoint_dir,
-                          rank, stage_info, tokenizer=None):
+                          rank, stage_info, tokenizer=None, config=None):
     """Save per-stage checkpoint."""
     os.makedirs(checkpoint_dir, exist_ok=True)
     path = os.path.join(checkpoint_dir, f"checkpoint-{step}")
@@ -97,8 +97,11 @@ def save_stage_checkpoint(stage_module, optimizer, step, epoch, checkpoint_dir,
         "rank": rank,
     }, os.path.join(path, f"stage_{rank}.pt"))
 
-    if tokenizer is not None and rank == 0:
-        tokenizer.save_pretrained(path)
+    if rank == 0:
+        if tokenizer is not None:
+            tokenizer.save_pretrained(path)
+        if config is not None:
+            config.save_pretrained(path)
 
     dist.barrier()
 
@@ -282,7 +285,7 @@ def train():
                 log("Save and exit requested.")
                 optimizer.eval()
                 save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
-                                      checkpoint_dir, rank, stage_info, tokenizer)
+                                      checkpoint_dir, rank, stage_info, tokenizer, config)
                 dist.destroy_process_group()
                 return
 
@@ -296,7 +299,7 @@ def train():
                     log("Save and exit requested.")
                     optimizer.eval()
                     save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
-                                          checkpoint_dir, rank, stage_info, tokenizer)
+                                          checkpoint_dir, rank, stage_info, tokenizer, config)
                     dist.destroy_process_group()
                     return
 
@@ -359,7 +362,7 @@ def train():
             if global_step % CHECKPOINT_INTERVAL == 0:
                 optimizer.eval()
                 save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
-                                      checkpoint_dir, rank, stage_info, tokenizer)
+                                      checkpoint_dir, rank, stage_info, tokenizer, config)
                 optimizer.train()
 
         # Epoch-end validation
@@ -396,7 +399,7 @@ def train():
 
         # Epoch-end checkpoint (with eval params)
         save_stage_checkpoint(stage_module, optimizer, global_step, epoch + 1,
-                              checkpoint_dir, rank, stage_info, tokenizer)
+                              checkpoint_dir, rank, stage_info, tokenizer, config)
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
