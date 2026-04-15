@@ -141,7 +141,7 @@ def load_latest_checkpoint(model, optimizer, checkpoint_dir):
 
     # Load model weights via from_pretrained (reads safetensors correctly)
     unwrapped = model.module if isinstance(model, DDP) else model
-    loaded = RecursiveCompressorLM.from_pretrained(latest, torch_dtype=torch.bfloat16)
+    loaded = RecursiveCompressorLM.from_pretrained(latest)
     unwrapped.load_state_dict(loaded.state_dict())
     del loaded
 
@@ -239,15 +239,15 @@ def train():
         num_workers=2, pin_memory=True,
     )
 
-    # Model (bfloat16)
-    model = RecursiveCompressorLM(config).to(dtype=torch.bfloat16, device=device)
+    # Model (fp32)
+    model = RecursiveCompressorLM(config).to(device)
     if distributed:
         model = DDP(model, device_ids=[local_rank])
 
     num_params = sum(p.numel() for p in model.parameters())
     log(f"Parameters: {num_params:,}")
     log(f"Device: {device}, World size: {world_size}, Effective batch size: {effective_batch_size}")
-    log(f"Context length: {CONTEXT_LENGTH}, Grad accum steps: {GRAD_ACCUM_STEPS}, dtype: bfloat16")
+    log(f"Context length: {CONTEXT_LENGTH}, Grad accum steps: {GRAD_ACCUM_STEPS}, dtype: float32")
 
     # Optimizer
     optimizer = RAdamScheduleFree(model.parameters(), lr=LEARNING_RATE)
@@ -359,21 +359,19 @@ def train():
                     step_start_time = time.time()
 
                 if global_step % CHECKPOINT_INTERVAL == 0:
+                    optimizer.eval()
                     if is_main_process():
                         save_checkpoint(model, optimizer, global_step, epoch, checkpoint_dir, tokenizer)
                     if distributed:
                         dist.barrier()
+                    optimizer.train()
 
                 accum_loss = 0.0
 
-        # Epoch-end checkpoint (save BEFORE optimizer.eval() to keep training params)
-        if is_main_process():
-            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir, tokenizer)
-        if distributed:
-            dist.barrier()
-
-        # Epoch-end validation
+        # Epoch-end: switch to eval params for validation and checkpoint
         model.eval()
+        optimizer.eval()
+
         val_loss = 0.0
         val_batches = 0
         with torch.no_grad():
@@ -392,7 +390,13 @@ def train():
         if val_batches > 0:
             log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Validation Loss: {val_loss / val_batches:.4f}")
 
-    # Save final model (training params, not averaged)
+        # Save checkpoint with averaged (eval) params
+        if is_main_process():
+            save_checkpoint(model, optimizer, global_step, epoch + 1, checkpoint_dir, tokenizer)
+        if distributed:
+            dist.barrier()
+
+    # Save final model with averaged (eval) params
     if is_main_process():
         final_path = os.path.join(data_dir, "final_model")
         unwrapped = model.module if isinstance(model, DDP) else model
