@@ -42,6 +42,8 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0):
 
     model = _load_model(model_dir, device)
     model.eval()
+    num_params = sum(p.numel() for p in model.parameters())
+    print(f"Parameters: {num_params:,}")
 
     # Use tokenizer from model dir if available, otherwise fall back to default
     if os.path.exists(os.path.join(model_dir, "tokenizer_config.json")):

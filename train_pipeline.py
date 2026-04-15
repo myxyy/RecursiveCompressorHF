@@ -216,10 +216,12 @@ def train():
     stage_info = stage_infos[rank]
     stage_module = RecursiveCompressorLMPipelineStage(config, **stage_info).to(device)
 
-    num_params = sum(p.numel() for p in stage_module.parameters())
-    log(f"Total layers: {config.num_layers}, Stages: {world_size}")
+    stage_params = sum(p.numel() for p in stage_module.parameters())
+    total_params_tensor = torch.tensor([stage_params], dtype=torch.long, device=device)
+    dist.all_reduce(total_params_tensor)
+    log(f"Total layers: {config.num_layers}, Stages: {world_size}, Total params: {total_params_tensor.item():,}")
     log(f"Stage {rank}: layers {stage_info['layer_start']}-{stage_info['layer_end']}, "
-        f"params: {num_params:,}, first={stage_info['is_first']}, last={stage_info['is_last']}")
+        f"params: {stage_params:,}, first={stage_info['is_first']}, last={stage_info['is_last']}")
 
     # Data (all ranks see the same data — pipeline parallel, not data parallel)
     val_size = max(1, int(len(full_dataset) * VALIDATION_RATIO))
