@@ -15,14 +15,32 @@ import os
 import torch
 from transformers import AutoTokenizer
 
+from configuration_recursive_compressor import RecursiveCompressorConfig
 from dataset import TOKENIZER_NAME
 from recursive_compressor_lm import RecursiveCompressorLM
+
+
+def _load_model(model_dir, device):
+    """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt)."""
+    full_model_pt = os.path.join(model_dir, "full_model.pt")
+    config_json = os.path.join(model_dir, "config.json")
+
+    if os.path.exists(full_model_pt):
+        # Pipeline checkpoint: load config.json + full_model.pt
+        config = RecursiveCompressorConfig.from_pretrained(model_dir)
+        model = RecursiveCompressorLM(config)
+        state_dict = torch.load(full_model_pt, map_location="cpu", weights_only=False)
+        model.load_state_dict(state_dict)
+        return model.to(device)
+    else:
+        # Standard save_pretrained directory
+        return RecursiveCompressorLM.from_pretrained(model_dir).to(device)
 
 
 def predict(prompt, model_dir, context_length=1024, temperature=1.0):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = RecursiveCompressorLM.from_pretrained(model_dir).to(device)
+    model = _load_model(model_dir, device)
     model.eval()
 
     # Use tokenizer from model dir if available, otherwise fall back to default
