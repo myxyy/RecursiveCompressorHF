@@ -32,6 +32,8 @@ from dataset import prepare_all_datasets, get_tokenizer
 
 load_dotenv()
 
+torch.set_float32_matmul_precision("high")
+
 # Hyperparameters
 CONTEXT_LENGTH = 2048
 LEARNING_RATE = 3e-4
