@@ -134,24 +134,24 @@ def _pack_units(units, context_length, pad_token_id, bos_token_id):
 class MemmapDataset(Dataset):
     """numpy memmapファイルからサンプルを読み出すデータセット。
     各サンプルはcontext_length長のトークン列で、__getitem__で(input_ids, labels)に変換。
-    in_memory=Trueでファイル全体をRAMに読み込む（高速だがメモリ消費大）。"""
+    prefault=Trueでファイル全体を事前にOSページキャッシュへ読み込む
+    （ディスクI/O削減。複数プロセス間でページキャッシュは共有されるため安全）。"""
 
-    def __init__(self, cache_path, pad_token_id, in_memory=False):
+    def __init__(self, cache_path, pad_token_id, prefault=False):
         with open(cache_path + ".meta.json", "r") as f:
             meta = json.load(f)
         self.num_samples = meta["num_samples"]
         self.context_length = meta["context_length"]
         self.pad_token_id = pad_token_id
-        mmap = np.memmap(
+        self.data = np.memmap(
             cache_path, dtype=np.uint16, mode="r",
             shape=(self.num_samples, self.context_length),
         )
-        if in_memory:
-            # Copy entire memmap into RAM as a regular numpy array
-            self.data = np.array(mmap)
-            del mmap
-        else:
-            self.data = mmap
+        if prefault:
+            # Touch all pages to populate the OS page cache.
+            # Page cache is shared across processes, so total RAM use stays
+            # bounded regardless of how many ranks call this.
+            _ = int(self.data.sum())
 
     def __len__(self):
         return self.num_samples
@@ -257,7 +257,7 @@ def _units_messages_item(item):
     return [format_conversation_turn(q, a) for q, a in turns]
 
 
-def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, units_fn, in_memory=False):
+def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, units_fn, prefault=False):
     """キャッシュがあればロード、なければ構築して返す"""
     if os.path.exists(cache_path + ".meta.json"):
         print(f"  Using cache: {cache_path}")
@@ -271,12 +271,13 @@ def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn
     if meta["num_samples"] == 0:
         return None
 
-    return MemmapDataset(cache_path, tokenizer.pad_token_id, in_memory=in_memory)
+    return MemmapDataset(cache_path, tokenizer.pad_token_id, prefault=prefault)
 
 
-def prepare_all_datasets(context_length, cache_dir=None, in_memory=False):
+def prepare_all_datasets(context_length, cache_dir=None, prefault=False):
     """全データセットを準備して結合する（日本語のみ）。
-    in_memory=Trueでキャッシュ全体をRAMに展開（高速化、メモリ消費大）。"""
+    prefault=Trueでキャッシュ全体をOSページキャッシュに事前読み込み
+    （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。"""
     tokenizer = get_tokenizer()
     if cache_dir is None:
         cache_dir = "./data/hf_cache"
@@ -315,11 +316,11 @@ def prepare_all_datasets(context_length, cache_dir=None, in_memory=False):
         cache_path = os.path.join(mmap_dir, f"{src['cache_name']}.mmap")
         ds = _prepare_cached_dataset(
             src["name"], cache_path, tokenizer, context_length,
-            src["load"], src["units"], in_memory=in_memory,
+            src["load"], src["units"], prefault=prefault,
         )
         if ds is not None:
             datasets.append(ds)
-            print(f"  Samples: {len(ds)}{' (in memory)' if in_memory else ''}")
+            print(f"  Samples: {len(ds)}{' (prefaulted)' if prefault else ''}")
 
     combined = ConcatDataset(datasets)
     print(f"Total samples: {len(combined)}")

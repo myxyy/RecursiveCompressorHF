@@ -43,7 +43,7 @@ MAX_CHECKPOINTS = 2
 VALIDATION_RATIO = 0.001
 CONTROL_FILE = "control.cmd"
 LOG_INTERVAL = 10
-DATASET_IN_MEMORY = True  # Load entire memmap caches into RAM (faster, high memory use)
+DATASET_PREFAULT = True  # Prefault memmap pages into OS page cache (shared across ranks)
 
 
 def get_data_dir():
@@ -186,14 +186,15 @@ def train():
     sentinel_path = os.path.join(cache_dir, "mmap", ".cache_ready")
     if rank == 0:
         print("Preparing datasets...", flush=True)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, in_memory=DATASET_IN_MEMORY)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, prefault=DATASET_PREFAULT)
         with open(sentinel_path, "w") as f:
             f.write("ready")
         print("Cache ready.", flush=True)
     else:
         while not os.path.exists(sentinel_path):
             time.sleep(2)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, in_memory=DATASET_IN_MEMORY)
+        # Other ranks just open the memmap (page cache populated by rank 0 if prefault enabled)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, prefault=False)
 
     dist.barrier()
     if rank == 0 and os.path.exists(sentinel_path):
