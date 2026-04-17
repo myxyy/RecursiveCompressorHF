@@ -43,6 +43,7 @@ MAX_CHECKPOINTS = 2
 VALIDATION_RATIO = 0.001
 CONTROL_FILE = "control.cmd"
 LOG_INTERVAL = 10
+DATASET_IN_MEMORY = True  # Load entire memmap caches into RAM (faster, high memory use)
 
 
 def get_data_dir():
@@ -185,14 +186,14 @@ def train():
     sentinel_path = os.path.join(cache_dir, "mmap", ".cache_ready")
     if rank == 0:
         print("Preparing datasets...", flush=True)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, in_memory=DATASET_IN_MEMORY)
         with open(sentinel_path, "w") as f:
             f.write("ready")
         print("Cache ready.", flush=True)
     else:
         while not os.path.exists(sentinel_path):
             time.sleep(2)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir)
+        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, in_memory=DATASET_IN_MEMORY)
 
     dist.barrier()
     if rank == 0 and os.path.exists(sentinel_path):
