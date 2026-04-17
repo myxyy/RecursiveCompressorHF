@@ -28,13 +28,23 @@ cp .env.example .env
 
 ### Training
 
+Two parallelism modes are supported.
+
 ```bash
 # Single GPU
 uv run python train.py
 
-# Multi-GPU (e.g. 6 GPUs)
+# DDP (data parallel, 6 GPUs)
 uv run torchrun --nproc_per_node=6 train.py
+
+# Pipeline parallel (model split across GPUs, 6 GPUs)
+uv run torchrun --nproc_per_node=6 train_pipeline.py
 ```
+
+| Mode | Use case |
+|---|---|
+| DDP | Faster training when the model fits on a single GPU |
+| Pipeline | When the model is too large for a single GPU |
 
 Training data is automatically downloaded from HuggingFace. Tokenized caches (numpy memmap) are stored in `$DATA_DIR/hf_cache/mmap/` and reused on subsequent runs.
 
@@ -46,9 +56,11 @@ echo "resume"        > control.cmd   # Resume training
 echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 ```
 
-Checkpoints are saved to `$DATA_DIR/checkpoints/` and automatically restored on restart.
+Checkpoints are saved to `$DATA_DIR/checkpoints/` (DDP) or `$DATA_DIR/checkpoints_pipeline/` (Pipeline) and automatically restored on restart.
 
 ### Text Generation
+
+Both DDP and pipeline checkpoints work with the same command.
 
 ```bash
 uv run python predict.py "Once upon a time" --model-dir ./data/final_model \
@@ -74,35 +86,36 @@ uv run pytest test_lm.py -v
 |---|---|
 | `recursive_compressor.py` | RecursiveCompressor module (`step`/`forward`/`predict`) |
 | `recursive_compressor_lm.py` | Language model (extends PreTrainedModel) |
+| `recursive_compressor_lm_pipeline.py` | Pipeline parallel stage wrapper |
 | `configuration_recursive_compressor.py` | Model config (extends PretrainedConfig) |
 | `dataset.py` | HF dataset loading, tokenization, memmap caching |
 | `train.py` | DDP training script (checkpointing, control commands) |
-| `predict.py` | Text generation (loads model via `from_pretrained`) |
+| `train_pipeline.py` | Pipeline parallel training script |
+| `predict.py` | Text generation (supports both DDP and pipeline checkpoints) |
 | `test_lm.py` | Tests |
 | `.env.example` | Environment config example |
 
-## Training Datasets
+## Training Datasets (Japanese only)
 
 | Dataset | Type |
 |---|---|
-| `wikimedia/wikipedia` (ja, en) | Documents |
-| `JeanKaddour/minipile` | Documents |
+| `wikimedia/wikipedia` (20231101.ja) | Documents |
+| `hotchpotch/cc100-ja-documents` | Documents |
 | `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | Dialogue |
 | `shi3z/ja_conv_wikipedia_orion14B_100K` | Dialogue |
-| `HuggingFaceH4/ultrachat_200k` | Dialogue |
 
-Document data is formatted with `[DOC]` markers, dialogue data with `[QUERY]`/`[ANSWER]` markers.
+Document data is formatted with `[DOC]` markers, dialogue data with `[QUERY]`/`[ANSWER]` markers. Short documents are packed into single samples to reduce PAD waste.
 
 ## Model Parameters
 
 | Parameter | Value |
 |---|---|
-| d_model | 1024 |
-| num_heads | 8 |
-| d_ff | 2048 |
-| chunk_size | 8 |
-| compress_size | 4 |
-| num_layers | 8 |
-| context_length | 4096 |
+| d_model | 2048 |
+| num_heads | 16 |
+| d_ff | 4096 |
+| chunk_size | 4 |
+| compress_size | 1 |
+| num_layers | 12 (DDP) / 16 (Pipeline) |
+| context_length | 2048 |
 | optimizer | RAdamScheduleFree |
-| learning_rate | 3e-4 |
+| dtype | float32 |

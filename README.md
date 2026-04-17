@@ -28,13 +28,23 @@ cp .env.example .env
 
 ### 学習
 
+2種類の並列学習方式に対応しています。
+
 ```bash
 # 単一GPU
 uv run python train.py
 
-# マルチGPU（例: 6GPU）
+# DDP（データ並列、6GPU）
 uv run torchrun --nproc_per_node=6 train.py
+
+# パイプライン並列（モデルをGPUに分割、6GPU）
+uv run torchrun --nproc_per_node=6 train_pipeline.py
 ```
+
+| 方式 | 用途 |
+|---|---|
+| DDP | モデルが1GPUに収まる場合の高速化 |
+| Pipeline | モデルが大きく1GPUに収まらない場合 |
 
 学習データはHuggingFaceから自動ダウンロードされ、トークナイズ済みキャッシュ（numpy memmap）が `$DATA_DIR/hf_cache/mmap/` に保存されます。2回目以降はキャッシュから高速にロードされます。
 
@@ -46,9 +56,11 @@ echo "resume"        > control.cmd   # 再開
 echo "save_and_exit" > control.cmd   # 保存して終了
 ```
 
-チェックポイントは `$DATA_DIR/checkpoints/` に保存され、再起動時に自動復帰します。
+チェックポイントは `$DATA_DIR/checkpoints/` または `$DATA_DIR/checkpoints_pipeline/` に保存され、再起動時に自動復帰します。
 
 ### テキスト生成
+
+DDP学習のチェックポイントもパイプライン学習のチェックポイントも同じコマンドで読み込めます。
 
 ```bash
 uv run python predict.py "吾輩は猫である。" --model-dir ./data/final_model \
@@ -74,35 +86,36 @@ uv run pytest test_lm.py -v
 |---|---|
 | `recursive_compressor.py` | RecursiveCompressorモジュール（`step`/`forward`/`predict`） |
 | `recursive_compressor_lm.py` | 言語モデル（PreTrainedModel継承） |
+| `recursive_compressor_lm_pipeline.py` | パイプライン並列用ステージラッパー |
 | `configuration_recursive_compressor.py` | モデル設定（PretrainedConfig継承） |
 | `dataset.py` | HFデータセット読み込み・トークナイズ・memmapキャッシュ |
 | `train.py` | DDP学習スクリプト（チェックポイント・制御コマンド対応） |
-| `predict.py` | テキスト生成（`from_pretrained`でモデルロード） |
+| `train_pipeline.py` | パイプライン並列学習スクリプト |
+| `predict.py` | テキスト生成（DDP/パイプライン両形式に対応） |
 | `test_lm.py` | テスト |
 | `.env.example` | 環境設定例 |
 
-## 学習データセット
+## 学習データセット（日本語のみ）
 
 | データセット | 種類 |
 |---|---|
-| `wikimedia/wikipedia` (ja, en) | 文章 |
-| `JeanKaddour/minipile` | 文章 |
+| `wikimedia/wikipedia` (20231101.ja) | 文章 |
+| `hotchpotch/cc100-ja-documents` | 文章 |
 | `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | 対話 |
 | `shi3z/ja_conv_wikipedia_orion14B_100K` | 対話 |
-| `HuggingFaceH4/ultrachat_200k` | 対話 |
 
-文章データは `[DOC]` マーカー付き、対話データは `[QUERY]`/`[ANSWER]` マーカー付きでフォーマットされます。
+文章データは `[DOC]` マーカー付き、対話データは `[QUERY]`/`[ANSWER]` マーカー付きでフォーマットされます。短い文書はパッキングして1サンプルにまとめ、PADによる無駄を削減しています。
 
 ## モデルパラメータ
 
 | パラメータ | 値 |
 |---|---|
-| d_model | 1024 |
-| num_heads | 8 |
-| d_ff | 2048 |
-| chunk_size | 8 |
-| compress_size | 4 |
-| num_layers | 8 |
-| context_length | 4096 |
+| d_model | 2048 |
+| num_heads | 16 |
+| d_ff | 4096 |
+| chunk_size | 4 |
+| compress_size | 1 |
+| num_layers | 12 (DDP) / 16 (Pipeline) |
+| context_length | 2048 |
 | optimizer | RAdamScheduleFree |
-| learning_rate | 3e-4 |
+| dtype | float32 |
