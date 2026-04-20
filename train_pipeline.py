@@ -22,12 +22,35 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.distributed.pipelining import PipelineStage
 from torch.distributed.pipelining.schedules import Schedule1F1B
 from dotenv import load_dotenv
-from schedulefree import RAdamScheduleFree
 
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from recursive_compressor_lm_pipeline import RecursiveCompressorLMPipelineStage
 from dataset import prepare_all_datasets, get_tokenizer
+
+torch.set_float32_matmul_precision("high")
+
+
+# Names that should NOT use Muon (use AdamW instead).
+# Muon is for 2D hidden-layer weights; embedding, output head, and learnable
+# context/query vectors are kept on AdamW per the original Muon recipe.
+_ADAMW_ONLY_KEYWORDS = ("embedding", "head", "compressor_query", "initial_context")
+
+
+def split_params_for_muon(model):
+    """Split parameters into (muon_params, adamw_params).
+    Muon manages 2D Linear weights inside hidden layers.
+    AdamW manages embedding, output head, learnable contexts, biases, LayerNorms."""
+    muon_params, adamw_params = [], []
+    for name, param in model.named_parameters():
+        if not param.requires_grad:
+            continue
+        excluded = any(kw in name for kw in _ADAMW_ONLY_KEYWORDS)
+        if param.ndim >= 2 and not excluded:
+            muon_params.append(param)
+        else:
+            adamw_params.append(param)
+    return muon_params, adamw_params
 
 load_dotenv()
 
@@ -83,16 +106,16 @@ def log(msg):
         print(msg, flush=True)
 
 
-def save_stage_checkpoint(stage_module, optimizer, step, epoch, checkpoint_dir,
+def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
                           rank, stage_info, tokenizer=None, config=None):
-    """Save per-stage checkpoint."""
+    """Save per-stage checkpoint. optimizers is a list of optimizer instances."""
     os.makedirs(checkpoint_dir, exist_ok=True)
     path = os.path.join(checkpoint_dir, f"checkpoint-{step}")
     os.makedirs(path, exist_ok=True)
 
     torch.save({
         "stage_state_dict": stage_module.state_dict(),
-        "optimizer_state_dict": optimizer.state_dict(),
+        "optimizers_state_dict": [opt.state_dict() for opt in optimizers],
         "step": step,
         "epoch": epoch,
         "stage_info": stage_info,
@@ -138,8 +161,8 @@ def _rotate_checkpoints(checkpoint_dir):
         log(f"Removed old checkpoint: {old}")
 
 
-def load_latest_checkpoint(stage_module, optimizer, checkpoint_dir, rank):
-    """Load latest per-stage checkpoint. Returns (step, epoch)."""
+def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank):
+    """Load latest per-stage checkpoint. optimizers is a list. Returns (step, epoch)."""
     if not os.path.exists(checkpoint_dir):
         return 0, 0
 
@@ -157,7 +180,11 @@ def load_latest_checkpoint(stage_module, optimizer, checkpoint_dir, rank):
         log(f"Resuming from checkpoint: {latest}")
         data = torch.load(stage_path, map_location="cpu", weights_only=False)
         stage_module.load_state_dict(data["stage_state_dict"])
-        optimizer.load_state_dict(data["optimizer_state_dict"])
+        if "optimizers_state_dict" in data:
+            for opt, state in zip(optimizers, data["optimizers_state_dict"]):
+                opt.load_state_dict(state)
+        else:
+            log("Old optimizer format detected; skipping optimizer state (starting fresh).")
         return data["step"], data["epoch"]
 
     # Fall back to full model
@@ -217,12 +244,12 @@ def train():
     # Split model across pipeline stages
     stage_infos = RecursiveCompressorLMPipelineStage.split_config(config.num_layers, world_size)
     stage_info = stage_infos[rank]
-    stage_module = RecursiveCompressorLMPipelineStage(config, **stage_info).to(device)
+    stage_module = RecursiveCompressorLMPipelineStage(config, **stage_info).to(dtype=torch.bfloat16, device=device)
 
     stage_params = sum(p.numel() for p in stage_module.parameters())
     total_params_tensor = torch.tensor([stage_params], dtype=torch.long, device=device)
     dist.all_reduce(total_params_tensor)
-    log(f"Total layers: {config.num_layers}, Stages: {world_size}, Total params: {total_params_tensor.item():,}")
+    log(f"Total layers: {config.num_layers}, Stages: {world_size}, Total params: {total_params_tensor.item():,}, dtype: bfloat16")
     log(f"Stage {rank}: layers {stage_info['layer_start']}-{stage_info['layer_end']}, "
         f"params: {stage_params:,}, first={stage_info['is_first']}, last={stage_info['is_last']}")
 
@@ -236,11 +263,23 @@ def train():
         sampler=train_sampler, num_workers=2, pin_memory=True, drop_last=True,
     )
 
-    # Optimizer
-    optimizer = RAdamScheduleFree(stage_module.parameters(), lr=LEARNING_RATE)
+    # Optimizers: Muon for hidden 2D matrices, AdamW for embedding/head/biases/norms
+    muon_params, adamw_params = split_params_for_muon(stage_module)
+    optimizers = []
+    if muon_params:
+        optimizers.append(torch.optim.Muon(
+            muon_params, lr=LEARNING_RATE, weight_decay=0.0,
+            momentum=0.95, adjust_lr_fn="match_rms_adamw",
+        ))
+    if adamw_params:
+        optimizers.append(torch.optim.AdamW(
+            adamw_params, lr=LEARNING_RATE, weight_decay=0.0,
+        ))
+    log(f"Stage {rank}: Muon manages {sum(p.numel() for p in muon_params):,} params, "
+        f"AdamW manages {sum(p.numel() for p in adamw_params):,} params")
 
     # Resume
-    start_step, start_epoch = load_latest_checkpoint(stage_module, optimizer, checkpoint_dir, rank)
+    start_step, start_epoch = load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank)
     global_step = start_step
 
     # Loss function (only used on last stage)
@@ -253,7 +292,6 @@ def train():
     total_steps = len(train_loader)
     for epoch in range(start_epoch, NUM_EPOCHS):
         stage_module.train()
-        optimizer.train()
         train_sampler.set_epoch(epoch)
 
         ema_loss = None
@@ -279,8 +317,7 @@ def train():
                 paused = False
             elif cmd == CMD_SAVE_AND_EXIT:
                 log("Save and exit requested.")
-                optimizer.eval()
-                save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
+                save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, tokenizer, config)
                 dist.destroy_process_group()
                 return
@@ -293,8 +330,7 @@ def train():
                     paused = False
                 elif cmd == CMD_SAVE_AND_EXIT:
                     log("Save and exit requested.")
-                    optimizer.eval()
-                    save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
+                    save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                           checkpoint_dir, rank, stage_info, tokenizer, config)
                     dist.destroy_process_group()
                     return
@@ -319,8 +355,10 @@ def train():
 
             # Gradient clipping and optimizer step
             grad_norm = nn.utils.clip_grad_norm_(stage_module.parameters(), GRAD_CLIP).item()
-            optimizer.step()
-            optimizer.zero_grad()
+            for opt in optimizers:
+                opt.step()
+            for opt in optimizers:
+                opt.zero_grad()
 
             # Loss tracking (last rank collects microbatch losses, broadcasts to rank 0)
             loss_tensor = torch.zeros(1, device=device)
@@ -356,16 +394,12 @@ def train():
                 step_start_time = time.time()
 
             if global_step % CHECKPOINT_INTERVAL == 0:
-                optimizer.eval()
-                save_stage_checkpoint(stage_module, optimizer, global_step, epoch,
+                save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, tokenizer, config)
-                optimizer.train()
 
-        # Epoch-end checkpoint (with eval params)
-        optimizer.eval()
-        save_stage_checkpoint(stage_module, optimizer, global_step, epoch + 1,
+        # Epoch-end checkpoint
+        save_stage_checkpoint(stage_module, optimizers, global_step, epoch + 1,
                               checkpoint_dir, rank, stage_info, tokenizer, config)
-        optimizer.train()
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
