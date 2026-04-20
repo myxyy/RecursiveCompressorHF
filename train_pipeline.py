@@ -20,7 +20,7 @@ import torch.distributed as dist
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data.distributed import DistributedSampler
 from torch.distributed.pipelining import PipelineStage
-from torch.distributed.pipelining.schedules import ScheduleGPipe
+from torch.distributed.pipelining.schedules import Schedule1F1B
 from dotenv import load_dotenv
 from schedulefree import RAdamScheduleFree
 
@@ -316,7 +316,7 @@ def train():
             pipe_stage = PipelineStage(
                 stage_module, stage_index=rank, num_stages=world_size, device=device,
             )
-            schedule = ScheduleGPipe(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
+            schedule = Schedule1F1B(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
             # Execute pipeline (losses are collected via the losses list arg)
             microbatch_losses = []
@@ -383,7 +383,7 @@ def train():
             pipe_stage = PipelineStage(
                 stage_module, stage_index=rank, num_stages=world_size, device=device,
             )
-            schedule = ScheduleGPipe(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
+            schedule = Schedule1F1B(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
             microbatch_losses = []
             if rank == 0:
