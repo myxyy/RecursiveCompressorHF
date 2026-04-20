@@ -19,6 +19,7 @@ from configuration_recursive_compressor import RecursiveCompressorConfig
 from dataset import TOKENIZER_NAME
 from recursive_compressor_lm import RecursiveCompressorLM
 
+torch.set_float32_matmul_precision("high")
 
 def _load_model(model_dir, device):
     """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt)."""
