@@ -17,7 +17,7 @@ from contextlib import nullcontext
 import torch
 import torch.nn as nn
 import torch.distributed as dist
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torch.distributed.pipelining import PipelineStage
 from torch.distributed.pipelining.schedules import Schedule1F1B
@@ -42,7 +42,6 @@ N_MICROBATCHES = 6
 BATCH_SIZE = 6  # Must be >= N_MICROBATCHES
 CHECKPOINT_INTERVAL = 1000
 MAX_CHECKPOINTS = 2
-VALIDATION_RATIO = 0.001
 CONTROL_FILE = "control.cmd"
 LOG_INTERVAL = 10
 DATASET_PREFAULT = True  # Prefault memmap pages into OS page cache (shared across ranks)
@@ -228,22 +227,13 @@ def train():
         f"params: {stage_params:,}, first={stage_info['is_first']}, last={stage_info['is_last']}")
 
     # Data (all ranks see the same data — pipeline parallel, not data parallel)
-    val_size = max(1, int(len(full_dataset) * VALIDATION_RATIO))
-    train_size = len(full_dataset) - val_size
-    train_dataset, val_dataset = random_split(
-        full_dataset, [train_size, val_size],
-        generator=torch.Generator().manual_seed(42),
-    )
-    log(f"Train: {train_size}, Validation: {val_size}")
+    train_dataset = full_dataset
+    log(f"Train: {len(train_dataset)}")
 
     train_sampler = DistributedSampler(train_dataset, num_replicas=1, rank=0, shuffle=True)
     train_loader = DataLoader(
         train_dataset, batch_size=BATCH_SIZE,
         sampler=train_sampler, num_workers=2, pin_memory=True, drop_last=True,
-    )
-    val_loader = DataLoader(
-        val_dataset, batch_size=BATCH_SIZE,
-        shuffle=False, num_workers=2, pin_memory=True, drop_last=True,
     )
 
     # Optimizer
@@ -371,41 +361,11 @@ def train():
                                       checkpoint_dir, rank, stage_info, tokenizer, config)
                 optimizer.train()
 
-        # Epoch-end validation
-        stage_module.eval()
-        optimizer.eval()
-        val_loss = 0.0
-        val_batches = 0
-        for input_ids, labels in val_loader:
-            input_ids = input_ids.to(device)
-            labels = labels.to(device)
-
-            pipe_stage = PipelineStage(
-                stage_module, stage_index=rank, num_stages=world_size, device=device,
-            )
-            schedule = Schedule1F1B(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
-
-            microbatch_losses = []
-            if rank == 0:
-                schedule.step(input_ids)
-            elif rank == world_size - 1:
-                schedule.step(target=labels, losses=microbatch_losses)
-            else:
-                schedule.step()
-
-            loss_tensor = torch.zeros(1, device=device)
-            if rank == world_size - 1 and microbatch_losses:
-                loss_tensor[0] = sum(l.item() for l in microbatch_losses) / len(microbatch_losses)
-            dist.broadcast(loss_tensor, src=world_size - 1)
-            val_loss += loss_tensor.item()
-            val_batches += 1
-
-        if val_batches > 0:
-            log(f"Epoch {epoch+1}/{NUM_EPOCHS}, Validation Loss: {val_loss / val_batches:.4f}")
-
         # Epoch-end checkpoint (with eval params)
+        optimizer.eval()
         save_stage_checkpoint(stage_module, optimizer, global_step, epoch + 1,
                               checkpoint_dir, rank, stage_info, tokenizer, config)
+        optimizer.train()
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
