@@ -55,7 +55,7 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0):
     token_ids = tokenizer.encode(prompt)
     generated = list(token_ids)
 
-    with torch.no_grad():
+    with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=(device.type == "cuda")):
         # Feed prompt as a single sequence using step
         input_ids = torch.tensor([token_ids], dtype=torch.long, device=device)
         logits, hidden = model.step(input_ids, None)
@@ -63,7 +63,7 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0):
 
         # Generate new tokens
         while len(generated) < context_length:
-            next_logits = logits / temperature
+            next_logits = logits.float() / temperature
             probs = torch.softmax(next_logits, dim=-1)
             next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
 

@@ -58,7 +58,7 @@ torch.set_float32_matmul_precision("high")
 
 # Hyperparameters
 CONTEXT_LENGTH = 2048
-LEARNING_RATE = 1e-4
+LEARNING_RATE = 2e-5
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
 N_MICROBATCHES = 6
@@ -230,9 +230,9 @@ def train():
 
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
-        d_model=2048,
+        d_model=3072,
         num_heads=16,
-        d_ff=4096,
+        d_ff=8192,
         chunk_size=4,
         compress_size=1,
         num_layers=16,
@@ -244,12 +244,15 @@ def train():
     # Split model across pipeline stages
     stage_infos = RecursiveCompressorLMPipelineStage.split_config(config.num_layers, world_size)
     stage_info = stage_infos[rank]
-    stage_module = RecursiveCompressorLMPipelineStage(config, **stage_info).to(dtype=torch.bfloat16, device=device)
+    # Master weights and optimizer state stay in fp32; forward/backward use
+    # bfloat16 via autocast (mixed precision).
+    stage_module = RecursiveCompressorLMPipelineStage(config, **stage_info).to(device)
 
     stage_params = sum(p.numel() for p in stage_module.parameters())
     total_params_tensor = torch.tensor([stage_params], dtype=torch.long, device=device)
     dist.all_reduce(total_params_tensor)
-    log(f"Total layers: {config.num_layers}, Stages: {world_size}, Total params: {total_params_tensor.item():,}, dtype: bfloat16")
+    log(f"Total layers: {config.num_layers}, Stages: {world_size}, Total params: {total_params_tensor.item():,}, "
+        f"params dtype: fp32, compute dtype: bfloat16 (autocast)")
     log(f"Stage {rank}: layers {stage_info['layer_start']}-{stage_info['layer_end']}, "
         f"params: {stage_params:,}, first={stage_info['is_first']}, last={stage_info['is_last']}")
 
@@ -344,14 +347,18 @@ def train():
             )
             schedule = Schedule1F1B(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
-            # Execute pipeline (losses are collected via the losses list arg)
+            # Execute pipeline (losses are collected via the losses list arg).
+            # Forward/backward run in bfloat16 via autocast; LayerNorm, Softmax,
+            # and CE loss stay in fp32 by autocast's policy. Gradients flow back
+            # to fp32 master weights.
             microbatch_losses = []
-            if rank == 0:
-                schedule.step(input_ids)
-            elif rank == world_size - 1:
-                schedule.step(target=labels, losses=microbatch_losses)
-            else:
-                schedule.step()
+            with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
+                if rank == 0:
+                    schedule.step(input_ids)
+                elif rank == world_size - 1:
+                    schedule.step(target=labels, losses=microbatch_losses)
+                else:
+                    schedule.step()
 
             # Gradient clipping and optimizer step
             grad_norm = nn.utils.clip_grad_norm_(stage_module.parameters(), GRAD_CLIP).item()

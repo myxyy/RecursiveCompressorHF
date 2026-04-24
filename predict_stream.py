@@ -54,7 +54,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, devic
     # Stream the prompt itself
     streamer.put(torch.tensor(token_ids))
 
-    with torch.no_grad():
+    with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=(device.type == "cuda")):
         # Feed prompt as a single sequence
         input_ids = torch.tensor([token_ids], dtype=torch.long, device=device)
         logits, hidden = model.step(input_ids, None)
@@ -64,7 +64,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, devic
         start_time = time.time()
 
         while len(token_ids) + num_generated < context_length:
-            next_logits = logits / temperature
+            next_logits = logits.float() / temperature
             probs = torch.softmax(next_logits, dim=-1)
             next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
 
