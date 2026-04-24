@@ -12,6 +12,7 @@ class MultiHeadAttention(nn.Module):
         assert self.head_dim * num_heads == d_model, "d_model must be divisible by num_heads"
 
         self.query_linear = nn.Linear(d_model, d_model)
+        self.gate_linear = nn.Linear(d_model, d_model)
         self.key_linear = nn.Linear(d_model, d_model)
         self.value_linear = nn.Linear(d_model, d_model)
         self.out_linear = nn.Linear(d_model, d_model)
@@ -20,6 +21,7 @@ class MultiHeadAttention(nn.Module):
         batch_size = query.size(0)
 
         # Linear projections
+        gate = self.gate_linear(query).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
         query = self.query_linear(query).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
         key = self.key_linear(key).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
         value = self.value_linear(value).view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
@@ -30,6 +32,7 @@ class MultiHeadAttention(nn.Module):
         if mask is not None:
             attn_mask = mask.bool()
         attn_output = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask)
+        attn_output = attn_output * torch.sigmoid(gate)
 
         # Concatenate heads and pass through final linear layer
         attn_output = attn_output.transpose(1, 2).contiguous().view(batch_size, -1, self.d_model)

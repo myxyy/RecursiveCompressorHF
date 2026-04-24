@@ -58,7 +58,7 @@ torch.set_float32_matmul_precision("high")
 
 # Hyperparameters
 CONTEXT_LENGTH = 2048
-LEARNING_RATE = 2e-5
+LEARNING_RATE = 5e-5
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
 N_MICROBATCHES = 6
@@ -230,9 +230,9 @@ def train():
 
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
-        d_model=3072,
+        d_model=2048,
         num_heads=16,
-        d_ff=8192,
+        d_ff=6144,
         chunk_size=4,
         compress_size=1,
         num_layers=16,
