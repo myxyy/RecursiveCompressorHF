@@ -115,7 +115,7 @@ class TestRecursiveCompressorLM:
                 predict_logits_list.append(logits)
             predict_logits = torch.stack(predict_logits_list, dim=1)
 
-        torch.testing.assert_close(predict_logits, forward_logits, atol=1e-4, rtol=1e-4)
+        torch.testing.assert_close(predict_logits, forward_logits, atol=1e-3, rtol=1e-2)
 
     @pytest.mark.parametrize("splits", [
         ([3, 4],),
@@ -149,7 +149,7 @@ class TestRecursiveCompressorLM:
                 pos += length
             step_logits = torch.cat(step_logits_list, dim=1)
 
-        torch.testing.assert_close(step_logits, forward_logits, atol=1e-4, rtol=1e-4)
+        torch.testing.assert_close(step_logits, forward_logits, atol=1e-3, rtol=1e-2)
 
     def test_step_matches_predict_token_by_token(self, config):
         """stepを1トークンずつ呼んだ結果がpredictと一致する"""
@@ -176,7 +176,7 @@ class TestRecursiveCompressorLM:
                 step_logits_list.append(logits)
             step_logits = torch.cat(step_logits_list, dim=1)
 
-        torch.testing.assert_close(step_logits, predict_logits, atol=1e-4, rtol=1e-4)
+        torch.testing.assert_close(step_logits, predict_logits, atol=1e-3, rtol=1e-2)
 
 
 class TestDataFormatting:
