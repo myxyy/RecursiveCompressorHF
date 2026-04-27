@@ -20,6 +20,7 @@ from transformers import AutoTokenizer, TextStreamer
 
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from dataset import TOKENIZER_NAME
+from predict import sample_token
 from recursive_compressor_lm import RecursiveCompressorLM
 
 torch.set_float32_matmul_precision("high")
@@ -44,7 +45,7 @@ def _load_tokenizer(model_dir):
     return AutoTokenizer.from_pretrained(TOKENIZER_NAME)
 
 
-def stream_generate(model, tokenizer, prompt, context_length, temperature, device):
+def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device):
     """Generate tokens one at a time, streaming output to stdout.
     Returns (num_generated, elapsed_seconds)."""
     streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
@@ -64,9 +65,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, devic
         start_time = time.time()
 
         while len(token_ids) + num_generated < context_length:
-            next_logits = logits.float() / temperature
-            probs = torch.softmax(next_logits, dim=-1)
-            next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
+            next_token = sample_token(logits.float(), temperature, top_p)
 
             tok_id = next_token.item()
             streamer.put(next_token.cpu())
@@ -90,6 +89,7 @@ def main():
     parser.add_argument("--model-dir", type=str, required=True, help="モデルディレクトリ")
     parser.add_argument("--context-length", type=int, default=1024, help="生成する最大コンテキスト長")
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
+    parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -102,7 +102,8 @@ def main():
 
     tokenizer = _load_tokenizer(args.model_dir)
 
-    print(f"Device: {device}, context_length: {args.context_length}, temperature: {args.temperature}")
+    print(f"Device: {device}, context_length: {args.context_length}, "
+          f"temperature: {args.temperature}, top_p: {args.top_p}")
     print("Type 'exit' to quit.")
 
     while True:
@@ -117,7 +118,7 @@ def main():
 
         num_generated, elapsed = stream_generate(
             model, tokenizer, prompt,
-            args.context_length, args.temperature, device,
+            args.context_length, args.temperature, args.top_p, device,
         )
         if elapsed > 0 and num_generated > 0:
             print(f"\n[{num_generated} tokens, {elapsed:.2f}s, {num_generated / elapsed:.2f} tok/s]")

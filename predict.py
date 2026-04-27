@@ -21,6 +21,25 @@ from recursive_compressor_lm import RecursiveCompressorLM
 
 torch.set_float32_matmul_precision("high")
 
+
+def sample_token(logits, temperature, top_p):
+    """Sample one token from logits with temperature and top-p (nucleus) filtering.
+    logits: (batch, vocab) — assumed fp32. Returns (batch,) long tensor."""
+    probs = torch.softmax(logits / temperature, dim=-1)
+    if top_p < 1.0:
+        sorted_probs, sorted_idx = torch.sort(probs, dim=-1, descending=True)
+        cumulative = sorted_probs.cumsum(dim=-1)
+        # Keep tokens until cumulative prob >= top_p (always keep at least the top one)
+        cutoff = cumulative > top_p
+        cutoff[..., 0] = False
+        cutoff[..., 1:] = cutoff[..., :-1].clone()
+        sorted_probs = sorted_probs.masked_fill(cutoff, 0.0)
+        sorted_probs = sorted_probs / sorted_probs.sum(dim=-1, keepdim=True)
+        next_in_sorted = torch.multinomial(sorted_probs, num_samples=1)
+        return sorted_idx.gather(-1, next_in_sorted).squeeze(-1)
+    return torch.multinomial(probs, num_samples=1).squeeze(-1)
+
+
 def _load_model(model_dir, device):
     """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt)."""
     full_model_pt = os.path.join(model_dir, "full_model.pt")
@@ -38,7 +57,7 @@ def _load_model(model_dir, device):
         return RecursiveCompressorLM.from_pretrained(model_dir).to(device)
 
 
-def predict(prompt, model_dir, context_length=1024, temperature=1.0):
+def predict(prompt, model_dir, context_length=1024, temperature=1.0, top_p=1.0):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     model = _load_model(model_dir, device)
@@ -63,9 +82,7 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0):
 
         # Generate new tokens
         while len(generated) < context_length:
-            next_logits = logits.float() / temperature
-            probs = torch.softmax(next_logits, dim=-1)
-            next_token = torch.multinomial(probs, num_samples=1).squeeze(-1)
+            next_token = sample_token(logits.float(), temperature, top_p)
 
             generated.append(next_token.item())
             if next_token.item() == tokenizer.eos_token_id:
@@ -84,9 +101,10 @@ def main():
     parser.add_argument("--model-dir", type=str, required=True, help="モデルディレクトリ (save_pretrained)")
     parser.add_argument("--context-length", type=int, default=1024, help="生成する最大コンテキスト長")
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
+    parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
     args = parser.parse_args()
 
-    text = predict(args.prompt, args.model_dir, args.context_length, args.temperature)
+    text = predict(args.prompt, args.model_dir, args.context_length, args.temperature, args.top_p)
     print(text)
 
 
