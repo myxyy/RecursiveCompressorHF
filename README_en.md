@@ -6,7 +6,7 @@ A language model implementation using a custom architecture with recursive compr
 
 ## Architecture
 
-RecursiveCompressor splits the input sequence into chunks, processes each chunk with causal attention, and achieves inter-chunk information transfer through recursive compression and decompression.
+RecursiveCompressor splits the input sequence into chunks, processes each chunk with causal attention (GatedAttention), and achieves inter-chunk information transfer through recursive compression and decompression.
 
 The language model (RecursiveCompressorLM) has the following structure:
 
@@ -26,25 +26,13 @@ cp .env.example .env
 
 ## Usage
 
-### Training
-
-Two parallelism modes are supported.
+### Training (Pipeline Parallel)
 
 ```bash
-# Single GPU
-uv run python train.py
-
-# DDP (data parallel, 6 GPUs)
-uv run torchrun --nproc_per_node=6 train.py
-
-# Pipeline parallel (model split across GPUs, 6 GPUs)
 uv run torchrun --nproc_per_node=6 train_pipeline.py
 ```
 
-| Mode | Use case |
-|---|---|
-| DDP | Faster training when the model fits on a single GPU |
-| Pipeline | When the model is too large for a single GPU |
+The model is split across GPUs using pipeline parallelism. Trains in mixed precision (fp32 master weights + bfloat16 autocast) with a two-optimizer setup: Muon (2D hidden weights) + AdamW (embedding, head, biases, LayerNorms).
 
 Training data is automatically downloaded from HuggingFace. Tokenized caches (numpy memmap) are stored in `$DATA_DIR/hf_cache/mmap/` and reused on subsequent runs.
 
@@ -56,23 +44,27 @@ echo "resume"        > control.cmd   # Resume training
 echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 ```
 
-Checkpoints are saved to `$DATA_DIR/checkpoints/` (DDP) or `$DATA_DIR/checkpoints_pipeline/` (Pipeline) and automatically restored on restart.
+Checkpoints are saved to `$DATA_DIR/checkpoints_pipeline/` and automatically restored on restart.
 
 ### Text Generation
 
-Both DDP and pipeline checkpoints work with the same command.
-
 ```bash
-uv run python predict.py "Once upon a time" --model-dir ./data/final_model \
-    --context-length 256 --temperature 0.8
+# Single generation
+uv run python predict.py "Once upon a time" --model-dir /path/to/checkpoint \
+    --context-length 256 --temperature 0.8 --top-p 0.9
+
+# Interactive streaming
+uv run python predict_stream.py --model-dir /path/to/checkpoint \
+    --context-length 1024 --temperature 0.8 --top-p 0.9
 ```
 
 | Option | Description | Default |
 |---|---|---|
-| `prompt` | Input text (required) | - |
+| `prompt` | Input text (required for predict.py only) | - |
 | `--model-dir` | Model directory (required) | - |
 | `--context-length` | Maximum generation length in tokens | 1024 |
 | `--temperature` | Sampling temperature | 1.0 |
+| `--top-p` | top-p (nucleus) sampling threshold (1.0 disables) | 1.0 |
 
 ### Tests
 
@@ -89,9 +81,9 @@ uv run pytest test_lm.py -v
 | `recursive_compressor_lm_pipeline.py` | Pipeline parallel stage wrapper |
 | `configuration_recursive_compressor.py` | Model config (extends PretrainedConfig) |
 | `dataset.py` | HF dataset loading, tokenization, memmap caching |
-| `train.py` | DDP training script (checkpointing, control commands) |
-| `train_pipeline.py` | Pipeline parallel training script |
-| `predict.py` | Text generation (supports both DDP and pipeline checkpoints) |
+| `train_pipeline.py` | Pipeline parallel training (Muon + AdamW, bfloat16 autocast) |
+| `predict.py` | Text generation |
+| `predict_stream.py` | Interactive streaming generation |
 | `test_lm.py` | Tests |
 | `.env.example` | Environment config example |
 
@@ -112,10 +104,11 @@ Document data is formatted with `[DOC]` markers, dialogue data with `[QUERY]`/`[
 |---|---|
 | d_model | 2048 |
 | num_heads | 16 |
-| d_ff | 4096 |
+| d_ff | 6144 |
 | chunk_size | 4 |
 | compress_size | 1 |
-| num_layers | 12 (DDP) / 16 (Pipeline) |
+| num_layers | 16 |
 | context_length | 2048 |
-| optimizer | RAdamScheduleFree |
-| dtype | float32 |
+| optimizer | Muon (2D hidden) + AdamW (embedding/head/bias/norm) |
+| learning rate | 5e-5 |
+| precision | fp32 master weights + bfloat16 autocast |
