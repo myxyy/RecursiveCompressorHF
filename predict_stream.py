@@ -20,7 +20,7 @@ from transformers import AutoTokenizer, TextStreamer
 
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from dataset import TOKENIZER_NAME
-from predict import sample_token
+from predict import _DTYPES, sample_token
 from recursive_compressor_lm import RecursiveCompressorLM
 
 torch.set_float32_matmul_precision("high")
@@ -92,19 +92,20 @@ def main():
     parser.add_argument("--context-length", type=int, default=1024, help="生成する最大コンテキスト長")
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
     parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
+    parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
     args = parser.parse_args()
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     print("Loading model...", flush=True)
-    model = _load_model(args.model_dir, device)
+    model = _load_model(args.model_dir, device, dtype=_DTYPES[args.precision])
     model.eval()
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Parameters: {num_params:,}")
 
     tokenizer = _load_tokenizer(args.model_dir)
 
-    print(f"Device: {device}, context_length: {args.context_length}, "
+    print(f"Device: {device}, precision: {args.precision}, context_length: {args.context_length}, "
           f"temperature: {args.temperature}, top_p: {args.top_p}")
     print("Type 'exit' to quit.")
 

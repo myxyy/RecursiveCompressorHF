@@ -56,10 +56,13 @@ def _load_model(model_dir, device, dtype=torch.bfloat16):
         return RecursiveCompressorLM.from_pretrained(model_dir).to(dtype=dtype, device=device)
 
 
-def predict(prompt, model_dir, context_length=1024, temperature=1.0, top_p=1.0):
+_DTYPES = {"bf16": torch.bfloat16, "fp32": torch.float32}
+
+
+def predict(prompt, model_dir, context_length=1024, temperature=1.0, top_p=1.0, precision="bf16"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    model = _load_model(model_dir, device)
+    model = _load_model(model_dir, device, dtype=_DTYPES[precision])
     model.eval()
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Parameters: {num_params:,}")
@@ -101,9 +104,10 @@ def main():
     parser.add_argument("--context-length", type=int, default=1024, help="生成する最大コンテキスト長")
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
     parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
+    parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
     args = parser.parse_args()
 
-    text = predict(args.prompt, args.model_dir, args.context_length, args.temperature, args.top_p)
+    text = predict(args.prompt, args.model_dir, args.context_length, args.temperature, args.top_p, args.precision)
     print(text)
 
 
