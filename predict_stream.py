@@ -26,17 +26,19 @@ from recursive_compressor_lm import RecursiveCompressorLM
 torch.set_float32_matmul_precision("high")
 
 
-def _load_model(model_dir, device):
-    """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt)."""
+def _load_model(model_dir, device, dtype=torch.bfloat16):
+    """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt).
+    Casts to dtype on device. Defaults to bfloat16 to halve VRAM and avoid the
+    autocast weight-cache that would otherwise duplicate fp32 weights."""
     full_model_pt = os.path.join(model_dir, "full_model.pt")
     if os.path.exists(full_model_pt):
         config = RecursiveCompressorConfig.from_pretrained(model_dir)
         model = RecursiveCompressorLM(config)
         state_dict = torch.load(full_model_pt, map_location="cpu", weights_only=False)
         model.load_state_dict(state_dict)
-        return model.to(device)
+        return model.to(dtype=dtype, device=device)
     else:
-        return RecursiveCompressorLM.from_pretrained(model_dir).to(device)
+        return RecursiveCompressorLM.from_pretrained(model_dir).to(dtype=dtype, device=device)
 
 
 def _load_tokenizer(model_dir):
@@ -55,7 +57,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
     # Stream the prompt itself
     streamer.put(torch.tensor(token_ids))
 
-    with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=(device.type == "cuda")):
+    with torch.no_grad():
         # Feed prompt as a single sequence
         input_ids = torch.tensor([token_ids], dtype=torch.long, device=device)
         logits, hidden = model.step(input_ids, None)

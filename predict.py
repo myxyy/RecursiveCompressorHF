@@ -40,21 +40,20 @@ def sample_token(logits, temperature, top_p):
     return torch.multinomial(probs, num_samples=1).squeeze(-1)
 
 
-def _load_model(model_dir, device):
-    """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt)."""
+def _load_model(model_dir, device, dtype=torch.bfloat16):
+    """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt).
+    Casts to dtype on device. Defaults to bfloat16 to halve VRAM and avoid the
+    autocast weight-cache that would otherwise duplicate fp32 weights."""
     full_model_pt = os.path.join(model_dir, "full_model.pt")
-    config_json = os.path.join(model_dir, "config.json")
 
     if os.path.exists(full_model_pt):
-        # Pipeline checkpoint: load config.json + full_model.pt
         config = RecursiveCompressorConfig.from_pretrained(model_dir)
         model = RecursiveCompressorLM(config)
         state_dict = torch.load(full_model_pt, map_location="cpu", weights_only=False)
         model.load_state_dict(state_dict)
-        return model.to(device)
+        return model.to(dtype=dtype, device=device)
     else:
-        # Standard save_pretrained directory
-        return RecursiveCompressorLM.from_pretrained(model_dir).to(device)
+        return RecursiveCompressorLM.from_pretrained(model_dir).to(dtype=dtype, device=device)
 
 
 def predict(prompt, model_dir, context_length=1024, temperature=1.0, top_p=1.0):
@@ -74,7 +73,7 @@ def predict(prompt, model_dir, context_length=1024, temperature=1.0, top_p=1.0):
     token_ids = tokenizer.encode(prompt)
     generated = list(token_ids)
 
-    with torch.no_grad(), torch.autocast(device_type=device.type, dtype=torch.bfloat16, enabled=(device.type == "cuda")):
+    with torch.no_grad():
         # Feed prompt as a single sequence using step
         input_ids = torch.tensor([token_ids], dtype=torch.long, device=device)
         logits, hidden = model.step(input_ids, None)
