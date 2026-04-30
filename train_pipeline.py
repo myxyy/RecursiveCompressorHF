@@ -10,10 +10,10 @@ Control commands (write to control.cmd file during training):
     echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 """
 
+import argparse
 import os
 import shutil
 import time
-from contextlib import nullcontext
 import torch
 import torch.nn as nn
 import torch.distributed as dist
@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from recursive_compressor_lm_pipeline import RecursiveCompressorLMPipelineStage
-from dataset import prepare_all_datasets, get_tokenizer
+from dataset import DATASET_TYPES, prepare_all_datasets
 
 torch.set_float32_matmul_precision("high")
 
@@ -78,6 +78,24 @@ def get_checkpoint_dir():
     return os.path.join(get_data_dir(), "checkpoints_pipeline")
 
 
+def _checkpoint_step(name):
+    """`checkpoint-pretrain-13000` -> 13000"""
+    return int(name.rsplit("-", 1)[1])
+
+
+def _checkpoint_name(dataset_type, step):
+    return f"checkpoint-{dataset_type}-{step}"
+
+
+def _list_checkpoints(checkpoint_dir, dataset_type):
+    """Return sorted-by-step list of checkpoint dir names matching dataset_type."""
+    if not os.path.exists(checkpoint_dir):
+        return []
+    prefix = f"checkpoint-{dataset_type}-"
+    names = [d for d in os.listdir(checkpoint_dir) if d.startswith(prefix)]
+    return sorted(names, key=_checkpoint_step)
+
+
 CMD_NONE = 0
 CMD_PAUSE = 1
 CMD_RESUME = 2
@@ -107,10 +125,11 @@ def log(msg):
 
 
 def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
-                          rank, stage_info, tokenizer=None, config=None):
+                          rank, stage_info, dataset_type,
+                          tokenizer=None, config=None):
     """Save per-stage checkpoint. optimizers is a list of optimizer instances."""
     os.makedirs(checkpoint_dir, exist_ok=True)
-    path = os.path.join(checkpoint_dir, f"checkpoint-{step}")
+    path = os.path.join(checkpoint_dir, _checkpoint_name(dataset_type, step))
     os.makedirs(path, exist_ok=True)
 
     torch.save({
@@ -133,10 +152,10 @@ def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
     # Rank 0 saves full model and removes old checkpoints
     if rank == 0:
         save_full_model(path, checkpoint_dir, step)
-        _rotate_checkpoints(checkpoint_dir)
+        _rotate_checkpoints(checkpoint_dir, dataset_type)
 
 
-def save_full_model(checkpoint_path, checkpoint_dir, step):
+def save_full_model(checkpoint_path):
     """Gather all stage state dicts and save as full model."""
     world_size = dist.get_world_size()
     gathered = []
@@ -149,27 +168,19 @@ def save_full_model(checkpoint_path, checkpoint_dir, step):
     torch.save(full_state, os.path.join(checkpoint_path, "full_model.pt"))
 
 
-def _rotate_checkpoints(checkpoint_dir):
-    """Keep only the latest MAX_CHECKPOINTS."""
-    checkpoints = sorted(
-        [d for d in os.listdir(checkpoint_dir) if d.startswith("checkpoint-")],
-        key=lambda x: int(x.split("-")[1]),
-    )
+def _rotate_checkpoints(checkpoint_dir, dataset_type):
+    """Keep only the latest MAX_CHECKPOINTS for this dataset_type."""
+    checkpoints = _list_checkpoints(checkpoint_dir, dataset_type)
     while len(checkpoints) > MAX_CHECKPOINTS:
         old = os.path.join(checkpoint_dir, checkpoints.pop(0))
         shutil.rmtree(old)
         log(f"Removed old checkpoint: {old}")
 
 
-def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank):
-    """Load latest per-stage checkpoint. optimizers is a list. Returns (step, epoch)."""
-    if not os.path.exists(checkpoint_dir):
-        return 0, 0
-
-    checkpoints = sorted(
-        [d for d in os.listdir(checkpoint_dir) if d.startswith("checkpoint-")],
-        key=lambda x: int(x.split("-")[1]),
-    )
+def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, dataset_type):
+    """Load latest per-stage checkpoint matching dataset_type.
+    Returns (step, epoch). If none found, returns (0, 0)."""
+    checkpoints = _list_checkpoints(checkpoint_dir, dataset_type)
     if not checkpoints:
         return 0, 0
 
@@ -187,7 +198,7 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank):
             log("Old optimizer format detected; skipping optimizer state (starting fresh).")
         return data["step"], data["epoch"]
 
-    # Fall back to full model
+    # Fall back to full model in latest checkpoint
     full_path = os.path.join(latest, "full_model.pt")
     if os.path.exists(full_path):
         log(f"Resuming from full model: {full_path}")
@@ -198,7 +209,18 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank):
     return 0, 0
 
 
-def train():
+def load_start_checkpoint(stage_module, start_checkpoint_path):
+    """Load model weights from an arbitrary checkpoint dir (model only, no optimizer).
+    Used for warm-starting fine-tuning from a pretrain checkpoint."""
+    full_path = os.path.join(start_checkpoint_path, "full_model.pt")
+    if not os.path.exists(full_path):
+        raise FileNotFoundError(f"full_model.pt not found in {start_checkpoint_path}")
+    log(f"Warm-starting from: {full_path}")
+    full_state = torch.load(full_path, map_location="cpu", weights_only=False)
+    stage_module.load_from_full_model(full_state)
+
+
+def train(dataset_type="pretrain", start_checkpoint=None):
     dist.init_process_group("nccl")
     rank = dist.get_rank()
     world_size = dist.get_world_size()
@@ -210,11 +232,16 @@ def train():
     checkpoint_dir = get_checkpoint_dir()
     cache_dir = os.path.join(data_dir, "hf_cache")
 
+    log(f"Dataset type: {dataset_type}")
+
     # Dataset cache (rank 0 builds, others wait)
-    sentinel_path = os.path.join(cache_dir, "mmap", ".cache_ready")
+    sentinel_path = os.path.join(cache_dir, "mmap", f".cache_ready_{dataset_type}")
     if rank == 0:
         print("Preparing datasets...", flush=True)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, prefault=DATASET_PREFAULT)
+        full_dataset, tokenizer = prepare_all_datasets(
+            CONTEXT_LENGTH, cache_dir=cache_dir,
+            prefault=DATASET_PREFAULT, dataset_type=dataset_type,
+        )
         with open(sentinel_path, "w") as f:
             f.write("ready")
         print("Cache ready.", flush=True)
@@ -222,7 +249,10 @@ def train():
         while not os.path.exists(sentinel_path):
             time.sleep(2)
         # Other ranks just open the memmap (page cache populated by rank 0 if prefault enabled)
-        full_dataset, tokenizer = prepare_all_datasets(CONTEXT_LENGTH, cache_dir=cache_dir, prefault=False)
+        full_dataset, tokenizer = prepare_all_datasets(
+            CONTEXT_LENGTH, cache_dir=cache_dir,
+            prefault=False, dataset_type=dataset_type,
+        )
 
     dist.barrier()
     if rank == 0 and os.path.exists(sentinel_path):
@@ -281,8 +311,18 @@ def train():
     log(f"Stage {rank}: Muon manages {sum(p.numel() for p in muon_params):,} params, "
         f"AdamW manages {sum(p.numel() for p in adamw_params):,} params")
 
-    # Resume
-    start_step, start_epoch = load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank)
+    # Resume from existing checkpoint of the same dataset_type if any
+    existing = _list_checkpoints(checkpoint_dir, dataset_type)
+    if existing and start_checkpoint is not None:
+        log(f"WARNING: --start-checkpoint={start_checkpoint} ignored because "
+            f"{len(existing)} existing {dataset_type} checkpoint(s) found in {checkpoint_dir}. "
+            f"Resuming from latest.")
+    start_step, start_epoch = load_latest_checkpoint(
+        stage_module, optimizers, checkpoint_dir, rank, dataset_type,
+    )
+    if not existing and start_checkpoint is not None:
+        # Warm-start model weights from external checkpoint (no optimizer state)
+        load_start_checkpoint(stage_module, start_checkpoint.rstrip("/"))
     global_step = start_step
 
     # Loss function (only used on last stage)
@@ -321,7 +361,8 @@ def train():
             elif cmd == CMD_SAVE_AND_EXIT:
                 log("Save and exit requested.")
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
-                                      checkpoint_dir, rank, stage_info, tokenizer, config)
+                                      checkpoint_dir, rank, stage_info, dataset_type,
+                                      tokenizer=tokenizer, config=config)
                 dist.destroy_process_group()
                 return
 
@@ -402,22 +443,24 @@ def train():
 
             if global_step % CHECKPOINT_INTERVAL == 0:
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
-                                      checkpoint_dir, rank, stage_info, tokenizer, config)
+                                      checkpoint_dir, rank, stage_info, dataset_type,
+                                      tokenizer=tokenizer, config=config)
 
         # Epoch-end checkpoint
         save_stage_checkpoint(stage_module, optimizers, global_step, epoch + 1,
-                              checkpoint_dir, rank, stage_info, tokenizer, config)
+                              checkpoint_dir, rank, stage_info, dataset_type,
+                              tokenizer=tokenizer, config=config)
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
     if rank == 0:
-        latest_ckpt = os.path.join(checkpoint_dir, f"checkpoint-{global_step}")
+        latest_ckpt = os.path.join(checkpoint_dir, _checkpoint_name(dataset_type, global_step))
         full_model_path = os.path.join(latest_ckpt, "full_model.pt")
         if os.path.exists(full_model_path):
             full_state = torch.load(full_model_path, map_location="cpu", weights_only=False)
             model = RecursiveCompressorLM(config)
             model.load_state_dict(full_state)
-            final_path = os.path.join(data_dir, "final_model")
+            final_path = os.path.join(data_dir, f"final_model_{dataset_type}")
             model.save_pretrained(final_path)
             tokenizer.save_pretrained(final_path)
             log(f"Final model saved: {final_path}")
@@ -425,5 +468,16 @@ def train():
     dist.destroy_process_group()
 
 
+def main():
+    parser = argparse.ArgumentParser(description="Pipeline parallel training for RecursiveCompressorLM")
+    parser.add_argument("--dataset-type", choices=list(DATASET_TYPES), default="pretrain",
+                        help="使用するデータセット種別")
+    parser.add_argument("--start-checkpoint", type=str, default=None,
+                        help="ファインチューニング元のチェックポイントディレクトリ "
+                             "（同 dataset_type のチェックポイントが既存の場合は無視され警告）")
+    args = parser.parse_args()
+    train(dataset_type=args.dataset_type, start_checkpoint=args.start_checkpoint)
+
+
 if __name__ == "__main__":
-    train()
+    main()

@@ -274,44 +274,67 @@ def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn
     return MemmapDataset(cache_path, tokenizer.pad_token_id, prefault=prefault)
 
 
-def prepare_all_datasets(context_length, cache_dir=None, prefault=False):
-    """全データセットを準備して結合する（日本語のみ）。
-    prefault=Trueでキャッシュ全体をOSページキャッシュに事前読み込み
-    （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。"""
-    tokenizer = get_tokenizer()
-    if cache_dir is None:
-        cache_dir = "./data/hf_cache"
-    mmap_dir = os.path.join(cache_dir, "mmap")
+DATASET_TYPES = ("pretrain", "instruct")
 
-    sources = [
-        {
+
+def _all_sources(cache_dir):
+    """全ソース定義。dataset_typeで絞り込んで使う。"""
+    return {
+        "wiki_ja": {
             "name": "wikimedia/wikipedia (ja)",
             "cache_name": "wiki_ja_v2",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
-        {
+        "cc100_ja": {
             "name": "hotchpotch/cc100-ja-documents",
             "cache_name": "cc100_ja_v2",
             "load": lambda: load_dataset("hotchpotch/cc100-ja-documents", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
-        {
+        "shi3z_llama2pro": {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
             "cache_name": "shi3z_llama2pro_v2",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
-        {
+        "shi3z_orion14b": {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
             "cache_name": "shi3z_orion14b_v2",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
-    ]
+    }
 
+
+_DATASET_GROUPS = {
+    "pretrain": ["wiki_ja", "cc100_ja", "shi3z_llama2pro", "shi3z_orion14b"],
+    "instruct": ["shi3z_llama2pro", "shi3z_orion14b"],
+}
+
+
+def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset_type="pretrain"):
+    """データセット種別に応じて構成データセットを準備し結合する（日本語のみ）。
+    dataset_type:
+        "pretrain" - wiki_ja + cc100_ja + 対話データセット2種
+        "instruct" - 対話データセット2種のみ
+    prefault=Trueでキャッシュ全体をOSページキャッシュに事前読み込み
+    （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。"""
+    if dataset_type not in DATASET_TYPES:
+        raise ValueError(f"dataset_type must be one of {DATASET_TYPES}, got {dataset_type!r}")
+
+    tokenizer = get_tokenizer()
+    if cache_dir is None:
+        cache_dir = "./data/hf_cache"
+    mmap_dir = os.path.join(cache_dir, "mmap")
+
+    all_sources = _all_sources(cache_dir)
+    source_keys = _DATASET_GROUPS[dataset_type]
+
+    print(f"Dataset type: {dataset_type}")
     datasets = []
-    for src in sources:
+    for key in source_keys:
+        src = all_sources[key]
         print(f"Loading {src['name']}...")
         cache_path = os.path.join(mmap_dir, f"{src['cache_name']}.mmap")
         ds = _prepare_cached_dataset(
