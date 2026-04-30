@@ -151,7 +151,7 @@ def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
 
     # Rank 0 saves full model and removes old checkpoints
     if rank == 0:
-        save_full_model(path, checkpoint_dir, step)
+        save_full_model(path)
         _rotate_checkpoints(checkpoint_dir, dataset_type)
 
 
