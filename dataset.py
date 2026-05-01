@@ -1,5 +1,6 @@
 import json
 import os
+from concurrent.futures import ProcessPoolExecutor
 import numpy as np
 import torch
 from torch.utils.data import Dataset, ConcatDataset
@@ -118,15 +119,56 @@ class MemmapDataset(Dataset):
         return input_ids, labels
 
 
-def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn):
+# Worker-process state for parallel tokenization. Initialized via
+# ProcessPoolExecutor's `initializer` so the tokenizer is loaded only once
+# per worker process.
+_WORKER_TOKENIZER = None
+
+
+def _tokenizer_init_worker(tokenizer_name):
+    global _WORKER_TOKENIZER
+    tk = AutoTokenizer.from_pretrained(tokenizer_name)
+    if tk.pad_token is None:
+        tk.pad_token = tk.eos_token
+    _WORKER_TOKENIZER = tk
+
+
+def _tokenize_text_lists_worker(text_lists, context_length):
+    """Worker: tokenize a batch of text lists using the worker-local tokenizer.
+    text_lists: list of (list[str] or None)
+    Returns: flat list of chunk token-id lists."""
+    chunks = []
+    for texts in text_lists:
+        if texts is None:
+            continue
+        for text in texts:
+            chunks.extend(_text_to_chunks(_WORKER_TOKENIZER, text, context_length))
+    return chunks
+
+
+def _items_to_text_batches(items, units_fn, batch_size):
+    """Generator yielding lists of (units_fn(item) for item in batch)."""
+    batch = []
+    for item in items:
+        batch.append(units_fn(item))
+        if len(batch) >= batch_size:
+            yield batch
+            batch = []
+    if batch:
+        yield batch
+
+
+def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn, num_workers=1):
     """イテレータからmemmapキャッシュを構築する。
     units_fn: item -> list of text strings (or None to skip)
-    各テキストはBOS付きトークン列にしてcontext_length単位で分割し、パックする。"""
+    各テキストはBOS付きトークン列にしてcontext_length単位で分割し、パックする。
+    num_workers > 1 で並列トークナイズを使用（順序は保たれる）。"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
     pad = tokenizer.pad_token_id
 
-    CHUNK_SIZE = 50000
+    PACK_THRESHOLD = 50000  # accumulated chunks before flushing to npy
+    BATCH_ITEMS = 500       # items per worker call (only used in parallel mode)
     chunk_dir = cache_path + ".chunks"
     os.makedirs(chunk_dir, exist_ok=True)
 
@@ -134,30 +176,62 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn)
     chunk_files = []
     total_items = 0
 
-    for item in items:
-        texts = units_fn(item)
-        if texts is None:
-            continue
-        for text in texts:
-            pending.extend(_text_to_chunks(tokenizer, text, context_length))
-        total_items += 1
-
-        if len(pending) >= CHUNK_SIZE:
-            packed = _pack_chunks(pending, context_length, pad)
-            chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
-            chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
-            np.save(chunk_path, chunk_arr)
-            chunk_files.append(chunk_path)
-            print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
-            pending = []
-
-    # Flush remaining
-    if pending:
+    def _flush_pack():
+        nonlocal pending
+        if not pending:
+            return
         packed = _pack_chunks(pending, context_length, pad)
         chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
         chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
         np.save(chunk_path, chunk_arr)
         chunk_files.append(chunk_path)
+        pending = []
+
+    if num_workers > 1:
+        with ProcessPoolExecutor(
+            max_workers=num_workers,
+            initializer=_tokenizer_init_worker,
+            initargs=(TOKENIZER_NAME,),
+        ) as executor:
+            in_flight = []  # list of (future, batch_size)
+            max_in_flight = num_workers * 2
+            batch_iter = _items_to_text_batches(items, units_fn, BATCH_ITEMS)
+            iter_done = False
+
+            while not iter_done or in_flight:
+                # Refill the in-flight queue
+                while not iter_done and len(in_flight) < max_in_flight:
+                    try:
+                        batch = next(batch_iter)
+                    except StopIteration:
+                        iter_done = True
+                        break
+                    fut = executor.submit(_tokenize_text_lists_worker, batch, context_length)
+                    in_flight.append((fut, len(batch)))
+
+                if in_flight:
+                    fut, bs = in_flight.pop(0)
+                    pending.extend(fut.result())
+                    total_items += bs
+
+                    if len(pending) >= PACK_THRESHOLD:
+                        _flush_pack()
+                        print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
+    else:
+        for item in items:
+            texts = units_fn(item)
+            if texts is None:
+                continue
+            for text in texts:
+                pending.extend(_text_to_chunks(tokenizer, text, context_length))
+            total_items += 1
+
+            if len(pending) >= PACK_THRESHOLD:
+                _flush_pack()
+                print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
+
+    # Final flush
+    _flush_pack()
 
     if not chunk_files:
         with open(cache_path + ".meta.json", "w") as f:
@@ -206,14 +280,15 @@ def _units_messages_item(item):
     return [format_conversation_turn(q, a) for q, a in turns]
 
 
-def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, units_fn, prefault=False):
+def _prepare_cached_dataset(name, cache_path, tokenizer, context_length, load_fn, units_fn,
+                            prefault=False, num_workers=1):
     """キャッシュがあればロード、なければ構築して返す"""
     if os.path.exists(cache_path + ".meta.json"):
         print(f"  Using cache: {cache_path}")
     else:
-        print(f"  Building cache: {cache_path}")
+        print(f"  Building cache: {cache_path} (num_workers={num_workers})")
         ds = load_fn()
-        _build_memmap_packed(cache_path, ds, tokenizer, context_length, units_fn)
+        _build_memmap_packed(cache_path, ds, tokenizer, context_length, units_fn, num_workers=num_workers)
 
     with open(cache_path + ".meta.json", "r") as f:
         meta = json.load(f)
@@ -280,13 +355,15 @@ _DATASET_GROUPS = {
 }
 
 
-def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset_type="pretrain"):
+def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset_type="pretrain",
+                         num_workers=1):
     """データセット種別に応じて構成データセットを準備し結合する。
     dataset_type:
         "pretrain" - wiki_ja + wiki_en + cc100_ja + minipile（文書のみ）
         "instruct" - shi3z 2種 + ultrachat_200k（対話のみ）
     prefault=Trueでキャッシュ全体をOSページキャッシュに事前読み込み
-    （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。"""
+    （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。
+    num_workers > 1 でキャッシュ未構築のデータセットを並列トークナイズ。"""
     if dataset_type not in DATASET_TYPES:
         raise ValueError(f"dataset_type must be one of {DATASET_TYPES}, got {dataset_type!r}")
 
@@ -306,7 +383,7 @@ def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset
         cache_path = os.path.join(mmap_dir, f"{src['cache_name']}.mmap")
         ds = _prepare_cached_dataset(
             src["name"], cache_path, tokenizer, context_length,
-            src["load"], src["units"], prefault=prefault,
+            src["load"], src["units"], prefault=prefault, num_workers=num_workers,
         )
         if ds is not None:
             datasets.append(ds)

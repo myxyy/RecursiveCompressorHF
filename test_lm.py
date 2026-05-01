@@ -305,6 +305,26 @@ class TestDataFormatting:
         assert input_ids.shape == (15,)
         assert input_ids[0].item() == 1  # BOS
 
+    def test_memmap_packed_parallel_matches_serial(self, tmp_path):
+        """num_workers > 1 でもシリアルと同じ結果になる"""
+        # Use the real tokenizer because workers re-load it
+        from dataset import get_tokenizer
+        tokenizer = get_tokenizer()
+        items = [{"text": f"sample text number {i} " * 5} for i in range(20)]
+
+        serial_path = str(tmp_path / "serial.mmap")
+        parallel_path = str(tmp_path / "parallel.mmap")
+
+        _build_memmap_packed(serial_path, list(items), tokenizer, context_length=64, units_fn=_units_doc_item, num_workers=1)
+        _build_memmap_packed(parallel_path, list(items), tokenizer, context_length=64, units_fn=_units_doc_item, num_workers=2)
+
+        serial_ds = MemmapDataset(serial_path, pad_token_id=tokenizer.pad_token_id)
+        parallel_ds = MemmapDataset(parallel_path, pad_token_id=tokenizer.pad_token_id)
+        assert len(serial_ds) == len(parallel_ds)
+        for i in range(len(serial_ds)):
+            assert torch.equal(serial_ds[i][0], parallel_ds[i][0])
+            assert torch.equal(serial_ds[i][1], parallel_ds[i][1])
+
     def test_memmap_cache_reuse(self, tmp_path):
         """キャッシュが存在する場合は再構築しない"""
         cache_path = str(tmp_path / "test.mmap")

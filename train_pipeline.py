@@ -68,6 +68,7 @@ MAX_CHECKPOINTS = 2
 CONTROL_FILE = "control.cmd"
 LOG_INTERVAL = 10
 DATASET_PREFAULT = True  # Prefault memmap pages into OS page cache (shared across ranks)
+CACHE_BUILD_WORKERS = 6  # Parallel tokenization workers when building memmap caches
 
 
 def get_data_dir():
@@ -241,6 +242,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         full_dataset, tokenizer = prepare_all_datasets(
             CONTEXT_LENGTH, cache_dir=cache_dir,
             prefault=DATASET_PREFAULT, dataset_type=dataset_type,
+            num_workers=CACHE_BUILD_WORKERS,
         )
         with open(sentinel_path, "w") as f:
             f.write("ready")
@@ -252,6 +254,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         full_dataset, tokenizer = prepare_all_datasets(
             CONTEXT_LENGTH, cache_dir=cache_dir,
             prefault=False, dataset_type=dataset_type,
+            num_workers=1,
         )
 
     dist.barrier()
