@@ -37,10 +37,10 @@ echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 - Hardware: 6x RTX 3090 (24GB VRAM each), 256GB RAM
 
 ## Key Design Decisions
-- **Tokenizer**: `elyza/ELYZA-japanese-Llama-2-7b-fast`. `[DOC]`, `[QUERY]`, `[ANSWER]` are plain text markers, not special tokens.
-- **Data format**: Documents: `<s>[DOC]text`, Conversations: `<s>[QUERY]q[ANSWER]a` per turn. BOS (`<s>`) separates units. No double-BOS.
-- **Packing**: Short documents are concatenated into context-length sequences to reduce PAD waste. Unit = `[BOS] + tokens` (no trailing BOS). Trailing BOS added by packer.
-- **Memmap caching**: Tokenized data stored as numpy memmap (uint16) for memory efficiency. Cache names include version suffix (e.g. `_v2`) - change suffix to force rebuild. `prefault=True` reads through memmap once on rank 0 to populate OS page cache (shared across all ranks; not per-process copy).
+- **Tokenizer**: `elyza/ELYZA-japanese-Llama-2-7b-fast`. `[QUERY]`, `[ANSWER]` are plain text markers (no `[DOC]` prefix anymore — documents are just `<s>text`).
+- **Data format**: Documents: `<s>text` (raw, no marker). Conversations: `<s>[QUERY]q[ANSWER]a` per turn.
+- **Chunking + Packing**: Each text is BOS-prefixed and split into `context_length`-sized chunks. The first chunk has `<s>`; continuation chunks are unmarked. Chunks are concatenated to fill context_length samples; no trailing BOS is added (the next chunk's leading BOS serves as separator). Pad with PAD tokens.
+- **Memmap caching**: Tokenized data stored as numpy memmap (uint16) for memory efficiency. Cache names include version suffix (e.g. `_v3`) - change suffix to force rebuild. `prefault=True` reads through memmap once on rank 0 to populate OS page cache (shared across all ranks; not per-process copy).
 - **Mixed precision**: Master weights and optimizer state in fp32, forward/backward in bfloat16 via `torch.autocast`. LayerNorm and Softmax stay in fp32 by autocast policy. CrossEntropyLoss receives `logits.float()` cast.
 - **Numerical stability**: Use `F.scaled_dot_product_attention` (internally fp32 even for low-precision inputs, enables FlashAttention). Padding `torch.zeros` must inherit `dtype=x.dtype`.
 - **Optimizers**: Muon (`torch.optim.Muon`) for 2D hidden Linear weights with `adjust_lr_fn="match_rms_adamw"`; AdamW for embedding, head, learnable contexts (`compressor_query`, `initial_context`), biases, and LayerNorms. Both share the same LR. `split_params_for_muon()` does the partition.
@@ -50,7 +50,7 @@ echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 
 ## Debugging Guidelines
 - When modifying data pipeline (packing, collation), add shape/length assertions before and after transformations.
-- All sequences in `_pack_units` must be exactly `context_length`. Use `(seq + [PAD] * context_length)[:context_length]` pattern to guarantee.
+- All sequences in `_pack_chunks` must be exactly `context_length`. Use `(seq + [PAD] * context_length)[:context_length]` pattern to guarantee.
 - After modifying training code, run `uv run pytest test_lm.py -v` before committing.
 - `test_step_split_consistency` and `test_predict_matches_forward` use `atol=1e-3, rtol=1e-2` — tightened tolerances may fail on numerical drift from architecture changes (GatedAttention etc.).
 
@@ -61,8 +61,13 @@ echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 - pipeline: n_microbatches=6, batch_size=6
 - mixed precision: fp32 master / bfloat16 autocast
 
-## Datasets (Japanese only)
-- `wikimedia/wikipedia` (20231101.ja)
-- `hotchpotch/cc100-ja-documents`
-- `shi3z/ja_conv_wikipedia_llama2pro8b_30k`
-- `shi3z/ja_conv_wikipedia_orion14B_100K`
+## Datasets
+Selected by `--dataset-type` in `train_pipeline.py`:
+- `pretrain` (documents only):
+  - `wikimedia/wikipedia` (20231101.ja, 20231101.en)
+  - `hotchpotch/cc100-ja-documents`
+  - `JeanKaddour/minipile`
+- `instruct` (conversations only):
+  - `shi3z/ja_conv_wikipedia_llama2pro8b_30k`
+  - `shi3z/ja_conv_wikipedia_orion14B_100K`
+  - `HuggingFaceH4/ultrachat_200k`

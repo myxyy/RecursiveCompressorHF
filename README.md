@@ -87,16 +87,27 @@ uv run pytest test_lm.py -v
 | `test_lm.py` | テスト |
 | `.env.example` | 環境設定例 |
 
-## 学習データセット（日本語のみ）
+## 学習データセット
 
-| データセット | 種類 |
+`--dataset-type` で選択:
+
+### `pretrain` (文書データ)
+| データセット | 言語 |
 |---|---|
-| `wikimedia/wikipedia` (20231101.ja) | 文章 |
-| `hotchpotch/cc100-ja-documents` | 文章 |
-| `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | 対話 |
-| `shi3z/ja_conv_wikipedia_orion14B_100K` | 対話 |
+| `wikimedia/wikipedia` (20231101.ja) | 日本語 |
+| `wikimedia/wikipedia` (20231101.en) | 英語 |
+| `hotchpotch/cc100-ja-documents` | 日本語 |
+| `JeanKaddour/minipile` | 英語 |
 
-文章データは `[DOC]` マーカー付き、対話データは `[QUERY]`/`[ANSWER]` マーカー付きでフォーマットされます。短い文書はパッキングして1サンプルにまとめ、PADによる無駄を削減しています。
+### `instruct` (対話データ)
+| データセット | 言語 |
+|---|---|
+| `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | 日本語 |
+| `shi3z/ja_conv_wikipedia_orion14B_100K` | 日本語 |
+| `HuggingFaceH4/ultrachat_200k` | 英語 |
+
+文書データは `<s>text` の形（マーカーなし）、対話データは `<s>[QUERY]q[ANSWER]a` 形式です。
+長文は context_length 単位で分割し、短文は連結してパッキングすることで PAD による無駄を削減しています。
 
 ## モデルパラメータ
 

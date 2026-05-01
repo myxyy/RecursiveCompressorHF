@@ -17,11 +17,6 @@ def get_tokenizer():
     return tokenizer
 
 
-def format_document(text):
-    """文章データのフォーマット: [DOC]text"""
-    return f"[DOC]{text}"
-
-
 def format_conversation_turn(query, answer):
     """対話の1ターン: [QUERY]q[ANSWER]a"""
     return f"[QUERY]{query}[ANSWER]{answer}"
@@ -53,78 +48,37 @@ def _extract_turns_messages(messages):
     return turns
 
 
-def tokenize_with_bos(tokenizer, text, context_length):
-    """BOS + text をトークナイズし、context_length以内ならBOSを末尾にも付ける。
-    PADトークンで埋め、labelsのPAD部分は-100にする。"""
+def _text_to_chunks(tokenizer, text, context_length):
+    """テキストをBOS付きトークン列にして、context_length単位で分割する。
+    最初のチャンクは[BOS]+tokens、続きはtokens（継続チャンク、BOSなし）。
+    各チャンクはcontext_length以下の長さ。"""
     bos = tokenizer.bos_token_id
-    pad = tokenizer.pad_token_id
-    tokens = tokenizer.encode(text, add_special_tokens=False)
-
-    # BOS + tokens (+ BOS if fits)
-    if len(tokens) + 2 <= context_length:
-        seq = [bos] + tokens + [bos]
-    else:
-        seq = [bos] + tokens
-
-    # Truncate to context_length
-    seq = seq[:context_length]
-
-    # input = seq[:-1], label = seq[1:]
-    input_len = len(seq) - 1
-    input_ids = seq[:-1]
-    labels = seq[1:]
-
-    # Pad
-    pad_len = context_length - 1 - input_len
-    if pad_len > 0:
-        input_ids = input_ids + [pad] * pad_len
-        labels = labels + [-100] * pad_len
-
-    return input_ids, labels
+    tokens = [bos] + tokenizer.encode(text, add_special_tokens=False)
+    return [tokens[i:i + context_length] for i in range(0, len(tokens), context_length)]
 
 
-def _tokenize_unit(tokenizer, text):
-    """テキストを1ユニットとしてトークナイズ。先頭BOSのみ、末尾BOSなし。
-    ユニット = [BOS] + encode(text)"""
-    bos = tokenizer.bos_token_id
-    tokens = tokenizer.encode(text, add_special_tokens=False)
-    return [bos] + tokens
-
-
-def _pack_units(units, context_length, pad_token_id, bos_token_id):
-    """ユニットのリストをcontext_length長のシーケンスに詰め込む。
-    各ユニットは[BOS]+tokensの形。パック結果は末尾にBOSを付加。
-    結果: <s>unit1<s>unit2<s>[PAD]...
-    返すリストの全要素は必ずcontext_length長。"""
+def _pack_chunks(chunks, context_length, pad_token_id):
+    """チャンクをcontext_length長のサンプルに詰め込む。
+    各チャンクはそのまま連結（末尾BOSは追加しない；次チャンクの先頭BOSが区切り役）。
+    不足分はPADで埋める。返すリストの全要素は必ずcontext_length長。"""
     packed = []
     current = []
 
-    def _flush(buf):
-        """バッファに末尾BOSを付加し、context_length長にPAD/truncateして確定"""
-        buf.append(bos_token_id)
-        seq = (buf + [pad_token_id] * context_length)[:context_length]
+    def _flush():
+        seq = (current + [pad_token_id] * context_length)[:context_length]
         packed.append(seq)
 
-    for unit in units:
-        # +1 for trailing BOS that will be appended by _flush
-        if len(unit) + 1 >= context_length:
-            # Flush current buffer first
-            if current:
-                _flush(current)
-                current = []
-            # Long unit: truncate and pad to exactly context_length
-            seq = (unit + [pad_token_id] * context_length)[:context_length]
-            packed.append(seq)
-            continue
-
-        if len(current) + len(unit) + 1 <= context_length:
-            current.extend(unit)
+    for chunk in chunks:
+        assert len(chunk) <= context_length, \
+            f"Chunk exceeds context_length: {len(chunk)} > {context_length}"
+        if len(current) + len(chunk) > context_length:
+            _flush()
+            current = list(chunk)
         else:
-            _flush(current)
-            current = list(unit)
+            current.extend(chunk)
 
     if current:
-        _flush(current)
+        _flush()
 
     assert all(len(s) == context_length for s in packed), \
         f"Pack length mismatch: {set(len(s) for s in packed)}, expected {context_length}"
@@ -165,19 +119,18 @@ class MemmapDataset(Dataset):
 
 
 def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn):
-    """イテレータからmemmapキャッシュを構築する（短文結合あり）。
-    units_fn: item -> list of unit strings (or None to skip)
-    各unitは_tokenize_unitでトークナイズされユニットのリストとして蓄積。"""
+    """イテレータからmemmapキャッシュを構築する。
+    units_fn: item -> list of text strings (or None to skip)
+    各テキストはBOS付きトークン列にしてcontext_length単位で分割し、パックする。"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
-    bos = tokenizer.bos_token_id
     pad = tokenizer.pad_token_id
 
     CHUNK_SIZE = 50000
     chunk_dir = cache_path + ".chunks"
     os.makedirs(chunk_dir, exist_ok=True)
 
-    all_units = []
+    pending = []
     chunk_files = []
     total_items = 0
 
@@ -186,21 +139,21 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn)
         if texts is None:
             continue
         for text in texts:
-            all_units.append(_tokenize_unit(tokenizer, text))
+            pending.extend(_text_to_chunks(tokenizer, text, context_length))
         total_items += 1
 
-        if len(all_units) >= CHUNK_SIZE:
-            packed = _pack_units(all_units, context_length, pad, bos)
+        if len(pending) >= CHUNK_SIZE:
+            packed = _pack_chunks(pending, context_length, pad)
             chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
             chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
             np.save(chunk_path, chunk_arr)
             chunk_files.append(chunk_path)
             print(f"  {total_items} items processed -> {sum(len(np.load(f)) for f in chunk_files)} packed samples", flush=True)
-            all_units = []
+            pending = []
 
     # Flush remaining
-    if all_units:
-        packed = _pack_units(all_units, context_length, pad, bos)
+    if pending:
+        packed = _pack_chunks(pending, context_length, pad)
         chunk_arr = np.stack([np.array(s, dtype=np.uint16) for s in packed])
         chunk_path = os.path.join(chunk_dir, f"chunk_{len(chunk_files)}.npy")
         np.save(chunk_path, chunk_arr)
@@ -232,17 +185,13 @@ def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn)
     print(f"  Cache built: {total_items} items -> {total_samples} packed samples", flush=True)
 
 
-# Keep old name for compatibility
-_build_memmap = _build_memmap_packed
-
-
 def _units_doc_item(item):
-    """文書アイテム → 1ユニット"""
-    return [format_document(item["text"])]
+    """文書アイテム → 1テキスト（[DOC]プリフィックスなし、生のtext）"""
+    return [item["text"]]
 
 
 def _units_sharegpt_item(item):
-    """ShareGPT対話 → ターン数ぶんのユニット"""
+    """ShareGPT対話 → ターン数ぶんのユニット文字列"""
     turns = _extract_turns_sharegpt(item["conversations"])
     if not turns:
         return None
@@ -250,7 +199,7 @@ def _units_sharegpt_item(item):
 
 
 def _units_messages_item(item):
-    """messages対話 → ターン数ぶんのユニット"""
+    """messages対話 → ターン数ぶんのユニット文字列"""
     turns = _extract_turns_messages(item["messages"])
     if not turns:
         return None
@@ -282,42 +231,60 @@ def _all_sources(cache_dir):
     return {
         "wiki_ja": {
             "name": "wikimedia/wikipedia (ja)",
-            "cache_name": "wiki_ja_v2",
+            "cache_name": "wiki_ja_v3",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
+            "units": _units_doc_item,
+        },
+        "wiki_en": {
+            "name": "wikimedia/wikipedia (en)",
+            "cache_name": "wiki_en_v3",
+            "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.en", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "cc100_ja": {
             "name": "hotchpotch/cc100-ja-documents",
-            "cache_name": "cc100_ja_v2",
+            "cache_name": "cc100_ja_v3",
             "load": lambda: load_dataset("hotchpotch/cc100-ja-documents", split="train", cache_dir=cache_dir),
+            "units": _units_doc_item,
+        },
+        "minipile": {
+            "name": "JeanKaddour/minipile",
+            "cache_name": "minipile_v3",
+            "load": lambda: load_dataset("JeanKaddour/minipile", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "shi3z_llama2pro": {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
-            "cache_name": "shi3z_llama2pro_v2",
+            "cache_name": "shi3z_llama2pro_v3",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
         "shi3z_orion14b": {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
-            "cache_name": "shi3z_orion14b_v2",
+            "cache_name": "shi3z_orion14b_v3",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
+        },
+        "ultrachat": {
+            "name": "HuggingFaceH4/ultrachat_200k",
+            "cache_name": "ultrachat_v3",
+            "load": lambda: load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft", cache_dir=cache_dir),
+            "units": _units_messages_item,
         },
     }
 
 
 _DATASET_GROUPS = {
-    "pretrain": ["wiki_ja", "cc100_ja", "shi3z_llama2pro", "shi3z_orion14b"],
-    "instruct": ["shi3z_llama2pro", "shi3z_orion14b"],
+    "pretrain": ["wiki_ja", "wiki_en", "cc100_ja", "minipile"],
+    "instruct": ["shi3z_llama2pro", "shi3z_orion14b", "ultrachat"],
 }
 
 
 def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset_type="pretrain"):
-    """データセット種別に応じて構成データセットを準備し結合する（日本語のみ）。
+    """データセット種別に応じて構成データセットを準備し結合する。
     dataset_type:
-        "pretrain" - wiki_ja + cc100_ja + 対話データセット2種
-        "instruct" - 対話データセット2種のみ
+        "pretrain" - wiki_ja + wiki_en + cc100_ja + minipile（文書のみ）
+        "instruct" - shi3z 2種 + ultrachat_200k（対話のみ）
     prefault=Trueでキャッシュ全体をOSページキャッシュに事前読み込み
     （ディスクI/O削減。プロセス間でページキャッシュ共有のため安全）。"""
     if dataset_type not in DATASET_TYPES:

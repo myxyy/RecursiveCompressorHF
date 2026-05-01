@@ -5,10 +5,10 @@ import torch
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from dataset import (
-    format_document, format_conversation_turn, tokenize_with_bos,
+    format_conversation_turn,
     _extract_turns_sharegpt, _extract_turns_messages,
     _build_memmap_packed, _units_doc_item, _units_sharegpt_item,
-    _tokenize_unit, _pack_units, MemmapDataset,
+    _text_to_chunks, _pack_chunks, MemmapDataset,
 )
 
 
@@ -180,9 +180,6 @@ class TestRecursiveCompressorLM:
 
 
 class TestDataFormatting:
-    def test_format_document(self):
-        assert format_document("本日は晴天なり") == "[DOC]本日は晴天なり"
-
     def test_format_conversation_turn(self):
         result = format_conversation_turn("質問1", "回答1")
         assert result == "[QUERY]質問1[ANSWER]回答1"
@@ -207,83 +204,67 @@ class TestDataFormatting:
         turns = _extract_turns_messages(messages)
         assert turns == [("Q1", "A1"), ("Q2", "A2")]
 
-    def test_tokenize_with_bos_short(self):
-        """短いテキストはBOS+text+BOS, PADで埋める"""
+    def test_text_to_chunks_short(self):
+        """短いテキストは1チャンクに収まる（BOS付き）"""
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
-        tokenizer.pad_token_id = 0
-        tokenizer.encode.return_value = [10, 11, 12]  # 3 tokens
+        tokenizer.encode.return_value = [10, 11, 12]
+        chunks = _text_to_chunks(tokenizer, "x", context_length=8)
+        assert chunks == [[1, 10, 11, 12]]
 
-        input_ids, labels = tokenize_with_bos(tokenizer, "test", context_length=10)
-        # seq = [1, 10, 11, 12, 1] (len=5)
-        # input = [1, 10, 11, 12], labels = [10, 11, 12, 1]
-        # pad to 9: input = [1,10,11,12,0,0,0,0,0], labels = [10,11,12,1,-100,-100,-100,-100,-100]
-        assert input_ids[:4] == [1, 10, 11, 12]
-        assert labels[:4] == [10, 11, 12, 1]
-        assert all(x == 0 for x in input_ids[4:])
-        assert all(x == -100 for x in labels[4:])
-        assert len(input_ids) == 9
-        assert len(labels) == 9
-
-    def test_pack_units_short_docs(self):
-        """短いユニットが結合され、末尾BOSが正しく付く"""
-        # Each unit: [BOS] + tokens (no trailing BOS)
-        units = [[1, 10, 11], [1, 20, 21], [1, 30]]
-        # pack with context_length=10, bos=1, pad=0
-        # first: [1,10,11,1,20,21,1,30,1,0] (3+3+2 units + trailing BOS + 1 pad)
-        packed = _pack_units(units, context_length=10, pad_token_id=0, bos_token_id=1)
-        assert len(packed) == 1
-        assert len(packed[0]) == 10
-        # Should be: units concat + trailing BOS + PAD
-        assert packed[0] == [1, 10, 11, 1, 20, 21, 1, 30, 1, 0]
-
-    def test_pack_units_no_double_bos(self):
-        """結合時に二重BOSが発生しない"""
-        units = [[1, 10], [1, 20]]
-        packed = _pack_units(units, context_length=8, pad_token_id=0, bos_token_id=1)
-        assert len(packed) == 1
-        # [1, 10, 1, 20, 1, 0, 0, 0] - no double BOS
-        seq = packed[0]
-        for i in range(len(seq) - 1):
-            if seq[i] == 1 and seq[i + 1] == 1:
-                # Only allowed if followed by content, not BOS-BOS
-                assert False, f"Double BOS at position {i}: {seq}"
-
-    def test_pack_units_overflow(self):
-        """バッファがあふれたときに正しくフラッシュされる"""
-        units = [[1, 10, 11], [1, 20, 21], [1, 30, 31]]
-        # context_length=8: first two units (3+3) + trailing BOS = 7, fits
-        # third unit (3) + trailing BOS = 4, wouldn't fit (7+3=10>8)
-        packed = _pack_units(units, context_length=8, pad_token_id=0, bos_token_id=1)
-        assert len(packed) == 2
-        assert packed[0] == [1, 10, 11, 1, 20, 21, 1, 0]  # 2 units + BOS + pad
-        assert packed[1] == [1, 30, 31, 1, 0, 0, 0, 0]    # 1 unit + BOS + pads
-
-    def test_pack_units_long_doc(self):
-        """長いユニットはtruncateされる"""
-        units = [list(range(20))]
-        packed = _pack_units(units, context_length=10, pad_token_id=0, bos_token_id=1)
-        assert len(packed) == 1
-        assert packed[0] == list(range(10))
-
-    def test_pack_units_conversation(self):
-        """対話データで各ターンがBOSで区切られる"""
+    def test_text_to_chunks_long(self):
+        """長いテキストはcontext_length単位で分割される（最初のチャンクのみBOS）"""
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
-        tokenizer.encode.side_effect = [
-            [10, 11],  # [QUERY]q1[ANSWER]a1
-            [20, 21],  # [QUERY]q2[ANSWER]a2
-        ]
-        unit1 = _tokenize_unit(tokenizer, "[QUERY]q1[ANSWER]a1")
-        unit2 = _tokenize_unit(tokenizer, "[QUERY]q2[ANSWER]a2")
-        # unit1 = [1, 10, 11], unit2 = [1, 20, 21]
-        assert unit1 == [1, 10, 11]
-        assert unit2 == [1, 20, 21]
-        packed = _pack_units([unit1, unit2], context_length=10, pad_token_id=0, bos_token_id=1)
-        # Expected: [1,10,11,1,20,21,1,0,0,0] = <s>turn1<s>turn2<s>[PAD]...
-        assert packed[0][:7] == [1, 10, 11, 1, 20, 21, 1]
+        # encode returns 10 tokens; with BOS = 11 tokens; context_length=4
+        tokenizer.encode.return_value = list(range(10, 20))
+        chunks = _text_to_chunks(tokenizer, "x", context_length=4)
+        # full tokens: [1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] (11 tokens)
+        # split into 4: [1,10,11,12], [13,14,15,16], [17,18,19]
+        assert chunks == [[1, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19]]
+
+    def test_pack_chunks_basic(self):
+        """spec例の動作: <s>abcdefghij, <s>123, <s>あいうえお をcontext_length=8で"""
+        # Tokens (1 char = 1 token), <s> = 1
+        # "abcdefghij" -> [1,2,...,10]
+        # "123" -> [101,102,103]
+        # "あいうえお" -> [201,202,203,204,205]
+        # Step 1: BOS prefix
+        # "<s>abcdefghij" -> [1,2,3,4,5,6,7,8,9,10] (with BOS=1)... wait that uses 1 for both
+        # Use distinct ids:
+        BOS = 99
+        # text1 = "abcdefghij" (10 tokens)
+        # text2 = "123" (3 tokens)
+        # text3 = "あいうえお" (5 tokens)
+        chunks_text1 = [[BOS, 1, 2, 3, 4, 5, 6, 7], [8, 9, 10]]  # split at 8
+        chunks_text2 = [[BOS, 101, 102, 103]]
+        chunks_text3 = [[BOS, 201, 202, 203, 204, 205]]
+        all_chunks = chunks_text1 + chunks_text2 + chunks_text3
+        packed = _pack_chunks(all_chunks, context_length=8, pad_token_id=0)
+        # Expected:
+        # 1. [BOS,1,2,3,4,5,6,7] (full)
+        # 2. [8,9,10,BOS,101,102,103,0] (3+4=7, pad 1)
+        # 3. [BOS,201,202,203,204,205,0,0] (6, pad 2)
+        assert len(packed) == 3
+        assert packed[0] == [BOS, 1, 2, 3, 4, 5, 6, 7]
+        assert packed[1] == [8, 9, 10, BOS, 101, 102, 103, 0]
+        assert packed[2] == [BOS, 201, 202, 203, 204, 205, 0, 0]
+
+    def test_pack_chunks_no_trailing_bos(self):
+        """末尾BOSが追加されないことを確認"""
+        chunks = [[1, 10, 11], [1, 20]]
+        packed = _pack_chunks(chunks, context_length=8, pad_token_id=0)
+        # [1,10,11,1,20] + [0,0,0] = [1,10,11,1,20,0,0,0]
+        assert packed == [[1, 10, 11, 1, 20, 0, 0, 0]]
+
+    def test_pack_chunks_full_length(self):
+        """ちょうどcontext_length長のチャンクはそのままemit"""
+        chunks = [[1, 2, 3, 4, 5, 6, 7, 8], [1, 9]]
+        packed = _pack_chunks(chunks, context_length=8, pad_token_id=0)
+        assert packed[0] == [1, 2, 3, 4, 5, 6, 7, 8]
+        assert packed[1] == [1, 9, 0, 0, 0, 0, 0, 0]
 
     def test_units_sharegpt_item(self):
         """ShareGPT対話が複数ユニットに分割される"""
@@ -297,6 +278,11 @@ class TestDataFormatting:
         assert len(units) == 2
         assert units[0] == "[QUERY]Q1[ANSWER]A1"
         assert units[1] == "[QUERY]Q2[ANSWER]A2"
+
+    def test_units_doc_item_no_prefix(self):
+        """文書アイテムは[DOC]プリフィックスなしで生のtextが返る"""
+        item = {"text": "本日は晴天なり"}
+        assert _units_doc_item(item) == ["本日は晴天なり"]
 
     def test_memmap_packed(self, tmp_path):
         """パック付きMemmapDatasetの構築と読み出し"""
@@ -312,7 +298,7 @@ class TestDataFormatting:
         _build_memmap_packed(cache_path, items, tokenizer, context_length=16, units_fn=_units_doc_item)
 
         ds = MemmapDataset(cache_path, pad_token_id=0)
-        # Two short docs (4 tokens each: [1,10,11,12]) + trailing BOS = 9, fits in 16
+        # Each text -> [1,10,11,12] (4 tokens). Two texts: 8 tokens, fits in 16. Pads 8.
         assert len(ds) == 1
 
         input_ids, labels = ds[0]
@@ -334,18 +320,3 @@ class TestDataFormatting:
         ds = MemmapDataset(cache_path, pad_token_id=0)
         assert len(ds) == 3
 
-    def test_tokenize_with_bos_long(self):
-        """長いテキストは末尾BOSなし、truncateされる"""
-        from unittest.mock import MagicMock
-        tokenizer = MagicMock()
-        tokenizer.bos_token_id = 1
-        tokenizer.pad_token_id = 0
-        tokenizer.encode.return_value = list(range(10, 25))  # 15 tokens
-
-        input_ids, labels = tokenize_with_bos(tokenizer, "test", context_length=10)
-        # seq = [1, 10, 11, ..., 18] truncated to 10
-        # input = [1,10,...,17] (9), labels = [10,11,...,18] (9)
-        assert len(input_ids) == 9
-        assert len(labels) == 9
-        assert input_ids[0] == 1
-        assert labels[0] == 10

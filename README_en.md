@@ -87,16 +87,27 @@ uv run pytest test_lm.py -v
 | `test_lm.py` | Tests |
 | `.env.example` | Environment config example |
 
-## Training Datasets (Japanese only)
+## Training Datasets
 
-| Dataset | Type |
+Selected by `--dataset-type`:
+
+### `pretrain` (documents)
+| Dataset | Language |
 |---|---|
-| `wikimedia/wikipedia` (20231101.ja) | Documents |
-| `hotchpotch/cc100-ja-documents` | Documents |
-| `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | Dialogue |
-| `shi3z/ja_conv_wikipedia_orion14B_100K` | Dialogue |
+| `wikimedia/wikipedia` (20231101.ja) | Japanese |
+| `wikimedia/wikipedia` (20231101.en) | English |
+| `hotchpotch/cc100-ja-documents` | Japanese |
+| `JeanKaddour/minipile` | English |
 
-Document data is formatted with `[DOC]` markers, dialogue data with `[QUERY]`/`[ANSWER]` markers. Short documents are packed into single samples to reduce PAD waste.
+### `instruct` (dialogue)
+| Dataset | Language |
+|---|---|
+| `shi3z/ja_conv_wikipedia_llama2pro8b_30k` | Japanese |
+| `shi3z/ja_conv_wikipedia_orion14B_100K` | Japanese |
+| `HuggingFaceH4/ultrachat_200k` | English |
+
+Documents are formatted as `<s>text` (no marker), dialogue as `<s>[QUERY]q[ANSWER]a`.
+Long texts are split into context_length-sized chunks; short texts are packed together to minimize PAD waste.
 
 ## Model Parameters
 

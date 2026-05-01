@@ -35,3 +35,31 @@
 ## その他
 必要なテストがあれば適宜追加してください  
 またこの文章も適宜追記修正お願いします
+
+## 実装結果
+
+### `dataset.py`
+- `format_document` を削除（`[DOC]`プリフィックス廃止）
+- `_units_doc_item` は生のtextを返すよう変更
+- 旧 `_tokenize_unit` と `_pack_units` を廃止し、以下の2つで置き換え:
+  - `_text_to_chunks(tokenizer, text, context_length)`: BOS付きトークン列をcontext_length単位で分割
+  - `_pack_chunks(chunks, context_length, pad_token_id)`: チャンクを連結してパック（**末尾BOSは追加しない**、次チャンクの先頭BOSが区切り役）
+- 長文の切り捨てを廃止 → context_length単位で分割して全データを学習に使用
+
+### データセット構成
+| dataset_type | 構成 |
+|---|---|
+| `pretrain` | wiki_ja, wiki_en, cc100_ja, minipile（文書のみ） |
+| `instruct` | shi3z_llama2pro, shi3z_orion14b, ultrachat_200k（対話のみ） |
+
+### キャッシュ命名
+全データセットを`_v3`サフィックスで命名し、再ビルドする:
+- `wiki_ja_v3.mmap`, `wiki_en_v3.mmap`, `cc100_ja_v3.mmap`, `minipile_v3.mmap`
+- `shi3z_llama2pro_v3.mmap`, `shi3z_orion14b_v3.mmap`, `ultrachat_v3.mmap`
+
+### テスト
+- 旧 `test_pack_units_*` を `test_pack_chunks_*` に置換
+- `test_text_to_chunks_short`, `test_text_to_chunks_long` を追加
+- `test_pack_chunks_basic` で仕様書の例（"abcdefghij", "123", "あいうえお"）が正しく処理されることを確認
+- `test_pack_chunks_no_trailing_bos` で末尾BOSが追加されないことを確認
+- `test_units_doc_item_no_prefix` で[DOC]プリフィックスが付かないことを確認
