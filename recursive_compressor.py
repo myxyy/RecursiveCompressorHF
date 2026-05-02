@@ -68,9 +68,11 @@ class RecursiveCompressor(nn.Module):
         self.mha_decoder = MultiHeadAttention(d_model, num_heads)
         self.norm_ffn_decoder = nn.LayerNorm(d_model)
         self.ffn_decoder = FFNSwiGLU(d_model, d_ff)
-        self.norm_compressor = nn.LayerNorm(d_model)
+        self.norm_compressor_kv = nn.LayerNorm(d_model)
+        self.norm_compressor_q = nn.LayerNorm(d_model)
         self.mha_compressor = MultiHeadAttention(d_model, num_heads)
-        self.norm_decompressor = nn.LayerNorm(d_model)
+        self.norm_decompressor_kv = nn.LayerNorm(d_model)
+        self.norm_decompressor_q = nn.LayerNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
 
     def step(self, xs, hidden):
@@ -139,18 +141,20 @@ class RecursiveCompressor(nn.Module):
 
         # Compression / Decompression
         all_pre_norm = all_chunks
-        all_normed = self.norm_compressor(all_chunks)
+        all_normed_for_compressor_kv = self.norm_compressor_kv(all_chunks)
+        all_normed_for_decompressor_q = self.norm_decompressor_q(all_chunks)
 
         comp_query_out = comp_query
         collapsed_dqs = list(deeper_qs)
 
         if num_full > 0 and comp_query is not None:
-            full_normed = all_normed[:batch_size * num_full]
+            full_normed = all_normed_for_compressor_kv[:batch_size * num_full]
 
             # Use comp_query for compression (expanded per chunk)
             cq_expanded = comp_query.unsqueeze(1).expand(batch_size, num_full, self.compress_size, d_model)
             cq_expanded = cq_expanded.reshape(batch_size * num_full, self.compress_size, d_model)
-            compressed = self.mha_compressor(cq_expanded, full_normed, full_normed)
+            cq_expanded_norm = self.norm_compressor_q(cq_expanded)
+            compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed) + cq_expanded
 
             # Reshape for recursion: each of compress_size streams processed independently
             compressed = compressed.view(batch_size, num_full, self.compress_size, d_model)
@@ -208,8 +212,8 @@ class RecursiveCompressor(nn.Module):
                 all_outer = None
 
         if all_outer is not None:
-            all_outer_normed = self.norm_decompressor(all_outer)
-            all_chunks = self.mha_decompressor(all_normed, all_outer_normed, all_outer_normed)
+            all_outer_normed = self.norm_decompressor_kv(all_outer)
+            all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed)
             all_chunks = all_chunks + all_pre_norm
 
         # Decoder: causal self-attention + FFN (independent per chunk)
