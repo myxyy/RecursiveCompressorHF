@@ -68,7 +68,7 @@ MAX_CHECKPOINTS = 2
 CONTROL_FILE = "control.cmd"
 LOG_INTERVAL = 10
 DATASET_PREFAULT = True  # Prefault memmap pages into OS page cache (shared across ranks)
-CACHE_BUILD_WORKERS = 6  # Parallel tokenization workers when building memmap caches
+CACHE_BUILD_WORKERS = 16  # Parallel tokenization workers when building memmap caches
 
 
 def get_data_dir():
