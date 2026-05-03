@@ -65,7 +65,14 @@ def _pack_chunks(chunks, context_length, pad_token_id):
     packed = []
     current = []
 
+    # Need at least 2 content tokens so that labels (= seq[1:]) has 1+ valid
+    # (non-PAD) position. A 1-content-token sample yields all-PAD labels which
+    # makes CrossEntropyLoss return NaN (mean of empty set).
+    MIN_CONTENT = 2
+
     def _flush():
+        if len(current) < MIN_CONTENT:
+            return  # Drop too-short samples to avoid all-PAD-label NaN downstream
         seq = (current + [pad_token_id] * context_length)[:context_length]
         packed.append(seq)
 
@@ -306,43 +313,43 @@ def _all_sources(cache_dir):
     return {
         "wiki_ja": {
             "name": "wikimedia/wikipedia (ja)",
-            "cache_name": "wiki_ja_v3",
+            "cache_name": "wiki_ja_v4",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "wiki_en": {
             "name": "wikimedia/wikipedia (en)",
-            "cache_name": "wiki_en_v3",
+            "cache_name": "wiki_en_v4",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.en", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "cc100_ja": {
             "name": "hotchpotch/cc100-ja-documents",
-            "cache_name": "cc100_ja_v3",
+            "cache_name": "cc100_ja_v4",
             "load": lambda: load_dataset("hotchpotch/cc100-ja-documents", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "minipile": {
             "name": "JeanKaddour/minipile",
-            "cache_name": "minipile_v3",
+            "cache_name": "minipile_v4",
             "load": lambda: load_dataset("JeanKaddour/minipile", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "shi3z_llama2pro": {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
-            "cache_name": "shi3z_llama2pro_v3",
+            "cache_name": "shi3z_llama2pro_v4",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
         "shi3z_orion14b": {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
-            "cache_name": "shi3z_orion14b_v3",
+            "cache_name": "shi3z_orion14b_v4",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
         "ultrachat": {
             "name": "HuggingFaceH4/ultrachat_200k",
-            "cache_name": "ultrachat_v3",
+            "cache_name": "ultrachat_v4",
             "load": lambda: load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft", cache_dir=cache_dir),
             "units": _units_messages_item,
         },

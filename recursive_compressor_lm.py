@@ -50,7 +50,13 @@ class RecursiveCompressorLM(PreTrainedModel):
         logits, _ = self.step(input_ids, None)
         loss = None
         if labels is not None:
-            loss = nn.CrossEntropyLoss()(logits.float().view(-1, self.config.vocab_size), labels.view(-1))
+            flat_targets = labels.view(-1)
+            flat_logits = logits.float().view(-1, self.config.vocab_size)
+            # Guard against all-PAD-label samples (would give 0/0 = NaN).
+            if (flat_targets != -100).sum() == 0:
+                loss = flat_logits.sum() * 0.0
+            else:
+                loss = nn.CrossEntropyLoss()(flat_logits, flat_targets)
         return CausalLMOutput(loss=loss, logits=logits)
 
     def predict(self, input_ids, hidden):

@@ -332,7 +332,15 @@ def train(dataset_type="pretrain", start_checkpoint=None):
     vocab_size = config.vocab_size
 
     def loss_fn(logits, targets):
-        return nn.CrossEntropyLoss()(logits.float().view(-1, vocab_size), targets.view(-1))
+        flat_targets = targets.view(-1)
+        flat_logits = logits.float().view(-1, vocab_size)
+        # If a microbatch happens to contain only PAD-labeled positions
+        # (e.g., a malformed packed sample), CrossEntropyLoss computes
+        # 0/0 = NaN. Guard against this by returning a zero loss that
+        # still depends on logits (so backward produces zero grads cleanly).
+        if (flat_targets != -100).sum() == 0:
+            return flat_logits.sum() * 0.0
+        return nn.CrossEntropyLoss()(flat_logits, flat_targets)
 
     # Training loop
     total_steps = len(train_loader)

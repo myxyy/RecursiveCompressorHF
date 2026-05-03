@@ -81,6 +81,21 @@ class TestRecursiveCompressorLM:
         model = RecursiveCompressorLM(config)
         assert len(model.layers) == config.num_layers
 
+    def test_loss_all_pad_labels_no_nan(self, model, config):
+        """labelsが全て-100でもlossがNaNにならない（0/0防止）"""
+        batch_size, seq_len = 2, 16
+        input_ids = torch.randint(0, config.vocab_size, (batch_size, seq_len))
+        labels = torch.full((batch_size, seq_len), -100, dtype=torch.long)
+        output = model(input_ids, labels=labels)
+        assert output.loss is not None
+        assert not torch.isnan(output.loss).item()
+        assert output.loss.item() == 0.0
+        # Backward should produce zero (not NaN) gradients
+        output.loss.backward()
+        for name, param in model.named_parameters():
+            assert param.grad is not None
+            assert not torch.isnan(param.grad).any().item(), f"NaN grad in {name}"
+
     def test_save_and_load(self, model, config, tmp_path):
         """save_pretrained / from_pretrained の動作確認"""
         model.save_pretrained(tmp_path)
@@ -265,6 +280,25 @@ class TestDataFormatting:
         packed = _pack_chunks(chunks, context_length=8, pad_token_id=0)
         assert packed[0] == [1, 2, 3, 4, 5, 6, 7, 8]
         assert packed[1] == [1, 9, 0, 0, 0, 0, 0, 0]
+
+    def test_pack_chunks_drops_single_token_sample(self):
+        """1トークンだけになるサンプルはドロップ（labels全PADでNaN防止）"""
+        # context_length=4. First chunk fills exactly. Second chunk has just 1 token
+        # (a continuation chunk where text length aligned poorly).
+        chunks = [[1, 2, 3, 4], [5]]
+        packed = _pack_chunks(chunks, context_length=4, pad_token_id=0)
+        # The 1-token continuation should be dropped, not emitted as [5, 0, 0, 0]
+        # which would produce all-PAD labels.
+        assert len(packed) == 1
+        assert packed[0] == [1, 2, 3, 4]
+
+    def test_pack_chunks_keeps_two_token_sample(self):
+        """2トークン以上は保持（labelsに有効位置が1つは残る）"""
+        chunks = [[1, 2, 3, 4], [5, 6]]
+        packed = _pack_chunks(chunks, context_length=4, pad_token_id=0)
+        assert len(packed) == 2
+        assert packed[0] == [1, 2, 3, 4]
+        assert packed[1] == [5, 6, 0, 0]
 
     def test_units_sharegpt_item(self):
         """ShareGPT対話が複数ユニットに分割される"""
