@@ -21,6 +21,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data.distributed import DistributedSampler
 from torch.distributed.pipelining import PipelineStage
 from torch.distributed.pipelining.schedules import Schedule1F1B
+from torch.utils.tensorboard import SummaryWriter
 from dotenv import load_dotenv
 
 from configuration_recursive_compressor import RecursiveCompressorConfig
@@ -328,6 +329,15 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         load_start_checkpoint(stage_module, start_checkpoint.rstrip("/"))
     global_step = start_step
 
+    # TensorBoard writer (rank 0 only). Logs raw per-step loss/grad_norm so
+    # the curves are accurate across resume (unlike EMA which restarts).
+    tb_writer = None
+    if rank == 0:
+        tb_dir = os.path.join(data_dir, "tensorboard", dataset_type)
+        os.makedirs(tb_dir, exist_ok=True)
+        tb_writer = SummaryWriter(log_dir=tb_dir)
+        log(f"TensorBoard log dir: {tb_dir}")
+
     # Loss function (only used on last stage)
     vocab_size = config.vocab_size
 
@@ -374,6 +384,8 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, dataset_type,
                                       tokenizer=tokenizer, config=config)
+                if tb_writer is not None:
+                    tb_writer.close()
                 dist.destroy_process_group()
                 return
 
@@ -430,6 +442,12 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             global_step += 1
             num_steps += 1
 
+            # Log raw values to TensorBoard every step (rank 0 only).
+            # Raw (not EMA) so curves stay correct across resume.
+            if tb_writer is not None:
+                tb_writer.add_scalar("train/loss", batch_loss, global_step)
+                tb_writer.add_scalar("train/grad_norm", grad_norm, global_step)
+
             if global_step % LOG_INTERVAL == 0:
                 elapsed = time.time() - train_start_time
                 step_time = time.time() - step_start_time
@@ -475,6 +493,9 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             model.save_pretrained(final_path)
             tokenizer.save_pretrained(final_path)
             log(f"Final model saved: {final_path}")
+
+    if tb_writer is not None:
+        tb_writer.close()
 
     dist.destroy_process_group()
 

@@ -9,6 +9,7 @@ dependencies = [
     "protobuf>=7.34.1",
     "python-dotenv>=1.1.0",
     "sentencepiece>=0.2.1",
+    "tensorboard>=2.15",
     "torch>=2.11.0",
     "torchaudio>=2.11.0",
     "torchvision>=0.26.0",

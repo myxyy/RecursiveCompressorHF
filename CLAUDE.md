@@ -30,6 +30,13 @@ echo "resume"        > control.cmd   # Resume
 echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 ```
 
+## TensorBoard
+Raw per-step `train/loss` and `train/grad_norm` are logged to
+`$DATA_DIR/tensorboard/{dataset_type}/`. View with:
+```bash
+uv run tensorboard --logdir $DATA_DIR/tensorboard/
+```
+
 ## Environment
 - `.env` file sets `DATA_DIR` (datasets, checkpoints, memmap caches)
 - Default: `DATA_DIR=./data`
