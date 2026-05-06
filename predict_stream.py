@@ -93,9 +93,18 @@ def main():
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
     parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
     parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
+    parser.add_argument("--device", type=str, default=None,
+                        help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    if args.device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    else:
+        # Allow shortcut like "0", "1" to mean "cuda:0", "cuda:1"
+        spec = args.device
+        if spec.isdigit():
+            spec = f"cuda:{spec}"
+        device = torch.device(spec)
 
     print("Loading model...", flush=True)
     model = _load_model(args.model_dir, device, dtype=_DTYPES[args.precision])
