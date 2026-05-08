@@ -3,6 +3,13 @@ from transformers import PretrainedConfig
 
 class RecursiveCompressorConfig(PretrainedConfig):
     model_type = "recursive_compressor"
+    # HF utilities (e.g. GenerationMixin) read num_hidden_layers/hidden_size;
+    # map them to our naming.
+    attribute_map = {
+        "num_hidden_layers": "num_layers",
+        "hidden_size": "d_model",
+        "num_attention_heads": "num_heads",
+    }
 
     def __init__(
         self,

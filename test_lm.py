@@ -111,6 +111,49 @@ class TestRecursiveCompressorLM:
             reloaded = loaded(input_ids).logits
         torch.testing.assert_close(orig, reloaded)
 
+    def test_generate_basic(self, model, config):
+        """HuggingFace generate() で出力が得られる"""
+        model.eval()
+        prompt = torch.randint(0, config.vocab_size, (1, 8))
+        out = model.generate(prompt, max_new_tokens=10, do_sample=False)
+        # output is prompt + new tokens
+        assert out.shape == (1, 18)
+        # The prompt portion should be preserved
+        assert torch.equal(out[0, :8], prompt[0])
+
+    def test_generate_uses_past_key_values(self, model, config):
+        """generate が past_key_values を使い回しても、毎回フルforwardと同じ結果"""
+        model.eval()
+        prompt = torch.randint(0, config.vocab_size, (1, 8))
+
+        # Generate with caching (default). Force a fixed length by disabling EOS
+        # stopping; otherwise a random small model often samples EOS early.
+        with_cache = model.generate(
+            prompt, max_new_tokens=8, min_new_tokens=8,
+            do_sample=False, eos_token_id=None,
+        )
+
+        # Manually generate without caching: each step recomputes from scratch
+        ids = prompt.clone()
+        for _ in range(8):
+            with torch.no_grad():
+                logits = model(ids, use_cache=False).logits
+            next_token = logits[:, -1, :].argmax(-1, keepdim=True)
+            ids = torch.cat([ids, next_token], dim=1)
+
+        torch.testing.assert_close(with_cache, ids)
+
+    def test_generate_with_sampling(self, model, config):
+        """sampling パラメータが動く"""
+        model.eval()
+        prompt = torch.randint(0, config.vocab_size, (1, 4))
+        torch.manual_seed(0)
+        out = model.generate(
+            prompt, max_new_tokens=8,
+            do_sample=True, temperature=0.8, top_p=0.9,
+        )
+        assert out.shape == (1, 12)
+
     @pytest.mark.parametrize("seq_len", [1, 7, 8, 16, 24, 32])
     def test_predict_matches_forward(self, config, seq_len):
         """predictを1トークンずつ呼んだ結果がforwardと一致する"""
