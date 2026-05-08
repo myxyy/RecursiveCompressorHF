@@ -114,23 +114,52 @@ def main():
 
     tokenizer = _load_tokenizer(args.model_dir)
 
-    print(f"Device: {device}, precision: {args.precision}, context_length: {args.context_length}, "
-          f"temperature: {args.temperature}, top_p: {args.top_p}")
-    print("Type 'exit' to quit.")
+    state = {
+        "context_length": args.context_length,
+        "temperature": args.temperature,
+        "top_p": args.top_p,
+    }
+
+    print(f"Device: {device}, precision: {args.precision}, context_length: {state['context_length']}, "
+          f"temperature: {state['temperature']}, top_p: {state['top_p']}")
+    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]'")
+
+    # Map command name -> (state key, value parser)
+    commands = {
+        "temperature": ("temperature", float),
+        "top-p": ("top_p", float),
+        "context-length": ("context_length", int),
+    }
 
     while True:
         try:
             prompt = input("\n>>> ")
         except EOFError:
             break
-        if prompt.strip().lower() == "exit":
+        stripped = prompt.strip()
+        if stripped.lower() == "exit":
             break
-        if not prompt:
+        if not stripped:
+            continue
+
+        # Check if input is a command
+        parts = stripped.split(maxsplit=1)
+        cmd = parts[0].lower()
+        if cmd in commands:
+            key, parse = commands[cmd]
+            if len(parts) == 1:
+                print(f"{cmd} = {state[key]}")
+            else:
+                try:
+                    state[key] = parse(parts[1])
+                    print(f"{cmd} set to {state[key]}")
+                except ValueError:
+                    print(f"Invalid value for {cmd}: {parts[1]!r}")
             continue
 
         num_generated, elapsed = stream_generate(
             model, tokenizer, prompt,
-            args.context_length, args.temperature, args.top_p, device,
+            state["context_length"], state["temperature"], state["top_p"], device,
         )
         if elapsed > 0 and num_generated > 0:
             print(f"\n[{num_generated} tokens, {elapsed:.2f}s, {num_generated / elapsed:.2f} tok/s]")
