@@ -41,7 +41,7 @@ _ADAMW_ONLY_KEYWORDS = ("embedding", "head", "compressor_query", "initial_contex
 def split_params_for_muon(model):
     """Split parameters into (muon_params, adamw_params).
     Muon manages 2D Linear weights inside hidden layers.
-    AdamW manages embedding, output head, learnable contexts, biases, LayerNorms."""
+    AdamW manages embedding, output head, learnable contexts, biases, RMSNorms."""
     muon_params, adamw_params = [], []
     for name, param in model.named_parameters():
         if not param.requires_grad:
@@ -412,9 +412,11 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             schedule = Schedule1F1B(pipe_stage, n_microbatches=N_MICROBATCHES, loss_fn=loss_fn)
 
             # Execute pipeline (losses are collected via the losses list arg).
-            # Forward/backward run in bfloat16 via autocast; LayerNorm, Softmax,
-            # and CE loss stay in fp32 by autocast's policy. Gradients flow back
-            # to fp32 master weights.
+            # Forward/backward run in bfloat16 via autocast; Softmax and CE loss
+            # stay in fp32 by autocast's policy. RMSNorm computes internally in
+            # fp32 (weight is fp32) but outputs bf16 — unlike LayerNorm whose
+            # autocast policy keeps the output in fp32. Gradients flow back to
+            # fp32 master weights.
             microbatch_losses = []
             with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
                 if rank == 0:

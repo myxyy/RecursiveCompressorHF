@@ -24,7 +24,7 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
             RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
             for _ in range(config.num_layers)
         ])
-        self.norm = nn.LayerNorm(config.d_model)
+        self.norm = nn.RMSNorm(config.d_model)
         self.head = nn.Linear(config.d_model, config.vocab_size, bias=False)
         self.post_init()
 

@@ -32,7 +32,7 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
         ])
 
         if is_last:
-            self.norm = nn.LayerNorm(config.d_model)
+            self.norm = nn.RMSNorm(config.d_model)
             self.head = nn.Linear(config.d_model, config.vocab_size, bias=False)
 
     def _num_queries(self):
