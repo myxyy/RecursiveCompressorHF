@@ -18,6 +18,7 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
     def __init__(self, config: RecursiveCompressorConfig):
         super().__init__(config)
         self.embedding = nn.Embedding(config.vocab_size, config.d_model)
+        nn.init.normal_(self.embedding.weight, mean=0.0, std=0.02)
         self.compressor_query = nn.Parameter(torch.randn(config.compress_size, config.d_model))
         self.layers = nn.ModuleList([
             RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
