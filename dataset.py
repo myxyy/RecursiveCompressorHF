@@ -19,8 +19,9 @@ def get_tokenizer():
 
 
 def format_conversation_turn(query, answer):
-    """対話の1ターン: [QUERY]q[ANSWER]a"""
-    return f"[QUERY]{query}[ANSWER]{answer}"
+    """対話の1ターン (Llama2形式): [INST]q[/INST]a
+    後段で BOS/EOS を付与すると `<s>[INST]q[/INST]a</s>` になる。"""
+    return f"[INST]{query}[/INST]{answer}"
 
 
 def _extract_turns_sharegpt(conversations):
@@ -50,11 +51,13 @@ def _extract_turns_messages(messages):
 
 
 def _text_to_chunks(tokenizer, text, context_length):
-    """テキストをBOS付きトークン列にして、context_length単位で分割する。
-    最初のチャンクは[BOS]+tokens、続きはtokens（継続チャンク、BOSなし）。
-    各チャンクはcontext_length以下の長さ。"""
+    """テキストを `<s>...</s>` 形式のトークン列にして、context_length単位で分割する。
+    最初のチャンクは [BOS]+tokens で始まり、最後のチャンクは末尾に [EOS] が付く
+    (1チャンクに収まる短いテキストは [BOS]+tokens+[EOS] になる)。継続チャンクは
+    マーカーなし。各チャンクは context_length 以下の長さ。"""
     bos = tokenizer.bos_token_id
-    tokens = [bos] + tokenizer.encode(text, add_special_tokens=False)
+    eos = tokenizer.eos_token_id
+    tokens = [bos] + tokenizer.encode(text, add_special_tokens=False) + [eos]
     return [tokens[i:i + context_length] for i in range(0, len(tokens), context_length)]
 
 
@@ -168,7 +171,8 @@ def _items_to_text_batches(items, units_fn, batch_size):
 def _build_memmap_packed(cache_path, items, tokenizer, context_length, units_fn, num_workers=1):
     """イテレータからmemmapキャッシュを構築する。
     units_fn: item -> list of text strings (or None to skip)
-    各テキストはBOS付きトークン列にしてcontext_length単位で分割し、パックする。
+    各テキストは `<s>...</s>` 形式 (BOS+tokens+EOS) のトークン列にして
+    context_length単位で分割し、パックする。
     num_workers > 1 で並列トークナイズを使用（順序は保たれる）。"""
     os.makedirs(os.path.dirname(cache_path), exist_ok=True)
 
@@ -313,43 +317,43 @@ def _all_sources(cache_dir):
     return {
         "wiki_ja": {
             "name": "wikimedia/wikipedia (ja)",
-            "cache_name": "wiki_ja_v4",
+            "cache_name": "wiki_ja_v5",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.ja", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "wiki_en": {
             "name": "wikimedia/wikipedia (en)",
-            "cache_name": "wiki_en_v4",
+            "cache_name": "wiki_en_v5",
             "load": lambda: load_dataset("wikimedia/wikipedia", "20231101.en", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "cc100_ja": {
             "name": "hotchpotch/cc100-ja-documents",
-            "cache_name": "cc100_ja_v4",
+            "cache_name": "cc100_ja_v5",
             "load": lambda: load_dataset("hotchpotch/cc100-ja-documents", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "minipile": {
             "name": "JeanKaddour/minipile",
-            "cache_name": "minipile_v4",
+            "cache_name": "minipile_v5",
             "load": lambda: load_dataset("JeanKaddour/minipile", split="train", cache_dir=cache_dir),
             "units": _units_doc_item,
         },
         "shi3z_llama2pro": {
             "name": "shi3z/ja_conv_wikipedia_llama2pro8b_30k",
-            "cache_name": "shi3z_llama2pro_v4",
+            "cache_name": "shi3z_llama2pro_v5",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_llama2pro8b_30k", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
         "shi3z_orion14b": {
             "name": "shi3z/ja_conv_wikipedia_orion14B_100K",
-            "cache_name": "shi3z_orion14b_v4",
+            "cache_name": "shi3z_orion14b_v5",
             "load": lambda: load_dataset("shi3z/ja_conv_wikipedia_orion14B_100K", split="train", cache_dir=cache_dir),
             "units": _units_sharegpt_item,
         },
         "ultrachat": {
             "name": "HuggingFaceH4/ultrachat_200k",
-            "cache_name": "ultrachat_v4",
+            "cache_name": "ultrachat_v5",
             "load": lambda: load_dataset("HuggingFaceH4/ultrachat_200k", split="train_sft", cache_dir=cache_dir),
             "units": _units_messages_item,
         },

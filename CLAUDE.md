@@ -44,10 +44,10 @@ uv run tensorboard --logdir $DATA_DIR/tensorboard/
 - Hardware: 6x RTX 3090 (24GB VRAM each), 256GB RAM
 
 ## Key Design Decisions
-- **Tokenizer**: `elyza/ELYZA-japanese-Llama-2-7b-fast`. `[QUERY]`, `[ANSWER]` are plain text markers (no `[DOC]` prefix anymore — documents are just `<s>text`).
-- **Data format**: Documents: `<s>text` (raw, no marker). Conversations: `<s>[QUERY]q[ANSWER]a` per turn.
-- **Chunking + Packing**: Each text is BOS-prefixed and split into `context_length`-sized chunks. The first chunk has `<s>`; continuation chunks are unmarked. Chunks are concatenated to fill context_length samples; no trailing BOS is added (the next chunk's leading BOS serves as separator). Pad with PAD tokens.
-- **Memmap caching**: Tokenized data stored as numpy memmap (uint16) for memory efficiency. Cache names include version suffix (e.g. `_v4`) - change suffix to force rebuild. `prefault=True` reads through memmap once on rank 0 to populate OS page cache (shared across all ranks; not per-process copy).
+- **Tokenizer**: `elyza/ELYZA-japanese-Llama-2-7b-fast`. `[INST]`, `[/INST]` are Llama-2-style plain text markers (not special tokens).
+- **Data format** (Llama 2 style): Documents: `<s>text</s>`. Conversations: `<s>[INST]q1[/INST]a1</s><s>[INST]q2[/INST]a2</s>...` (each turn is BOS+EOS-wrapped).
+- **Chunking + Packing**: Each text is wrapped as `[BOS] + tokens + [EOS]` and split into `context_length`-sized chunks. The first chunk starts with `<s>`, the last chunk ends with `</s>`; if the text fits in one chunk it has both. Continuation chunks are unmarked. Chunks are concatenated to fill context_length samples; pad with PAD tokens.
+- **Memmap caching**: Tokenized data stored as numpy memmap (uint16) for memory efficiency. Cache names include version suffix (currently `_v5`) - change suffix to force rebuild. `prefault=True` reads through memmap once on rank 0 to populate OS page cache (shared across all ranks; not per-process copy).
 - **All-PAD-label NaN guard**: `_pack_chunks` enforces `MIN_CONTENT=2` so a packed sample always has ≥1 valid label position (otherwise CE loss = 0/0 = NaN). Loss functions in `train_pipeline.loss_fn` and `RecursiveCompressorLM.forward` ALSO guard against all-PAD microbatches (return `logits.sum() * 0.0`) for defense-in-depth. Discovered when training hit NaN deterministically at ~step 12610 from a single 1-token continuation chunk that became its own sample.
 - **Mixed precision**: Master weights and optimizer state in fp32, forward/backward in bfloat16 via `torch.autocast`. Softmax stays in fp32 by autocast policy. RMSNorm computes internally in fp32 (weight is fp32) but **outputs bf16** — unlike LayerNorm which is in autocast's fp32-output list. CrossEntropyLoss receives `logits.float()` cast.
 - **Numerical stability**: Use `F.scaled_dot_product_attention` (internally fp32 even for low-precision inputs, enables FlashAttention). Padding `torch.zeros` must inherit `dtype=x.dtype`.

@@ -240,7 +240,7 @@ class TestRecursiveCompressorLM:
 class TestDataFormatting:
     def test_format_conversation_turn(self):
         result = format_conversation_turn("質問1", "回答1")
-        assert result == "[QUERY]質問1[ANSWER]回答1"
+        assert result == "[INST]質問1[/INST]回答1"
 
     def test_extract_turns_sharegpt(self):
         conversations = [
@@ -263,25 +263,27 @@ class TestDataFormatting:
         assert turns == [("Q1", "A1"), ("Q2", "A2")]
 
     def test_text_to_chunks_short(self):
-        """短いテキストは1チャンクに収まる（BOS付き）"""
+        """短いテキストは1チャンクに収まる（先頭BOS、末尾EOS）"""
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
         tokenizer.encode.return_value = [10, 11, 12]
         chunks = _text_to_chunks(tokenizer, "x", context_length=8)
-        assert chunks == [[1, 10, 11, 12]]
+        assert chunks == [[1, 10, 11, 12, 2]]
 
     def test_text_to_chunks_long(self):
-        """長いテキストはcontext_length単位で分割される（最初のチャンクのみBOS）"""
+        """長いテキストはcontext_length単位で分割（先頭BOS、最終チャンク末尾EOS）"""
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
-        # encode returns 10 tokens; with BOS = 11 tokens; context_length=4
+        tokenizer.eos_token_id = 2
+        # encode returns 10 tokens; with BOS+EOS = 12 tokens; context_length=4
         tokenizer.encode.return_value = list(range(10, 20))
         chunks = _text_to_chunks(tokenizer, "x", context_length=4)
-        # full tokens: [1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19] (11 tokens)
-        # split into 4: [1,10,11,12], [13,14,15,16], [17,18,19]
-        assert chunks == [[1, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19]]
+        # full tokens: [1, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 2] (12 tokens)
+        # split into 4: [1,10,11,12], [13,14,15,16], [17,18,19,2]
+        assert chunks == [[1, 10, 11, 12], [13, 14, 15, 16], [17, 18, 19, 2]]
 
     def test_pack_chunks_basic(self):
         """spec例の動作: <s>abcdefghij, <s>123, <s>あいうえお をcontext_length=8で"""
@@ -353,8 +355,8 @@ class TestDataFormatting:
         ]}
         units = _units_sharegpt_item(item)
         assert len(units) == 2
-        assert units[0] == "[QUERY]Q1[ANSWER]A1"
-        assert units[1] == "[QUERY]Q2[ANSWER]A2"
+        assert units[0] == "[INST]Q1[/INST]A1"
+        assert units[1] == "[INST]Q2[/INST]A2"
 
     def test_units_doc_item_no_prefix(self):
         """文書アイテムは[DOC]プリフィックスなしで生のtextが返る"""
@@ -366,6 +368,7 @@ class TestDataFormatting:
         from unittest.mock import MagicMock
         tokenizer = MagicMock()
         tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
         tokenizer.pad_token_id = 0
         tokenizer.encode.return_value = [10, 11, 12]
 
@@ -375,7 +378,7 @@ class TestDataFormatting:
         _build_memmap_packed(cache_path, items, tokenizer, context_length=16, units_fn=_units_doc_item)
 
         ds = MemmapDataset(cache_path, pad_token_id=0)
-        # Each text -> [1,10,11,12] (4 tokens). Two texts: 8 tokens, fits in 16. Pads 8.
+        # Each text -> [1,10,11,12,2] (5 tokens). Two texts: 10 tokens, fits in 16. Pads 6.
         assert len(ds) == 1
 
         input_ids, labels = ds[0]
