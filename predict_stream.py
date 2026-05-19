@@ -14,14 +14,42 @@ Commands at the prompt:
     temperature [val]        - show or set temperature
     top-p [val]              - show or set top_p
     context-length [val]     - show or set max total token length
+
+Input editing:
+    Enter                    - submit
+    Alt+Enter (Esc, Enter)   - insert newline (multi-line input)
 """
 
 import argparse
 import time
 import torch
+from prompt_toolkit import PromptSession
+from prompt_toolkit.key_binding import KeyBindings
 from transformers import TextStreamer
 
 from predict import _DTYPES, _load_model, _load_tokenizer
+
+
+def _make_prompt_session():
+    """Multi-line REPL. Enter submits; Alt+Enter (Esc then Enter) inserts a newline.
+
+    Terminals can't distinguish Shift+Enter from Enter at the byte level, so to use
+    Shift+Enter as a newline, configure the terminal to send Esc+Enter (\\x1b\\r)
+    for Shift+Enter. In VSCode, add to keybindings.json:
+        {"key": "shift+enter", "command": "workbench.action.terminal.sendSequence",
+         "args": {"text": "\\u001b\\r"}, "when": "terminalFocus"}
+    """
+    bindings = KeyBindings()
+
+    @bindings.add("enter")
+    def _(event):
+        event.current_buffer.validate_and_handle()
+
+    @bindings.add("escape", "enter")
+    def _(event):
+        event.current_buffer.insert_text("\n")
+
+    return PromptSession(key_bindings=bindings, multiline=True)
 
 torch.set_float32_matmul_precision("high")
 
@@ -84,6 +112,7 @@ def main():
     print(f"Device: {device}, precision: {args.precision}, context_length: {state['context_length']}, "
           f"temperature: {state['temperature']}, top_p: {state['top_p']}")
     print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]'")
+    print("Input: Enter to submit, Alt+Enter (or Esc then Enter) for newline")
 
     commands = {
         "temperature": ("temperature", float),
@@ -91,10 +120,11 @@ def main():
         "context-length": ("context_length", int),
     }
 
+    session = _make_prompt_session()
     while True:
         try:
-            prompt = input("\n>>> ")
-        except EOFError:
+            prompt = session.prompt("\n>>> ")
+        except (EOFError, KeyboardInterrupt):
             break
         stripped = prompt.strip()
         if stripped.lower() == "exit":
