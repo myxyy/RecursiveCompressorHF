@@ -14,6 +14,8 @@ Commands at the prompt:
     temperature [val]        - show or set temperature
     top-p [val]              - show or set top_p
     context-length [val]     - show or set max total token length
+    skip-special-tokens [true/false] - show or set whether to skip special tokens in output
+    stop-on-eos [true/false] - show or set whether to stop generation on EOS token
 
 Input editing:
     Enter                    - submit
@@ -65,11 +67,11 @@ def _make_prompt_session():
 torch.set_float32_matmul_precision("high")
 
 
-def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device):
+def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos):
     """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds, interrupted).
     SIGINT (Ctrl+C) during generation flips a stopping criterion flag, so generation
     halts cleanly after the next token without raising KeyboardInterrupt."""
-    streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
+    streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=skip_special_tokens)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
     prompt_len = input_ids.size(1)
 
@@ -91,6 +93,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
                 pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
                 streamer=streamer,
                 stopping_criteria=StoppingCriteriaList([stopper]),
+                eos_token_id=tokenizer.eos_token_id if stop_on_eos else None,
             )
         elapsed = time.time() - start_time
     finally:
@@ -131,17 +134,21 @@ def main():
         "context_length": args.context_length,
         "temperature": args.temperature,
         "top_p": args.top_p,
+        "skip_special_tokens": True,
+        "stop_on_eos": True,
     }
 
     print(f"Device: {device}, precision: {args.precision}, context_length: {state['context_length']}, "
           f"temperature: {state['temperature']}, top_p: {state['top_p']}")
-    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]'")
+    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]', 'skip-special-tokens [true/false]', 'stop-on-eos [true/false]'")
     print("Input: Enter to submit, Alt+Enter (or Esc then Enter) for newline")
 
     commands = {
         "temperature": ("temperature", float),
         "top-p": ("top_p", float),
         "context-length": ("context_length", int),
+        "skip-special-tokens": ("skip_special_tokens", lambda x: x.lower() in ("true", "1", "yes", "on")),
+        "stop-on-eos": ("stop_on_eos", lambda x: x.lower() in ("true", "1", "yes", "on")),
     }
 
     session = _make_prompt_session()
@@ -173,6 +180,8 @@ def main():
         num_generated, elapsed, interrupted = stream_generate(
             model, tokenizer, prompt,
             state["context_length"], state["temperature"], state["top_p"], device,
+            state["skip_special_tokens"],
+            state["stop_on_eos"],
         )
         if interrupted:
             print("\n[interrupted]")
