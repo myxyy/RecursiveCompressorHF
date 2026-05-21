@@ -35,6 +35,7 @@ class ServerState:
     tokenizer = None
     device = None
     bos_id = None
+    eos_id = None
     inference_lock = threading.Lock()
 
 
@@ -64,16 +65,16 @@ def _sample_token(logits: torch.Tensor, temperature: float, top_p: float) -> int
 
 
 @torch.no_grad()
-def _generate_turn(hidden, query_text, is_first_turn, temperature, top_p, on_token):
-    """Run one turn. Always ends by feeding a BOS through `step` so the
-    next turn cleanly starts with `[QUERY]...[ANSWER]` (no leading BOS).
+def _generate_turn(hidden, query_text, temperature, top_p, on_token):
+    """Run one turn in Llama 2 format. Each turn is wrapped as
+    `<s>[INST]q[/INST]a</s>` so the input here is `<s>[INST]q[/INST]` and
+    generation stops at EOS. The EOS is fed through `step` before stopping so
+    the next turn's input cleanly begins with `<s>[INST]...`.
 
     Returns (new_hidden, reason, num_generated) where reason is one of
-    "bos" (model emitted BOS) or "max_tokens" (forced cutoff)."""
-    text = f"[QUERY]{query_text}[ANSWER]"
-    ids = state.tokenizer.encode(text, add_special_tokens=False)
-    if is_first_turn:
-        ids = [state.bos_id] + ids
+    "eos" (model emitted EOS) or "max_tokens" (forced cutoff)."""
+    text = f"[INST]{query_text}[/INST]"
+    ids = [state.bos_id] + state.tokenizer.encode(text, add_special_tokens=False)
 
     input_ids = torch.tensor([ids], dtype=torch.long, device=state.device)
     logits, hidden = state.model.step(input_ids, hidden)
@@ -83,11 +84,11 @@ def _generate_turn(hidden, query_text, is_first_turn, temperature, top_p, on_tok
     reason = "max_tokens"
     for _ in range(MAX_NEW_TOKENS_PER_TURN):
         next_id = _sample_token(next_logits, temperature, top_p)
-        if next_id == state.bos_id:
+        if next_id == state.eos_id:
             _, hidden = state.model.step(
                 torch.tensor([[next_id]], dtype=torch.long, device=state.device), hidden
             )
-            reason = "bos"
+            reason = "eos"
             break
         on_token(next_id)
         num_generated += 1
@@ -96,10 +97,10 @@ def _generate_turn(hidden, query_text, is_first_turn, temperature, top_p, on_tok
         )
         next_logits = logits[0, -1, :]
     else:
-        # Hit the per-turn cap without emitting BOS. Inject one so the running
-        # token stream stays in `<s>[QUERY]q[ANSWER]a<s>...` shape.
+        # Hit the per-turn cap without emitting EOS. Inject one so the running
+        # token stream stays in `<s>[INST]q[/INST]a</s><s>...` shape.
         _, hidden = state.model.step(
-            torch.tensor([[state.bos_id]], dtype=torch.long, device=state.device), hidden
+            torch.tensor([[state.eos_id]], dtype=torch.long, device=state.device), hidden
         )
 
     return hidden, reason, num_generated
@@ -269,7 +270,6 @@ def index():
 async def ws_chat(ws: WebSocket):
     await ws.accept()
     hidden = None
-    is_first = True
     loop = asyncio.get_running_loop()
 
     try:
@@ -295,11 +295,11 @@ async def ws_chat(ws: WebSocket):
             def on_token_cb(tid: int):
                 asyncio.run_coroutine_threadsafe(q.put(("token", tid)), loop)
 
-            def runner(prev_hidden, prev_first):
+            def runner(prev_hidden):
                 with state.inference_lock:
                     try:
                         new_hidden, reason, num_gen = _generate_turn(
-                            prev_hidden, text, prev_first, temperature, top_p, on_token_cb
+                            prev_hidden, text, temperature, top_p, on_token_cb
                         )
                     except Exception as e:
                         asyncio.run_coroutine_threadsafe(q.put(("error", repr(e))), loop)
@@ -308,7 +308,7 @@ async def ws_chat(ws: WebSocket):
                     q.put(("done", new_hidden, reason, num_gen)), loop
                 )
 
-            threading.Thread(target=runner, args=(hidden, is_first), daemon=True).start()
+            threading.Thread(target=runner, args=(hidden,), daemon=True).start()
 
             collected_ids: list[int] = []
             decoded_so_far = ""
@@ -325,7 +325,6 @@ async def ws_chat(ws: WebSocket):
                 elif kind == "done":
                     _, new_hidden, reason, num_gen = event
                     hidden = new_hidden
-                    is_first = False
                     await ws.send_json({"type": "end", "reason": reason, "num_tokens": num_gen})
                     break
                 elif kind == "error":
@@ -370,15 +369,17 @@ def main():
 
     tokenizer = _load_tokenizer(args.model_dir)
     bos_id = tokenizer.bos_token_id
-    if bos_id is None:
-        raise RuntimeError("Tokenizer has no bos_token_id; required for turn separation.")
+    eos_id = tokenizer.eos_token_id
+    if bos_id is None or eos_id is None:
+        raise RuntimeError("Tokenizer needs both bos_token_id and eos_token_id for Llama2-style turn framing.")
 
     state.model = model
     state.tokenizer = tokenizer
     state.device = device
     state.bos_id = bos_id
+    state.eos_id = eos_id
 
-    print(f"Device: {device}, precision: {args.precision}, BOS id: {bos_id}")
+    print(f"Device: {device}, precision: {args.precision}, BOS id: {bos_id}, EOS id: {eos_id}")
     print(f"Listening on http://{args.host}:{args.port}", flush=True)
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
