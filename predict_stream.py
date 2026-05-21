@@ -18,16 +18,27 @@ Commands at the prompt:
 Input editing:
     Enter                    - submit
     Alt+Enter (Esc, Enter)   - insert newline (multi-line input)
+    Ctrl+C (during gen)      - interrupt generation and return to prompt
 """
 
 import argparse
+import signal
 import time
 import torch
 from prompt_toolkit import PromptSession
 from prompt_toolkit.key_binding import KeyBindings
-from transformers import TextStreamer
+from transformers import StoppingCriteria, StoppingCriteriaList, TextStreamer
 
 from predict import _DTYPES, _load_model, _load_tokenizer
+
+
+class _InterruptStoppingCriteria(StoppingCriteria):
+    """Halts generation when `interrupted` is flipped to True (e.g. by SIGINT)."""
+    def __init__(self):
+        self.interrupted = False
+
+    def __call__(self, input_ids, scores, **kwargs):
+        return self.interrupted
 
 
 def _make_prompt_session():
@@ -55,25 +66,38 @@ torch.set_float32_matmul_precision("high")
 
 
 def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device):
-    """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds)."""
+    """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds, interrupted).
+    SIGINT (Ctrl+C) during generation flips a stopping criterion flag, so generation
+    halts cleanly after the next token without raising KeyboardInterrupt."""
     streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=True)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
     prompt_len = input_ids.size(1)
 
-    start_time = time.time()
-    with torch.no_grad():
-        output_ids = model.generate(
-            input_ids,
-            max_length=context_length,
-            do_sample=True,
-            temperature=temperature,
-            top_p=top_p,
-            pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
-            streamer=streamer,
-        )
-    elapsed = time.time() - start_time
+    stopper = _InterruptStoppingCriteria()
+
+    def _on_sigint(signum, frame):
+        stopper.interrupted = True
+
+    old_handler = signal.signal(signal.SIGINT, _on_sigint)
+    try:
+        start_time = time.time()
+        with torch.no_grad():
+            output_ids = model.generate(
+                input_ids,
+                max_length=context_length,
+                do_sample=True,
+                temperature=temperature,
+                top_p=top_p,
+                pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
+                streamer=streamer,
+                stopping_criteria=StoppingCriteriaList([stopper]),
+            )
+        elapsed = time.time() - start_time
+    finally:
+        signal.signal(signal.SIGINT, old_handler)
+
     num_generated = output_ids.size(1) - prompt_len
-    return num_generated, elapsed
+    return num_generated, elapsed, stopper.interrupted
 
 
 def main():
@@ -146,10 +170,12 @@ def main():
                     print(f"Invalid value for {cmd}: {parts[1]!r}")
             continue
 
-        num_generated, elapsed = stream_generate(
+        num_generated, elapsed, interrupted = stream_generate(
             model, tokenizer, prompt,
             state["context_length"], state["temperature"], state["top_p"], device,
         )
+        if interrupted:
+            print("\n[interrupted]")
         if elapsed > 0 and num_generated > 0:
             print(f"\n[{num_generated} tokens, {elapsed:.2f}s, {num_generated / elapsed:.2f} tok/s]")
 
