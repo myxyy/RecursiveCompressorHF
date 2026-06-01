@@ -58,12 +58,12 @@ load_dotenv()
 torch.set_float32_matmul_precision("high")
 
 # Hyperparameters
-CONTEXT_LENGTH = 1024
+CONTEXT_LENGTH = 2048
 LEARNING_RATE = 5e-5
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
-N_MICROBATCHES = 12
-BATCH_SIZE = 12  # Must be >= N_MICROBATCHES
+N_MICROBATCHES = 6
+BATCH_SIZE = 6  # Must be >= N_MICROBATCHES
 CHECKPOINT_INTERVAL = 1000
 MAX_CHECKPOINTS = 2
 CONTROL_FILE = "control.cmd"
