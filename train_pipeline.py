@@ -269,7 +269,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         d_ff=6144,
         chunk_size=4,
         compress_size=1,
-        num_layers=16,
+        num_layers=24,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
