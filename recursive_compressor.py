@@ -53,27 +53,23 @@ class FFNSwiGLU(nn.Module):
         output = self.linear2(x_act)
         return output
 
-class RecursiveCompressor(nn.Module):
-    def __init__(self, d_model, num_heads, d_ff, chunk_size, compress_size):
-        super(RecursiveCompressor, self).__init__()
+class RecursiveCompressorAttention(nn.Module):
+    def __init__(self, d_model, num_heads, chunk_size, compress_size):
+        super(RecursiveCompressorAttention, self).__init__()
         self.chunk_size = chunk_size
         self.compress_size = compress_size
         self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
         self.initial_context = nn.Parameter(torch.randn(compress_size, d_model))
         self.norm_mha_encoder = nn.RMSNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
-        self.norm_ffn_encoder = nn.RMSNorm(d_model)
-        self.ffn_encoder = FFNSwiGLU(d_model, d_ff)
-        self.norm_mha_decoder = nn.RMSNorm(d_model)
-        self.mha_decoder = MultiHeadAttention(d_model, num_heads)
-        self.norm_ffn_decoder = nn.RMSNorm(d_model)
-        self.ffn_decoder = FFNSwiGLU(d_model, d_ff)
         self.norm_compressor_kv = nn.RMSNorm(d_model)
         self.norm_compressor_q = nn.RMSNorm(d_model)
         self.mha_compressor = MultiHeadAttention(d_model, num_heads)
         self.norm_decompressor_kv = nn.RMSNorm(d_model)
         self.norm_decompressor_q = nn.RMSNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
+        self.linear_query = nn.Linear(d_model, compress_size * d_model)
+        self.compressor_query_pos = nn.Parameter(torch.randn(compress_size, d_model))
 
     def step(self, xs, hidden):
         """
@@ -127,17 +123,6 @@ class RecursiveCompressor(nn.Module):
             parts.append(rem_padded)
 
         all_chunks = torch.cat(parts, dim=0)
-
-        # Encoder: causal self-attention + FFN (independent per chunk)
-        ac = all_chunks
-        all_chunks = self.norm_mha_encoder(all_chunks)
-        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
-        all_chunks = all_chunks + ac
-
-        ac = all_chunks
-        all_chunks = self.norm_ffn_encoder(all_chunks)
-        all_chunks = self.ffn_encoder(all_chunks)
-        all_chunks = all_chunks + ac
 
         # Compression / Decompression
         all_pre_norm = all_chunks
@@ -218,13 +203,8 @@ class RecursiveCompressor(nn.Module):
 
         # Decoder: causal self-attention + FFN (independent per chunk)
         ac = all_chunks
-        all_chunks = self.norm_mha_decoder(all_chunks)
-        all_chunks = self.mha_decoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
-        all_chunks = all_chunks + ac
-
-        ac = all_chunks
-        all_chunks = self.norm_ffn_decoder(all_chunks)
-        all_chunks = self.ffn_decoder(all_chunks)
+        all_chunks = self.norm_mha_encoder(all_chunks)
+        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
         all_chunks = all_chunks + ac
 
         # Reconstruct output
@@ -258,3 +238,17 @@ class RecursiveCompressor(nn.Module):
         output_xs, hidden = self.step(xs_expanded, hidden)
         output_xs[0] = output_xs[0].squeeze(1)
         return output_xs, hidden
+
+class RecursiveCompressor(nn.Module):
+    def __init__(self, d_model, num_heads, d_ff, chunk_size, compress_size):
+        super(RecursiveCompressor, self).__init__()
+        self.attention = RecursiveCompressorAttention(d_model, num_heads, chunk_size, compress_size)
+
+    def forward(self, xs):
+        return self.attention(xs)
+    
+    def predict(self, xs, hidden):
+        return self.attention.predict(xs, hidden)
+
+    def step(self, xs, hidden):
+        return self.attention.step(xs, hidden)
