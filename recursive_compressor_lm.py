@@ -19,7 +19,6 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
         super().__init__(config)
         self.embedding = nn.Embedding(config.vocab_size, config.d_model)
         nn.init.normal_(self.embedding.weight, mean=0.0, std=0.02)
-        self.compressor_query = nn.Parameter(torch.randn(config.compress_size, config.d_model))
         self.layers = nn.ModuleList([
             RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
             for _ in range(config.num_layers)
@@ -36,8 +35,7 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
         """Create xs list: [data, q, q, q, ...] with enough queries for max recursion."""
         batch_size = x.size(0)
         n = self._num_queries()
-        q = self.compressor_query[None, :, :].expand(batch_size, -1, -1)
-        return [x] + [q for _ in range(n)]
+        return [x] + [None for _ in range(n)]
 
     def step(self, input_ids, hidden):
         x = self.embedding(input_ids)

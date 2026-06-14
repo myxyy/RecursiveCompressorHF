@@ -68,15 +68,14 @@ class RecursiveCompressorAttention(nn.Module):
         self.norm_decompressor_kv = nn.RMSNorm(d_model)
         self.norm_decompressor_q = nn.RMSNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
-        self.linear_query = nn.Linear(d_model, compress_size * d_model)
         self.compressor_query_pos = nn.Parameter(torch.randn(compress_size, d_model))
 
     def step(self, xs, hidden):
         """
         xs: list of tensors
             xs[0]: (batch, seq_len, d_model) - main data
-            xs[1]: (batch, compress_size, d_model) - compressor query for this level
-            xs[2:]: deeper compressor queries (same shape as xs[1])
+            xs[1]: (batch, compressed_seq_len, compress_size, d_model) - compressor query for this level
+            xs[2:]: deeper compressor queries
         hidden: list of (inner_context, outer_context) tuples
 
         Returns: (output_xs, hidden)
@@ -124,6 +123,17 @@ class RecursiveCompressorAttention(nn.Module):
 
         all_chunks = torch.cat(parts, dim=0)
 
+        # Compressor query (per-chunk: (batch, num_full, compress_size, d_model)).
+        # First stage gets comp_query=None and derives it from each full chunk's
+        # last vector (from `combined`, so step/forward chunk boundaries align).
+        # Later stages receive the previous stage's compressed sequence as the
+        # query directly.
+        if comp_query is None and num_full > 0:
+            full_view = combined[:, :full_len].reshape(batch_size, num_full, self.chunk_size, d_model)
+            comp_query = full_view[:, :, -1, :].unsqueeze(2).expand(batch_size, num_full, self.compress_size, d_model)
+        if comp_query is not None:
+            comp_query = comp_query + self.compressor_query_pos
+
         # Compression / Decompression
         all_pre_norm = all_chunks
         all_normed_for_compressor_kv = self.norm_compressor_kv(all_chunks)
@@ -135,9 +145,10 @@ class RecursiveCompressorAttention(nn.Module):
         if num_full > 0 and comp_query is not None:
             full_normed = all_normed_for_compressor_kv[:batch_size * num_full]
 
-            # Use comp_query for compression (expanded per chunk)
-            cq_expanded = comp_query.unsqueeze(1).expand(batch_size, num_full, self.compress_size, d_model)
-            cq_expanded = cq_expanded.reshape(batch_size * num_full, self.compress_size, d_model)
+            # comp_query is per-chunk: (batch, num_full, compress_size, d_model).
+            assert comp_query.size(1) == num_full, \
+                f"comp_query chunk count {comp_query.size(1)} != num_full {num_full}"
+            cq_expanded = comp_query.reshape(batch_size * num_full, self.compress_size, d_model)
             cq_expanded_norm = self.norm_compressor_q(cq_expanded)
             compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed) + cq_expanded
 
@@ -146,11 +157,16 @@ class RecursiveCompressorAttention(nn.Module):
             compressed = compressed.permute(0, 2, 1, 3).contiguous()
             compressed = compressed.view(batch_size * self.compress_size, num_full, d_model)
 
-            # Expand deeper queries for recursive call
+            # Expand deeper queries for recursive call. Each is per-chunk 4D:
+            # (batch, S, compress_size, d_model) -> (batch*compress_size, S, compress_size, d_model)
             expanded_dqs = []
             for dq in deeper_qs:
-                exp = dq.unsqueeze(1).expand(batch_size, self.compress_size, self.compress_size, d_model)
-                exp = exp.reshape(batch_size * self.compress_size, self.compress_size, d_model)
+                if dq is None:
+                    expanded_dqs.append(None)
+                    continue
+                s = dq.size(1)
+                exp = dq.unsqueeze(1).expand(batch_size, self.compress_size, s, self.compress_size, d_model)
+                exp = exp.reshape(batch_size * self.compress_size, s, self.compress_size, d_model)
                 expanded_dqs.append(exp)
 
             # Recursive step
@@ -177,13 +193,19 @@ class RecursiveCompressorAttention(nn.Module):
             else:
                 all_outer = full_outer
 
-            # comp_query output: the last chunk's compressed result (carries processed info)
-            comp_query_out = new_outer
+            # comp_query output: the full compressed sequence, propagated to the
+            # next layer as its per-chunk compressor query (Option B).
+            comp_query_out = compressed_out
 
-            # Collapse deeper results from (batch*compress_size, S, D) to (batch, S, D)
+            # Collapse deeper results across the compress_size stream dimension:
+            # (batch*compress_size, S, compress_size, d_model) -> (batch, S, compress_size, d_model)
             collapsed_dqs = []
             for dq_out in deeper_out:
-                dq_collapsed = dq_out.view(batch_size, self.compress_size, self.compress_size, d_model).mean(dim=1)
+                if dq_out is None:
+                    collapsed_dqs.append(None)
+                    continue
+                s = dq_out.size(1)
+                dq_collapsed = dq_out.view(batch_size, self.compress_size, s, self.compress_size, d_model).mean(dim=1)
                 collapsed_dqs.append(dq_collapsed)
         else:
             if prev_outer is not None:
@@ -221,10 +243,10 @@ class RecursiveCompressorAttention(nn.Module):
         new_inner = combined[:, full_len:] if rem > 0 else None
         hidden.append((new_inner, new_outer))
 
-        # Build output list: [processed_data, comp_query_out, *collapsed_deeper_queries]
-        output_xs = [output]
-        if comp_query_out is not None:
-            output_xs.append(comp_query_out)
+        # Build output list: [processed_data, comp_query_out, *collapsed_deeper_queries].
+        # Always include the comp_query_out slot (may be None) so the list length
+        # is preserved across layers and recursion levels.
+        output_xs = [output, comp_query_out]
         output_xs.extend(collapsed_dqs)
 
         return output_xs, hidden
