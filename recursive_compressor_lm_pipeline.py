@@ -24,7 +24,6 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
 
         if is_first:
             self.embedding = nn.Embedding(config.vocab_size, config.d_model)
-            self.compressor_query = nn.Parameter(torch.randn(config.compress_size, config.d_model))
 
         self.layers = nn.ModuleList([
             RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
@@ -39,10 +38,10 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
         return math.ceil(math.log(65536) / math.log(self.config.chunk_size)) + 1
 
     def _make_xs(self, x):
-        batch_size = x.size(0)
+        """Queries all start as None; each layer's first stage derives its
+        per-chunk compressor query from the data (see RecursiveCompressorAttention)."""
         n = self._num_queries()
-        q = self.compressor_query[None, :, :].expand(batch_size, -1, -1)
-        return [x] + [q for _ in range(n)]
+        return [x] + [None for _ in range(n)]
 
     def forward(self, x):
         if self.is_first:
@@ -63,31 +62,50 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
             return self._pack_xs(xs)
 
     def _pack_xs(self, xs):
-        """Pack list of tensors into a single tensor for inter-stage transfer.
-        xs[0]: (batch, seq_len, d_model), xs[1:]: (batch, compress_size, d_model)
-        Pack by padding xs[1:] to seq_len and stacking along a new dim."""
+        """Pack the xs list into a single tensor for inter-stage transfer.
+
+        xs[0]: (batch, seq_len, d_model) - main data.
+        xs[k] (k>=1): per-chunk query (batch, S_k, compress_size, d_model) or None,
+            where S_k = seq_len // chunk_size**k (None once S_k hits 0).
+
+        Each query slot is flattened to (batch, S_k*compress_size, d_model), padded
+        to seq_len, and stacked. None slots become zero padding; the receiver
+        reconstructs which slots are None from seq_len (the structure is
+        deterministic), so the zeros are never consumed."""
         data = xs[0]  # (batch, seq_len, d_model)
         batch_size, seq_len, d_model = data.size()
-        queries = xs[1:]  # each (batch, compress_size, d_model)
 
         padded = [data]
-        for q in queries:
-            # Pad compress_size -> seq_len
-            pad_len = seq_len - q.size(1)
-            padded_q = torch.cat([q, torch.zeros(batch_size, pad_len, d_model, device=q.device, dtype=q.dtype)], dim=1)
-            padded.append(padded_q)
+        for slot in xs[1:]:
+            if slot is None:
+                padded.append(torch.zeros(batch_size, seq_len, d_model, device=data.device, dtype=data.dtype))
+                continue
+            flat = slot.reshape(batch_size, -1, d_model)  # (batch, S_k*compress_size, d_model)
+            pad_len = seq_len - flat.size(1)
+            if pad_len > 0:
+                flat = torch.cat([flat, torch.zeros(batch_size, pad_len, d_model, device=data.device, dtype=data.dtype)], dim=1)
+            padded.append(flat)
 
         return torch.stack(padded, dim=1)  # (batch, 1+num_queries, seq_len, d_model)
 
     def _unpack_xs(self, packed):
-        """Unpack tensor back to list of tensors."""
+        """Inverse of _pack_xs. Recomputes each slot's length S_k from seq_len
+        and reconstructs None for slots where S_k == 0."""
         # packed: (batch, 1+num_queries, seq_len, d_model)
-        data = packed[:, 0]  # (batch, seq_len, d_model)
-        queries = []
-        compress_size = self.config.compress_size
-        for i in range(1, packed.size(1)):
-            queries.append(packed[:, i, :compress_size, :])  # (batch, compress_size, d_model)
-        return [data] + queries
+        batch_size, num_slots, seq_len, d_model = packed.size()
+        cs = self.config.compress_size
+        chunk = self.config.chunk_size
+
+        xs = [packed[:, 0]]  # data: (batch, seq_len, d_model)
+        s = seq_len
+        for k in range(1, num_slots):
+            s = s // chunk  # S_k
+            if s > 0:
+                flat = packed[:, k, :s * cs, :]  # (batch, S_k*compress_size, d_model)
+                xs.append(flat.reshape(batch_size, s, cs, d_model))
+            else:
+                xs.append(None)
+        return xs
 
     @staticmethod
     def split_config(num_layers, num_stages):
@@ -118,7 +136,7 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
                     local_idx = global_idx - self.layer_start
                     local_key = f"layers.{local_idx}.{parts[2]}"
                     local_state[local_key] = value
-            elif self.is_first and key in ("embedding.weight", "compressor_query"):
+            elif self.is_first and key == "embedding.weight":
                 local_state[key] = value
             elif self.is_last and (key.startswith("norm.") or key.startswith("head.")):
                 local_state[key] = value

@@ -4,6 +4,7 @@ import pytest
 import torch
 from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
+from recursive_compressor_lm_pipeline import RecursiveCompressorLMPipelineStage
 from dataset import (
     format_conversation_turn,
     _extract_turns_sharegpt, _extract_turns_messages,
@@ -235,6 +236,124 @@ class TestRecursiveCompressorLM:
             step_logits = torch.cat(step_logits_list, dim=1)
 
         torch.testing.assert_close(step_logits, predict_logits, atol=5e-3, rtol=5e-2)
+
+
+class TestRecursiveCompressorLMPipeline:
+    """Pipeline-stage wrapper must stay numerically equivalent to the monolithic
+    RecursiveCompressorLM. These tests guard against the two halves drifting apart
+    when the architecture changes (e.g. the per-chunk query refactor)."""
+
+    @pytest.fixture
+    def config(self):
+        # chunk_size=4 so seq_len=64 recurses a few levels (64->16->4->1->0),
+        # exercising both populated query slots and trailing None slots.
+        return RecursiveCompressorConfig(
+            vocab_size=100,
+            d_model=64,
+            num_heads=4,
+            d_ff=128,
+            chunk_size=4,
+            compress_size=2,
+            num_layers=6,
+        )
+
+    def _build_stages(self, config, full_model, num_stages):
+        """Split a full model into pipeline stages sharing its weights."""
+        full_sd = full_model.state_dict()
+        splits = RecursiveCompressorLMPipelineStage.split_config(config.num_layers, num_stages)
+        stages = []
+        for sp in splits:
+            stage = RecursiveCompressorLMPipelineStage(
+                config, sp["layer_start"], sp["layer_end"], sp["is_first"], sp["is_last"],
+            )
+            stage.eval()
+            stage.load_from_full_model(full_sd)
+            stages.append(stage)
+        return stages
+
+    @pytest.mark.parametrize("num_stages", [1, 2, 3, 6])
+    @pytest.mark.parametrize("seq_len", [64, 30])
+    def test_pipeline_matches_full_model(self, config, num_stages, seq_len):
+        """全ステージを通した logits が monolithic モデルと一致する（pack/unpack含む）"""
+        torch.manual_seed(0)
+        full = RecursiveCompressorLM(config)
+        full.eval()
+
+        input_ids = torch.randint(0, config.vocab_size, (2, seq_len))
+        with torch.no_grad():
+            logits_full = full(input_ids).logits
+
+            stages = self._build_stages(config, full, num_stages)
+            x = input_ids
+            for stage in stages:
+                x = stage(x)
+            logits_pipe = x
+
+        assert logits_pipe.shape == logits_full.shape
+        torch.testing.assert_close(logits_pipe, logits_full, atol=1e-2, rtol=5e-2)
+
+    def test_pack_unpack_roundtrip(self, config):
+        """_pack_xs / _unpack_xs が None スロットを含めて往復で復元する"""
+        stage = RecursiveCompressorLMPipelineStage(config, 0, 2, is_first=True, is_last=False)
+        stage.eval()
+
+        # Build an xs whose slot lengths match what the model actually produces:
+        # slot k has S_k = seq_len // chunk_size**k (None once it hits 0).
+        batch, seq_len, d_model, cs = 2, 64, config.d_model, config.compress_size
+        n = stage._num_queries()
+        xs = [torch.randn(batch, seq_len, d_model)]
+        s = seq_len
+        for _ in range(n):
+            s = s // config.chunk_size
+            if s > 0:
+                xs.append(torch.randn(batch, s, cs, d_model))
+            else:
+                xs.append(None)
+
+        packed = stage._pack_xs(xs)
+        restored = stage._unpack_xs(packed)
+
+        assert len(restored) == len(xs)
+        for orig, rest in zip(xs, restored):
+            if orig is None:
+                assert rest is None
+            else:
+                torch.testing.assert_close(rest, orig)
+
+    def test_reconstruct_full_state_dict(self, config):
+        """ステージに分割→再構成した state dict が元モデルと一致する"""
+        torch.manual_seed(1)
+        full = RecursiveCompressorLM(config)
+        full_sd = full.state_dict()
+
+        num_stages = 3
+        splits = RecursiveCompressorLMPipelineStage.split_config(config.num_layers, num_stages)
+        gathered = []
+        for rank, sp in enumerate(splits):
+            stage = RecursiveCompressorLMPipelineStage(
+                config, sp["layer_start"], sp["layer_end"], sp["is_first"], sp["is_last"],
+            )
+            stage.load_from_full_model(full_sd)
+            gathered.append((rank, sp, stage.state_dict()))
+
+        reconstructed = RecursiveCompressorLMPipelineStage.reconstruct_full_state_dict(gathered)
+
+        assert set(reconstructed.keys()) == set(full_sd.keys())
+        for key in full_sd:
+            torch.testing.assert_close(reconstructed[key], full_sd[key])
+
+    def test_split_config_covers_all_layers(self):
+        """split_config が全レイヤを過不足なく分配する"""
+        splits = RecursiveCompressorLMPipelineStage.split_config(num_layers=16, num_stages=6)
+        assert splits[0]["is_first"] and not splits[0]["is_last"]
+        assert splits[-1]["is_last"] and not splits[-1]["is_first"]
+        assert splits[0]["layer_start"] == 0
+        assert splits[-1]["layer_end"] == 16
+        # contiguous, non-overlapping coverage
+        for prev, nxt in zip(splits, splits[1:]):
+            assert prev["layer_end"] == nxt["layer_start"]
+        total = sum(s["layer_end"] - s["layer_start"] for s in splits)
+        assert total == 16
 
 
 class TestDataFormatting:

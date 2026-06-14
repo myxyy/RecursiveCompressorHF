@@ -261,16 +261,41 @@ class RecursiveCompressorAttention(nn.Module):
         output_xs[0] = output_xs[0].squeeze(1)
         return output_xs, hidden
 
+class RecursiveCompressorFFN(nn.Module):
+    def __init__(self, d_model, d_ff):
+        super(RecursiveCompressorFFN, self).__init__()
+        self.norm = nn.RMSNorm(d_model)
+        self.ffn = FFNSwiGLU(d_model, d_ff)
+
+    def forward(self, xs):
+        # Pre-norm residual FFN applied per recursion level (each xs element).
+        # xs may contain None in unused deeper-query slots (recursion depths
+        # beyond where compression bottomed out), so pass those through.
+        out = []
+        for x in xs:
+            if x is None:
+                out.append(None)
+                continue
+            out.append(x + self.ffn(self.norm(x)))
+        return out
+
 class RecursiveCompressor(nn.Module):
     def __init__(self, d_model, num_heads, d_ff, chunk_size, compress_size):
         super(RecursiveCompressor, self).__init__()
         self.attention = RecursiveCompressorAttention(d_model, num_heads, chunk_size, compress_size)
+        self.ffn = RecursiveCompressorFFN(d_model, d_ff)
 
     def forward(self, xs):
-        return self.attention(xs)
+        xs = self.attention(xs)
+        xs = self.ffn(xs)
+        return xs
     
     def predict(self, xs, hidden):
-        return self.attention.predict(xs, hidden)
+        xs, hidden = self.attention.predict(xs, hidden)
+        xs = self.ffn(xs)
+        return xs, hidden
 
     def step(self, xs, hidden):
-        return self.attention.step(xs, hidden)
+        xs, hidden = self.attention.step(xs, hidden)
+        xs = self.ffn(xs)
+        return xs, hidden
