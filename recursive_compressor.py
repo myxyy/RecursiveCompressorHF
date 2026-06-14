@@ -68,7 +68,7 @@ class RecursiveCompressorAttention(nn.Module):
         self.norm_decompressor_kv = nn.RMSNorm(d_model)
         self.norm_decompressor_q = nn.RMSNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
-        self.compressor_query_pos = nn.Parameter(torch.randn(compress_size, d_model))
+        self.compressor_query_pos = nn.Parameter(torch.randn(compress_size, d_model) * 0.02)
 
     def step(self, xs, hidden):
         """
