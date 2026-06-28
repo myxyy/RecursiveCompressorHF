@@ -161,12 +161,12 @@ HTML_PAGE = """<!DOCTYPE html>
   <h1>RecursiveCompressor Chat</h1>
   <div class="controls">
     <label class="slider">Temperature
-      <input type="range" id="temp" min="0.01" max="2" step="0.01" value="0.1">
-      <span class="val" id="temp-val">0.10</span>
+      <input type="range" id="temp" min="0.01" max="2" step="0.01" value="1.0">
+      <span class="val" id="temp-val">1.0</span>
     </label>
     <label class="slider">Top-p
-      <input type="range" id="topp" min="0" max="1" step="0.01" value="0.9">
-      <span class="val" id="topp-val">0.90</span>
+      <input type="range" id="topp" min="0" max="1" step="0.01" value="0.95">
+      <span class="val" id="topp-val">0.95</span>
     </label>
     <span id="status">connecting...</span>
   </div>
