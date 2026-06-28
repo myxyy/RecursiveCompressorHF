@@ -6,9 +6,10 @@ from configuration_recursive_compressor import RecursiveCompressorConfig
 from recursive_compressor_lm import RecursiveCompressorLM
 from recursive_compressor_lm_pipeline import RecursiveCompressorLMPipelineStage
 from dataset import (
-    format_conversation_turn,
     _extract_turns_sharegpt, _extract_turns_messages,
-    _build_memmap_packed, _units_doc_item, _units_sharegpt_item,
+    _build_memmap_packed, _build_memmap_conversations,
+    _units_doc_item, _turns_sharegpt_item, _turns_messages_item,
+    _conversation_to_ids_and_mask, _conversation_to_samples,
     _text_to_chunks, _pack_chunks, MemmapDataset,
 )
 
@@ -357,10 +358,6 @@ class TestRecursiveCompressorLMPipeline:
 
 
 class TestDataFormatting:
-    def test_format_conversation_turn(self):
-        result = format_conversation_turn("質問1", "回答1")
-        assert result == "[INST]質問1[/INST]回答1"
-
     def test_extract_turns_sharegpt(self):
         conversations = [
             {"from": "human", "value": "Q1"},
@@ -464,18 +461,81 @@ class TestDataFormatting:
         assert packed[0] == [1, 2, 3, 4]
         assert packed[1] == [5, 6, 0, 0]
 
-    def test_units_sharegpt_item(self):
-        """ShareGPT対話が複数ユニットに分割される"""
+    def test_turns_sharegpt_item(self):
+        """ShareGPT対話が (q, a) タプルのリストになる"""
         item = {"conversations": [
             {"from": "human", "value": "Q1"},
             {"from": "gpt", "value": "A1"},
             {"from": "human", "value": "Q2"},
             {"from": "gpt", "value": "A2"},
         ]}
-        units = _units_sharegpt_item(item)
-        assert len(units) == 2
-        assert units[0] == "[INST]Q1[/INST]A1"
-        assert units[1] == "[INST]Q2[/INST]A2"
+        turns = _turns_sharegpt_item(item)
+        assert turns == [("Q1", "A1"), ("Q2", "A2")]
+
+    def test_turns_messages_item(self):
+        """messages対話が (q, a) タプルのリストになる"""
+        item = {"messages": [
+            {"role": "user", "content": "Q1"},
+            {"role": "assistant", "content": "A1"},
+        ]}
+        assert _turns_messages_item(item) == [("Q1", "A1")]
+
+    def test_turns_item_empty_returns_none(self):
+        """ターンが取れない対話は None"""
+        assert _turns_sharegpt_item({"conversations": []}) is None
+        assert _turns_messages_item({"messages": []}) is None
+
+    def test_conversation_to_ids_and_mask(self):
+        """応答トークン(answer本文+EOS)だけ mask=1、prompt(BOS+[INST]q[/INST])は0"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
+
+        # encode("[INST]q[/INST]") -> prompt body, encode(answer) -> answer body
+        def fake_encode(text, add_special_tokens=False):
+            return {"[INST]Q1[/INST]": [10, 11], "A1": [20],
+                    "[INST]Q2[/INST]": [12], "A2": [21, 22]}[text]
+        tokenizer.encode.side_effect = fake_encode
+
+        ids, mask = _conversation_to_ids_and_mask(tokenizer, [("Q1", "A1"), ("Q2", "A2")])
+        # turn1: <s>[10,11] (prompt) + [20] <eos> (answer)
+        # turn2: <s>[12] (prompt) + [21,22] <eos> (answer)
+        assert ids == [1, 10, 11, 20, 2, 1, 12, 21, 22, 2]
+        assert mask == [0, 0, 0, 1, 1, 0, 0, 1, 1, 1]
+
+    def test_conversation_to_samples_no_concat_and_pad(self):
+        """1会話が context_length 長サンプル1つになり、会話をまたぐ連結はしない"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.side_effect = lambda text, add_special_tokens=False: \
+            {"[INST]Q[/INST]": [10, 11], "A": [20]}.get(text, [99])
+
+        samples = _conversation_to_samples(tokenizer, [("Q", "A")], context_length=8)
+        # ids: <s>10 11 20 <eos> = [1,10,11,20,2], pad to 8
+        assert len(samples) == 1
+        ids, mask = samples[0]
+        assert ids == [1, 10, 11, 20, 2, 0, 0, 0]
+        assert mask == [0, 0, 0, 1, 1, 0, 0, 0]
+
+    def test_conversation_to_samples_splits_long(self):
+        """context_lengthを超える会話は分割される（連結はしないが分割はする）"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
+        tokenizer.pad_token_id = 0
+        # prompt 2 tokens, answer 6 tokens -> total per turn 1+2+6+1=10 > ctx 8
+        tokenizer.encode.side_effect = lambda text, add_special_tokens=False: \
+            {"[INST]Q[/INST]": [10, 11], "A": [20, 21, 22, 23, 24, 25]}.get(text, [99])
+        samples = _conversation_to_samples(tokenizer, [("Q", "A")], context_length=8)
+        # ids total = [1,10,11,20,21,22,23,24,25,2] (10) -> chunk0 len8, chunk1 len2 (pad)
+        assert len(samples) == 2
+        assert samples[0][0] == [1, 10, 11, 20, 21, 22, 23, 24]
+        assert samples[1][0] == [25, 2, 0, 0, 0, 0, 0, 0]
 
     def test_units_doc_item_no_prefix(self):
         """文書アイテムは[DOC]プリフィックスなしで生のtextが返る"""
@@ -523,6 +583,77 @@ class TestDataFormatting:
         for i in range(len(serial_ds)):
             assert torch.equal(serial_ds[i][0], parallel_ds[i][0])
             assert torch.equal(serial_ds[i][1], parallel_ds[i][1])
+
+    def test_memmap_conversations_response_only_labels(self, tmp_path):
+        """対話キャッシュ: 応答トークンのみ labels に残り、prompt/PADは -100"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.side_effect = lambda text, add_special_tokens=False: \
+            {"[INST]Q[/INST]": [10, 11], "A": [20, 21]}.get(text, [99])
+
+        items = [{"turns": [("Q", "A")]}]
+        cache_path = str(tmp_path / "conv.mmap")
+        _build_memmap_conversations(
+            cache_path, items, tokenizer, context_length=8,
+            turns_fn=lambda it: it["turns"],
+        )
+
+        ds = MemmapDataset(cache_path, pad_token_id=0)
+        assert len(ds) == 1
+        input_ids, labels = ds[0]
+        # seq = [1,10,11,20,21,2,0,0]; mask = [0,0,0,1,1,1,0,0]
+        # input_ids = seq[:-1] = [1,10,11,20,21,2,0]
+        # labels = seq[1:] with mask[1:]==0 -> -100
+        #   seq[1:]  = [10,11,20,21, 2, 0, 0]
+        #   mask[1:] = [ 0, 0, 1, 1, 1, 0, 0]
+        #   labels   = [-100,-100,20,21,2,-100,-100]
+        assert input_ids.tolist() == [1, 10, 11, 20, 21, 2, 0]
+        assert labels.tolist() == [-100, -100, 20, 21, 2, -100, -100]
+
+    def test_memmap_conversations_no_cross_conversation_packing(self, tmp_path):
+        """対話キャッシュ: 短い会話同士を連結せず、各会話が独立サンプルになる"""
+        from unittest.mock import MagicMock
+        tokenizer = MagicMock()
+        tokenizer.bos_token_id = 1
+        tokenizer.eos_token_id = 2
+        tokenizer.pad_token_id = 0
+        tokenizer.encode.side_effect = lambda text, add_special_tokens=False: \
+            {"[INST]Q[/INST]": [10], "A": [20]}.get(text, [99])
+
+        items = [{"turns": [("Q", "A")]}, {"turns": [("Q", "A")]}]
+        cache_path = str(tmp_path / "conv2.mmap")
+        _build_memmap_conversations(
+            cache_path, items, tokenizer, context_length=8,
+            turns_fn=lambda it: it["turns"],
+        )
+        ds = MemmapDataset(cache_path, pad_token_id=0)
+        # Two short conversations -> two separate samples (NOT packed into one).
+        assert len(ds) == 2
+        for i in range(2):
+            input_ids, _ = ds[i]
+            # each is <s>10 20 <eos> padded = [1,10,20,2,0,0,0] (len ctx-1=7)
+            assert input_ids.tolist() == [1, 10, 20, 2, 0, 0, 0]
+
+    def test_memmap_conversations_parallel_matches_serial(self, tmp_path):
+        """対話キャッシュ: num_workers>1 でもシリアルと一致（ids/maskとも）"""
+        from dataset import get_tokenizer
+        tokenizer = get_tokenizer()
+        items = [{"turns": [(f"質問{i}", f"回答{i}番目のテキスト")]} for i in range(20)]
+
+        serial = str(tmp_path / "cs.mmap")
+        parallel = str(tmp_path / "cp.mmap")
+        _build_memmap_conversations(serial, list(items), tokenizer, 64, lambda it: it["turns"], num_workers=1)
+        _build_memmap_conversations(parallel, list(items), tokenizer, 64, lambda it: it["turns"], num_workers=2)
+
+        sd = MemmapDataset(serial, pad_token_id=tokenizer.pad_token_id)
+        pd = MemmapDataset(parallel, pad_token_id=tokenizer.pad_token_id)
+        assert len(sd) == len(pd) > 0
+        for i in range(len(sd)):
+            assert torch.equal(sd[i][0], pd[i][0])
+            assert torch.equal(sd[i][1], pd[i][1])  # labels (mask-derived) match too
 
     def test_memmap_cache_reuse(self, tmp_path):
         """キャッシュが存在する場合は再構築しない"""
