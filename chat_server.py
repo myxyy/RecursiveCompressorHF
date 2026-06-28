@@ -65,16 +65,27 @@ def _sample_token(logits: torch.Tensor, temperature: float, top_p: float) -> int
 
 
 @torch.no_grad()
-def _generate_turn(hidden, query_text, temperature, top_p, on_token):
+def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_event=None):
     """Run one turn in Llama 2 format. Each turn is wrapped as
     `<s>[INST]q[/INST]a</s>` so the input here is `<s>[INST]q[/INST]` and
     generation stops at EOS. The EOS is fed through `step` before stopping so
     the next turn's input cleanly begins with `<s>[INST]...`.
 
+    cancel_event: optional threading.Event; when set, generation stops early
+    (checked before the prompt step and each token). The returned hidden is
+    then mid-turn and meant to be discarded by the caller (reset/disconnect).
+
     Returns (new_hidden, reason, num_generated) where reason is one of
-    "eos" (model emitted EOS) or "max_tokens" (forced cutoff)."""
+    "eos" (model emitted EOS), "max_tokens" (forced cutoff), or
+    "cancelled" (cancel_event was set)."""
+    def cancelled():
+        return cancel_event is not None and cancel_event.is_set()
+
     text = f"[INST]{query_text}[/INST]"
     ids = [state.bos_id] + state.tokenizer.encode(text, add_special_tokens=False)
+
+    if cancelled():
+        return hidden, "cancelled", 0
 
     input_ids = torch.tensor([ids], dtype=torch.long, device=state.device)
     logits, hidden = state.model.step(input_ids, hidden)
@@ -83,6 +94,9 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token):
     num_generated = 0
     reason = "max_tokens"
     for _ in range(MAX_NEW_TOKENS_PER_TURN):
+        if cancelled():
+            reason = "cancelled"
+            break
         next_id = _sample_token(next_logits, temperature, top_p)
         if next_id == state.eos_id:
             _, hidden = state.model.step(
@@ -137,6 +151,9 @@ HTML_PAGE = """<!DOCTYPE html>
   button { padding: 8px 18px; font-size: 14px; border: none; border-radius: 8px;
            background: #2b6cb0; color: #fff; cursor: pointer; }
   button:disabled { background: #aaa; cursor: not-allowed; }
+  button.secondary { background: #e2e2e2; color: #333; }
+  button.secondary:hover:not(:disabled) { background: #d4d4d4; }
+  button.secondary:disabled { background: #eee; color: #aaa; }
 </style>
 </head>
 <body>
@@ -158,6 +175,7 @@ HTML_PAGE = """<!DOCTYPE html>
 <footer>
   <div class="input-row">
     <textarea id="input" placeholder="メッセージを入力 (Enter で送信、Shift+Enter で改行)"></textarea>
+    <button id="reset" class="secondary" disabled title="会話をリセット (進行中の生成は中断、temperature/top-pは維持)">リセット</button>
     <button id="send" disabled>送信</button>
   </div>
 </footer>
@@ -170,6 +188,7 @@ const statusEl = document.getElementById('status');
 const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('send');
+const resetBtn = document.getElementById('reset');
 
 tempEl.addEventListener('input', () => { tempVal.textContent = (+tempEl.value).toFixed(2); });
 toppEl.addEventListener('input', () => { toppVal.textContent = (+toppEl.value).toFixed(2); });
@@ -177,15 +196,24 @@ toppEl.addEventListener('input', () => { toppVal.textContent = (+toppEl.value).t
 let ws = null;
 let busy = false;
 let currentBot = null;
+let awaitingReset = false;
 
 function setStatus(text, color) {
   statusEl.textContent = text;
   statusEl.style.color = color || '#888';
 }
 
+function updateButtons() {
+  const open = ws && ws.readyState === WebSocket.OPEN;
+  // Send is blocked while generating, resetting, or disconnected.
+  sendBtn.disabled = busy || awaitingReset || !open;
+  // Reset stays enabled during generation so it can interrupt it.
+  resetBtn.disabled = awaitingReset || !open;
+}
+
 function setBusy(b) {
   busy = b;
-  sendBtn.disabled = b || !ws || ws.readyState !== WebSocket.OPEN;
+  updateButtons();
 }
 
 function addMessage(role, text) {
@@ -200,11 +228,20 @@ function addMessage(role, text) {
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(proto + '://' + location.host + '/ws/chat');
-  ws.onopen = () => { setStatus('connected', '#0a0'); setBusy(false); };
+  ws.onopen = () => { awaitingReset = false; setStatus('connected', '#0a0'); setBusy(false); };
   ws.onclose = () => { setStatus('disconnected (reload to reconnect)', '#c00'); setBusy(true); };
   ws.onerror = () => { setStatus('connection error', '#c00'); };
   ws.onmessage = (ev) => {
     const data = JSON.parse(ev.data);
+    if (data.type === 'reset_done') {
+      awaitingReset = false;
+      setStatus('connected', '#0a0');
+      setBusy(false);
+      return;
+    }
+    // While a reset is pending, ignore any in-flight generation messages
+    // (start/delta/end) from the turn being interrupted.
+    if (awaitingReset) return;
     if (data.type === 'start') {
       currentBot = addMessage('bot', '');
       setStatus('generating...', '#06a');
@@ -246,10 +283,27 @@ function send() {
   setStatus('queued / generating...', '#06a');
 }
 
+function doReset() {
+  if (!ws || ws.readyState !== WebSocket.OPEN || awaitingReset) return;
+  // Interrupt any in-progress generation and clear the conversation.
+  // temperature / top-p sliders are left untouched, so they carry over.
+  ws.send(JSON.stringify({ type: 'reset' }));
+  chatEl.innerHTML = '';
+  currentBot = null;
+  awaitingReset = true;
+  setStatus('resetting...', '#06a');
+  updateButtons();
+}
+
 sendBtn.addEventListener('click', send);
+resetBtn.addEventListener('click', doReset);
 inputEl.addEventListener('keydown', (e) => {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 });
+
+// Closing/refreshing the tab closes the socket promptly so the server can
+// interrupt the in-progress generation (also handled by the browser on unload).
+window.addEventListener('pagehide', () => { if (ws) ws.close(); });
 
 connect();
 </script>
@@ -269,77 +323,116 @@ def index():
 @app.websocket("/ws/chat")
 async def ws_chat(ws: WebSocket):
     await ws.accept()
-    hidden = None
     loop = asyncio.get_running_loop()
+
+    # Per-connection state. `hidden` is the conversation context (None = fresh).
+    # `cancel_event` interrupts the in-progress generation (reset / disconnect).
+    session = {"hidden": None}
+    cancel_event = threading.Event()
+    gen_task = None  # asyncio.Task streaming the current generation, or None
+
+    async def run_generation(text, temperature, top_p):
+        """Stream one turn to the client. Runs the model in a worker thread and
+        forwards tokens via an asyncio.Queue. Saves the new hidden state only if
+        the turn was not cancelled."""
+        cancel_event.clear()
+        await ws.send_json({"type": "start"})
+
+        q: asyncio.Queue = asyncio.Queue()
+
+        def post(item):
+            # Hand an item from the worker thread to the asyncio queue. The
+            # worker can outlive the connection; if the loop is gone, drop the
+            # item and close the orphaned coroutine to avoid a warning.
+            coro = q.put(item)
+            try:
+                asyncio.run_coroutine_threadsafe(coro, loop)
+            except RuntimeError:
+                coro.close()
+
+        def on_token_cb(tid: int):
+            post(("token", tid))
+
+        def runner(prev_hidden):
+            with state.inference_lock:
+                try:
+                    result = _generate_turn(
+                        prev_hidden, text, temperature, top_p, on_token_cb, cancel_event
+                    )
+                except Exception as e:
+                    post(("error", repr(e)))
+                    return
+            post(("done", *result))
+
+        threading.Thread(target=runner, args=(session["hidden"],), daemon=True).start()
+
+        collected_ids: list[int] = []
+        decoded_so_far = ""
+        while True:
+            event = await q.get()
+            kind = event[0]
+            if kind == "token":
+                collected_ids.append(event[1])
+                if cancel_event.is_set():
+                    continue  # drain remaining tokens silently; turn is being discarded
+                full = state.tokenizer.decode(collected_ids, skip_special_tokens=True)
+                delta = full[len(decoded_so_far):]
+                if delta:
+                    decoded_so_far = full
+                    await ws.send_json({"type": "delta", "text": delta})
+            elif kind == "done":
+                _, new_hidden, reason, num_gen = event
+                if reason != "cancelled":
+                    session["hidden"] = new_hidden
+                    await ws.send_json({"type": "end", "reason": reason, "num_tokens": num_gen})
+                break
+            elif kind == "error":
+                await ws.send_json({"type": "error", "message": event[1]})
+                break
 
     try:
         while True:
             msg = await ws.receive_json()
-            if msg.get("type") != "query":
-                continue
-            text = (msg.get("text") or "").strip()
-            if not text:
-                continue
-            try:
-                temperature = float(msg.get("temperature", 1.0))
-                top_p = float(msg.get("top_p", 1.0))
-            except (TypeError, ValueError):
-                temperature, top_p = 1.0, 1.0
-            temperature = max(0.01, min(2.0, temperature))
-            top_p = max(0.0, min(1.0, top_p))
+            t = msg.get("type")
 
-            await ws.send_json({"type": "start"})
-
-            q: asyncio.Queue = asyncio.Queue()
-
-            def on_token_cb(tid: int):
-                asyncio.run_coroutine_threadsafe(q.put(("token", tid)), loop)
-
-            def runner(prev_hidden):
-                with state.inference_lock:
+            if t == "reset":
+                # Interrupt any in-progress generation, then drop the context.
+                cancel_event.set()
+                if gen_task is not None:
                     try:
-                        new_hidden, reason, num_gen = _generate_turn(
-                            prev_hidden, text, temperature, top_p, on_token_cb
-                        )
-                    except Exception as e:
-                        asyncio.run_coroutine_threadsafe(q.put(("error", repr(e))), loop)
-                        return
-                asyncio.run_coroutine_threadsafe(
-                    q.put(("done", new_hidden, reason, num_gen)), loop
-                )
+                        await gen_task
+                    except Exception:
+                        pass
+                    gen_task = None
+                session["hidden"] = None
+                await ws.send_json({"type": "reset_done"})
 
-            threading.Thread(target=runner, args=(hidden,), daemon=True).start()
+            elif t == "query":
+                if gen_task is not None and not gen_task.done():
+                    continue  # already generating (client also guards via busy)
+                text = (msg.get("text") or "").strip()
+                if not text:
+                    continue
+                try:
+                    temperature = float(msg.get("temperature", 1.0))
+                    top_p = float(msg.get("top_p", 1.0))
+                except (TypeError, ValueError):
+                    temperature, top_p = 1.0, 1.0
+                temperature = max(0.01, min(2.0, temperature))
+                top_p = max(0.0, min(1.0, top_p))
+                gen_task = asyncio.create_task(run_generation(text, temperature, top_p))
 
-            collected_ids: list[int] = []
-            decoded_so_far = ""
-            while True:
-                event = await q.get()
-                kind = event[0]
-                if kind == "token":
-                    collected_ids.append(event[1])
-                    full = state.tokenizer.decode(collected_ids, skip_special_tokens=True)
-                    delta = full[len(decoded_so_far):]
-                    if delta:
-                        decoded_so_far = full
-                        await ws.send_json({"type": "delta", "text": delta})
-                elif kind == "done":
-                    _, new_hidden, reason, num_gen = event
-                    hidden = new_hidden
-                    await ws.send_json({"type": "end", "reason": reason, "num_tokens": num_gen})
-                    break
-                elif kind == "error":
-                    await ws.send_json({"type": "error", "message": event[1]})
-                    break
     except WebSocketDisconnect:
         pass
-    except Exception as e:
-        try:
-            await ws.send_json({"type": "error", "message": repr(e)})
-        except Exception:
-            pass
+    except Exception:
+        pass
     finally:
-        # Hidden state goes out of scope; CUDA caching allocator reclaims it.
-        del hidden
+        # Interrupt the worker thread and drop the context. Hidden state goes
+        # out of scope; the CUDA caching allocator reclaims it.
+        cancel_event.set()
+        if gen_task is not None:
+            gen_task.cancel()
+        session["hidden"] = None
 
 
 def main():
