@@ -37,6 +37,9 @@ class ServerState:
     bos_id = None
     eos_id = None
     inference_lock = threading.Lock()
+    # Default slider values served to the browser (overridable via CLI).
+    default_temperature = 1.0
+    default_top_p = 1.0
 
 
 state = ServerState()
@@ -161,12 +164,12 @@ HTML_PAGE = """<!DOCTYPE html>
   <h1>RecursiveCompressor Chat</h1>
   <div class="controls">
     <label class="slider">Temperature
-      <input type="range" id="temp" min="0.01" max="2" step="0.01" value="1.0">
-      <span class="val" id="temp-val">1.0</span>
+      <input type="range" id="temp" min="0.01" max="2" step="0.01" value="__TEMP_DEFAULT__">
+      <span class="val" id="temp-val">__TEMP_DEFAULT__</span>
     </label>
     <label class="slider">Top-p
-      <input type="range" id="topp" min="0" max="1" step="0.01" value="0.95">
-      <span class="val" id="topp-val">0.95</span>
+      <input type="range" id="topp" min="0" max="1" step="0.01" value="__TOPP_DEFAULT__">
+      <span class="val" id="topp-val">__TOPP_DEFAULT__</span>
     </label>
     <span id="status">connecting...</span>
   </div>
@@ -317,7 +320,12 @@ app = FastAPI()
 
 @app.get("/")
 def index():
-    return HTMLResponse(HTML_PAGE)
+    html = (
+        HTML_PAGE
+        .replace("__TEMP_DEFAULT__", f"{state.default_temperature:g}")
+        .replace("__TOPP_DEFAULT__", f"{state.default_top_p:g}")
+    )
+    return HTMLResponse(html)
 
 
 @app.websocket("/ws/chat")
@@ -442,6 +450,10 @@ def main():
     parser.add_argument("--port", type=int, default=DEFAULT_PORT, help=f"ポート (デフォルト {DEFAULT_PORT})")
     parser.add_argument("--host", type=str, default="127.0.0.1", help="バインドホスト (デフォルト 127.0.0.1)")
     parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
+    parser.add_argument("--temperature", type=float, default=1.0,
+                        help="温度スライダーの初期値 (デフォルト 1.0)")
+    parser.add_argument("--top-p", type=float, default=1.0,
+                        help="top-p スライダーの初期値 (デフォルト 1.0)")
     parser.add_argument("--device", type=str, default=None,
                         help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
@@ -471,8 +483,12 @@ def main():
     state.device = device
     state.bos_id = bos_id
     state.eos_id = eos_id
+    # Clamp to the slider ranges so the served initial value is always valid.
+    state.default_temperature = max(0.01, min(2.0, args.temperature))
+    state.default_top_p = max(0.0, min(1.0, args.top_p))
 
     print(f"Device: {device}, precision: {args.precision}, BOS id: {bos_id}, EOS id: {eos_id}")
+    print(f"Default sliders: temperature={state.default_temperature:g}, top_p={state.default_top_p:g}")
     print(f"Listening on http://{args.host}:{args.port}", flush=True)
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
