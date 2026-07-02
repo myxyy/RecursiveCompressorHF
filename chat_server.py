@@ -1,7 +1,7 @@
 """
 Chat WebUI server for RecursiveCompressorLM (instruct).
 
-Loads the instruct model (default: myxy/recursive-compressor-2-7b-instruct)
+Loads the instruct model (default: myxy/recursive-compressor-v1.2-2.6b-c4c1-instruct)
 and serves a ChatGPT-like interface in the browser. Each browser tab opens
 its own WebSocket; the per-tab hidden state lives only as long as that
 WebSocket is open. Inference runs sequentially across all sessions
@@ -23,7 +23,7 @@ from fastapi.responses import HTMLResponse
 
 from predict import _DTYPES, _load_model, _load_tokenizer
 
-DEFAULT_MODEL = "myxy/recursive-compressor-2-7b-instruct"
+DEFAULT_MODEL = "myxy/recursive-compressor-v1.2-2.6b-c4c1-instruct"
 DEFAULT_PORT = 8000
 MAX_NEW_TOKENS_PER_TURN = 1024
 
