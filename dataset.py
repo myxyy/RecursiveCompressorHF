@@ -556,7 +556,9 @@ def prepare_all_datasets(context_length, cache_dir=None, prefault=False, dataset
     tokenizer = get_tokenizer()
     if cache_dir is None:
         cache_dir = "./data/hf_cache"
-    mmap_dir = os.path.join(cache_dir, "mmap")
+    # Segregate caches by context length so switching context_length does not
+    # require deleting the old caches (e.g. mmap/ctx2048/, mmap/ctx4096/).
+    mmap_dir = os.path.join(cache_dir, "mmap", f"ctx{context_length}")
 
     all_sources = _all_sources(cache_dir)
     source_keys = _DATASET_GROUPS[dataset_type]
