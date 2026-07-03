@@ -40,15 +40,22 @@ class ServerState:
     # Default slider values served to the browser (overridable via CLI).
     default_temperature = 1.0
     default_top_p = 1.0
+    default_penalty_add = 0.0
+    default_penalty_decay = 0.0
 
 
 state = ServerState()
 
 
 @torch.no_grad()
-def _sample_token(logits: torch.Tensor, temperature: float, top_p: float) -> int:
-    """Sample one token from a 1-D logits tensor."""
+def _sample_token(logits: torch.Tensor, temperature: float, top_p: float,
+                  penalty: torch.Tensor = None) -> int:
+    """Sample one token from a 1-D logits tensor.
+    penalty: optional (vocab,) tensor subtracted from logits before the
+    temperature division (decaying repetition penalty)."""
     logits = logits.float()
+    if penalty is not None:
+        logits = logits - penalty
     if temperature <= 0:
         return int(torch.argmax(logits).item())
     probs = torch.softmax(logits / max(temperature, 1e-5), dim=-1)
@@ -68,7 +75,8 @@ def _sample_token(logits: torch.Tensor, temperature: float, top_p: float) -> int
 
 
 @torch.no_grad()
-def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_event=None):
+def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_event=None,
+                   penalty=None, penalty_add=0.0, penalty_decay=0.0):
     """Run one turn in Llama 2 format. Each turn is wrapped as
     `<s>[INST]q[/INST]a</s>` so the input here is `<s>[INST]q[/INST]` and
     generation stops at EOS. The EOS is fed through `step` before stopping so
@@ -78,11 +86,22 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_even
     (checked before the prompt step and each token). The returned hidden is
     then mid-turn and meant to be discarded by the caller (reset/disconnect).
 
+    penalty: (vocab,) fp32 tensor of accumulated repetition penalties, or None.
+    Decaying repetition penalty: sampling uses softmax((logits - penalty)/T);
+    after each generated token w, `penalty *= penalty_decay` (all entries, so
+    unused words recover over time) then `penalty[w] += penalty_add`. EOS is
+    exempt (never penalized) so accumulated penalty cannot suppress stopping.
+    Only generated tokens update the penalty — prompt tokens do not.
+    The tensor is mutated in place; the caller keeps/discards it alongside
+    the hidden state.
+
     Returns (new_hidden, reason, num_generated) where reason is one of
     "eos" (model emitted EOS), "max_tokens" (forced cutoff), or
     "cancelled" (cancel_event was set)."""
     def cancelled():
         return cancel_event is not None and cancel_event.is_set()
+
+    use_penalty = penalty is not None and penalty_add > 0
 
     text = f"[INST]{query_text}[/INST]"
     ids = [state.bos_id] + state.tokenizer.encode(text, add_special_tokens=False)
@@ -100,13 +119,17 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_even
         if cancelled():
             reason = "cancelled"
             break
-        next_id = _sample_token(next_logits, temperature, top_p)
+        next_id = _sample_token(next_logits, temperature, top_p,
+                                penalty if use_penalty else None)
         if next_id == state.eos_id:
             _, hidden = state.model.step(
                 torch.tensor([[next_id]], dtype=torch.long, device=state.device), hidden
             )
             reason = "eos"
             break
+        if use_penalty:
+            penalty.mul_(penalty_decay)
+            penalty[next_id] += penalty_add
         on_token(next_id)
         num_generated += 1
         logits, hidden = state.model.step(
@@ -157,6 +180,17 @@ HTML_PAGE = """<!DOCTYPE html>
   button.secondary { background: #e2e2e2; color: #333; }
   button.secondary:hover:not(:disabled) { background: #d4d4d4; }
   button.secondary:disabled { background: #eee; color: #aaa; }
+  details.penalty { position: relative; font-size: 13px; }
+  details.penalty summary { cursor: pointer; user-select: none; list-style: none;
+                            padding: 4px 10px; border: 1px solid #ccc; border-radius: 8px;
+                            background: #fafafa; }
+  details.penalty summary::-webkit-details-marker { display: none; }
+  details.penalty summary::after { content: " ▾"; color: #888; }
+  details.penalty[open] summary { background: #eef4fb; border-color: #2b6cb0; }
+  .penalty-panel { position: absolute; top: calc(100% + 6px); left: 0; z-index: 10;
+                   background: #fff; border: 1px solid #ccc; border-radius: 8px;
+                   padding: 12px 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+                   display: flex; flex-direction: column; gap: 10px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -171,6 +205,19 @@ HTML_PAGE = """<!DOCTYPE html>
       <input type="range" id="topp" min="0" max="1" step="0.01" value="__TOPP_DEFAULT__">
       <span class="val" id="topp-val">__TOPP_DEFAULT__</span>
     </label>
+    <details class="penalty">
+      <summary>Repeat penalty: <span id="pen-summary"></span></summary>
+      <div class="penalty-panel">
+        <label class="slider" title="出力トークンのlogitから引くペナルティ加算量 (0で無効)">Add
+          <input type="range" id="pen-add" min="0" max="2" step="0.01" value="__PEN_ADD_DEFAULT__">
+          <span class="val" id="pen-add-val">__PEN_ADD_DEFAULT__</span>
+        </label>
+        <label class="slider" title="毎トークンごとの全ペナルティ減衰係数 (0で直前トークンのみ、1で無減衰蓄積)">Decay
+          <input type="range" id="pen-decay" min="0" max="1" step="0.01" value="__PEN_DECAY_DEFAULT__">
+          <span class="val" id="pen-decay-val">__PEN_DECAY_DEFAULT__</span>
+        </label>
+      </div>
+    </details>
     <span id="status">connecting...</span>
   </div>
 </header>
@@ -178,7 +225,7 @@ HTML_PAGE = """<!DOCTYPE html>
 <footer>
   <div class="input-row">
     <textarea id="input" placeholder="メッセージを入力 (Enter で送信、Shift+Enter で改行)"></textarea>
-    <button id="reset" class="secondary" disabled title="会話をリセット (進行中の生成は中断、temperature/top-pは維持)">リセット</button>
+    <button id="reset" class="secondary" disabled title="会話をリセット (進行中の生成は中断、スライダー設定は維持、蓄積ペナルティはクリア)">リセット</button>
     <button id="send" disabled>送信</button>
   </div>
 </footer>
@@ -192,9 +239,25 @@ const chatEl = document.getElementById('chat');
 const inputEl = document.getElementById('input');
 const sendBtn = document.getElementById('send');
 const resetBtn = document.getElementById('reset');
+const penAddEl = document.getElementById('pen-add');
+const penAddVal = document.getElementById('pen-add-val');
+const penDecayEl = document.getElementById('pen-decay');
+const penDecayVal = document.getElementById('pen-decay-val');
+const penSummary = document.getElementById('pen-summary');
 
 tempEl.addEventListener('input', () => { tempVal.textContent = (+tempEl.value).toFixed(2); });
 toppEl.addEventListener('input', () => { toppVal.textContent = (+toppEl.value).toFixed(2); });
+
+function updatePenaltyLabels() {
+  penAddVal.textContent = (+penAddEl.value).toFixed(2);
+  penDecayVal.textContent = (+penDecayEl.value).toFixed(2);
+  penSummary.textContent = +penAddEl.value > 0
+    ? (+penAddEl.value).toFixed(2) + ' / ' + (+penDecayEl.value).toFixed(2)
+    : 'off';
+}
+penAddEl.addEventListener('input', updatePenaltyLabels);
+penDecayEl.addEventListener('input', updatePenaltyLabels);
+updatePenaltyLabels();
 
 let ws = null;
 let busy = false;
@@ -281,6 +344,8 @@ function send() {
     text: text,
     temperature: +tempEl.value,
     top_p: +toppEl.value,
+    penalty_add: +penAddEl.value,
+    penalty_decay: +penDecayEl.value,
   }));
   setBusy(true);
   setStatus('queued / generating...', '#06a');
@@ -324,6 +389,8 @@ def index():
         HTML_PAGE
         .replace("__TEMP_DEFAULT__", f"{state.default_temperature:g}")
         .replace("__TOPP_DEFAULT__", f"{state.default_top_p:g}")
+        .replace("__PEN_ADD_DEFAULT__", f"{state.default_penalty_add:g}")
+        .replace("__PEN_DECAY_DEFAULT__", f"{state.default_penalty_decay:g}")
     )
     return HTMLResponse(html)
 
@@ -334,17 +401,31 @@ async def ws_chat(ws: WebSocket):
     loop = asyncio.get_running_loop()
 
     # Per-connection state. `hidden` is the conversation context (None = fresh).
+    # `penalty` is the (vocab,) decaying-repetition-penalty tensor (None until
+    # first used); it lives and dies with the conversation, like `hidden`.
     # `cancel_event` interrupts the in-progress generation (reset / disconnect).
-    session = {"hidden": None}
+    session = {"hidden": None, "penalty": None}
     cancel_event = threading.Event()
     gen_task = None  # asyncio.Task streaming the current generation, or None
 
-    async def run_generation(text, temperature, top_p):
+    async def run_generation(text, temperature, top_p, penalty_add, penalty_decay):
         """Stream one turn to the client. Runs the model in a worker thread and
         forwards tokens via an asyncio.Queue. Saves the new hidden state only if
         the turn was not cancelled."""
         cancel_event.clear()
         await ws.send_json({"type": "start"})
+
+        # Work on a copy of the penalty tensor so a cancelled turn rolls back
+        # penalties together with the hidden state.
+        if penalty_add > 0:
+            if session["penalty"] is not None:
+                penalty = session["penalty"].clone()
+            else:
+                penalty = torch.zeros(
+                    state.model.config.vocab_size, dtype=torch.float32, device=state.device
+                )
+        else:
+            penalty = None  # disabled this turn; keep the session tensor as-is
 
         q: asyncio.Queue = asyncio.Queue()
 
@@ -365,7 +446,8 @@ async def ws_chat(ws: WebSocket):
             with state.inference_lock:
                 try:
                     result = _generate_turn(
-                        prev_hidden, text, temperature, top_p, on_token_cb, cancel_event
+                        prev_hidden, text, temperature, top_p, on_token_cb, cancel_event,
+                        penalty=penalty, penalty_add=penalty_add, penalty_decay=penalty_decay,
                     )
                 except Exception as e:
                     post(("error", repr(e)))
@@ -392,6 +474,8 @@ async def ws_chat(ws: WebSocket):
                 _, new_hidden, reason, num_gen = event
                 if reason != "cancelled":
                     session["hidden"] = new_hidden
+                    if penalty is not None:
+                        session["penalty"] = penalty
                     await ws.send_json({"type": "end", "reason": reason, "num_tokens": num_gen})
                 break
             elif kind == "error":
@@ -413,6 +497,7 @@ async def ws_chat(ws: WebSocket):
                         pass
                     gen_task = None
                 session["hidden"] = None
+                session["penalty"] = None
                 await ws.send_json({"type": "reset_done"})
 
             elif t == "query":
@@ -424,11 +509,18 @@ async def ws_chat(ws: WebSocket):
                 try:
                     temperature = float(msg.get("temperature", 1.0))
                     top_p = float(msg.get("top_p", 1.0))
+                    penalty_add = float(msg.get("penalty_add", 0.0))
+                    penalty_decay = float(msg.get("penalty_decay", 0.0))
                 except (TypeError, ValueError):
                     temperature, top_p = 1.0, 1.0
+                    penalty_add, penalty_decay = 0.0, 0.0
                 temperature = max(0.01, min(2.0, temperature))
                 top_p = max(0.0, min(1.0, top_p))
-                gen_task = asyncio.create_task(run_generation(text, temperature, top_p))
+                penalty_add = max(0.0, min(2.0, penalty_add))
+                penalty_decay = max(0.0, min(1.0, penalty_decay))
+                gen_task = asyncio.create_task(
+                    run_generation(text, temperature, top_p, penalty_add, penalty_decay)
+                )
 
     except WebSocketDisconnect:
         pass
@@ -441,6 +533,7 @@ async def ws_chat(ws: WebSocket):
         if gen_task is not None:
             gen_task.cancel()
         session["hidden"] = None
+        session["penalty"] = None
 
 
 def main():
@@ -454,6 +547,10 @@ def main():
                         help="温度スライダーの初期値 (デフォルト 1.0)")
     parser.add_argument("--top-p", type=float, default=1.0,
                         help="top-p スライダーの初期値 (デフォルト 1.0)")
+    parser.add_argument("--penalty-add", type=float, default=0.0,
+                        help="繰り返しペナルティ加算量の初期値 (0で無効、デフォルト 0)")
+    parser.add_argument("--penalty-decay", type=float, default=0.0,
+                        help="繰り返しペナルティ減衰係数の初期値 (0~1、デフォルト 0)")
     parser.add_argument("--device", type=str, default=None,
                         help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
@@ -486,9 +583,12 @@ def main():
     # Clamp to the slider ranges so the served initial value is always valid.
     state.default_temperature = max(0.01, min(2.0, args.temperature))
     state.default_top_p = max(0.0, min(1.0, args.top_p))
+    state.default_penalty_add = max(0.0, min(2.0, args.penalty_add))
+    state.default_penalty_decay = max(0.0, min(1.0, args.penalty_decay))
 
     print(f"Device: {device}, precision: {args.precision}, BOS id: {bos_id}, EOS id: {eos_id}")
-    print(f"Default sliders: temperature={state.default_temperature:g}, top_p={state.default_top_p:g}")
+    print(f"Default sliders: temperature={state.default_temperature:g}, top_p={state.default_top_p:g}, "
+          f"penalty_add={state.default_penalty_add:g}, penalty_decay={state.default_penalty_decay:g}")
     print(f"Listening on http://{args.host}:{args.port}", flush=True)
     uvicorn.run(app, host=args.host, port=args.port, log_level="info")
 
