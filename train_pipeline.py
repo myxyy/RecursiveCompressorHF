@@ -58,7 +58,7 @@ load_dotenv()
 torch.set_float32_matmul_precision("high")
 
 # Hyperparameters
-CONTEXT_LENGTH = 2048
+CONTEXT_LENGTH = 1024
 LEARNING_RATE = 5e-5
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
@@ -268,7 +268,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         num_heads=16,
         d_ff=6144,
         chunk_size=4,
-        compress_size=1,
+        compress_size=2,
         num_layers=24,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
