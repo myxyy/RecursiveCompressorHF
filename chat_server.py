@@ -198,7 +198,7 @@ HTML_PAGE = """<!DOCTYPE html>
   <h1>RecursiveCompressor Chat</h1>
   <div class="controls">
     <label class="slider">Temperature
-      <input type="range" id="temp" min="0.01" max="2" step="0.01" value="__TEMP_DEFAULT__">
+      <input type="range" id="temp" min="0" max="2" step="0.01" value="__TEMP_DEFAULT__">
       <span class="val" id="temp-val">__TEMP_DEFAULT__</span>
     </label>
     <label class="slider">Top-p
@@ -514,7 +514,7 @@ async def ws_chat(ws: WebSocket):
                 except (TypeError, ValueError):
                     temperature, top_p = 1.0, 1.0
                     penalty_add, penalty_decay = 0.0, 0.0
-                temperature = max(0.01, min(2.0, temperature))
+                temperature = max(0.0, min(2.0, temperature))
                 top_p = max(0.0, min(1.0, top_p))
                 penalty_add = max(0.0, min(2.0, penalty_add))
                 penalty_decay = max(0.0, min(1.0, penalty_decay))
@@ -581,7 +581,7 @@ def main():
     state.bos_id = bos_id
     state.eos_id = eos_id
     # Clamp to the slider ranges so the served initial value is always valid.
-    state.default_temperature = max(0.01, min(2.0, args.temperature))
+    state.default_temperature = max(0.0, min(2.0, args.temperature))
     state.default_top_p = max(0.0, min(1.0, args.top_p))
     state.default_penalty_add = max(0.0, min(2.0, args.penalty_add))
     state.default_penalty_decay = max(0.0, min(1.0, args.penalty_decay))
