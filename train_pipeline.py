@@ -134,8 +134,10 @@ def log(msg):
 
 def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
                           rank, stage_info, dataset_type,
-                          tokenizer=None, config=None, schedulers=None):
-    """Save per-stage checkpoint. optimizers/schedulers are lists of instances."""
+                          tokenizer=None, config=None, schedulers=None, ema_loss=None):
+    """Save per-stage checkpoint. optimizers/schedulers are lists of instances.
+    ema_loss is persisted so the plateau scheduler resumes from the smoothed
+    loss instead of a single noisy batch (which could pollute its `best`)."""
     os.makedirs(checkpoint_dir, exist_ok=True)
     path = os.path.join(checkpoint_dir, _checkpoint_name(dataset_type, step))
     os.makedirs(path, exist_ok=True)
@@ -144,6 +146,7 @@ def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
         "stage_state_dict": stage_module.state_dict(),
         "optimizers_state_dict": [opt.state_dict() for opt in optimizers],
         "schedulers_state_dict": [sch.state_dict() for sch in (schedulers or [])],
+        "ema_loss": ema_loss,
         "step": step,
         "epoch": epoch,
         "stage_info": stage_info,
@@ -189,10 +192,11 @@ def _rotate_checkpoints(checkpoint_dir, dataset_type):
 def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, dataset_type,
                            schedulers=None):
     """Load latest per-stage checkpoint matching dataset_type.
-    Returns (step, epoch). If none found, returns (0, 0)."""
+    Returns (step, epoch, ema_loss). If none found, returns (0, 0, None).
+    ema_loss is None for old checkpoints that predate it."""
     checkpoints = _list_checkpoints(checkpoint_dir, dataset_type)
     if not checkpoints:
-        return 0, 0
+        return 0, 0, None
 
     latest = os.path.join(checkpoint_dir, checkpoints[-1])
     stage_path = os.path.join(latest, f"stage_{rank}.pt")
@@ -223,7 +227,7 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, datas
                         setattr(sch, key, state[key])
         elif schedulers:
             log("No scheduler state in checkpoint; plateau counters start fresh.")
-        return data["step"], data["epoch"]
+        return data["step"], data["epoch"], data.get("ema_loss")
 
     # Fall back to full model in latest checkpoint
     full_path = os.path.join(latest, "full_model.pt")
@@ -231,9 +235,9 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, datas
         log(f"Resuming from full model: {full_path}")
         full_state = torch.load(full_path, map_location="cpu", weights_only=False)
         stage_module.load_from_full_model(full_state)
-        return 0, 0
+        return 0, 0, None
 
-    return 0, 0
+    return 0, 0, None
 
 
 def load_start_checkpoint(stage_module, start_checkpoint_path):
@@ -358,7 +362,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         log(f"WARNING: --start-checkpoint={start_checkpoint} ignored because "
             f"{len(existing)} existing {dataset_type} checkpoint(s) found in {checkpoint_dir}. "
             f"Resuming from latest.")
-    start_step, start_epoch = load_latest_checkpoint(
+    start_step, start_epoch, resume_ema_loss = load_latest_checkpoint(
         stage_module, optimizers, checkpoint_dir, rank, dataset_type,
         schedulers=schedulers,
     )
@@ -396,7 +400,12 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         stage_module.train()
         train_sampler.set_epoch(epoch)
 
-        ema_loss = None
+        # Resume the EMA loss saved in the checkpoint (first epoch only) so the
+        # plateau scheduler keeps seeing the smoothed loss. Restarting the EMA
+        # from a single noisy batch could dip below the restored scheduler
+        # `best` and pollute it (especially with threshold=0), causing
+        # premature lr reductions later.
+        ema_loss = resume_ema_loss if epoch == start_epoch else None
         EMA_BETA = 0.99
         num_steps = 0
         paused = False
@@ -421,7 +430,8 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                 log("Save and exit requested.")
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, dataset_type,
-                                      tokenizer=tokenizer, config=config, schedulers=schedulers)
+                                      tokenizer=tokenizer, config=config, schedulers=schedulers,
+                                      ema_loss=ema_loss)
                 if tb_writer is not None:
                     tb_writer.close()
                 dist.destroy_process_group()
@@ -437,7 +447,8 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                     log("Save and exit requested.")
                     save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                           checkpoint_dir, rank, stage_info, dataset_type,
-                                          tokenizer=tokenizer, config=config, schedulers=schedulers)
+                                          tokenizer=tokenizer, config=config, schedulers=schedulers,
+                                      ema_loss=ema_loss)
                     dist.destroy_process_group()
                     return
 
@@ -526,12 +537,14 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             if global_step % CHECKPOINT_INTERVAL == 0:
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, dataset_type,
-                                      tokenizer=tokenizer, config=config, schedulers=schedulers)
+                                      tokenizer=tokenizer, config=config, schedulers=schedulers,
+                                      ema_loss=ema_loss)
 
         # Epoch-end checkpoint
         save_stage_checkpoint(stage_module, optimizers, global_step, epoch + 1,
                               checkpoint_dir, rank, stage_info, dataset_type,
-                              tokenizer=tokenizer, config=config, schedulers=schedulers)
+                              tokenizer=tokenizer, config=config, schedulers=schedulers,
+                                      ema_loss=ema_loss)
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
