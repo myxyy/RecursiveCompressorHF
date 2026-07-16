@@ -62,6 +62,11 @@ CONTEXT_LENGTH = 1024
 LEARNING_RATE = 5e-5
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
+# ReduceLROnPlateau (applied per STEP, not per epoch, fed with the EMA loss —
+# the EMA smooths per-step noise the way an epoch average would).
+SCHEDULER_FACTOR = 0.9    # lr *= factor when the EMA loss plateaus
+SCHEDULER_PATIENCE = 1000  # steps without improvement before reducing
+SCHEDULER_COOLDOWN = 100   # steps to wait after a reduction before counting again
 N_MICROBATCHES = 6
 BATCH_SIZE = 6  # Must be >= N_MICROBATCHES
 CHECKPOINT_INTERVAL = 1000
@@ -128,8 +133,8 @@ def log(msg):
 
 def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
                           rank, stage_info, dataset_type,
-                          tokenizer=None, config=None):
-    """Save per-stage checkpoint. optimizers is a list of optimizer instances."""
+                          tokenizer=None, config=None, schedulers=None):
+    """Save per-stage checkpoint. optimizers/schedulers are lists of instances."""
     os.makedirs(checkpoint_dir, exist_ok=True)
     path = os.path.join(checkpoint_dir, _checkpoint_name(dataset_type, step))
     os.makedirs(path, exist_ok=True)
@@ -137,6 +142,7 @@ def save_stage_checkpoint(stage_module, optimizers, step, epoch, checkpoint_dir,
     torch.save({
         "stage_state_dict": stage_module.state_dict(),
         "optimizers_state_dict": [opt.state_dict() for opt in optimizers],
+        "schedulers_state_dict": [sch.state_dict() for sch in (schedulers or [])],
         "step": step,
         "epoch": epoch,
         "stage_info": stage_info,
@@ -179,7 +185,8 @@ def _rotate_checkpoints(checkpoint_dir, dataset_type):
         log(f"Removed old checkpoint: {old}")
 
 
-def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, dataset_type):
+def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, dataset_type,
+                           schedulers=None):
     """Load latest per-stage checkpoint matching dataset_type.
     Returns (step, epoch). If none found, returns (0, 0)."""
     checkpoints = _list_checkpoints(checkpoint_dir, dataset_type)
@@ -198,6 +205,16 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, datas
                 opt.load_state_dict(state)
         else:
             log("Old optimizer format detected; skipping optimizer state (starting fresh).")
+        # Restore scheduler state (best / bad-step counters / cooldown). The
+        # reduced lr itself lives in the optimizer state; without this the
+        # plateau counters would reset on every resume. Old checkpoints
+        # without scheduler state just start the counters fresh.
+        saved_sch = data.get("schedulers_state_dict") or []
+        if schedulers and len(saved_sch) == len(schedulers):
+            for sch, state in zip(schedulers, saved_sch):
+                sch.load_state_dict(state)
+        elif schedulers:
+            log("No scheduler state in checkpoint; plateau counters start fresh.")
         return data["step"], data["epoch"]
 
     # Fall back to full model in latest checkpoint
@@ -315,6 +332,17 @@ def train(dataset_type="pretrain", start_checkpoint=None):
     log(f"Stage {rank}: Muon manages {sum(p.numel() for p in muon_params):,} params, "
         f"AdamW manages {sum(p.numel() for p in adamw_params):,} params")
 
+    # Per-step ReduceLROnPlateau on the EMA loss. One scheduler per optimizer;
+    # both receive the same EMA loss every step, so they transition in lockstep
+    # (and identically on every rank, since the loss is broadcast).
+    schedulers = [
+        torch.optim.lr_scheduler.ReduceLROnPlateau(
+            opt, mode="min", factor=SCHEDULER_FACTOR,
+            patience=SCHEDULER_PATIENCE, cooldown=SCHEDULER_COOLDOWN,
+        )
+        for opt in optimizers
+    ]
+
     # Resume from existing checkpoint of the same dataset_type if any
     existing = _list_checkpoints(checkpoint_dir, dataset_type)
     if existing and start_checkpoint is not None:
@@ -323,6 +351,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             f"Resuming from latest.")
     start_step, start_epoch = load_latest_checkpoint(
         stage_module, optimizers, checkpoint_dir, rank, dataset_type,
+        schedulers=schedulers,
     )
     if not existing and start_checkpoint is not None:
         # Warm-start model weights from external checkpoint (no optimizer state)
@@ -383,7 +412,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                 log("Save and exit requested.")
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, dataset_type,
-                                      tokenizer=tokenizer, config=config)
+                                      tokenizer=tokenizer, config=config, schedulers=schedulers)
                 if tb_writer is not None:
                     tb_writer.close()
                 dist.destroy_process_group()
@@ -398,7 +427,8 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                 elif cmd == CMD_SAVE_AND_EXIT:
                     log("Save and exit requested.")
                     save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
-                                          checkpoint_dir, rank, stage_info, tokenizer, config)
+                                          checkpoint_dir, rank, stage_info, dataset_type,
+                                          tokenizer=tokenizer, config=config, schedulers=schedulers)
                     dist.destroy_process_group()
                     return
 
@@ -444,11 +474,22 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             global_step += 1
             num_steps += 1
 
+            # Per-step plateau scheduling on the EMA loss. ema_loss is computed
+            # from the broadcast batch_loss, so every rank feeds identical
+            # values and all schedulers stay in lockstep.
+            prev_lr = optimizers[0].param_groups[0]["lr"]
+            for sch in schedulers:
+                sch.step(ema_loss)
+            current_lr = optimizers[0].param_groups[0]["lr"]
+            if current_lr != prev_lr:
+                log(f"Step {global_step}: ReduceLROnPlateau {prev_lr:.3e} -> {current_lr:.3e}")
+
             # Log raw values to TensorBoard every step (rank 0 only).
             # Raw (not EMA) so curves stay correct across resume.
             if tb_writer is not None:
                 tb_writer.add_scalar("train/loss", batch_loss, global_step)
                 tb_writer.add_scalar("train/grad_norm", grad_norm, global_step)
+                tb_writer.add_scalar("train/lr", current_lr, global_step)
 
             if global_step % LOG_INTERVAL == 0:
                 elapsed = time.time() - train_start_time
@@ -475,12 +516,12 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             if global_step % CHECKPOINT_INTERVAL == 0:
                 save_stage_checkpoint(stage_module, optimizers, global_step, epoch,
                                       checkpoint_dir, rank, stage_info, dataset_type,
-                                      tokenizer=tokenizer, config=config)
+                                      tokenizer=tokenizer, config=config, schedulers=schedulers)
 
         # Epoch-end checkpoint
         save_stage_checkpoint(stage_module, optimizers, global_step, epoch + 1,
                               checkpoint_dir, rank, stage_info, dataset_type,
-                              tokenizer=tokenizer, config=config)
+                              tokenizer=tokenizer, config=config, schedulers=schedulers)
 
     # Save final full model via from_pretrained-compatible format
     dist.barrier()
