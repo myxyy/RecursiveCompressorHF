@@ -66,7 +66,8 @@ GRAD_CLIP = 1.0
 # the EMA smooths per-step noise the way an epoch average would).
 SCHEDULER_FACTOR = 0.9    # lr *= factor when the EMA loss plateaus
 SCHEDULER_PATIENCE = 1000  # steps without improvement before reducing
-SCHEDULER_COOLDOWN = 100   # steps to wait after a reduction before counting again
+SCHEDULER_COOLDOWN = 1000   # steps to wait after a reduction before counting again
+SCHEDULER_THRESHOLD = 0.0  # min relative improvement to count as "improved"
 N_MICROBATCHES = 6
 BATCH_SIZE = 6  # Must be >= N_MICROBATCHES
 CHECKPOINT_INTERVAL = 1000
@@ -209,10 +210,17 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, datas
         # reduced lr itself lives in the optimizer state; without this the
         # plateau counters would reset on every resume. Old checkpoints
         # without scheduler state just start the counters fresh.
+        # NOTE: restore ONLY the dynamic counters, not the full state_dict —
+        # load_state_dict() would also overwrite factor/patience/cooldown/
+        # threshold/min_lrs with the values saved in the checkpoint, silently
+        # discarding any hyperparameter changes made before the resume.
+        _SCHEDULER_DYNAMIC_KEYS = ("best", "num_bad_epochs", "cooldown_counter", "last_epoch")
         saved_sch = data.get("schedulers_state_dict") or []
         if schedulers and len(saved_sch) == len(schedulers):
             for sch, state in zip(schedulers, saved_sch):
-                sch.load_state_dict(state)
+                for key in _SCHEDULER_DYNAMIC_KEYS:
+                    if key in state:
+                        setattr(sch, key, state[key])
         elif schedulers:
             log("No scheduler state in checkpoint; plateau counters start fresh.")
         return data["step"], data["epoch"]
@@ -339,6 +347,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         torch.optim.lr_scheduler.ReduceLROnPlateau(
             opt, mode="min", factor=SCHEDULER_FACTOR,
             patience=SCHEDULER_PATIENCE, cooldown=SCHEDULER_COOLDOWN,
+            threshold=SCHEDULER_THRESHOLD, min_lr=LEARNING_RATE * 0.1
         )
         for opt in optimizers
     ]
@@ -509,7 +518,8 @@ def train(dataset_type="pretrain", start_checkpoint=None):
                     f"Loss: {ema_loss:.4f} | "
                     f"GradNorm: {grad_norm:.4f} | "
                     f"Tok/s: {tokens_per_sec:.0f} | "
-                    f"ETA: {eta_str}"
+                    f"ETA: {eta_str} | "
+                    f"LR: {current_lr:.3e}"
                 )
                 step_start_time = time.time()
 
