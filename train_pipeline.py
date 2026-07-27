@@ -351,7 +351,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         torch.optim.lr_scheduler.ReduceLROnPlateau(
             opt, mode="min", factor=SCHEDULER_FACTOR,
             patience=SCHEDULER_PATIENCE, cooldown=SCHEDULER_COOLDOWN,
-            threshold=SCHEDULER_THRESHOLD, min_lr=LEARNING_RATE * 0.1
+            threshold=SCHEDULER_THRESHOLD, min_lr=1e-6
         )
         for opt in optimizers
     ]
