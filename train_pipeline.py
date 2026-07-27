@@ -65,7 +65,7 @@ GRAD_CLIP = 1.0
 # ReduceLROnPlateau (applied per STEP, not per epoch, fed with the EMA loss —
 # the EMA smooths per-step noise the way an epoch average would).
 SCHEDULER_FACTOR = 0.9    # lr *= factor when the EMA loss plateaus
-SCHEDULER_PATIENCE = 1000  # steps without improvement before reducing
+SCHEDULER_PATIENCE = 10000  # steps without improvement before reducing
 SCHEDULER_COOLDOWN = 1000   # steps to wait after a reduction before counting again
 SCHEDULER_THRESHOLD = 0.0  # min relative improvement to count as "improved"
 N_MICROBATCHES = 6
@@ -366,6 +366,9 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         stage_module, optimizers, checkpoint_dir, rank, dataset_type,
         schedulers=schedulers,
     )
+    #for opt in optimizers:
+    #    for param_group in opt.param_groups:
+    #        param_group["lr"] = LEARNING_RATE  # Reset LR to config value on resume
     if not existing and start_checkpoint is not None:
         # Warm-start model weights from external checkpoint (no optimizer state)
         load_start_checkpoint(stage_module, start_checkpoint.rstrip("/"))
