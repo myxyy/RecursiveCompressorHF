@@ -356,6 +356,50 @@ class TestRecursiveCompressorLMPipeline:
         total = sum(s["layer_end"] - s["layer_start"] for s in splits)
         assert total == 16
 
+    def test_split_config_custom_layer_counts(self):
+        """明示的なlayer_countsによる傾斜分配"""
+        counts = [1, 2, 3, 4, 5, 9]
+        splits = RecursiveCompressorLMPipelineStage.split_config(
+            num_layers=24, num_stages=6, layer_counts=counts)
+        assert [s["layer_end"] - s["layer_start"] for s in splits] == counts
+        assert splits[0]["layer_start"] == 0 and splits[-1]["layer_end"] == 24
+        for prev, nxt in zip(splits, splits[1:]):
+            assert prev["layer_end"] == nxt["layer_start"]
+        # invalid: wrong sum
+        with pytest.raises(AssertionError):
+            RecursiveCompressorLMPipelineStage.split_config(
+                num_layers=24, num_stages=6, layer_counts=[4, 4, 4, 4, 4, 5])
+        # invalid: wrong length
+        with pytest.raises(AssertionError):
+            RecursiveCompressorLMPipelineStage.split_config(
+                num_layers=24, num_stages=6, layer_counts=[12, 12])
+
+    def test_pipeline_matches_full_model_uneven_split(self, config):
+        """傾斜分配でも monolithic モデルと logits が一致する"""
+        torch.manual_seed(2)
+        full = RecursiveCompressorLM(config)
+        full.eval()
+        full_sd = full.state_dict()
+
+        counts = [1, 2, 3]  # uneven split of 6 layers over 3 stages
+        splits = RecursiveCompressorLMPipelineStage.split_config(
+            config.num_layers, 3, layer_counts=counts)
+        stages = []
+        for sp in splits:
+            st = RecursiveCompressorLMPipelineStage(
+                config, sp["layer_start"], sp["layer_end"], sp["is_first"], sp["is_last"])
+            st.eval()
+            st.load_from_full_model(full_sd)
+            stages.append(st)
+
+        input_ids = torch.randint(0, config.vocab_size, (2, 64))
+        with torch.no_grad():
+            logits_full = full(input_ids).logits
+            x = input_ids
+            for st in stages:
+                x = st(x)
+        torch.testing.assert_close(x, logits_full, atol=1e-2, rtol=5e-2)
+
 
 class TestDataFormatting:
     def test_extract_turns_sharegpt(self):

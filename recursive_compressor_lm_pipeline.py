@@ -108,14 +108,29 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
         return xs
 
     @staticmethod
-    def split_config(num_layers, num_stages):
-        """Divide layers across stages. Returns list of config dicts."""
-        base = num_layers // num_stages
-        remainder = num_layers % num_stages
+    def split_config(num_layers, num_stages, layer_counts=None):
+        """Divide layers across stages. Returns list of config dicts.
+
+        layer_counts: optional explicit per-stage layer counts (list of ints
+        summing to num_layers). Use this to skew layers toward LATER stages:
+        under 1F1B, stage r holds (num_stages - r) in-flight microbatch
+        activations, so early stages need fewer layers to balance VRAM.
+        None = even split (remainder added to the first stages)."""
+        if layer_counts is not None:
+            assert len(layer_counts) == num_stages, \
+                f"layer_counts has {len(layer_counts)} entries, expected {num_stages}"
+            assert sum(layer_counts) == num_layers, \
+                f"layer_counts sums to {sum(layer_counts)}, expected {num_layers}"
+            assert all(c >= 1 for c in layer_counts), "every stage needs >= 1 layer"
+            counts = list(layer_counts)
+        else:
+            base = num_layers // num_stages
+            remainder = num_layers % num_stages
+            counts = [base + (1 if i < remainder else 0) for i in range(num_stages)]
+
         stages = []
         start = 0
-        for i in range(num_stages):
-            count = base + (1 if i < remainder else 0)
+        for i, count in enumerate(counts):
             stages.append({
                 "layer_start": start,
                 "layer_end": start + count,

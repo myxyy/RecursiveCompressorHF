@@ -68,8 +68,13 @@ SCHEDULER_FACTOR = 0.9    # lr *= factor when the EMA loss plateaus
 SCHEDULER_PATIENCE = 5000  # steps without improvement before reducing
 SCHEDULER_COOLDOWN = 1000   # steps to wait after a reduction before counting again
 SCHEDULER_THRESHOLD = 0.0  # min relative improvement to count as "improved"
-N_MICROBATCHES = 6
-BATCH_SIZE = 6  # Must be >= N_MICROBATCHES
+N_MICROBATCHES = 12
+BATCH_SIZE = 12  # Must be >= N_MICROBATCHES
+# Per-stage layer counts (None = even split). Under 1F1B, stage r holds
+# (num_stages - r) in-flight microbatch activations, so VRAM balance needs
+# FEWER layers on early stages (which also carry the embedding) and more on
+# late ones. Tune against observed per-GPU VRAM. Must sum to num_layers.
+STAGE_LAYER_SPLIT = [3, 4, 5, 6, 7, 7]
 CHECKPOINT_INTERVAL = 1000
 MAX_CHECKPOINTS = 2
 CONTROL_FILE = "control.cmd"
@@ -190,10 +195,16 @@ def _rotate_checkpoints(checkpoint_dir, dataset_type):
 
 
 def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, dataset_type,
-                           schedulers=None):
+                           schedulers=None, stage_info=None):
     """Load latest per-stage checkpoint matching dataset_type.
     Returns (step, epoch, ema_loss). If none found, returns (0, 0, None).
-    ema_loss is None for old checkpoints that predate it."""
+    ema_loss is None for old checkpoints that predate it.
+
+    stage_info: the CURRENT stage layout. If the checkpoint was saved with a
+    different layer split (STAGE_LAYER_SPLIT changed), the per-stage state
+    dict no longer matches this stage — model weights are then reloaded from
+    full_model.pt (layer indices are global there) and optimizer state starts
+    fresh, but step/epoch/EMA/scheduler counters still carry over."""
     checkpoints = _list_checkpoints(checkpoint_dir, dataset_type)
     if not checkpoints:
         return 0, 0, None
@@ -204,12 +215,31 @@ def load_latest_checkpoint(stage_module, optimizers, checkpoint_dir, rank, datas
     if os.path.exists(stage_path):
         log(f"Resuming from checkpoint: {latest}")
         data = torch.load(stage_path, map_location="cpu", weights_only=False)
-        stage_module.load_state_dict(data["stage_state_dict"])
-        if "optimizers_state_dict" in data:
-            for opt, state in zip(optimizers, data["optimizers_state_dict"]):
-                opt.load_state_dict(state)
+
+        saved_info = data.get("stage_info") or {}
+        split_changed = stage_info is not None and (
+            saved_info.get("layer_start") != stage_info["layer_start"]
+            or saved_info.get("layer_end") != stage_info["layer_end"]
+        )
+        if split_changed:
+            full_path = os.path.join(latest, "full_model.pt")
+            if not os.path.exists(full_path):
+                raise RuntimeError(
+                    f"Stage layer split changed (checkpoint {saved_info.get('layer_start')}-"
+                    f"{saved_info.get('layer_end')} vs current {stage_info['layer_start']}-"
+                    f"{stage_info['layer_end']}) but {full_path} is missing."
+                )
+            log(f"Stage layer split changed; loading weights from full_model.pt "
+                f"(optimizer state starts fresh).")
+            full_state = torch.load(full_path, map_location="cpu", weights_only=False)
+            stage_module.load_from_full_model(full_state)
         else:
-            log("Old optimizer format detected; skipping optimizer state (starting fresh).")
+            stage_module.load_state_dict(data["stage_state_dict"])
+            if "optimizers_state_dict" in data:
+                for opt, state in zip(optimizers, data["optimizers_state_dict"]):
+                    opt.load_state_dict(state)
+            else:
+                log("Old optimizer format detected; skipping optimizer state (starting fresh).")
         # Restore scheduler state (best / bad-step counters / cooldown). The
         # reduced lr itself lives in the optimizer state; without this the
         # plateau counters would reset on every resume. Old checkpoints
@@ -305,7 +335,10 @@ def train(dataset_type="pretrain", start_checkpoint=None):
     )
 
     # Split model across pipeline stages
-    stage_infos = RecursiveCompressorLMPipelineStage.split_config(config.num_layers, world_size)
+    stage_infos = RecursiveCompressorLMPipelineStage.split_config(
+        config.num_layers, world_size, layer_counts=STAGE_LAYER_SPLIT,
+    )
+    log(f"Stage layer split: {[s['layer_end'] - s['layer_start'] for s in stage_infos]}")
     stage_info = stage_infos[rank]
     # Master weights and optimizer state stay in fp32; forward/backward use
     # bfloat16 via autocast (mixed precision).
@@ -364,7 +397,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
             f"Resuming from latest.")
     start_step, start_epoch, resume_ema_loss = load_latest_checkpoint(
         stage_module, optimizers, checkpoint_dir, rank, dataset_type,
-        schedulers=schedulers,
+        schedulers=schedulers, stage_info=stage_info,
     )
     #for opt in optimizers:
     #    for param_group in opt.param_groups:
