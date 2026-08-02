@@ -58,8 +58,8 @@ load_dotenv()
 torch.set_float32_matmul_precision("high")
 
 # Hyperparameters
-CONTEXT_LENGTH = 1024
-LEARNING_RATE = 5e-5
+CONTEXT_LENGTH = 2048
+LEARNING_RATE = 1e-4
 NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
 # ReduceLROnPlateau (applied per STEP, not per epoch, fed with the EMA loss —
@@ -293,12 +293,12 @@ def train(dataset_type="pretrain", start_checkpoint=None):
 
     config = RecursiveCompressorConfig(
         vocab_size=tokenizer.vocab_size,
-        d_model=2048,
-        num_heads=16,
-        d_ff=6144,
-        chunk_size=2,
+        d_model=1536,
+        num_heads=12,
+        d_ff=8192,
+        chunk_size=4,
         compress_size=1,
-        num_layers=24,
+        num_layers=32,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
