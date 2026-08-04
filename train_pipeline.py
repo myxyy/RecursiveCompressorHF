@@ -64,9 +64,9 @@ NUM_EPOCHS = 1
 GRAD_CLIP = 1.0
 # ReduceLROnPlateau (applied per STEP, not per epoch, fed with the EMA loss —
 # the EMA smooths per-step noise the way an epoch average would).
-SCHEDULER_FACTOR = 0.9    # lr *= factor when the EMA loss plateaus
-SCHEDULER_PATIENCE = 5000  # steps without improvement before reducing
-SCHEDULER_COOLDOWN = 1000   # steps to wait after a reduction before counting again
+SCHEDULER_FACTOR = 0.95    # lr *= factor when the EMA loss plateaus
+SCHEDULER_PATIENCE = 10000  # steps without improvement before reducing
+SCHEDULER_COOLDOWN = 0   # steps to wait after a reduction before counting again
 SCHEDULER_THRESHOLD = 0.0  # min relative improvement to count as "improved"
 N_MICROBATCHES = 12
 BATCH_SIZE = 12  # Must be >= N_MICROBATCHES
