@@ -2,6 +2,12 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
+def alibi_slopes(num_heads):
+    """Standard ALiBi head slopes: geometric sequence 2^(-8h/H), h=1..H."""
+    return torch.tensor([2.0 ** (-8.0 * (h + 1) / num_heads) for h in range(num_heads)])
+
+
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, num_heads):
         super(MultiHeadAttention, self).__init__()
@@ -24,7 +30,13 @@ class MultiHeadAttention(nn.Module):
         # sigmoid(4) ~= 0.98, and the gate can still learn to close.
         nn.init.constant_(self.gate_linear.bias, 4.0)
 
-    def forward(self, query, key, value, mask=None):
+    def forward(self, query, key, value, mask=None, attn_bias=None):
+        """
+        mask:      optional bool mask (True = attend), (Lq, Lk)
+        attn_bias: optional additive float bias (num_heads, Lq, Lk) — used for
+                   ALiBi-style relative position slopes; any -inf entries also
+                   act as a mask. Only one of mask / attn_bias should be given.
+        """
         batch_size = query.size(0)
 
         # Linear projections
@@ -36,7 +48,9 @@ class MultiHeadAttention(nn.Module):
         # Scaled dot-product attention (internally uses float32 for bfloat16 inputs,
         # and enables FlashAttention/memory-efficient kernels when available)
         attn_mask = None
-        if mask is not None:
+        if attn_bias is not None:
+            attn_mask = attn_bias.unsqueeze(0).to(query.dtype)  # (1, H, Lq, Lk)
+        elif mask is not None:
             attn_mask = mask.bool()
         attn_output = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask)
         attn_output = attn_output * torch.sigmoid(gate)
@@ -65,7 +79,6 @@ class RecursiveCompressorAttention(nn.Module):
         super(RecursiveCompressorAttention, self).__init__()
         self.chunk_size = chunk_size
         self.compress_size = compress_size
-        self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
         self.initial_context = nn.Parameter(torch.randn(compress_size, d_model))
         self.norm_mha_encoder = nn.RMSNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
@@ -75,7 +88,28 @@ class RecursiveCompressorAttention(nn.Module):
         self.norm_decompressor_kv = nn.RMSNorm(d_model)
         self.norm_decompressor_q = nn.RMSNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
-        self.compressor_query_pos = nn.Parameter(torch.randn(compress_size, d_model) * 0.02)
+
+        # ALiBi-style relative position biases (replace the former learnable
+        # compressor_query_pos). Length-independent: distances are within a
+        # chunk only, and the SAME buffers are reused at every recursion level,
+        # so unbounded generation stays possible. Buffers are persistent
+        # (saved in state_dict): with persistent=False, from_pretrained's
+        # meta-device init path would leave them uninitialized.
+        slopes = alibi_slopes(num_heads)  # (H,)
+        pos = torch.arange(chunk_size)
+        # Encoder (causal within-chunk self-attention): -m_h * (i - j),
+        # with the causal mask baked in as -inf above the diagonal.
+        rel = (pos.view(-1, 1) - pos.view(1, -1)).float()          # (C, C)
+        enc = -slopes.view(-1, 1, 1) * rel                          # (H, C, C)
+        enc = enc.masked_fill(torch.triu(torch.ones(chunk_size, chunk_size, dtype=torch.bool), 1), float("-inf"))
+        self.register_buffer("encoder_attn_bias", enc)
+        # Compressor (queries summarize a chunk): bias kv positions by their
+        # distance from the chunk end, -m_h * (C-1-j), so heads see the
+        # chunk's token ORDER at different sharpness — this is what lets the
+        # compressed vector keep positional identity of its contents.
+        dist = (chunk_size - 1 - pos).float()                       # (C,)
+        comp = (-slopes.view(-1, 1, 1) * dist.view(1, 1, -1)).expand(num_heads, compress_size, chunk_size)
+        self.register_buffer("compressor_attn_bias", comp.contiguous())
 
     def step(self, xs, hidden):
         """
@@ -138,8 +172,6 @@ class RecursiveCompressorAttention(nn.Module):
         if comp_query is None and num_full > 0:
             full_view = combined[:, :full_len].reshape(batch_size, num_full, self.chunk_size, d_model)
             comp_query = full_view[:, :, -1, :].unsqueeze(2).expand(batch_size, num_full, self.compress_size, d_model)
-        if comp_query is not None:
-            comp_query = comp_query + self.compressor_query_pos
 
         # Compression / Decompression
         all_pre_norm = all_chunks
@@ -157,7 +189,8 @@ class RecursiveCompressorAttention(nn.Module):
                 f"comp_query chunk count {comp_query.size(1)} != num_full {num_full}"
             cq_expanded = comp_query.reshape(batch_size * num_full, self.compress_size, d_model)
             cq_expanded_norm = self.norm_compressor_q(cq_expanded)
-            compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed) + cq_expanded
+            compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed,
+                                             attn_bias=self.compressor_attn_bias) + cq_expanded
 
             # Reshape for recursion: each of compress_size streams processed independently
             compressed = compressed.view(batch_size, num_full, self.compress_size, d_model)
@@ -230,10 +263,12 @@ class RecursiveCompressorAttention(nn.Module):
             all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed)
             all_chunks = all_chunks + all_pre_norm
 
-        # Decoder: causal self-attention + FFN (independent per chunk)
+        # Decoder: causal self-attention + FFN (independent per chunk).
+        # ALiBi bias carries both the causal mask (-inf) and relative positions.
         ac = all_chunks
         all_chunks = self.norm_mha_encoder(all_chunks)
-        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
+        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks,
+                                      attn_bias=self.encoder_attn_bias)
         all_chunks = all_chunks + ac
 
         # Reconstruct output
