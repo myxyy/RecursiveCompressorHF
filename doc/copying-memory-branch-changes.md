@@ -30,16 +30,17 @@ Copy Memory Problem（人工データセット）による基礎検証と、そ�
   サブモジュール `__init__` 内の手動初期化を上書きするため、
   `RecursiveCompressorLM._init_weights` のオーバーライドで適用
 
-### 2. ALiBi相当のヘッド毎位置スロープ (f8a5f5b)
+### 2. ALiBi相当のヘッド毎位置スロープ (f8a5f5b) → **後に削除**
 - 学習可能な `compressor_query_pos` を削除し、固定・非学習のALiBiバイアス
   （スロープ 2^(-8h/H)）を attention logit に加算する方式へ
-- encoder（チャンク内causal self-attn）: 標準ALiBi `-m_h*(i-j)`。
-  causalマスクは -inf としてバイアスに焼き込み（`mask_tril` バッファ廃止）
-- compressor: kv位置のバイアス（→ 変更4で一般化）
-- **チャンク内相対距離のみの固定バッファを全再帰レベルで共有** → 長さ非依存で
-  「メモリの許す限り無限に生成」の設計目標と両立
-- 注意: バッファは persistent（`persistent=False` だと `from_pretrained` の
-  meta-device初期化経路で未初期化になる）
+- **その後のablationで削除が決定**: chunk_pos_emb（変更6）導入後は位置情報として
+  冗長であり、負スロープによる過去valueの希釈が支配的な弊害になることが判明
+  （d512比較: 訓練域12倍のT≈25kまでno-ALiBiがstring accで+0.2〜+0.4の大差、
+  ALiBiが勝るのは16倍以遠のgraceful degradationのみ）。位置情報は
+  chunk_pos_emb（値空間タグ）に一本化し、encoderのcausalマスクは
+  `mask_tril`（boolバッファ）に復帰
+- 得られた知見: バッファはpersistentにすること（`persistent=False` だと
+  `from_pretrained` のmeta-device初期化経路で未初期化になる）
 
 ### 3. decompressor kv の retrieve_size 窓 (7cbc6c4)
 - 新ハイパーパラメータ `retrieve_size`（k、デフォルト4）を config に追加
@@ -82,10 +83,11 @@ Copy Memory Problem（人工データセット）による基礎検証と、そ�
 before:  chunk化 → [comp_query導出(生埋め込み)] → 圧縮 → 再帰
          → decompressor(kv=直前圧縮1点, クエリ=生埋め込み) → encoder → 出力
 
-after:   chunk化 → +chunk_pos_emb → encoder(ALiBi)
-         → [comp_query導出(encoder出力チャンク末尾)] → 圧縮(クエリ別ALiBi) → 再帰
-         → decompressor(kv=過去k点の窓, チャンク距離ALiBi, クエリ=encoder出力) → 出力
+after:   chunk化 → +chunk_pos_emb → encoder(causalマスク)
+         → [comp_query導出(encoder出力チャンク末尾)] → 圧縮 → 再帰
+         → decompressor(kv=過去k点の窓, クエリ=encoder出力) → 出力
 ```
+(ALiBiバイアスは一時導入されたがablationの結果削除。位置情報はchunk_pos_embのみ)
 
 ## 実験基盤（exp/copying/）(08eb71e, 8ba5755, 2b7bbe2)
 

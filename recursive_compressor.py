@@ -3,11 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-def alibi_slopes(num_heads):
-    """Standard ALiBi head slopes: geometric sequence 2^(-8h/H), h=1..H."""
-    return torch.tensor([2.0 ** (-8.0 * (h + 1) / num_heads) for h in range(num_heads)])
-
-
 class MultiHeadAttention(nn.Module):
     def __init__(self, d_model, num_heads):
         super(MultiHeadAttention, self).__init__()
@@ -30,13 +25,7 @@ class MultiHeadAttention(nn.Module):
         # sigmoid(4) ~= 0.98, and the gate can still learn to close.
         nn.init.constant_(self.gate_linear.bias, 4.0)
 
-    def forward(self, query, key, value, mask=None, attn_bias=None):
-        """
-        mask:      optional bool mask (True = attend), (Lq, Lk)
-        attn_bias: optional additive float bias (num_heads, Lq, Lk) — used for
-                   ALiBi-style relative position slopes; any -inf entries also
-                   act as a mask. Only one of mask / attn_bias should be given.
-        """
+    def forward(self, query, key, value, mask=None):
         batch_size = query.size(0)
 
         # Linear projections
@@ -48,9 +37,7 @@ class MultiHeadAttention(nn.Module):
         # Scaled dot-product attention (internally uses float32 for bfloat16 inputs,
         # and enables FlashAttention/memory-efficient kernels when available)
         attn_mask = None
-        if attn_bias is not None:
-            attn_mask = attn_bias.unsqueeze(0).to(query.dtype)  # (1, H, Lq, Lk)
-        elif mask is not None:
+        if mask is not None:
             attn_mask = mask.bool()
         attn_output = F.scaled_dot_product_attention(query, key, value, attn_mask=attn_mask)
         attn_output = attn_output * torch.sigmoid(gate)
@@ -87,13 +74,21 @@ class RecursiveCompressorAttention(nn.Module):
         # them + 1 real summary, ...).
         self.initial_context = nn.Parameter(torch.randn(retrieve_size, compress_size, d_model))
         # Within-chunk position embedding added to tokens right after chunking.
-        # ALiBi only skews attention WEIGHTS; a compressed summary
+        # This is the SOLE source of position information. Attention-weight
+        # biases (ALiBi) were tried and removed: a compressed summary
         # z = sum_j softmax_j * W_v e_j keeps the bag of its contents but not
-        # their order (measured on the copy task: bag recovered 100%, order at
-        # the bag-only optimum). This tags positions in VALUE space so order
-        # survives compression. chunk_size vectors, shared by every recursion
-        # level — length-independent, so unbounded generation is unaffected.
+        # their order unless positions are tagged in VALUE space (measured on
+        # the copy task: bag recovered 100%, order at the bag-only optimum),
+        # and the negative slopes dilute distant values, costing large accuracy
+        # up to ~12x the train horizon for a modest gain only beyond ~16x
+        # (see doc/instruction-for-claude/copying-task.md, ALiBi ablation).
+        # chunk_size vectors, shared by every recursion level —
+        # length-independent, so unbounded generation is unaffected.
+        # NOTE: with ALiBi's per-query bias gone, the compress_size>1 queries
+        # (all derived from the same chunk-last vector) are degenerate again;
+        # current operation uses compress_size=1 where this doesn't matter.
         self.chunk_pos_emb = nn.Parameter(torch.randn(chunk_size, d_model) * 0.02)
+        self.register_buffer('mask_tril', torch.ones(chunk_size, chunk_size).tril())
         self.norm_mha_encoder = nn.RMSNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
         self.norm_compressor_kv = nn.RMSNorm(d_model)
@@ -102,47 +97,6 @@ class RecursiveCompressorAttention(nn.Module):
         self.norm_decompressor_kv = nn.RMSNorm(d_model)
         self.norm_decompressor_q = nn.RMSNorm(d_model)
         self.mha_decompressor = MultiHeadAttention(d_model, num_heads)
-
-        # ALiBi-style relative position biases (replace the former learnable
-        # compressor_query_pos). Length-independent: distances are within a
-        # chunk only, and the SAME buffers are reused at every recursion level,
-        # so unbounded generation stays possible. Buffers are persistent
-        # (saved in state_dict): with persistent=False, from_pretrained's
-        # meta-device init path would leave them uninitialized.
-        slopes = alibi_slopes(num_heads)  # (H,)
-        pos = torch.arange(chunk_size)
-        # Encoder (causal within-chunk self-attention): -m_h * (i - j),
-        # with the causal mask baked in as -inf above the diagonal.
-        rel = (pos.view(-1, 1) - pos.view(1, -1)).float()          # (C, C)
-        enc = -slopes.view(-1, 1, 1) * rel                          # (H, C, C)
-        enc = enc.masked_fill(torch.triu(torch.ones(chunk_size, chunk_size, dtype=torch.bool), 1), float("-inf"))
-        self.register_buffer("encoder_attn_bias", enc)
-        # Compressor (queries summarize a chunk): PER-QUERY position bias.
-        # The compress_size queries are all derived from the same chunk-末尾
-        # vector, so without distinct biases they are fully degenerate (S
-        # identical outputs — S>1 adds no capacity). Assign query s a "home"
-        # position c(s) spread evenly over the chunk and bias kv position j by
-        # -m_h * |c(s) - j|: each query prefers its own region, so with S ~= C
-        # compression approaches an order-preserving re-layout of the chunk.
-        # S=1 reduces to the previous chunk-end recency bias (c(0) = C-1).
-        if compress_size > 1:
-            centers = torch.arange(compress_size).float() * (chunk_size - 1) / (compress_size - 1)
-        else:
-            centers = torch.tensor([float(chunk_size - 1)])
-        qdist = (centers.view(-1, 1) - pos.view(1, -1).float()).abs()   # (S, C)
-        comp = -slopes.view(-1, 1, 1) * qdist.unsqueeze(0)              # (H, S, C)
-        self.register_buffer("compressor_attn_bias", comp.contiguous())
-        # Decompressor (chunk positions -> window of retrieve_size past chunk
-        # summaries): bias each window slot by its chunk distance from the
-        # current chunk, -m_h * (k-1-w) where w=k-1 is the immediately
-        # preceding chunk. The compress_size vectors of one slot share the
-        # same distance.
-        w = torch.arange(retrieve_size)
-        wdist = (retrieve_size - 1 - w).float()                     # (k,)
-        dec = (-slopes.view(-1, 1, 1) * wdist.view(1, 1, -1))       # (H, 1, k)
-        dec = dec.repeat_interleave(compress_size, dim=2)           # (H, 1, k*S)
-        dec = dec.expand(num_heads, chunk_size, retrieve_size * compress_size)
-        self.register_buffer("decompressor_attn_bias", dec.contiguous())
 
     def step(self, xs, hidden):
         """
@@ -212,8 +166,7 @@ class RecursiveCompressorAttention(nn.Module):
         # to effectively one d_model vector of retrieved information.)
         ac = all_chunks
         all_chunks = self.norm_mha_encoder(all_chunks)
-        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks,
-                                      attn_bias=self.encoder_attn_bias)
+        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks, mask=self.mask_tril)
         all_chunks = all_chunks + ac
 
         # Compressor query (per-chunk: (batch, num_full, compress_size, d_model)).
@@ -243,8 +196,7 @@ class RecursiveCompressorAttention(nn.Module):
                 f"comp_query chunk count {comp_query.size(1)} != num_full {num_full}"
             cq_expanded = comp_query.reshape(batch_size * num_full, self.compress_size, d_model)
             cq_expanded_norm = self.norm_compressor_q(cq_expanded)
-            compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed,
-                                             attn_bias=self.compressor_attn_bias) + cq_expanded
+            compressed = self.mha_compressor(cq_expanded_norm, full_normed, full_normed) + cq_expanded
 
             # Reshape for recursion: each of compress_size streams processed independently
             compressed = compressed.view(batch_size, num_full, self.compress_size, d_model)
@@ -327,8 +279,7 @@ class RecursiveCompressorAttention(nn.Module):
         # tokens query the window of past chunk summaries.
         if all_outer is not None:
             all_outer_normed = self.norm_decompressor_kv(all_outer)
-            all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed,
-                                               attn_bias=self.decompressor_attn_bias)
+            all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed)
             all_chunks = all_chunks + all_pre_norm
 
         # Reconstruct output
