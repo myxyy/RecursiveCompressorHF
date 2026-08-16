@@ -19,6 +19,7 @@ class RecursiveCompressorConfig(PretrainedConfig):
         d_ff=2048,
         chunk_size=8,
         compress_size=4,
+        retrieve_size=4,
         num_layers=8,
         pad_token_id=None,
         bos_token_id=1,
@@ -30,6 +31,7 @@ class RecursiveCompressorConfig(PretrainedConfig):
         self.d_ff = d_ff
         self.chunk_size = chunk_size
         self.compress_size = compress_size
+        self.retrieve_size = retrieve_size
         self.num_layers = num_layers
         super().__init__(
             vocab_size=vocab_size,

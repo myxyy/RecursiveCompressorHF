@@ -328,6 +328,7 @@ def train(dataset_type="pretrain", start_checkpoint=None):
         d_ff=8192,
         chunk_size=4,
         compress_size=1,
+        retrieve_size=4,
         num_layers=32,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,

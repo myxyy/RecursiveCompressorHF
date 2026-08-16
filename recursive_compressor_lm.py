@@ -20,7 +20,8 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
         self.embedding = nn.Embedding(config.vocab_size, config.d_model)
         nn.init.normal_(self.embedding.weight, mean=0.0, std=0.02)
         self.layers = nn.ModuleList([
-            RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
+            RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size,
+                                config.compress_size, getattr(config, "retrieve_size", 4))
             for _ in range(config.num_layers)
         ])
         self.norm = nn.RMSNorm(config.d_model)

@@ -75,11 +75,17 @@ class FFNSwiGLU(nn.Module):
         return output
 
 class RecursiveCompressorAttention(nn.Module):
-    def __init__(self, d_model, num_heads, chunk_size, compress_size):
+    def __init__(self, d_model, num_heads, chunk_size, compress_size, retrieve_size=4):
         super(RecursiveCompressorAttention, self).__init__()
         self.chunk_size = chunk_size
         self.compress_size = compress_size
-        self.initial_context = nn.Parameter(torch.randn(compress_size, d_model))
+        self.retrieve_size = retrieve_size
+        # Learnable initial outer context: chunk i attends to the compressed
+        # summaries of the previous `retrieve_size` chunks; near the sequence
+        # start the missing slots are filled from this parameter (chunk 0 sees
+        # all retrieve_size initial vectors, chunk 1 sees retrieve_size-1 of
+        # them + 1 real summary, ...).
+        self.initial_context = nn.Parameter(torch.randn(retrieve_size, compress_size, d_model))
         self.norm_mha_encoder = nn.RMSNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
         self.norm_compressor_kv = nn.RMSNorm(d_model)
@@ -110,6 +116,17 @@ class RecursiveCompressorAttention(nn.Module):
         dist = (chunk_size - 1 - pos).float()                       # (C,)
         comp = (-slopes.view(-1, 1, 1) * dist.view(1, 1, -1)).expand(num_heads, compress_size, chunk_size)
         self.register_buffer("compressor_attn_bias", comp.contiguous())
+        # Decompressor (chunk positions -> window of retrieve_size past chunk
+        # summaries): bias each window slot by its chunk distance from the
+        # current chunk, -m_h * (k-1-w) where w=k-1 is the immediately
+        # preceding chunk. The compress_size vectors of one slot share the
+        # same distance.
+        w = torch.arange(retrieve_size)
+        wdist = (retrieve_size - 1 - w).float()                     # (k,)
+        dec = (-slopes.view(-1, 1, 1) * wdist.view(1, 1, -1))       # (H, 1, k)
+        dec = dec.repeat_interleave(compress_size, dim=2)           # (H, 1, k*S)
+        dec = dec.expand(num_heads, chunk_size, retrieve_size * compress_size)
+        self.register_buffer("decompressor_attn_bias", dec.contiguous())
 
     def step(self, xs, hidden):
         """
@@ -134,9 +151,11 @@ class RecursiveCompressorAttention(nn.Module):
         hidden_self = hidden.pop() if hidden else (None, None)
         prev_inner, prev_outer = hidden_self
 
-        # Initial outer context: learnable parameter (data-independent to preserve predict==forward)
+        # Initial outer context: learnable parameter (data-independent to preserve
+        # predict==forward). Shape (B, retrieve_size, compress_size, d) — the
+        # window of the last `retrieve_size` chunk summaries, index 0 = oldest.
         if prev_outer is None:
-            prev_outer = self.initial_context[None, :, :].expand(batch_size, -1, -1)
+            prev_outer = self.initial_context[None].expand(batch_size, -1, -1, -1)
 
         # Combine with previous partial chunk
         if prev_inner is not None:
@@ -222,14 +241,23 @@ class RecursiveCompressorAttention(nn.Module):
             compressed_out = compressed_out.permute(0, 2, 1, 3).contiguous()
             # (batch, num_full, compress_size, d_model)
 
-            # Shift: chunk i uses outer context from chunks 0..i-1
-            full_outer = torch.cat([prev_outer.unsqueeze(1), compressed_out[:, :-1]], dim=1)
-            new_outer = compressed_out[:, -1]
-
-            full_outer = full_outer.view(batch_size * num_full, self.compress_size, d_model)
+            # Sliding retrieval window: chunk i attends to the summaries of
+            # chunks [i-k .. i-1] (k = retrieve_size). Prepending prev_outer
+            # (the carried window; initial_context on the first call) makes the
+            # early chunks' windows blend initial slots with real summaries,
+            # with no special-casing. unfold yields num_full+1 windows; the
+            # extra last one is the freshest window, used for the remainder
+            # chunk and carried forward as the new hidden outer context.
+            ctx_seq = torch.cat([prev_outer, compressed_out], dim=1)  # (B, k+num_full, S, d)
+            windows = ctx_seq.unfold(1, self.retrieve_size, 1)        # (B, num_full+1, S, d, k)
+            windows = windows.permute(0, 1, 4, 2, 3)                  # (B, num_full+1, k, S, d)
+            full_outer = windows[:, :num_full].reshape(
+                batch_size * num_full, self.retrieve_size * self.compress_size, d_model)
+            new_outer = windows[:, num_full].contiguous()             # (B, k, S, d)
 
             if rem > 0:
-                all_outer = torch.cat([full_outer, new_outer], dim=0)
+                all_outer = torch.cat(
+                    [full_outer, new_outer.reshape(batch_size, -1, d_model)], dim=0)
             else:
                 all_outer = full_outer
 
@@ -249,8 +277,10 @@ class RecursiveCompressorAttention(nn.Module):
                 collapsed_dqs.append(dq_collapsed)
         else:
             if prev_outer is not None:
+                # No new summaries this call; reuse the carried window as-is.
                 new_outer = prev_outer
-                all_outer = prev_outer
+                all_outer = prev_outer.reshape(
+                    batch_size, self.retrieve_size * self.compress_size, d_model)
             else:
                 # No compressor query at all - skip decompression
                 new_outer = None
@@ -260,7 +290,8 @@ class RecursiveCompressorAttention(nn.Module):
 
         if all_outer is not None:
             all_outer_normed = self.norm_decompressor_kv(all_outer)
-            all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed)
+            all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed,
+                                               attn_bias=self.decompressor_attn_bias)
             all_chunks = all_chunks + all_pre_norm
 
         # Decoder: causal self-attention + FFN (independent per chunk).
@@ -322,9 +353,9 @@ class RecursiveCompressorFFN(nn.Module):
         return out
 
 class RecursiveCompressor(nn.Module):
-    def __init__(self, d_model, num_heads, d_ff, chunk_size, compress_size):
+    def __init__(self, d_model, num_heads, d_ff, chunk_size, compress_size, retrieve_size=4):
         super(RecursiveCompressor, self).__init__()
-        self.attention = RecursiveCompressorAttention(d_model, num_heads, chunk_size, compress_size)
+        self.attention = RecursiveCompressorAttention(d_model, num_heads, chunk_size, compress_size, retrieve_size)
         self.ffn = RecursiveCompressorFFN(d_model, d_ff)
 
     def forward(self, xs):

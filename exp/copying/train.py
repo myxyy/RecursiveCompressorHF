@@ -51,6 +51,7 @@ def parse_args():
     p.add_argument("--num-layers", type=int, default=2)
     p.add_argument("--chunk-size", type=int, default=4)
     p.add_argument("--compress-size", type=int, default=1)
+    p.add_argument("--retrieve-size", type=int, default=4)
     p.add_argument("--loss-positions", choices=["all", "answer"], default="all",
                    help="all=全位置CE (CKConv等の既存研究と同じ) / answer=末尾10位置のみ")
     p.add_argument("--seed", type=int, default=0)
@@ -104,6 +105,7 @@ def main():
         d_ff=args.d_ff,
         chunk_size=args.chunk_size,
         compress_size=args.compress_size,
+        retrieve_size=args.retrieve_size,
         num_layers=args.num_layers,
         pad_token_id=None, bos_token_id=None, eos_token_id=None,
     )

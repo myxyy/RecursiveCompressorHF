@@ -26,7 +26,8 @@ class RecursiveCompressorLMPipelineStage(nn.Module):
             self.embedding = nn.Embedding(config.vocab_size, config.d_model)
 
         self.layers = nn.ModuleList([
-            RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size, config.compress_size)
+            RecursiveCompressor(config.d_model, config.num_heads, config.d_ff, config.chunk_size,
+                                config.compress_size, getattr(config, "retrieve_size", 4))
             for _ in range(self.num_local_layers)
         ])
 
