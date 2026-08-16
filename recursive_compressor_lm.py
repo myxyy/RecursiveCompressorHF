@@ -6,7 +6,7 @@ from transformers.generation import GenerationMixin
 from transformers.modeling_outputs import CausalLMOutputWithPast
 
 from configuration_recursive_compressor import RecursiveCompressorConfig
-from recursive_compressor import RecursiveCompressor
+from recursive_compressor import MultiHeadAttention, RecursiveCompressor
 
 
 class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
@@ -26,6 +26,16 @@ class RecursiveCompressorLM(PreTrainedModel, GenerationMixin):
         self.norm = nn.RMSNorm(config.d_model)
         self.head = nn.Linear(config.d_model, config.vocab_size, bias=False)
         self.post_init()
+
+    def _init_weights(self, module):
+        """Extends HF's generic init (which re-initializes every nn.Linear and
+        zeroes its bias, overriding anything done in submodule __init__s).
+        Re-opens the attention gates afterwards: nn.Module.apply visits
+        children first, so gate_linear is zeroed by the base pass before this
+        runs for the enclosing MultiHeadAttention."""
+        super()._init_weights(module)
+        if isinstance(module, MultiHeadAttention):
+            nn.init.constant_(module.gate_linear.bias, 4.0)
 
     def _num_queries(self):
         """Maximum number of compressor queries needed for recursion depth + 1."""

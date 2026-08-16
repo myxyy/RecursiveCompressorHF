@@ -17,6 +17,13 @@ class MultiHeadAttention(nn.Module):
         self.value_linear = nn.Linear(d_model, d_model)
         self.out_linear = nn.Linear(d_model, d_model)
 
+        # Open the gate at init: with default (near-zero) init the sigmoid gate
+        # multiplies every attention output by ~0.5, compounding to ~0.5^k decay
+        # across k recursion levels and suppressing long-range signal
+        # (measured on the copy task; see instruction-for-claude/copying-task.md).
+        # sigmoid(4) ~= 0.98, and the gate can still learn to close.
+        nn.init.constant_(self.gate_linear.bias, 4.0)
+
     def forward(self, query, key, value, mask=None):
         batch_size = query.size(0)
 
