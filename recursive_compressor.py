@@ -109,12 +109,20 @@ class RecursiveCompressorAttention(nn.Module):
         enc = -slopes.view(-1, 1, 1) * rel                          # (H, C, C)
         enc = enc.masked_fill(torch.triu(torch.ones(chunk_size, chunk_size, dtype=torch.bool), 1), float("-inf"))
         self.register_buffer("encoder_attn_bias", enc)
-        # Compressor (queries summarize a chunk): bias kv positions by their
-        # distance from the chunk end, -m_h * (C-1-j), so heads see the
-        # chunk's token ORDER at different sharpness — this is what lets the
-        # compressed vector keep positional identity of its contents.
-        dist = (chunk_size - 1 - pos).float()                       # (C,)
-        comp = (-slopes.view(-1, 1, 1) * dist.view(1, 1, -1)).expand(num_heads, compress_size, chunk_size)
+        # Compressor (queries summarize a chunk): PER-QUERY position bias.
+        # The compress_size queries are all derived from the same chunk-末尾
+        # vector, so without distinct biases they are fully degenerate (S
+        # identical outputs — S>1 adds no capacity). Assign query s a "home"
+        # position c(s) spread evenly over the chunk and bias kv position j by
+        # -m_h * |c(s) - j|: each query prefers its own region, so with S ~= C
+        # compression approaches an order-preserving re-layout of the chunk.
+        # S=1 reduces to the previous chunk-end recency bias (c(0) = C-1).
+        if compress_size > 1:
+            centers = torch.arange(compress_size).float() * (chunk_size - 1) / (compress_size - 1)
+        else:
+            centers = torch.tensor([float(chunk_size - 1)])
+        qdist = (centers.view(-1, 1) - pos.view(1, -1).float()).abs()   # (S, C)
+        comp = -slopes.view(-1, 1, 1) * qdist.unsqueeze(0)              # (H, S, C)
         self.register_buffer("compressor_attn_bias", comp.contiguous())
         # Decompressor (chunk positions -> window of retrieve_size past chunk
         # summaries): bias each window slot by its chunk distance from the
