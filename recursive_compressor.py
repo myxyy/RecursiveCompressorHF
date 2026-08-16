@@ -86,6 +86,14 @@ class RecursiveCompressorAttention(nn.Module):
         # all retrieve_size initial vectors, chunk 1 sees retrieve_size-1 of
         # them + 1 real summary, ...).
         self.initial_context = nn.Parameter(torch.randn(retrieve_size, compress_size, d_model))
+        # Within-chunk position embedding added to tokens right after chunking.
+        # ALiBi only skews attention WEIGHTS; a compressed summary
+        # z = sum_j softmax_j * W_v e_j keeps the bag of its contents but not
+        # their order (measured on the copy task: bag recovered 100%, order at
+        # the bag-only optimum). This tags positions in VALUE space so order
+        # survives compression. chunk_size vectors, shared by every recursion
+        # level — length-independent, so unbounded generation is unaffected.
+        self.chunk_pos_emb = nn.Parameter(torch.randn(chunk_size, d_model) * 0.02)
         self.norm_mha_encoder = nn.RMSNorm(d_model)
         self.mha_encoder = MultiHeadAttention(d_model, num_heads)
         self.norm_compressor_kv = nn.RMSNorm(d_model)
@@ -190,15 +198,34 @@ class RecursiveCompressorAttention(nn.Module):
             parts.append(rem_padded)
 
         all_chunks = torch.cat(parts, dim=0)
+        # Tag within-chunk positions in value space (see __init__). Padding
+        # positions of the remainder chunk also get tagged, but they are never
+        # attended to (causal mask) and are cut in the output reconstruction.
+        all_chunks = all_chunks + self.chunk_pos_emb
+
+        # Self-attention FIRST (standard transformer-decoder block order:
+        # self-attn -> cross-attn). The per-chunk causal attention with ALiBi
+        # position-differentiates tokens BEFORE the retrieval cross-attention,
+        # so runs of identical tokens can still address the retrieval window
+        # by position. (With the old cross-attn-first order, identical raw
+        # embeddings issued identical retrieval queries, limiting each chunk
+        # to effectively one d_model vector of retrieved information.)
+        ac = all_chunks
+        all_chunks = self.norm_mha_encoder(all_chunks)
+        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks,
+                                      attn_bias=self.encoder_attn_bias)
+        all_chunks = all_chunks + ac
 
         # Compressor query (per-chunk: (batch, num_full, compress_size, d_model)).
         # First stage gets comp_query=None and derives it from each full chunk's
-        # last vector (from `combined`, so step/forward chunk boundaries align).
-        # Later stages receive the previous stage's compressed sequence as the
-        # query directly.
+        # ENCODED last vector — after causal self-attention this is a summary of
+        # the whole chunk. (Chunking is based on `combined`, so step/forward
+        # chunk boundaries align; the encoder is chunk-local, so its output is
+        # split-invariant too.) Later stages receive the previous stage's
+        # compressed sequence as the query directly.
         if comp_query is None and num_full > 0:
-            full_view = combined[:, :full_len].reshape(batch_size, num_full, self.chunk_size, d_model)
-            comp_query = full_view[:, :, -1, :].unsqueeze(2).expand(batch_size, num_full, self.compress_size, d_model)
+            enc_full = all_chunks[:batch_size * num_full].view(batch_size, num_full, self.chunk_size, d_model)
+            comp_query = enc_full[:, :, -1, :].unsqueeze(2).expand(batch_size, num_full, self.compress_size, d_model)
 
         # Compression / Decompression
         all_pre_norm = all_chunks
@@ -296,19 +323,13 @@ class RecursiveCompressorAttention(nn.Module):
                 # Skip decompression block below
                 all_outer = None
 
+        # Cross-attention retrieval: position-differentiated (encoded) chunk
+        # tokens query the window of past chunk summaries.
         if all_outer is not None:
             all_outer_normed = self.norm_decompressor_kv(all_outer)
             all_chunks = self.mha_decompressor(all_normed_for_decompressor_q, all_outer_normed, all_outer_normed,
                                                attn_bias=self.decompressor_attn_bias)
             all_chunks = all_chunks + all_pre_norm
-
-        # Decoder: causal self-attention + FFN (independent per chunk).
-        # ALiBi bias carries both the causal mask (-inf) and relative positions.
-        ac = all_chunks
-        all_chunks = self.norm_mha_encoder(all_chunks)
-        all_chunks = self.mha_encoder(all_chunks, all_chunks, all_chunks,
-                                      attn_bias=self.encoder_attn_bias)
-        all_chunks = all_chunks + ac
 
         # Reconstruct output
         output_parts = []
