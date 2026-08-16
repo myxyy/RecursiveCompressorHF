@@ -54,6 +54,9 @@ def parse_args():
     p.add_argument("--retrieve-size", type=int, default=4)
     p.add_argument("--loss-positions", choices=["all", "answer"], default="all",
                    help="all=全位置CE (CKConv等の既存研究と同じ) / answer=末尾10位置のみ")
+    p.add_argument("--t-dist", choices=["uniform", "loguniform"], default="uniform",
+                   help="訓練Tのサンプリング分布。loguniformは短いTを多く出す"
+                        " (T~U[1,2028]一様ではanswer信号が薄く短T足場も出ず学習が立ち上がらない)")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--device", type=str, default=None, help="例: 0, cuda:3, cpu")
     p.add_argument("--log-interval", type=int, default=100)
@@ -136,7 +139,11 @@ def main():
     t0 = time.time()
 
     for step in range(1, args.steps + 1):
-        T = int(torch.randint(1, args.max_t + 1, (1,), generator=data_gen).item())
+        if args.t_dist == "loguniform":
+            u = torch.rand(1, generator=data_gen).item()
+            T = max(1, min(args.max_t, int(math.exp(u * math.log(args.max_t + 1)))))
+        else:
+            T = int(torch.randint(1, args.max_t + 1, (1,), generator=data_gen).item())
         input_ids, labels = make_batch(T, args.batch_size, generator=data_gen, device=device)
         if args.loss_positions == "answer":
             labels = mask_non_answer(labels)

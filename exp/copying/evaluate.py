@@ -33,7 +33,9 @@ from task import MEMORY_LEN, make_batch, score_logits  # noqa: E402
 torch.set_float32_matmul_precision("high")
 
 CHUNK_LEN = 8192          # step() feed size (memory bound per call)
-TOKEN_BUDGET = 2 ** 22    # ~4M tokens per eval batch -> auto batch sizing
+TOKEN_BUDGET = 2 ** 19    # ~0.5M tokens per eval batch -> auto batch sizing
+                          # (memory per step ~ batch x min(L, CHUNK_LEN);
+                          #  2^22 OOMed on 24GB at d_model=512)
 
 
 def parse_args():
