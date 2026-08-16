@@ -136,6 +136,11 @@ def main():
     log_f = open(log_path, "a")
     ema_loss = None
     interval_tok = interval_tok_n = interval_str = interval_str_n = 0
+    # Best-checkpoint tracking: training occasionally destabilizes for a few
+    # hundred steps (loss spikes, accuracy craters, then recovers), so the
+    # final checkpoint can land in a dip. Keep the best interval-averaged
+    # weights in model_best/ (lexicographic: string acc, token acc, -EMA loss).
+    best_score = (-1.0, -1.0, float("-inf"))
     t0 = time.time()
 
     for step in range(1, args.steps + 1):
@@ -178,6 +183,14 @@ def main():
                   f"tok_acc {tok_acc:.4f} | str_acc {str_acc:.4f} | "
                   f"lr {lr:.2e} | {elapsed:.0f}s", flush=True)
             interval_tok = interval_tok_n = interval_str = interval_str_n = 0
+
+            score = (str_acc, tok_acc, -ema_loss)
+            if score > best_score:
+                best_score = score
+                model.save_pretrained(run_dir / "model_best")
+                with open(run_dir / "best.json", "w") as f:
+                    json.dump({"step": step, "string_acc": str_acc,
+                               "token_acc": tok_acc, "ema_loss": ema_loss}, f, indent=2)
 
         if args.eval_interval and step % args.eval_interval == 0:
             accs = quick_eval(model, device, eval_ts, 64, eval_gen, autocast_dtype)

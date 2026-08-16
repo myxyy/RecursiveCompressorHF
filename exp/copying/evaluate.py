@@ -46,6 +46,8 @@ def parse_args():
     p.add_argument("--seed", type=int, default=12345)
     p.add_argument("--device", type=str, default=None)
     p.add_argument("--precision", choices=["bf16", "fp32"], default="bf16")
+    p.add_argument("--checkpoint", choices=["auto", "best", "final"], default="auto",
+                   help="auto=model_best/があればそれ、なければmodel/ (final)")
     return p.parse_args()
 
 
@@ -95,8 +97,14 @@ def main():
 
     data_dir = os.environ.get("DATA_DIR", str(REPO_ROOT / "data"))
     run_dir = Path(data_dir) / "exp" / "copying" / args.run_name
-    model_dir = run_dir / "model"
+    if args.checkpoint == "best":
+        model_dir = run_dir / "model_best"
+    elif args.checkpoint == "final":
+        model_dir = run_dir / "model"
+    else:  # auto
+        model_dir = run_dir / "model_best" if (run_dir / "model_best").exists() else run_dir / "model"
     assert model_dir.exists(), f"checkpoint not found: {model_dir}"
+    print(f"Using checkpoint: {model_dir.name}")
 
     run_config = {}
     cfg_path = run_dir / "run_config.json"
