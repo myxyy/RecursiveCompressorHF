@@ -85,6 +85,89 @@ class LogKV(nn.Module):
         v_out = torch.einsum('bls,blsd->bld', attention_weights, all_v)
         return v_out
 
+    def step(self, x, hidden=None):
+        """Sequential forward with carried state: concatenating step() outputs
+        over any split of the input reproduces forward(x) exactly (same kv
+        sets, same slot order, so identical up to float reduction order).
+
+        Per-level state: the incomplete current chunk (cur_*, < chunk_size
+        entries: the completed sub-unit summaries of the query's own block)
+        and the last completed chunk (prev_*): O(chunk_size * num_levels * d)
+        memory, i.e. logarithmic in total sequence length. Levels are created
+        on demand as chunks cascade upward (the counterpart of forward's
+        while-loop depth plus the top-remainder level).
+
+        Why this matches forward(): forward's attention only ever reads slots
+        c < j of block u (sub-units entirely before the query) and slots
+        c >= j of block u-1 (a fully completed chunk), so padded/incomplete
+        chunk compressions are never consumed — exactly the cur/prev state
+        kept here, with compression performed only when a chunk completes.
+
+        hidden: list of [cur_q, cur_k, cur_v, prev_k, prev_v] per level
+        (None to start). The caller's hidden is not mutated.
+        Returns (out, new_hidden).
+        """
+        C = self.chunk_size
+        batch_size, seq_len, d_model = x.size()
+        assert d_model == self.dim, "Input dimension must match the specified dimension"
+        q_all = self.lq(x)
+        k_all = self.lk(x)
+        v_all = self.lv(x)
+        scale = d_model ** -0.5
+
+        levels = [list(lvl) for lvl in hidden] if hidden is not None else []
+
+        def new_level():
+            e = x.new_zeros(batch_size, 0, d_model)
+            return [e, e, e, None, None]
+
+        def push(idx, q1, k1, v1):
+            if idx == len(levels):
+                levels.append(new_level())
+            lvl = levels[idx]
+            lvl[0] = torch.cat([lvl[0], q1], dim=1)
+            lvl[1] = torch.cat([lvl[1], k1], dim=1)
+            lvl[2] = torch.cat([lvl[2], v1], dim=1)
+            if lvl[0].size(1) == C:
+                # chunk complete: it becomes this level's previous block and
+                # its compression cascades to the level above
+                lvl[3], lvl[4] = lvl[1], lvl[2]
+                q_, k_, v_ = self.compressor(lvl[0], lvl[1], lvl[2])
+                e = x.new_zeros(batch_size, 0, d_model)
+                lvl[0], lvl[1], lvl[2] = e, e, e
+                push(idx + 1, q_, k_, v_)
+
+        outs = []
+        for t in range(seq_len):
+            q_t = q_all[:, t:t + 1]  # (batch_size, 1, d_model)
+
+            # Attention over the current window state (token t not yet pushed,
+            # matching forward where slot c == j falls through to prev).
+            # Slot order per level: cur[0..j-1] then prev[j..C-1] — identical
+            # to forward's slot order c = 0..C-1 with invalid slots removed.
+            k_slots, v_slots = [], []
+            for lvl in levels:
+                cur_k, cur_v, prev_k, prev_v = lvl[1], lvl[2], lvl[3], lvl[4]
+                j = cur_k.size(1)
+                if prev_k is not None:
+                    k_slots.append(torch.cat([cur_k, prev_k[:, j:]], dim=1))
+                    v_slots.append(torch.cat([cur_v, prev_v[:, j:]], dim=1))
+                elif j > 0:
+                    k_slots.append(cur_k)
+                    v_slots.append(cur_v)
+            if k_slots:
+                ks = torch.cat(k_slots, dim=1)  # (batch_size, n_slots, d_model)
+                vs = torch.cat(v_slots, dim=1)
+                logits = torch.einsum('bod,bsd->bos', q_t, ks) * scale
+                weights = torch.softmax(logits, dim=-1)
+                outs.append(torch.einsum('bos,bsd->bod', weights, vs))
+            else:
+                outs.append(torch.zeros_like(q_t))  # sequence start: no kv yet
+
+            push(0, q_t, k_all[:, t:t + 1], v_all[:, t:t + 1])
+
+        return torch.cat(outs, dim=1), levels
+
     def forward_list_list(self, q, k, v):
         chunk_size = self.chunk_size
         batch_size, seq_len, d_model = q.size()
