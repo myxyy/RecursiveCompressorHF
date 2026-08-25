@@ -39,50 +39,16 @@ class LogKV(nn.Module):
         c >= j come from the previous block u-1 (their own-block versions are
         incomplete or would contain the query's local future, so using them
         would break causality). Together they form a sliding window of the
-        last C sub-unit summaries at every scale, so each position sees
-        C * num_levels kv entries covering ~chunk_size**num_levels tokens.
-        One softmax normalizes across all levels jointly.
+        last C sub-unit summaries at every scale; the top level (the fully
+        compressed remainder) extends the receptive field to the whole
+        sequence. One softmax normalizes across all levels jointly.
+
+        step() is the single authoritative implementation (its chunked pass
+        reproduces these semantics exactly — see its docstring); forward is a
+        one-shot step() from empty state. A standalone reference
+        implementation of the semantics above lives in test_logkv.py.
         """
-        C = self.chunk_size
-        batch_size, seq_len, d_model = x.size()
-        assert d_model == self.dim, "Input dimension must match the specified dimension"
-        q = self.lq(x)  # (batch_size, seq_len, d_model)
-        k = self.lk(x)
-        v = self.lv(x)
-
-        k_list, v_list = self.forward_list_list(q, k, v)
-
-        scale = d_model ** -0.5
-        s = torch.arange(seq_len, device=x.device)
-        c_idx = torch.arange(C, device=x.device)
-
-        logits_list = []   # per level: (batch_size, seq_len, C)
-        v_slots_list = []  # per level: (batch_size, seq_len, C, d_model)
-        for i, (kc, vc) in enumerate(zip(k_list, v_list)):
-            # kc, vc: (batch_size, num_blocks_i, C, d_model)
-            sub_len = C ** i
-            unit_len = C ** (i + 1)
-            u = s // unit_len                           # (seq_len,) block index
-            j = (s % unit_len) // sub_len               # (seq_len,) sub-unit pos in block
-            use_prev = c_idx[None, :] >= j[:, None]     # (seq_len, C) slot taken from block u-1
-            blk = u[:, None] - use_prev.long()          # (seq_len, C)
-            invalid = blk < 0                           # before sequence start
-            blk = blk.clamp(min=0)
-            cexp = c_idx[None, :].expand(seq_len, C)
-            k_slots = kc[:, blk, cexp, :]               # (batch_size, seq_len, C, d_model)
-            v_slots = vc[:, blk, cexp, :]
-            logits = torch.einsum('bld,blcd->blc', q, k_slots) * scale
-            logits = logits.masked_fill(invalid[None, :, :], float('-inf'))
-            logits_list.append(logits)
-            v_slots_list.append(v_slots)
-
-        attention_logits = torch.cat(logits_list, dim=-1)        # (batch_size, seq_len, C*levels)
-        attention_weights = torch.softmax(attention_logits, dim=-1)
-        # Positions with no valid kv at all (sequence start) give an all -inf
-        # row -> NaN after softmax; treat them as zero output.
-        attention_weights = torch.nan_to_num(attention_weights)
-        all_v = torch.cat(v_slots_list, dim=2)                   # (batch_size, seq_len, C*levels, d_model)
-        v_out = torch.einsum('bls,blsd->bld', attention_weights, all_v)
+        v_out, _ = self.step(x)
         return v_out
 
     def step(self, x, hidden=None):
@@ -198,50 +164,10 @@ class LogKV(nn.Module):
         v_out = torch.einsum('bls,blsd->bld', attention_weights, all_v)
         return v_out, (levels, offset + seq_len)
 
-    def forward_list_list(self, q, k, v):
-        chunk_size = self.chunk_size
-        batch_size, seq_len, d_model = q.size()
-        assert k.size() == (batch_size, seq_len, d_model), "Key tensor shape must match query tensor shape"
-        assert v.size() == (batch_size, seq_len, d_model), "Value tensor shape must match query tensor shape"
-
-        k_list = []
-        v_list = []
-
-        while seq_len > chunk_size:
-            pad_len = (chunk_size - seq_len % chunk_size) % chunk_size
-            if pad_len > 0:
-                q = torch.cat([q, torch.zeros(batch_size, pad_len, d_model, device=q.device)], dim=1)
-                k = torch.cat([k, torch.zeros(batch_size, pad_len, d_model, device=k.device)], dim=1)
-                v = torch.cat([v, torch.zeros(batch_size, pad_len, d_model, device=v.device)], dim=1)
-            num_chunks = q.size(1) // chunk_size
-
-            k_list.append(k.reshape(batch_size, num_chunks, chunk_size, d_model))
-            v_list.append(v.reshape(batch_size, num_chunks, chunk_size, d_model))
-
-            q_, k_, v_ = self.compressor(
-                q.reshape(batch_size * num_chunks, chunk_size, d_model),
-                k.reshape(batch_size * num_chunks, chunk_size, d_model),
-                v.reshape(batch_size * num_chunks, chunk_size, d_model))
-            q_ = q_.reshape(batch_size, num_chunks, d_model)
-            k_ = k_.reshape(batch_size, num_chunks, d_model)
-            v_ = v_.reshape(batch_size, num_chunks, d_model)
-
-            q = q_
-            k = k_
-            v = v_
-            seq_len = q.size(1)
-
-        # Top level: the fully-compressed remainder (length <= chunk_size)
-        # carries the sequence's oldest/global information. Include it as a
-        # final level, padded to a single chunk, so the receptive field covers
-        # the WHOLE sequence rather than only the ~chunk_size**num_levels most
-        # recent tokens. (When the input itself is <= chunk_size this is the
-        # only level, giving short sequences plain previous-token attention.)
-        pad_len = chunk_size - seq_len
-        if pad_len > 0:
-            k = torch.cat([k, torch.zeros(batch_size, pad_len, d_model, device=k.device)], dim=1)
-            v = torch.cat([v, torch.zeros(batch_size, pad_len, d_model, device=v.device)], dim=1)
-        k_list.append(k.reshape(batch_size, 1, chunk_size, d_model))
-        v_list.append(v.reshape(batch_size, 1, chunk_size, d_model))
-
-        return k_list, v_list
+    def predict(self, x, hidden=None):
+        """Single-token inference: x is (batch_size, d_model), one token
+        without the sequence dimension (same interface as
+        RecursiveCompressorAttention.predict). Returns (out, new_hidden)
+        with out of shape (batch_size, d_model)."""
+        v_out, hidden = self.step(x.unsqueeze(1), hidden)
+        return v_out.squeeze(1), hidden
