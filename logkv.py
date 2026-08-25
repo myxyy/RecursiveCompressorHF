@@ -1,3 +1,5 @@
+import math
+
 import torch
 import torch.nn as nn
 
@@ -154,6 +156,14 @@ class LogKV(nn.Module):
             k_slots = k_ctx[:, local, :]                                 # (batch_size, seq_len, C, d_model)
             v_slots = v_ctx[:, local, :]
             logits = torch.einsum('bld,blcd->blc', q_new, k_slots) * scale
+            # Level-decay bias: a level-i slot summarizes C**i tokens, and a
+            # salient token survives attention-pooled compression undiluted,
+            # so it appears in ~log(L) slots across levels at full strength.
+            # Weighting level i by C**-i collapses those cross-level copies
+            # into a geometric series ~= one count, removing the
+            # multiplicity amplification behind topic fixation (and inducing
+            # a parameter-free ~1/distance recency prior).
+            logits = logits - i * math.log(C)
             logits = logits.masked_fill(invalid[None, :, :], float('-inf'))
             logits_list.append(logits)
             v_slots_list.append(v_slots)

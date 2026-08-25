@@ -195,6 +195,7 @@ def reference_forward(m, x):
         blk = blk.clamp(min=0)
         cexp = c_idx[None, :].expand(seq_len, C)
         logits = torch.einsum('bld,blcd->blc', q, kc[:, blk, cexp, :]) * scale
+        logits = logits - i * math.log(C)  # level-decay bias (see LogKV.step)
         logits_list.append(logits.masked_fill(invalid[None, :, :], float('-inf')))
         v_slots_list.append(vc[:, blk, cexp, :])
     weights = torch.nan_to_num(
