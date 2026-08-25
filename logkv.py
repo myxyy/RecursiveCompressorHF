@@ -171,3 +171,43 @@ class LogKV(nn.Module):
         with out of shape (batch_size, d_model)."""
         v_out, hidden = self.step(x.unsqueeze(1), hidden)
         return v_out.squeeze(1), hidden
+
+
+class FFNSwiGLU(nn.Module):
+    def __init__(self, d_model, d_ff):
+        super(FFNSwiGLU, self).__init__()
+        self.linear1 = nn.Linear(d_model, d_ff * 2)
+        self.linear2 = nn.Linear(d_ff, d_model)
+
+    def forward(self, x):
+        x_proj = self.linear1(x)
+        x_proj1, x_proj2 = x_proj.chunk(2, dim=-1)
+        x_act = torch.nn.functional.silu(x_proj1) * x_proj2
+        output = self.linear2(x_act)
+        return output
+
+
+class LogKVBlock(nn.Module):
+    """Standard pre-norm transformer block with LogKV attention:
+    x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
+
+    def __init__(self, dim, chunk_size, d_ff):
+        super(LogKVBlock, self).__init__()
+        self.attention_norm = nn.RMSNorm(dim)
+        self.attention = LogKV(dim, chunk_size)
+        self.ffn_norm = nn.RMSNorm(dim)
+        self.ffn = FFNSwiGLU(dim, d_ff)
+
+    def forward(self, x):
+        x = x + self.attention(self.attention_norm(x))
+        return x + self.ffn(self.ffn_norm(x))
+
+    def step(self, x, hidden=None):
+        y, hidden = self.attention.step(self.attention_norm(x), hidden)
+        x = x + y
+        return x + self.ffn(self.ffn_norm(x)), hidden
+
+    def predict(self, x, hidden=None):
+        y, hidden = self.attention.predict(self.attention_norm(x), hidden)
+        x = x + y
+        return x + self.ffn(self.ffn_norm(x)), hidden

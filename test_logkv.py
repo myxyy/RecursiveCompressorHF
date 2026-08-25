@@ -1,4 +1,4 @@
-"""Tests for LogKV (recursive_compressor_2): step()/forward() equivalence.
+"""Tests for LogKV (logkv.py): step()/forward() equivalence.
 
 Run: uv run pytest test_logkv.py -v
 """
@@ -8,7 +8,7 @@ import math
 import pytest
 import torch
 
-from recursive_compressor_2 import LogKV
+from logkv import LogKV
 
 
 def make(dim=32, chunk_size=4, seed=0):
