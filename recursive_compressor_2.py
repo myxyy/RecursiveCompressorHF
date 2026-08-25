@@ -29,61 +29,60 @@ class LogKV(nn.Module):
         self.compressor = Compressor()
 
     def forward(self, x):
-        chunk_size = self.chunk_size
+        """Multi-resolution causal attention over log-many kv slots.
+
+        Semantics (per level i, sub-unit = chunk_size**i tokens, block =
+        chunk_size sub-units): a query at position s, sitting in sub-unit
+        j (0..C-1) of block u, attends to C slots — the compressed kv of the
+        C sub-units immediately PRECEDING its own sub-unit. Slots c < j come
+        from the query's own block u (already-complete sub-units); slots
+        c >= j come from the previous block u-1 (their own-block versions are
+        incomplete or would contain the query's local future, so using them
+        would break causality). Together they form a sliding window of the
+        last C sub-unit summaries at every scale, so each position sees
+        C * num_levels kv entries covering ~chunk_size**num_levels tokens.
+        One softmax normalizes across all levels jointly.
+        """
+        C = self.chunk_size
         batch_size, seq_len, d_model = x.size()
         assert d_model == self.dim, "Input dimension must match the specified dimension"
-        q = self.lq(x) # (batch_size, seq_len, d_model)
+        q = self.lq(x)  # (batch_size, seq_len, d_model)
         k = self.lk(x)
         v = self.lv(x)
 
         k_list, v_list = self.forward_list_list(q, k, v)
-        attention_logits_list = []
-        for i in range(len(k_list)):
-            batch_size, comp_len, _, d_model = k_list[i].size()
-            unit_len = chunk_size ** (i+1)
-            comp_len = comp_len + 1
-            former_k = torch.cat([k_list[i], torch.zeros(batch_size, 1, chunk_size, d_model, device=k.device)], dim=1) # (batch_size, comp_len, chunk_size, d_model)
-            latter_k = torch.cat([torch.zeros(batch_size, 1, chunk_size, d_model, device=k.device), k_list[i]], dim=1) # (batch_size, comp_len, chunk_size, d_model)
-            former_kv_mask = (torch.ones(chunk_size, chunk_size, device=k.device).triu())[None, None, :, :].expand(batch_size, comp_len, -1, -1).reshape(batch_size, comp_len * chunk_size, chunk_size)
-            latter_kv_mask = 1 - former_kv_mask
-            prefix_mask = 1 - torch.ones(comp_len * chunk_size, self.chunk_size, device=k.device).triu()[None, :, :].expand(batch_size, -1, -1)
-            prefix_mask_inf = prefix_mask.masked_fill(prefix_mask == 0, float('-inf')).masked_fill(prefix_mask == 1, 0.0)
 
-            former_k_expanded = former_k.unsqueeze(2).expand(-1, -1, unit_len, -1, -1) # (batch_size, comp_len, unit_len, chunk_size, d_model)
-            latter_k_expanded = latter_k.unsqueeze(2).expand(-1, -1, unit_len, -1, -1) # (batch_size, comp_len, unit_len, chunk_size, d_model)
-            q_pad_len = comp_len * unit_len - seq_len
-            q_padded = torch.cat([q, torch.zeros(batch_size, q_pad_len, d_model, device=q.device)], dim=1) if q_pad_len > 0 else q
-            q_reshaped = q_padded.view(batch_size, comp_len, unit_len, d_model) # (batch_size, comp_len, unit_len, d_model)
-            attention_logits_former = torch.einsum('bculd,bculd->bcull', q_reshaped.unsqueeze(3), former_k_expanded) * former_kv_mask.unsqueeze(2) * (d_model ** -0.5) # (batch_size, comp_len, unit_len, chunk_size)
-            attention_logits_latter = torch.einsum('bculd,bculd->bcull', q_reshaped.unsqueeze(3), latter_k_expanded) * latter_kv_mask.unsqueeze(2) * (d_model ** -0.5) # (batch_size, comp_len, unit_len, chunk_size)
-            attention_logits = (attention_logits_former + attention_logits_latter) + prefix_mask_inf.unsqueeze(2)
-            attention_logits = attention_logits.view(batch_size, comp_len * unit_len, chunk_size) # (batch_size, comp_len * unit_len, chunk_size)
-            attention_logits = attention_logits[:, :seq_len, :]  # Remove padding if any
-            attention_logits_list.append(attention_logits)
+        scale = d_model ** -0.5
+        s = torch.arange(seq_len, device=x.device)
+        c_idx = torch.arange(C, device=x.device)
 
-        attention_logits = torch.cat(attention_logits_list, dim=-1) # (batch_size, seq_len, total_kv_len)
+        logits_list = []   # per level: (batch_size, seq_len, C)
+        v_slots_list = []  # per level: (batch_size, seq_len, C, d_model)
+        for i, (kc, vc) in enumerate(zip(k_list, v_list)):
+            # kc, vc: (batch_size, num_blocks_i, C, d_model)
+            sub_len = C ** i
+            unit_len = C ** (i + 1)
+            u = s // unit_len                           # (seq_len,) block index
+            j = (s % unit_len) // sub_len               # (seq_len,) sub-unit pos in block
+            use_prev = c_idx[None, :] >= j[:, None]     # (seq_len, C) slot taken from block u-1
+            blk = u[:, None] - use_prev.long()          # (seq_len, C)
+            invalid = blk < 0                           # before sequence start
+            blk = blk.clamp(min=0)
+            cexp = c_idx[None, :].expand(seq_len, C)
+            k_slots = kc[:, blk, cexp, :]               # (batch_size, seq_len, C, d_model)
+            v_slots = vc[:, blk, cexp, :]
+            logits = torch.einsum('bld,blcd->blc', q, k_slots) * scale
+            logits = logits.masked_fill(invalid[None, :, :], float('-inf'))
+            logits_list.append(logits)
+            v_slots_list.append(v_slots)
+
+        attention_logits = torch.cat(logits_list, dim=-1)        # (batch_size, seq_len, C*levels)
         attention_weights = torch.softmax(attention_logits, dim=-1)
-        # split attention weights into total_kv_len // chunk_size parts
-        attention_weights_list = torch.split(attention_weights, chunk_size, dim=-1)
-
-        v_out_list = []
-
-        for i in range(len(attention_weights_list)):
-            attention_weight = attention_weights_list[i] # (batch_size, seq_len, chunk_size)
-            former_v = torch.cat([v_list[i], torch.zeros(batch_size, 1, chunk_size, d_model, device=v.device)], dim=1) # (batch_size, comp_len, chunk_size, d_model)
-            latter_v = torch.cat([torch.zeros(batch_size, 1, chunk_size, d_model, device=v.device), v_list[i]], dim=1) # (batch_size, comp_len, chunk_size, d_model)
-            former_v_expanded = former_v.unsqueeze(2).expand(-1, -1, unit_len, -1, -1) # (batch_size, comp_len, unit_len, chunk_size, d_model)
-            latter_v_expanded = latter_v.unsqueeze(2).expand(-1, -1, unit_len, -1, -1) # (batch_size, comp_len, unit_len, chunk_size, d_model)
-            former_kv_mask = (torch.ones(chunk_size, chunk_size, device=k.device).triu())[None, None, :, :].expand(batch_size, comp_len, -1, -1).reshape(batch_size, comp_len * chunk_size, chunk_size)
-            latter_kv_mask = 1 - former_kv_mask
-            attention_weights_former = attention_weight * former_kv_mask[:, :seq_len, :]
-            attention_weights_latter = attention_weight * latter_kv_mask[:, :seq_len, :]
-            former_v_out = torch.einsum('bsl,bsld->bsd', attention_weights_former, former_v_expanded.view(batch_size, comp_len * unit_len, chunk_size, d_model)[:, :seq_len, :, :]) # (batch_size, seq_len, d_model)
-            latter_v_out = torch.einsum('bsl,bsld->bsd', attention_weights_latter, latter_v_expanded.view(batch_size, comp_len * unit_len, chunk_size, d_model)[:, :seq_len, :, :]) # (batch_size, seq_len, d_model)
-            v_out = former_v_out + latter_v_out # (batch_size, seq_len, d_model)
-            v_out_list.append(v_out)
-
-        v_out = torch.stack(v_out_list, dim=0).sum(dim=0) # (batch_size, seq_len, d_model)
+        # Positions with no valid kv at all (sequence start) give an all -inf
+        # row -> NaN after softmax; treat them as zero output.
+        attention_weights = torch.nan_to_num(attention_weights)
+        all_v = torch.cat(v_slots_list, dim=2)                   # (batch_size, seq_len, C*levels, d_model)
+        v_out = torch.einsum('bls,blsd->bld', attention_weights, all_v)
         return v_out
 
     def forward_list_list(self, q, k, v):
@@ -118,5 +117,18 @@ class LogKV(nn.Module):
             k = k_
             v = v_
             seq_len = q.size(1)
+
+        # Top level: the fully-compressed remainder (length <= chunk_size)
+        # carries the sequence's oldest/global information. Include it as a
+        # final level, padded to a single chunk, so the receptive field covers
+        # the WHOLE sequence rather than only the ~chunk_size**num_levels most
+        # recent tokens. (When the input itself is <= chunk_size this is the
+        # only level, giving short sequences plain previous-token attention.)
+        pad_len = chunk_size - seq_len
+        if pad_len > 0:
+            k = torch.cat([k, torch.zeros(batch_size, pad_len, d_model, device=k.device)], dim=1)
+            v = torch.cat([v, torch.zeros(batch_size, pad_len, d_model, device=v.device)], dim=1)
+        k_list.append(k.reshape(batch_size, 1, chunk_size, d_model))
+        v_list.append(v.reshape(batch_size, 1, chunk_size, d_model))
 
         return k_list, v_list
