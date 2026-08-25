@@ -73,10 +73,13 @@ def test_hidden_not_mutated():
     x2 = torch.randn(2, 7, 32)
     with torch.no_grad():
         _, h = m.step(x1, None)
-        snapshot = [[t.clone() if torch.is_tensor(t) else t for t in lvl] for lvl in h]
+        levels, offset = h
+        snapshot = [[t.clone() if torch.is_tensor(t) else t for t in lvl]
+                    for lvl in levels]
         ya, _ = m.step(x2, h)
         # h must be unchanged
-        for lvl, snap in zip(h, snapshot):
+        assert h[1] == offset
+        for lvl, snap in zip(h[0], snapshot):
             for t, s in zip(lvl, snap):
                 if torch.is_tensor(t):
                     assert torch.equal(t, s)
@@ -91,11 +94,12 @@ def test_state_size_logarithmic():
     m = make(chunk_size=4)
     for L in [16, 64, 256, 1024]:
         with torch.no_grad():
-            _, h = m.step(torch.randn(1, L, 32), None)
+            _, (levels, offset) = m.step(torch.randn(1, L, 32), None)
+        assert offset == L
         expected_max = math.ceil(math.log(L, 4)) + 1
-        assert len(h) <= expected_max, (L, len(h), expected_max)
+        assert len(levels) <= expected_max, (L, len(levels), expected_max)
         # each level holds < C current entries and at most one C-sized prev chunk
-        for lvl in h:
+        for lvl in levels:
             assert lvl[0].size(1) < 4
             if lvl[3] is not None:
                 assert lvl[3].size(1) == 4
@@ -110,3 +114,21 @@ def test_step_causal_matches_incremental_prefix():
         _, h = m.step(x[:, :23], None)
         y_tail, _ = m.step(x[:, 23:], h)
     torch.testing.assert_close(y_tail, y_full[:, 23:], atol=1e-5, rtol=1e-4)
+
+
+@pytest.mark.parametrize("chunk_size", [2, 4])
+def test_chunked_step_large_awkward_splits(chunk_size):
+    """大きめ系列を境界非整列な塊で処理してもforwardと一致する"""
+    m = make(chunk_size=chunk_size)
+    x = torch.randn(1, 500, 32)
+    with torch.no_grad():
+        y_fwd = m(x)
+        hidden = None
+        parts = []
+        pos = 0
+        for n in [7, 130, 1, 64, 255, 43]:
+            y, hidden = m.step(x[:, pos:pos + n], hidden)
+            parts.append(y)
+            pos += n
+        y_step = torch.cat(parts, dim=1)
+    torch.testing.assert_close(y_step, y_fwd, atol=1e-5, rtol=1e-4)
