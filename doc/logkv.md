@@ -250,17 +250,38 @@ loss が 0.07 高い点は recency prior による長距離参照のハンディ
   反復耐性を損なわない。残る語レベル反復は小規模 LM 一般の性質で、repetition penalty や
   temperature で制御する領域
 
-## 6. 未解決・今後の候補
+## 6. 実験 3: Copying タスク（長距離検索・長さ外挿）
 
-- **長距離検索の回帰確認**: レベル減衰は遠い内容の参照に log d のロジット逆風を課す。
-  `exp/copying` / `exp/selective-copying` を LogKVLM 対応にして長 T の string accuracy
-  を測る（旧アーキでは T≈25k まで外挿できていた）
+`exp/copying/train.py --arch logkv`（run `logkv-d512-logu`: d512・2 層・8 ヘッド・5.26M、
+50k step、T~loguniform[1,2028]）。詳細は
+[instruction-for-claude/copying-task.md](instruction-for-claude/copying-task.md) 末尾。
+
+| T | 旧アーキ conv+sink (11M) | LogKV (5.26M) |
+|---|---|---|
+| ≤2028 | str ≈1.00 | str 0.86–0.98（T=1 のみ 0.13） |
+| 3k–16k | str 0.83–0.99 | str 0.73–0.89 |
+| 24576 | str 0.84 | str 0.30 |
+| 32k–65k | str 0.17–0.20 / tok 0.82–0.85 | str 0.28–0.42 / tok 0.87–0.91 |
+| 131072 | tok 0.27 | tok 0.67 |
+
+- 位置埋め込み・conv・sink・retrieve 窓なしで、階層窓の因果構造だけから順序を復元し
+  8 倍外挿まで str 0.73–0.89。旧アーキのような崖がなく、64 倍でも tok 0.67（bag 最適
+  0.41 超 = 部分的に順序保持）
+- 24k 以降の plateau（str ≈0.3）は旧アーキより低い。レベル減衰の log d 逆風か、圧縮
+  サブユニットの粒度（10 桁が 16k トークン圧縮 1 本に埋まる）が候補。C の累乗境界で
+  非単調
+- T=1 で答え位置 7・8 の隣接桁取り違え（blank ゼロの特殊配置での相対位置推定ずれ）
+
+## 7. 未解決・今後の候補
+
+- Copying の 24k 以降 plateau の要因分解（レベル減衰の有無 / 係数、訓練延長）と T=1 異常の
+  原因調査。Selective Copying（`exp/selective-copying` ランチャーはそのまま使える）
 - **長期訓練での執着再発確認**: 8H 減衰版を 20000 ステップ程度まで回し、1024 トークン
   生成の反復指標を再実施（temperature 0.7 / 1.0 の両方で）
 - 減衰係数の可変化: `−i·β`（β を per-layer 学習、init log C）は必要になれば容易
 - 残る反復（リスト様式・空白連続）への repetition penalty 適用と chat_server 対応
 
-## 7. コマンド
+## 8. コマンド
 
 ```bash
 uv run pytest test_logkv.py test_logkv_lm.py -v
