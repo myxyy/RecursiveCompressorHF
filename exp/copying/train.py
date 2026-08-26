@@ -29,7 +29,9 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from configuration_logkv import LogKVConfig  # noqa: E402
 from configuration_recursive_compressor import RecursiveCompressorConfig  # noqa: E402
+from logkv_lm import LogKVLM  # noqa: E402
 from recursive_compressor_lm import RecursiveCompressorLM  # noqa: E402
 from task import TASK_NAME, VOCAB_SIZE, make_batch, mask_non_answer, score_logits  # noqa: E402
 
@@ -39,6 +41,9 @@ torch.set_float32_matmul_precision("high")
 def parse_args():
     p = argparse.ArgumentParser(description="Copy task training")
     p.add_argument("--run-name", type=str, required=True)
+    p.add_argument("--arch", choices=["recursive", "logkv"], default="recursive",
+                   help="recursive=RecursiveCompressorLM / logkv=LogKVLM "
+                        "(compress-size/retrieve-sizeはlogkvでは無視)")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -121,18 +126,30 @@ def main():
 
     torch.manual_seed(args.seed)
 
-    config = RecursiveCompressorConfig(
-        vocab_size=VOCAB_SIZE,
-        d_model=args.d_model,
-        num_heads=args.num_heads,
-        d_ff=args.d_ff,
-        chunk_size=args.chunk_size,
-        compress_size=args.compress_size,
-        retrieve_size=args.retrieve_size,
-        num_layers=args.num_layers,
-        pad_token_id=None, bos_token_id=None, eos_token_id=None,
-    )
-    model = RecursiveCompressorLM(config).to(device)
+    if args.arch == "logkv":
+        config = LogKVConfig(
+            vocab_size=VOCAB_SIZE,
+            d_model=args.d_model,
+            num_heads=args.num_heads,
+            d_ff=args.d_ff,
+            chunk_size=args.chunk_size,
+            num_layers=args.num_layers,
+            pad_token_id=None, bos_token_id=None, eos_token_id=None,
+        )
+        model = LogKVLM(config).to(device)
+    else:
+        config = RecursiveCompressorConfig(
+            vocab_size=VOCAB_SIZE,
+            d_model=args.d_model,
+            num_heads=args.num_heads,
+            d_ff=args.d_ff,
+            chunk_size=args.chunk_size,
+            compress_size=args.compress_size,
+            retrieve_size=args.retrieve_size,
+            num_layers=args.num_layers,
+            pad_token_id=None, bos_token_id=None, eos_token_id=None,
+        )
+        model = RecursiveCompressorLM(config).to(device)
     model.train()
     num_params = sum(p.numel() for p in model.parameters())
 
@@ -143,7 +160,7 @@ def main():
     with open(run_dir / "run_config.json", "w") as f:
         json.dump(run_config, f, indent=2)
 
-    print(f"Copy task training: {num_params:,} params on {device}, "
+    print(f"Copy task training ({args.arch}): {num_params:,} params on {device}, "
           f"T~U[1,{args.max_t}], {args.steps} steps, loss={args.loss_positions}")
     print(f"Run dir: {run_dir}")
 

@@ -27,6 +27,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
+from logkv_lm import LogKVLM  # noqa: E402
 from recursive_compressor_lm import RecursiveCompressorLM  # noqa: E402
 from task import MEMORY_LEN, TASK_NAME, make_batch, score_logits  # noqa: E402
 
@@ -113,7 +114,9 @@ def main():
     train_max_t = run_config.get("max_t")
 
     dtype = torch.bfloat16 if args.precision == "bf16" else torch.float32
-    model = RecursiveCompressorLM.from_pretrained(model_dir).to(device=device, dtype=dtype)
+    model_type = json.loads((model_dir / "config.json").read_text()).get("model_type")
+    model_cls = LogKVLM if model_type == "logkv" else RecursiveCompressorLM
+    model = model_cls.from_pretrained(model_dir).to(device=device, dtype=dtype)
     model.eval()
     autocast_enabled = device.type == "cuda" and args.precision == "bf16"
 
