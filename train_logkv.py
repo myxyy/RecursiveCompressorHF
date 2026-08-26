@@ -57,6 +57,7 @@ def parse_args():
                    choices=["pretrain", "instruct"])
     p.add_argument("--context-length", type=int, default=2048)
     p.add_argument("--d-model", type=int, default=1024)
+    p.add_argument("--num-heads", type=int, default=8)
     p.add_argument("--d-ff", type=int, default=3072)
     p.add_argument("--chunk-size", type=int, default=4)
     p.add_argument("--num-layers", type=int, default=16)
@@ -205,6 +206,7 @@ def main():
     config = LogKVConfig(
         vocab_size=tokenizer.vocab_size,
         d_model=args.d_model,
+        num_heads=args.num_heads,
         d_ff=args.d_ff,
         chunk_size=args.chunk_size,
         num_layers=args.num_layers,
@@ -233,7 +235,7 @@ def main():
         model = LogKVLM(config).to(device)
     model.train()
     num_params = sum(p.numel() for p in model.parameters())
-    log(f"LogKVLM: {num_params:,} params | d_model={args.d_model} d_ff={args.d_ff} "
+    log(f"LogKVLM: {num_params:,} params | d_model={args.d_model} heads={args.num_heads} d_ff={args.d_ff} "
         f"layers={args.num_layers} chunk={args.chunk_size} ctx={args.context_length}")
     log(f"world={world_size} batch/GPU={args.batch_size} accum={args.grad_accum} "
         f"-> effective batch {world_size * args.batch_size * args.grad_accum}")

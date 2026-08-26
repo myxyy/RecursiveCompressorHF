@@ -11,16 +11,17 @@ import torch
 from logkv import LogKV
 
 
-def make(dim=32, chunk_size=4, seed=0):
+def make(dim=32, chunk_size=4, seed=0, num_heads=4):
     torch.manual_seed(seed)
-    return LogKV(dim=dim, chunk_size=chunk_size).eval()
+    return LogKV(dim=dim, chunk_size=chunk_size, num_heads=num_heads).eval()
 
 
+@pytest.mark.parametrize("num_heads", [1, 4])
 @pytest.mark.parametrize("chunk_size", [2, 4])
 @pytest.mark.parametrize("seq_len", [1, 3, 4, 5, 16, 17, 64, 100, 257])
-def test_step_full_equals_forward(chunk_size, seq_len):
+def test_step_full_equals_forward(chunk_size, seq_len, num_heads):
     """一括step(hidden=None)がforwardと一致する"""
-    m = make(chunk_size=chunk_size)
+    m = make(chunk_size=chunk_size, num_heads=num_heads)
     x = torch.randn(2, seq_len, 32)
     with torch.no_grad():
         y_fwd = m(x)
@@ -142,11 +143,23 @@ def test_chunked_step_large_awkward_splits(chunk_size):
 # ---------------------------------------------------------------------------
 
 def reference_forward(m, x):
+    """Multi-head wrapper: fold heads into batch, run the single-head
+    reference core per head, merge, output-project."""
+    batch_size, seq_len, dim = x.size()
+    H, dh = m.num_heads, m.head_dim
+
+    def split(t):
+        return t.view(batch_size, seq_len, H, dh).transpose(1, 2).reshape(batch_size * H, seq_len, dh)
+
+    out = _reference_core(m, split(m.lq(x)), split(m.lk(x)), split(m.lv(x)))
+    out = out.view(batch_size, H, seq_len, dh).transpose(1, 2).reshape(batch_size, seq_len, dim)
+    return m.lo(out)
+
+
+def _reference_core(m, q, k, v):
     C = m.chunk_size
-    batch_size, seq_len, d_model = x.size()
-    q = m.lq(x)
-    k = m.lk(x)
-    v = m.lv(x)
+    batch_size, seq_len, d_model = q.size()
+    x = q
 
     # build per-level kv chunks by recursive compression
     k_list, v_list = [], []
@@ -204,11 +217,12 @@ def reference_forward(m, x):
     return torch.einsum('bls,blsd->bld', weights, all_v)
 
 
+@pytest.mark.parametrize("num_heads", [1, 4])
 @pytest.mark.parametrize("chunk_size", [2, 4])
 @pytest.mark.parametrize("seq_len", [1, 3, 4, 5, 16, 17, 64, 100, 257])
-def test_forward_matches_reference(chunk_size, seq_len):
+def test_forward_matches_reference(chunk_size, seq_len, num_heads):
     """forward(=step委譲)が独立参照実装と一致する"""
-    m = make(chunk_size=chunk_size)
+    m = make(chunk_size=chunk_size, num_heads=num_heads)
     x = torch.randn(2, seq_len, 32)
     with torch.no_grad():
         y = m(x)
@@ -216,9 +230,10 @@ def test_forward_matches_reference(chunk_size, seq_len):
     torch.testing.assert_close(y, y_ref, atol=1e-5, rtol=1e-4)
 
 
-def test_forward_matches_reference_fp64_exact():
+@pytest.mark.parametrize("num_heads", [1, 4])
+def test_forward_matches_reference_fp64_exact(num_heads):
     """fp64で参照実装と機械精度一致(kv集合・スロット順が厳密同一)"""
-    m = make().double()
+    m = make(num_heads=num_heads).double()
     x = torch.randn(1, 257, 32, dtype=torch.float64)
     with torch.no_grad():
         d = (m(x) - reference_forward(m, x)).abs().max().item()
@@ -275,3 +290,20 @@ def test_predict_continues_from_step_prefix():
             outs.append(y.unsqueeze(1))
     torch.testing.assert_close(torch.cat(outs, dim=1), y_fwd[:, 50:],
                                atol=1e-5, rtol=1e-4)
+
+
+def test_heads_are_independent():
+    """ヘッドごとに独立した階層・attentionになっている
+    (ヘッドhの出力は他ヘッドのk/v射影の摂動に影響されない)"""
+    m = make(num_heads=4)
+    x = torch.randn(1, 40, 32)
+    with torch.no_grad():
+        ref = m._attend(m._split_heads(m.lq(x)), m._split_heads(m.lk(x)),
+                        m._split_heads(m.lv(x)), None)[0]           # (H, L, dh)
+        k = m._split_heads(m.lk(x)).clone()
+        v = m._split_heads(m.lv(x)).clone()
+        k[1:] += 1.0
+        v[1:] += 1.0                                                # perturb heads 1..3
+        out = m._attend(m._split_heads(m.lq(x)), k, v, None)[0]
+    assert torch.equal(out[0], ref[0])
+    assert not torch.allclose(out[1], ref[1])

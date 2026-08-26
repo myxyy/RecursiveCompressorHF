@@ -8,12 +8,14 @@ class LogKVConfig(PretrainedConfig):
     attribute_map = {
         "num_hidden_layers": "num_layers",
         "hidden_size": "d_model",
+        "num_attention_heads": "num_heads",
     }
 
     def __init__(
         self,
         vocab_size=32000,
         d_model=1024,
+        num_heads=8,
         d_ff=2048,
         chunk_size=4,
         num_layers=8,
@@ -23,6 +25,7 @@ class LogKVConfig(PretrainedConfig):
         **kwargs,
     ):
         self.d_model = d_model
+        self.num_heads = num_heads
         self.d_ff = d_ff
         self.chunk_size = chunk_size
         self.num_layers = num_layers

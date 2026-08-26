@@ -21,14 +21,31 @@ class Compressor(nn.Module):
         return q_out, k_out, v_out
 
 class LogKV(nn.Module):
-    def __init__(self, dim, chunk_size):
+    def __init__(self, dim, chunk_size, num_heads=1):
         super(LogKV, self).__init__()
+        assert dim % num_heads == 0, "dim must be divisible by num_heads"
         self.dim = dim
         self.chunk_size = chunk_size
+        self.num_heads = num_heads
+        self.head_dim = dim // num_heads
         self.lq = nn.Linear(dim, dim, bias=False)
         self.lk = nn.Linear(dim, dim, bias=False)
         self.lv = nn.Linear(dim, dim, bias=False)
+        self.lo = nn.Linear(dim, dim, bias=False)
         self.compressor = Compressor()
+
+    def _split_heads(self, t):
+        """(B, L, dim) -> (B*H, L, head_dim): heads folded into the batch
+        dimension so the hierarchy/attention core runs per head unchanged."""
+        batch_size, seq_len, _ = t.size()
+        t = t.view(batch_size, seq_len, self.num_heads, self.head_dim)
+        return t.transpose(1, 2).reshape(batch_size * self.num_heads, seq_len, self.head_dim)
+
+    def _merge_heads(self, t, batch_size):
+        """(B*H, L, head_dim) -> (B, L, dim)"""
+        seq_len = t.size(1)
+        t = t.view(batch_size, self.num_heads, seq_len, self.head_dim)
+        return t.transpose(1, 2).reshape(batch_size, seq_len, self.dim)
 
     def forward(self, x):
         """Multi-resolution causal attention over log-many kv slots.
@@ -74,16 +91,25 @@ class LogKV(nn.Module):
           [prev, cur, entries completed this call] covers every access.
 
         hidden: (levels, offset) — levels[i] = [cur_q, cur_k, cur_v,
-        prev_k, prev_v] (incomplete current chunk + last completed chunk),
+        prev_k, prev_v] (incomplete current chunk + last completed chunk;
+        heads are folded into the batch dimension, i.e. batch B*H),
         offset = number of tokens processed so far. The caller's hidden is
         not mutated. Returns (out, new_hidden).
         """
-        C = self.chunk_size
         batch_size, seq_len, d_model = x.size()
         assert d_model == self.dim, "Input dimension must match the specified dimension"
-        q_new = self.lq(x)
-        k_new = self.lk(x)
-        v_new = self.lv(x)
+        q_new = self._split_heads(self.lq(x))
+        k_new = self._split_heads(self.lk(x))
+        v_new = self._split_heads(self.lv(x))
+        v_out, hidden = self._attend(q_new, k_new, v_new, hidden)
+        return self.lo(self._merge_heads(v_out, batch_size)), hidden
+
+    def _attend(self, q_new, k_new, v_new, hidden):
+        """Hierarchy update + windowed attention on projected, head-folded
+        (B*H, L, head_dim) tensors. See step() for the semantics."""
+        C = self.chunk_size
+        batch_size, seq_len, d_model = q_new.size()
+        x = q_new  # for dtype/device
         scale = d_model ** -0.5
 
         if hidden is None:
@@ -143,7 +169,7 @@ class LogKV(nn.Module):
 
         # ---- (B) attention for all queries of the segment at once ----
         if not ctxs:
-            return torch.zeros_like(x), (levels, offset + seq_len)
+            return torch.zeros_like(q_new), (levels, offset + seq_len)
 
         s_abs = offset + torch.arange(seq_len, device=x.device)  # (seq_len,)
         c_idx = torch.arange(C, device=x.device)
@@ -201,10 +227,10 @@ class LogKVBlock(nn.Module):
     """Standard pre-norm transformer block with LogKV attention:
     x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
 
-    def __init__(self, dim, chunk_size, d_ff):
+    def __init__(self, dim, chunk_size, d_ff, num_heads=1):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
-        self.attention = LogKV(dim, chunk_size)
+        self.attention = LogKV(dim, chunk_size, num_heads)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 

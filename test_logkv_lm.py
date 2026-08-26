@@ -16,6 +16,7 @@ def config():
     return LogKVConfig(
         vocab_size=32,
         d_model=16,
+        num_heads=4,
         d_ff=32,
         chunk_size=4,
         num_layers=2,
@@ -33,7 +34,7 @@ class TestLogKVBlock:
     def test_forward_step_predict_equivalence_fp64(self):
         """block単位でもforward/step/predictが機械精度一致する"""
         torch.manual_seed(0)
-        block = LogKVBlock(16, 4, 32).double().eval()
+        block = LogKVBlock(16, 4, 32, num_heads=4).double().eval()
         x = torch.randn(2, 50, 16, dtype=torch.float64)
         with torch.no_grad():
             y_fwd = block(x)
@@ -48,7 +49,7 @@ class TestLogKVBlock:
 
     def test_backward(self):
         torch.manual_seed(0)
-        block = LogKVBlock(16, 4, 32)
+        block = LogKVBlock(16, 4, 32, num_heads=4)
         x = torch.randn(2, 30, 16, requires_grad=True)
         block(x).sum().backward()
         assert torch.isfinite(x.grad).all()
