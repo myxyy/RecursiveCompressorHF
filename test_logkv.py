@@ -307,3 +307,23 @@ def test_heads_are_independent():
         out = m._attend(m._split_heads(m.lq(x)), k, v, None)[0]
     assert torch.equal(out[0], ref[0])
     assert not torch.allclose(out[1], ref[1])
+
+
+def test_recompute_attention_matches_stored():
+    """activation checkpoint経路(訓練時)と非checkpoint経路で出力・勾配が一致"""
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4).double()
+    x = torch.randn(2, 100, 32, dtype=torch.float64, requires_grad=True)
+    outs, grads = [], []
+    for flag in [True, False]:
+        m.recompute_attention = flag
+        m.zero_grad()
+        x.grad = None
+        y = m(x)
+        y.square().sum().backward()
+        outs.append(y.detach().clone())
+        grads.append([x.grad.clone()] + [p.grad.clone() for p in m.parameters()])
+    assert torch.equal(outs[0], outs[1])
+    for g0, g1 in zip(grads[0], grads[1]):
+        assert torch.equal(g0, g1)
+    m.recompute_attention = True

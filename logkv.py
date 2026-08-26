@@ -2,6 +2,7 @@ import math
 
 import torch
 import torch.nn as nn
+from torch.utils.checkpoint import checkpoint
 
 class Compressor(nn.Module):
     def __init__(self):
@@ -33,6 +34,12 @@ class LogKV(nn.Module):
         self.lv = nn.Linear(dim, dim, bias=False)
         self.lo = nn.Linear(dim, dim, bias=False)
         self.compressor = Compressor()
+        # Recompute each level's slot gather + partial softmax in backward
+        # (activation checkpointing) instead of storing the gathered
+        # (B*H, L, C, head_dim) slot tensors for every level — the dominant
+        # VRAM term. Numerically identical to storing them; costs one extra
+        # gather/einsum per level in backward. Inference is unaffected.
+        self.recompute_attention = True
 
     def _split_heads(self, t):
         """(B, L, dim) -> (B*H, L, head_dim): heads folded into the batch
@@ -173,15 +180,38 @@ class LogKV(nn.Module):
 
         s_abs = offset + torch.arange(seq_len, device=x.device)  # (seq_len,)
         c_idx = torch.arange(C, device=x.device)
-        logits_list, v_slots_list = [], []
+        k_ctxs, v_ctxs, locals_, invalids = [], [], [], []
         for i, (base, k_ctx, v_ctx) in enumerate(ctxs):
             q_sub = s_abs // (C ** i)                                    # (seq_len,)
             a = q_sub[:, None] - C + ((c_idx[None, :] - q_sub[:, None]) % C)  # (seq_len, C)
-            invalid = a < 0
-            local = (a - base).clamp(min=0, max=max(k_ctx.size(1) - 1, 0))
-            k_slots = k_ctx[:, local, :]                                 # (batch_size, seq_len, C, d_model)
-            v_slots = v_ctx[:, local, :]
-            logits = torch.einsum('bld,blcd->blc', q_new, k_slots) * scale
+            k_ctxs.append(k_ctx)
+            v_ctxs.append(v_ctx)
+            locals_.append((a - base).clamp(min=0, max=max(k_ctx.size(1) - 1, 0)))
+            invalids.append(a < 0)
+        n_levels = len(ctxs)
+        flat = (*k_ctxs, *v_ctxs, *locals_, *invalids)
+        # The whole attention pass is one checkpoint region: autograd keeps
+        # only its inputs (per-level contexts, ~1.33*L*d total) and output,
+        # and recomputes gathers / partial softmaxes in backward.
+        if self.recompute_attention and torch.is_grad_enabled() and q_new.requires_grad:
+            v_out = checkpoint(self._attend_levels, q_new, n_levels, scale, *flat,
+                               use_reentrant=False)
+        else:
+            v_out = self._attend_levels(q_new, n_levels, scale, *flat)
+        return v_out, (levels, offset + seq_len)
+
+    def _attend_levels(self, q, n_levels, scale, *flat):
+        """Online softmax over levels: each level contributes its slot-local
+        max m_i, denominator l_i and value numerator acc_i (relative to
+        m_i); these are merged with the standard rescaling so the result
+        equals one joint softmax over the concatenated slots of all levels —
+        without ever materializing the (B*H, L, C*levels, head_dim)
+        concatenation."""
+        C = self.chunk_size
+        k_ctxs, v_ctxs = flat[:n_levels], flat[n_levels:2 * n_levels]
+        locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:]
+        m = l = acc = None
+        for i in range(n_levels):
             # Level-decay bias: a level-i slot summarizes C**i tokens, and a
             # salient token survives attention-pooled compression undiluted,
             # so it appears in ~log(L) slots across levels at full strength.
@@ -189,16 +219,43 @@ class LogKV(nn.Module):
             # into a geometric series ~= one count, removing the
             # multiplicity amplification behind topic fixation (and inducing
             # a parameter-free ~1/distance recency prior).
-            logits = logits - i * math.log(C)
-            logits = logits.masked_fill(invalid[None, :, :], float('-inf'))
-            logits_list.append(logits)
-            v_slots_list.append(v_slots)
+            level_bias = -i * math.log(C)
+            m_i, l_i, acc_i = self._level_attention(
+                q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
+            if m is None:
+                m, l, acc = m_i, l_i, acc_i
+            else:
+                m_new = torch.maximum(m, m_i)
+                # rows with no valid slot so far have m_new = -inf; any finite
+                # reference works for them since their contributions are 0
+                m_ref = torch.where(m_new == float('-inf'), torch.zeros_like(m_new), m_new)
+                alpha = torch.exp(m - m_ref)
+                beta = torch.exp(m_i - m_ref)
+                l = l * alpha + l_i * beta
+                acc = acc * alpha[..., None] + acc_i * beta[..., None]
+                m = m_new
+        # positions with no valid kv at all (sequence start) -> zero output
+        l_safe = torch.where(l > 0, l, torch.ones_like(l))
+        return (acc / l_safe[..., None]).to(q.dtype)
 
-        attention_logits = torch.cat(logits_list, dim=-1)
-        attention_weights = torch.nan_to_num(torch.softmax(attention_logits, dim=-1))
-        all_v = torch.cat(v_slots_list, dim=2)
-        v_out = torch.einsum('bls,blsd->bld', attention_weights, all_v)
-        return v_out, (levels, offset + seq_len)
+    @staticmethod
+    def _level_attention(q, k_ctx, v_ctx, local, invalid, level_bias, scale):
+        """One level's slot gather + partial softmax statistics.
+        Returns (m, l, acc): per-row max logit (-inf if no valid slot),
+        sum of exp(logit - m), and sum of exp(logit - m) * v."""
+        k_slots = k_ctx[:, local, :]                                 # (B*H, L, C, head_dim)
+        v_slots = v_ctx[:, local, :]
+        logits = torch.einsum('bld,blcd->blc', q, k_slots) * scale + level_bias
+        logits = logits.masked_fill(invalid[None, :, :], float('-inf'))
+        # accumulate softmax statistics in >= fp32 (fp32 under bf16 autocast,
+        # fp64 for fp64 inputs)
+        acc_dtype = torch.promote_types(logits.dtype, torch.float32)
+        m = logits.max(dim=-1).values.to(acc_dtype)                  # (B*H, L)
+        m_safe = torch.where(m == float('-inf'), torch.zeros_like(m), m)
+        p = torch.exp(logits.to(acc_dtype) - m_safe[..., None])
+        l = p.sum(dim=-1)
+        acc = torch.einsum('blc,blcd->bld', p, v_slots).to(acc_dtype)
+        return m, l, acc
 
     def predict(self, x, hidden=None):
         """Single-token inference: x is (batch_size, d_model), one token

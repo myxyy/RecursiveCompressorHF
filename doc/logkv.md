@@ -92,7 +92,32 @@ all-PAD ラベルの NaN ガード、HF `generate()` 用に per-layer hidden を
 として opaque に持ち回り、Cache ラップ無効化）。greedy `generate()` が step+argmax の
 逐次生成と完全一致することをテストしている。
 
-### 3.4 訓練インフラ
+### 3.4 online softmax と attention の再計算（VRAM 削減）
+
+`_attend_levels` はレベルごとに `(m_i, l_i, acc_i)`（スロット内最大ロジット・分母・value
+の分子）を計算し、標準の再スケーリングで逐次マージする **online softmax**。全レベルの
+slot を連結した `(B·H, L, C·levels, d_head)` テンソルを作らない。さらに attention 部全体を
+`torch.utils.checkpoint`（非 reentrant）の 1 領域にし、autograd が保持するのは各レベルの
+ctx（合計 ≈1.33 L·d）と出力だけで、gather と部分 softmax は逆伝播時に再計算する
+（`LogKV.recompute_attention`、推論時は無効）。
+
+設計上の注意点:
+
+- online softmax の統計量は `promote_types(logits.dtype, fp32)` で累積（bf16 autocast 下は
+  fp32、fp64 入力は fp64）。有効スロットのない行は `m = −inf` のまま持ち、マージの基準値
+  だけ 0 に差し替える（0 の寄与に任意の基準値を使うのは安全だが、空レベルに 0 を
+  そのまま使うと有限ロジット行の基準が狂いアンダーフローする）
+- レベル単位の checkpoint では fp32 の部分和 `acc_i` とマージ中間 `(L, d)` が外側に残り
+  削減が 15.9→13.0 GiB に留まった。**attention 部全体を 1 領域** にして 10.2 GiB
+- 数値影響: fp64 で参照実装と機械精度一致、checkpoint 経路と非 checkpoint 経路は出力・
+  勾配ともビット一致。実データ 8 サンプル × 2047 トークン（8H checkpoint-5000）で
+  fp32 同士の logits 平均差 1.6e-6（loss 差 6e-8）。bf16 では fp32 真値からの距離が
+  旧 9.02e-3 / 新 8.99e-3 と同等（loss 差 2.05e-4 vs 1.61e-4）で、新旧の bf16 間の差は
+  各々の bf16 丸め誤差の範囲内
+- 再計算コストは attention の gather/einsum が安価なため小さく、28 スロット連結の巨大
+  cat/einsum が消えた分で相殺され、同 batch でも旧実装より速い
+
+### 3.5 訓練インフラ
 
 LogKVLM は 1 GPU に収まるので **DDP データ並列**（`torchrun --nproc_per_node=6
 train_logkv.py`）。既存の mmap キャッシュ（`hf_cache/mmap/ctx2048/`, pretrain）を
@@ -104,10 +129,20 @@ rank 0 が `--sample-interval` ごとに固定日本語プロンプト 3 種か�
 実測（d1024 / d_ff 3072 / 16 層 / C=4 / ctx2048、シングルヘッド 294M パラメータ。
 8 ヘッド版は `lo` の分 +17M）:
 
-- batch 2/GPU で 16 GiB、**batch 4 は OOM**。支配項はレベルごとの slot gather
-  `(L, C·levels, d)` の保存
+- 旧 attention 実装（全レベルの slot を連結して 1 回の softmax）: batch 2/GPU で 16 GiB、
+  **batch 4 は OOM**。支配項はレベルごとの slot gather `(L, C·levels, d)` と連結コピーの保存
 - 約 4,000 tok/s/GPU、6 GPU DDP 実効 **約 15k tok/s**（1000 ステップ ≈ 50 分）
 - 8 ヘッド版（310M）: batch 2/GPU で 15.9 GiB、約 4,260 tok/s/GPU（シングルヘッドと同等）
+
+**online softmax + attention 部の activation checkpoint（§3.4）導入後**（8 ヘッド、1 GPU 実測）:
+
+| batch/GPU | 旧実装 | 新実装 |
+|---|---|---|
+| 2 | 15.9 GiB / 4,260 tok/s | **10.2 GiB** / 4,840 tok/s |
+| 4 | OOM | 16.3 GiB / **5,725 tok/s** |
+| 6 | OOM | 22.5 GiB / 5,865 tok/s |
+
+`train_logkv.py` のデフォルトは batch 4 × accum 1（実効 24 のまま）に変更。
 
 ## 4. 実験 1: 日本語文法の獲得（補正なし、run `d1024-l16`）
 
@@ -223,8 +258,6 @@ loss が 0.07 高い点は recency prior による長距離参照のハンディ
 - **長期訓練での執着再発確認**: 8H 減衰版を 20000 ステップ程度まで回し、1024 トークン
   生成の反復指標を再実施（temperature 0.7 / 1.0 の両方で）
 - 減衰係数の可変化: `−i·β`（β を per-layer 学習、init log C）は必要になれば容易
-- メモリ削減: slot gather `(L, C·levels, d)` の保存が VRAM の支配項。レベルごとに
-  逐次 softmax する形（online softmax）にすれば batch を増やせる
 - 残る反復（リスト様式・空白連続）への repetition penalty 適用と chat_server 対応
 
 ## 7. コマンド
