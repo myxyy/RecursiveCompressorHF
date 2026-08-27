@@ -46,6 +46,9 @@ def parse_args():
                         "(compress-size/retrieve-sizeはlogkvでは無視)")
     p.add_argument("--phase-emb", action="store_true",
                    help="logkv: 学習可能位相埋め込み(位置のC進数桁)を有効化")
+    p.add_argument("--phase-levels", type=int, default=16,
+                   help="logkv: 位相埋め込みに使う桁数(周期 C^phase_levels)。訓練で全桁値が"
+                        "出現する範囲に制限すると域外でも未学習ベクトルを踏まない")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -137,6 +140,7 @@ def main():
             chunk_size=args.chunk_size,
             num_layers=args.num_layers,
             phase_emb=args.phase_emb,
+            phase_levels=args.phase_levels,
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)
