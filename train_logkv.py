@@ -63,6 +63,9 @@ def parse_args():
     p.add_argument("--num-layers", type=int, default=16)
     p.add_argument("--phase-emb", action="store_true",
                    help="学習可能位相埋め込み(位置のC進数桁)を有効化")
+    p.add_argument("--phase-levels", type=int, default=2,
+                   help="位相埋め込みの桁数(周期C^n)。小さいほど外挿・エイリアシング耐性が"
+                        "高い(doc/logkv.md §6.5、Copying/Selective検証はn=2を推奨)")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
@@ -213,6 +216,7 @@ def main():
         chunk_size=args.chunk_size,
         num_layers=args.num_layers,
         phase_emb=args.phase_emb,
+        phase_levels=args.phase_levels,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
