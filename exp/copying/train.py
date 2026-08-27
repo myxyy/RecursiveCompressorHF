@@ -44,6 +44,8 @@ def parse_args():
     p.add_argument("--arch", choices=["recursive", "logkv"], default="recursive",
                    help="recursive=RecursiveCompressorLM / logkv=LogKVLM "
                         "(compress-size/retrieve-sizeはlogkvでは無視)")
+    p.add_argument("--phase-emb", action="store_true",
+                   help="logkv: 学習可能位相埋め込み(位置のC進数桁)を有効化")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -134,6 +136,7 @@ def main():
             d_ff=args.d_ff,
             chunk_size=args.chunk_size,
             num_layers=args.num_layers,
+            phase_emb=args.phase_emb,
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)

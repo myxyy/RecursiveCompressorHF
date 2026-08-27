@@ -167,3 +167,28 @@ class TestLogKVLM:
                 tok = logits.argmax(dim=-1)
         manual = torch.stack(toks, dim=1)
         assert torch.equal(out[:, 10:], manual)
+
+
+def test_lm_with_phase_emb_roundtrip(tmp_path):
+    """phase_emb有効なLMの保存/読込・step/predict一致"""
+    cfg = LogKVConfig(vocab_size=32, d_model=16, num_heads=4, d_ff=32, chunk_size=4,
+                      num_layers=2, phase_emb=True, phase_levels=8,
+                      pad_token_id=None, bos_token_id=None, eos_token_id=None)
+    torch.manual_seed(0)
+    model = LogKVLM(cfg).double().eval()
+    assert model.layers[0].attention.phase_emb is not None
+    ids = torch.randint(0, 32, (2, 50))
+    with torch.no_grad():
+        full = model(ids).logits
+        l1, h = model.step(ids[:, :23])
+        parts = [l1]
+        for t in range(23, 50):
+            l, h = model.predict(ids[:, t], h)
+            parts.append(l.unsqueeze(1))
+        seq = torch.cat(parts, dim=1)
+    assert (seq - full).abs().max().item() < 1e-12
+    model.save_pretrained(tmp_path / "m")
+    loaded = LogKVLM.from_pretrained(tmp_path / "m").double().eval()
+    assert loaded.config.phase_emb is True
+    with torch.no_grad():
+        assert torch.equal(loaded(ids).logits, full)

@@ -45,7 +45,7 @@ _CMD_MAP = {"pause": CMD_PAUSE, "resume": CMD_RESUME, "save_and_exit": CMD_SAVE_
 
 # Muon is for 2D hidden-layer weights; embedding and output head stay on AdamW
 # per the original Muon recipe (biases/RMSNorms are 1D and fall through).
-_ADAMW_ONLY_KEYWORDS = ("embedding", "head")
+_ADAMW_ONLY_KEYWORDS = ("embedding", "head", "phase_emb")  # phase_emb is 3D (Muon needs 2D)
 
 SAMPLE_PROMPTS = ["日本の首都は", "昔々あるところに", "人工知能とは"]
 
@@ -61,6 +61,8 @@ def parse_args():
     p.add_argument("--d-ff", type=int, default=3072)
     p.add_argument("--chunk-size", type=int, default=4)
     p.add_argument("--num-layers", type=int, default=16)
+    p.add_argument("--phase-emb", action="store_true",
+                   help="学習可能位相埋め込み(位置のC進数桁)を有効化")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
@@ -210,6 +212,7 @@ def main():
         d_ff=args.d_ff,
         chunk_size=args.chunk_size,
         num_layers=args.num_layers,
+        phase_emb=args.phase_emb,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,

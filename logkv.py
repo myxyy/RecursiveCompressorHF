@@ -22,13 +22,28 @@ class Compressor(nn.Module):
         return q_out, k_out, v_out
 
 class LogKV(nn.Module):
-    def __init__(self, dim, chunk_size, num_heads=1):
+    def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16):
         super(LogKV, self).__init__()
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         self.dim = dim
         self.chunk_size = chunk_size
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
+        # Learnable phase embedding: the absolute position s is expanded in
+        # base C, s = sum_i j_i * C**i, and each digit j_i (= the query's
+        # phase within its level-i block) selects one of C vectors per level.
+        # The sum over levels is added to the attention INPUT (before the
+        # q/k/v projections), never to the residual stream. It is bounded
+        # and periodic (independent of sequence length) and breaks the
+        # positional degeneracy inside runs of identical tokens, where every
+        # multi-scale window (and hence every kv) would otherwise coincide
+        # (see doc/logkv.md §6.2).
+        self.phase_levels = phase_levels if phase_emb else 0
+        if phase_emb:
+            self.phase_emb = nn.Parameter(torch.empty(phase_levels, chunk_size, dim))
+            nn.init.normal_(self.phase_emb, mean=0.0, std=0.02)
+        else:
+            self.phase_emb = None
         self.lq = nn.Linear(dim, dim, bias=False)
         self.lk = nn.Linear(dim, dim, bias=False)
         self.lv = nn.Linear(dim, dim, bias=False)
@@ -53,6 +68,14 @@ class LogKV(nn.Module):
         seq_len = t.size(1)
         t = t.view(batch_size, self.num_heads, seq_len, self.head_dim)
         return t.transpose(1, 2).reshape(batch_size, seq_len, self.dim)
+
+    def _phase(self, offset, seq_len, device):
+        """(seq_len, dim): sum over levels of the phase vector selected by
+        the base-C digit of the absolute position offset + t."""
+        s = offset + torch.arange(seq_len, device=device)                 # (L,)
+        i = torch.arange(self.phase_levels, device=device)                # (n,)
+        digits = (s[:, None] // (self.chunk_size ** i)[None, :]) % self.chunk_size  # (L, n)
+        return self.phase_emb[i[None, :].expand_as(digits), digits].sum(dim=1)
 
     def forward(self, x):
         """Multi-resolution causal attention over log-many kv slots.
@@ -105,6 +128,9 @@ class LogKV(nn.Module):
         """
         batch_size, seq_len, d_model = x.size()
         assert d_model == self.dim, "Input dimension must match the specified dimension"
+        if self.phase_emb is not None:
+            offset = hidden[1] if hidden is not None else 0
+            x = x + self._phase(offset, seq_len, x.device).to(x.dtype)[None]
         q_new = self._split_heads(self.lq(x))
         k_new = self._split_heads(self.lk(x))
         v_new = self._split_heads(self.lv(x))
@@ -284,10 +310,10 @@ class LogKVBlock(nn.Module):
     """Standard pre-norm transformer block with LogKV attention:
     x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
 
-    def __init__(self, dim, chunk_size, d_ff, num_heads=1):
+    def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
-        self.attention = LogKV(dim, chunk_size, num_heads)
+        self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 

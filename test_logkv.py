@@ -147,6 +147,12 @@ def reference_forward(m, x):
     reference core per head, merge, output-project."""
     batch_size, seq_len, dim = x.size()
     H, dh = m.num_heads, m.head_dim
+    if m.phase_emb is not None:
+        # base-C digits of absolute position (offset 0), summed over levels
+        s = torch.arange(seq_len)
+        ph = sum(m.phase_emb[i, (s // (m.chunk_size ** i)) % m.chunk_size]
+                 for i in range(m.phase_levels))
+        x = x + ph[None].to(x.dtype)
 
     def split(t):
         return t.view(batch_size, seq_len, H, dh).transpose(1, 2).reshape(batch_size * H, seq_len, dh)
@@ -327,3 +333,63 @@ def test_recompute_attention_matches_stored():
     for g0, g1 in zip(grads[0], grads[1]):
         assert torch.equal(g0, g1)
     m.recompute_attention = True
+
+
+# ---------------------------------------------------------------------------
+# learnable phase embedding
+# ---------------------------------------------------------------------------
+
+def make_phase(chunk_size=4, num_heads=4, seed=0):
+    torch.manual_seed(seed)
+    return LogKV(dim=32, chunk_size=chunk_size, num_heads=num_heads,
+                 phase_emb=True, phase_levels=6).eval()
+
+
+@pytest.mark.parametrize("chunk_size", [2, 4])
+def test_phase_forward_matches_reference_fp64(chunk_size):
+    m = make_phase(chunk_size=chunk_size).double()
+    x = torch.randn(2, 257, 32, dtype=torch.float64)
+    with torch.no_grad():
+        d = (m(x) - reference_forward(m, x)).abs().max().item()
+    assert d < 1e-12, d
+
+
+def test_phase_step_split_and_predict_fp64():
+    """位相はオフセット(絶対位置)から計算されるので分割stepでも一致する"""
+    m = make_phase().double()
+    x = torch.randn(2, 90, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y_fwd = m(x)
+        y1, h = m.step(x[:, :37])
+        y2, h = m.step(x[:, 37:70], h)
+        parts = [y1, y2]
+        for t in range(70, 90):
+            y, h = m.predict(x[:, t], h)
+            parts.append(y.unsqueeze(1))
+        y_seq = torch.cat(parts, dim=1)
+    assert (y_seq - y_fwd).abs().max().item() < 1e-12
+
+
+def test_phase_breaks_uniform_run_degeneracy():
+    """同一トークン連続入力で、位相なしでは一致する位置の出力が位相ありでは区別される"""
+    x = torch.randn(1, 1, 32).expand(1, 40, 32).contiguous()  # all positions identical
+    torch.manual_seed(0)
+    m0 = LogKV(dim=32, chunk_size=4, num_heads=4).eval()
+    with torch.no_grad():
+        y0 = m0(x)
+    # without phase: positions 18/19 (same level phases except digit 0) coincide
+    assert torch.allclose(y0[0, 18], y0[0, 19], atol=1e-6)
+    m1 = make_phase()
+    with torch.no_grad():
+        y1 = m1(x)
+    assert not torch.allclose(y1[0, 18], y1[0, 19], atol=1e-4)
+
+
+def test_phase_digits():
+    """_phaseが位置のC進数桁に対応するベクトル和になっている"""
+    m = make_phase(chunk_size=4)
+    with torch.no_grad():
+        ph = m._phase(offset=5, seq_len=3, device=torch.device("cpu"))  # positions 5,6,7
+    for t, s in enumerate([5, 6, 7]):
+        expect = sum(m.phase_emb[i, (s // 4 ** i) % 4] for i in range(6))
+        assert torch.allclose(ph[t], expect)

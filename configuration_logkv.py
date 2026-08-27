@@ -19,6 +19,8 @@ class LogKVConfig(PretrainedConfig):
         d_ff=2048,
         chunk_size=4,
         num_layers=8,
+        phase_emb=False,
+        phase_levels=16,
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
@@ -29,6 +31,8 @@ class LogKVConfig(PretrainedConfig):
         self.d_ff = d_ff
         self.chunk_size = chunk_size
         self.num_layers = num_layers
+        self.phase_emb = phase_emb
+        self.phase_levels = phase_levels
         super().__init__(
             vocab_size=vocab_size,
             pad_token_id=pad_token_id,
