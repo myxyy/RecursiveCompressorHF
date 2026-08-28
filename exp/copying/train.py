@@ -49,6 +49,8 @@ def parse_args():
     p.add_argument("--phase-levels", type=int, default=16,
                    help="logkv: 位相埋め込みに使う桁数(周期 C^phase_levels)。訓練で全桁値が"
                         "出現する範囲に制限すると域外でも未学習ベクトルを踏まない")
+    p.add_argument("--learnable-decay", action="store_true",
+                   help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -141,6 +143,7 @@ def main():
             num_layers=args.num_layers,
             phase_emb=args.phase_emb,
             phase_levels=args.phase_levels,
+            learnable_decay=args.learnable_decay,
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)

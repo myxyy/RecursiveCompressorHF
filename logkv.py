@@ -22,13 +22,23 @@ class Compressor(nn.Module):
         return q_out, k_out, v_out
 
 class LogKV(nn.Module):
-    def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16):
+    def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
+                 learnable_decay=False):
         super(LogKV, self).__init__()
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         self.dim = dim
         self.chunk_size = chunk_size
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
+        # Level-decay slope: level-i slots get logit bias -i * beta. Fixed
+        # beta = log C (weight C**-i) collapses the cross-level copies of a
+        # token into ~one count (see _attend_levels). With learnable_decay
+        # each head learns its own beta, initialized at log C (unconstrained:
+        # 0 = no decay, log C = the analytic value, larger = stronger recency).
+        if learnable_decay:
+            self.level_decay = nn.Parameter(torch.full((num_heads,), math.log(chunk_size)))
+        else:
+            self.level_decay = None
         # Learnable phase embedding: the absolute position s is expanded in
         # base C, s = sum_i j_i * C**i, and each digit j_i (= the query's
         # phase within its level-i block) selects one of C vectors per level.
@@ -236,6 +246,11 @@ class LogKV(nn.Module):
         C = self.chunk_size
         k_ctxs, v_ctxs = flat[:n_levels], flat[n_levels:2 * n_levels]
         locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:]
+        if self.level_decay is not None:
+            # rows of q are batch-major then head (see _split_heads):
+            # row b*H + h -> head h
+            batch_size = q.size(0) // self.num_heads
+            slope = self.level_decay.repeat(batch_size)[:, None, None]  # (B*H, 1, 1)
         m = l = acc = None
         for i in range(n_levels):
             # Level-decay bias: a level-i slot summarizes C**i tokens, and a
@@ -245,7 +260,7 @@ class LogKV(nn.Module):
             # into a geometric series ~= one count, removing the
             # multiplicity amplification behind topic fixation (and inducing
             # a parameter-free ~1/distance recency prior).
-            level_bias = -i * math.log(C)
+            level_bias = -i * math.log(C) if self.level_decay is None else -i * slope
             m_i, l_i, acc_i = self._level_attention(
                 q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
             if m is None:
@@ -267,6 +282,7 @@ class LogKV(nn.Module):
     @staticmethod
     def _level_attention(q, k_ctx, v_ctx, local, invalid, level_bias, scale):
         """One level's slot gather + partial softmax statistics.
+        level_bias: python float, or a (B*H, 1, 1) tensor for per-head slopes.
         Returns (m, l, acc): per-row max logit (-inf if no valid slot),
         sum of exp(logit - m), and sum of exp(logit - m) * v."""
         k_slots = k_ctx[:, local, :]                                 # (B*H, L, C, head_dim)
@@ -312,10 +328,11 @@ class LogKVBlock(nn.Module):
     """Standard pre-norm transformer block with LogKV attention:
     x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
 
-    def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16):
+    def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
+                 learnable_decay=False):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
-        self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels)
+        self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 

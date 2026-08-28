@@ -21,6 +21,7 @@ class LogKVConfig(PretrainedConfig):
         num_layers=8,
         phase_emb=False,
         phase_levels=16,
+        learnable_decay=False,
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
@@ -33,6 +34,7 @@ class LogKVConfig(PretrainedConfig):
         self.num_layers = num_layers
         self.phase_emb = phase_emb
         self.phase_levels = phase_levels
+        self.learnable_decay = learnable_decay
         super().__init__(
             vocab_size=vocab_size,
             pad_token_id=pad_token_id,

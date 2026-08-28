@@ -214,7 +214,10 @@ def _reference_core(m, q, k, v):
         blk = blk.clamp(min=0)
         cexp = c_idx[None, :].expand(seq_len, C)
         logits = torch.einsum('bld,blcd->blc', q, kc[:, blk, cexp, :]) * scale
-        logits = logits - i * math.log(C)  # level-decay bias (see LogKV.step)
+        if m.level_decay is not None:   # per-head learnable slope (rows are batch-major, head-minor)
+            logits = logits - i * m.level_decay.repeat(batch_size // m.num_heads)[:, None, None]
+        else:
+            logits = logits - i * math.log(C)  # fixed level-decay bias (see LogKV.step)
         logits_list.append(logits.masked_fill(invalid[None, :, :], float('-inf')))
         v_slots_list.append(vc[:, blk, cexp, :])
     weights = torch.nan_to_num(
@@ -393,3 +396,44 @@ def test_phase_digits():
     for t, s in enumerate([5, 6, 7]):
         expect = sum(m.phase_emb[i, (s // 4 ** i) % 4] for i in range(6))
         assert torch.allclose(ph[t], expect)
+
+
+# ---------------------------------------------------------------------------
+# learnable level-decay slope
+# ---------------------------------------------------------------------------
+
+def test_learnable_decay_init_matches_fixed():
+    """初期値log Cなので固定減衰と出力が一致する"""
+    torch.manual_seed(0)
+    m_fixed = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2).double().eval()
+    torch.manual_seed(0)
+    m_learn = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+                    learnable_decay=True).double().eval()
+    assert torch.allclose(m_learn.level_decay, torch.full((4,), math.log(4), dtype=torch.float64))
+    x = torch.randn(2, 100, 32, dtype=torch.float64)
+    with torch.no_grad():
+        # the parameter is created in fp32 (log C rounded to ~1e-8), hence 1e-6
+        assert (m_fixed(x) - m_learn(x)).abs().max().item() < 1e-6
+
+
+def test_learnable_decay_matches_reference_and_step_fp64():
+    """ヘッドごとに異なる係数でも参照実装・分割stepと機械精度一致"""
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, learnable_decay=True).double().eval()
+    with torch.no_grad():
+        m.level_decay.copy_(torch.tensor([0.0, 0.7, 1.386, 3.0], dtype=torch.float64))
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, _ = m.step(x[:, 57:], h)
+        assert (torch.cat([y1, y2], 1) - y).abs().max().item() < 1e-12
+
+
+def test_learnable_decay_gets_gradient():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, learnable_decay=True)
+    x = torch.randn(2, 60, 32)
+    m(x).square().sum().backward()
+    assert m.level_decay.grad is not None and torch.isfinite(m.level_decay.grad).all()
+    assert m.level_decay.grad.abs().sum() > 0
