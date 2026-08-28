@@ -11,6 +11,7 @@ Usage:
 """
 
 import argparse
+import json
 import os
 import torch
 from transformers import AutoTokenizer
@@ -28,8 +29,19 @@ _DTYPES = {"bf16": torch.bfloat16, "fp32": torch.float32}
 def _load_model(model_dir, device, dtype=torch.bfloat16):
     """Load model from save_pretrained dir or pipeline checkpoint (full_model.pt).
     Casts to dtype on device. Defaults to bfloat16 to halve VRAM and avoid the
-    autocast weight-cache that would otherwise duplicate fp32 weights."""
+    autocast weight-cache that would otherwise duplicate fp32 weights.
+    The architecture is picked from config.json's model_type
+    ("logkv" -> LogKVLM, otherwise RecursiveCompressorLM)."""
     full_model_pt = os.path.join(model_dir, "full_model.pt")
+    config_json = os.path.join(model_dir, "config.json")
+    model_type = None
+    if os.path.exists(config_json):
+        with open(config_json) as f:
+            model_type = json.load(f).get("model_type")
+
+    if model_type == "logkv":
+        from logkv_lm import LogKVLM
+        return LogKVLM.from_pretrained(model_dir).to(dtype=dtype, device=device)
 
     if os.path.exists(full_model_pt):
         config = RecursiveCompressorConfig.from_pretrained(model_dir)

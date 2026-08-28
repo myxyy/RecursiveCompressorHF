@@ -1,5 +1,5 @@
 """
-Streaming text generation with RecursiveCompressorLM.
+Streaming text generation with RecursiveCompressorLM / LogKVLM (auto-detected from config.json).
 
 Usage:
     uv run python predict_stream.py --model-dir /path/to/checkpoint

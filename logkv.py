@@ -280,7 +280,9 @@ class LogKV(nn.Module):
         m_safe = torch.where(m == float('-inf'), torch.zeros_like(m), m)
         p = torch.exp(logits.to(acc_dtype) - m_safe[..., None])
         l = p.sum(dim=-1)
-        acc = torch.einsum('blc,blcd->bld', p, v_slots).to(acc_dtype)
+        # matmul in the value dtype (what autocast does anyway; also makes
+        # bf16-weight inference without autocast work), accumulate in >= fp32
+        acc = torch.einsum('blc,blcd->bld', p.to(v_slots.dtype), v_slots).to(acc_dtype)
         return m, l, acc
 
     def predict(self, x, hidden=None):

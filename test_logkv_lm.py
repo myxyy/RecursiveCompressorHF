@@ -192,3 +192,18 @@ def test_lm_with_phase_emb_roundtrip(tmp_path):
     assert loaded.config.phase_emb is True
     with torch.no_grad():
         assert torch.equal(loaded(ids).logits, full)
+
+
+def test_bf16_weights_inference_without_autocast():
+    """bf16重み(autocastなし)で推論でき、fp32と概ね一致する(predict.pyの経路)"""
+    cfg = LogKVConfig(vocab_size=32, d_model=16, num_heads=4, d_ff=32, chunk_size=4,
+                      num_layers=2, phase_emb=True, phase_levels=2,
+                      pad_token_id=None, bos_token_id=None, eos_token_id=None)
+    torch.manual_seed(0)
+    model = LogKVLM(cfg).eval()
+    ids = torch.randint(0, 32, (2, 40))
+    with torch.no_grad():
+        ref = model(ids).logits
+        out = model.to(torch.bfloat16)(ids).logits
+    assert out.dtype == torch.bfloat16
+    torch.testing.assert_close(out.float(), ref, atol=0.15, rtol=0.05)
