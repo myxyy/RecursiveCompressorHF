@@ -158,6 +158,8 @@ def reference_forward(m, x):
         return t.view(batch_size, seq_len, H, dh).transpose(1, 2).reshape(batch_size * H, seq_len, dh)
 
     out = _reference_core(m, split(m.lq(x)), split(m.lk(x)), split(m.lv(x)))
+    if m.lg is not None:
+        out = out * torch.sigmoid(split(m.lg(x)))
     out = out.view(batch_size, H, seq_len, dh).transpose(1, 2).reshape(batch_size, seq_len, dim)
     return m.lo(out)
 
@@ -437,3 +439,34 @@ def test_learnable_decay_gets_gradient():
     m(x).square().sum().backward()
     assert m.level_decay.grad is not None and torch.isfinite(m.level_decay.grad).all()
     assert m.level_decay.grad.abs().sum() > 0
+
+
+# ---------------------------------------------------------------------------
+# gated attention
+# ---------------------------------------------------------------------------
+
+def test_gated_matches_reference_and_step_fp64():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+              gated_attention=True).double().eval()
+    with torch.no_grad():
+        m.lg.bias.normal_()  # make the gate non-trivial
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, _ = m.step(x[:, 57:], h)
+        assert (torch.cat([y1, y2], 1) - y).abs().max().item() < 1e-12
+
+
+def test_gate_changes_output_and_gets_gradient():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, gated_attention=True)
+    x = torch.randn(2, 60, 32)
+    y = m(x)
+    y.square().sum().backward()
+    assert m.lg.weight.grad is not None and m.lg.weight.grad.abs().sum() > 0
+    with torch.no_grad():
+        m.lg.bias.fill_(10.0)  # gate -> ~1
+        y_open = m(x)
+    assert not torch.allclose(y, y_open)

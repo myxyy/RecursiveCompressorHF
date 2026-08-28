@@ -68,6 +68,8 @@ def parse_args():
                         "高い(doc/logkv.md §6.5、Copying/Selective検証はn=2を推奨)")
     p.add_argument("--learnable-decay", action="store_true",
                    help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
+    p.add_argument("--gated-attention", action="store_true",
+                   help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
@@ -220,6 +222,7 @@ def main():
         phase_emb=args.phase_emb,
         phase_levels=args.phase_levels,
         learnable_decay=args.learnable_decay,
+        gated_attention=args.gated_attention,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,

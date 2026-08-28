@@ -51,6 +51,8 @@ def parse_args():
                         "出現する範囲に制限すると域外でも未学習ベクトルを踏まない")
     p.add_argument("--learnable-decay", action="store_true",
                    help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
+    p.add_argument("--gated-attention", action="store_true",
+                   help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -144,6 +146,7 @@ def main():
             phase_emb=args.phase_emb,
             phase_levels=args.phase_levels,
             learnable_decay=args.learnable_decay,
+            gated_attention=args.gated_attention,
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)
