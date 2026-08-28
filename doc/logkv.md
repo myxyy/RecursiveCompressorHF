@@ -431,7 +431,27 @@ LM の標準構成は **固定 log C のレベル減衰 + 位相埋め込み（p
 とする（`--phase-emb --phase-levels 2`、`learnable_decay` は使わない）。学習可能減衰は
 検索を要するタスク（Selective 系）向けのオプションとして残す。
 
+### 6.9 Gated attention（`gated_attention`）
+
+`recursive_compressor.MultiHeadAttention` と同形のゲート（sigmoid(W_g x + b) を各ヘッドの
+attention 出力に要素ごとに乗算してから出力射影、標準 init、`--gated-attention`）を標準構成に
+追加して Copying / Selective を再実験。詳細は各タスクの doc 末尾。
+
+| | Copying | Selective |
+|---|---|---|
+| 域内 | 1.000（不変） | T=16 str 0.66→**0.86**、T=32 0.31→**0.57**、T=64 0.11→0.30 |
+| 域外 | 131k まで 1.000（不変） | 2048 tok 0.63→**0.75**、131k 0.54→**0.61**（≥4k で conv+sink 以上） |
+
+- 学習可能減衰（§6.7）と違い**外挿を犠牲にせず域内も改善**する、LogKV 系で最も強い構成。
+  域内は依然 conv+sink（T=64 str 0.86）に届かない
+- ゲートは bias≈0.5 のまま内容依存でほぼ二値的（<0.1 が 53%、>0.9 が 28%）に働き、答え位置で
+  attention 出力を強く絞る「読み出しフィルタ」。Copying の収束は遅くなる（best 44700 vs 23100）
+- 本番 LM への採用可否は §6.6 と同じ手順での検証が必要（ゲートは残差への注入を減らす方向
+  なので執着に対しては中立〜有利と予想）
+
 ## 7. 未解決・今後の候補
+
+- Gated attention の本番 LM 検証（5000 步 + 生成の反復指標）→ 良ければ標準構成に追加
 - Selective 域内の順序符号強化（conv 版との差 T=64 str 0.11–0.38 vs 0.86 の要因分解）
 - 位相埋め込み版で本番 LM を訓練し、執着・空白ループ・loss への影響を確認。良ければ
   `phase_emb` のデフォルトを True に切り替え
