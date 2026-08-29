@@ -427,9 +427,13 @@ doc 末尾。
 
 ### 6.8 標準構成の確定
 
-LM の標準構成は **固定 log C のレベル減衰 + 位相埋め込み（phase_levels=2）+ マルチヘッド**
-とする（`--phase-emb --phase-levels 2`、`learnable_decay` は使わない）。学習可能減衰は
-検索を要するタスク（Selective 系）向けのオプションとして残す。
+LM の標準構成は **固定 log C のレベル減衰 + 位相埋め込み（phase_levels=2）+ マルチヘッド
++ gated attention（§6.9）** とする（`--phase-emb --phase-levels 2 --gated-attention`、
+`learnable_decay` は使わない）。学習可能減衰は検索を要するタスク（Selective 系）向けの
+オプションとして残す。
+
+gated 版（`d1024-h8-l16-ph2-gated/checkpoint-5000`）は predict_stream.py で複数回試行し、
+安定した回では **30,000 トークン以上**（訓練 ctx の 15 倍超）の連続生成が確認された。
 
 ### 6.9 Gated attention（`gated_attention`）
 
@@ -466,8 +470,6 @@ attention 出力に要素ごとに乗算してから出力射影、標準 init�
     repetition penalty 側で扱う
 
 ## 7. 未解決・今後の候補
-
-- gated attention を標準構成に加えるかの決定
 - Selective 域内の順序符号強化（conv 版との差 T=64 str 0.11–0.38 vs 0.86 の要因分解）
 - 位相埋め込み版で本番 LM を訓練し、執着・空白ループ・loss への影響を確認。良ければ
   `phase_emb` のデフォルトを True に切り替え
