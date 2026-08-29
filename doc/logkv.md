@@ -470,26 +470,38 @@ attention 出力に要素ごとに乗算してから出力射影、標準 init�
     repetition penalty 側で扱う
 
 ## 7. 未解決・今後の候補
-- Selective 域内の順序符号強化（conv 版との差 T=64 str 0.11–0.38 vs 0.86 の要因分解）
-- 位相埋め込み版で本番 LM を訓練し、執着・空白ループ・loss への影響を確認。良ければ
-  `phase_emb` のデフォルトを True に切り替え
-- **長期訓練での執着再発確認**: 8H 減衰版を 20000 ステップ程度まで回し、1024 トークン
-  生成の反復指標を再実施（temperature 0.7 / 1.0 の両方で）
-- 減衰係数の可変化: `−i·β`（β を per-layer 学習、init log C）は必要になれば容易
-- 残る反復（リスト様式・空白連続）への repetition penalty 適用と chat_server 対応
+
+- **長期訓練**: 標準構成（§6.8）で 20000 ステップ以上回し、執着の再発有無（1024 / 10k トークン
+  生成の反復指標、temperature 0.7 / 1.0）と loss の推移を確認
+- Selective 域内の順序符号強化（conv 版との差 T=64 str 0.30 vs 0.86 の要因分解）
+- 残る局所反復（リスト様式・同一トークン連続）への repetition penalty 適用と chat_server 対応
+- config デフォルトの切替（`phase_emb=True, phase_levels=2, gated_attention=True`）— 旧
+  チェックポイントを読む用途が終わった時点で
 
 ## 8. コマンド
 
 ```bash
 uv run pytest test_logkv.py test_logkv_lm.py -v
-uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> --max-steps 5000
-uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> --resume latest
+
+# 標準構成 (§6.8) での訓練
+uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
+    --phase-emb --phase-levels 2 --gated-attention --max-steps 5000
+uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
+    --phase-emb --phase-levels 2 --gated-attention --resume latest
+
+# 生成 (config.json から構成を自動判別)
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-5000/model \
     --max-new-tokens 1024 --seed 0
+uv run python predict_stream.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-5000/model \
+    --temperature 0.7 --top-p 0.9
+
+# Copying / Selective (標準構成)
+uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention \
+    --run-name <name> --t-dist loguniform
+uv run python exp/copying/evaluate.py --run-name <name> --max-t-exp 17
 ```
 
-チェックポイント: `$DATA_DIR/checkpoints_logkv/d1024-l16/checkpoint-6277`（補正なし）、
-`$DATA_DIR/checkpoints_logkv/d1024-l16-leveldecay/checkpoint-5000`（レベル減衰、以上 2 つは
-シングルヘッド時代のコード 3f7cc40 が必要）、
-`$DATA_DIR/checkpoints_logkv/d1024-h8-l16-leveldecay/checkpoint-5000`（8 ヘッド + レベル減衰、
-現行コードで読込可）。
+主なチェックポイント（`$DATA_DIR/checkpoints_logkv/`、いずれも 5000 步）:
+`d1024-h8-l16-ph2-gated`（**標準構成**）、`d1024-h8-l16-ld-phase2`（gated なし）、
+`d1024-h8-l16-ph2-ldecay`（学習可能減衰）、`d1024-h8-l16-leveldecay`（位相なし）。
+シングルヘッド時代の `d1024-l16`（補正なし）と `d1024-l16-leveldecay` はコード 3f7cc40 が必要。
