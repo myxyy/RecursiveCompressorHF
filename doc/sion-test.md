@@ -1,7 +1,7 @@
 # sion_test.py（Needle-in-a-Haystack）の LogKV での実行記録
 
 友人提供の評価パイプライン [sion_test.py](../sion_test.py) を LogKV（[doc/logkv.md](logkv.md)）
-で実行した記録。ブランチ `logkv-sion-test`。
+で実行した記録。ブランチ `logkv-sion-test`。（韓国語版: [sion-test.ko.md](sion-test.ko.md)）
 
 ## 1. スクリプトの概要
 
