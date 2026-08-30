@@ -168,6 +168,8 @@ def _reference_core(m, q, k, v):
     C = m.chunk_size
     batch_size, seq_len, d_model = q.size()
     x = q
+    if m.k_norm is not None:  # kv_norm: level-0 slots
+        k, v = m.k_norm(k), m.v_norm(v)
 
     # build per-level kv chunks by recursive compression
     k_list, v_list = [], []
@@ -187,6 +189,8 @@ def _reference_core(m, q, k, v):
             ql.reshape(batch_size * n, C, d_model),
             kl.reshape(batch_size * n, C, d_model),
             vl.reshape(batch_size * n, C, d_model))
+        if m.k_norm is not None:  # kv_norm: after every compression
+            k_, v_ = m.k_norm(k_), m.v_norm(v_)
         ql = q_.reshape(batch_size, n, d_model)
         kl = k_.reshape(batch_size, n, d_model)
         vl = v_.reshape(batch_size, n, d_model)
@@ -470,3 +474,44 @@ def test_gate_changes_output_and_gets_gradient():
         m.lg.bias.fill_(10.0)  # gate -> ~1
         y_open = m(x)
     assert not torch.allclose(y, y_open)
+
+
+# ---------------------------------------------------------------------------
+# kv_norm
+# ---------------------------------------------------------------------------
+
+def test_kv_norm_matches_reference_and_step_fp64():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+              gated_attention=True, kv_norm=True).double().eval()
+    with torch.no_grad():
+        m.k_norm.weight.normal_(1.0, 0.3); m.v_norm.weight.normal_(1.0, 0.3)
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, _ = m.step(x[:, 57:], h)
+        assert (torch.cat([y1, y2], 1) - y).abs().max().item() < 1e-12
+        for t in range(3):
+            y3, h = m.predict(x[:, 57 + t] if False else x[:, t], None if t == 0 else h)
+
+
+def test_kv_norm_equalizes_slot_scale_across_levels():
+    """全レベルのk/vスロットがRMS 1(ゲイン1)になる"""
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, kv_norm=True).eval()
+    x = torch.randn(1, 200, 32) * 5.0
+    with torch.no_grad():
+        _, (levels, _) = m.step(x)
+    for i, (cur_q, cur_k, cur_v, prev_k, prev_v) in enumerate(levels):
+        for t in (cur_k, cur_v, prev_k, prev_v):
+            if t is not None and t.numel():
+                rms = t.pow(2).mean(-1).sqrt()
+                assert torch.allclose(rms, torch.ones_like(rms), atol=1e-4), (i, rms)
+
+
+def test_kv_norm_gets_gradient():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, kv_norm=True)
+    m(torch.randn(2, 60, 32)).square().sum().backward()
+    assert m.k_norm.weight.grad.abs().sum() > 0 and m.v_norm.weight.grad.abs().sum() > 0

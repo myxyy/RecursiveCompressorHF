@@ -23,6 +23,7 @@ class LogKVConfig(PretrainedConfig):
         phase_levels=16,
         learnable_decay=False,
         gated_attention=False,
+        kv_norm=False,
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
@@ -37,6 +38,7 @@ class LogKVConfig(PretrainedConfig):
         self.phase_levels = phase_levels
         self.learnable_decay = learnable_decay
         self.gated_attention = gated_attention
+        self.kv_norm = kv_norm
         super().__init__(
             vocab_size=vocab_size,
             pad_token_id=pad_token_id,

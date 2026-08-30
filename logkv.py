@@ -23,13 +23,22 @@ class Compressor(nn.Module):
 
 class LogKV(nn.Module):
     def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
-                 learnable_decay=False, gated_attention=False):
+                 learnable_decay=False, gated_attention=False, kv_norm=False):
         super(LogKV, self).__init__()
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         self.dim = dim
         self.chunk_size = chunk_size
         self.num_heads = num_heads
         self.head_dim = dim // num_heads
+        # kv_norm: per-head RMSNorm applied to k and v right after projection
+        # (level 0) AND after every compression, with the same modules, so
+        # slots at every level have identical scale. Attention pooling
+        # otherwise shrinks mixed keys/values, adding an implicit,
+        # sharpness-dependent recency bias on top of the explicit -i*beta
+        # (doc/logkv.md §6.10); with kv_norm the explicit bias is the only
+        # level-dependent scale factor.
+        self.k_norm = nn.RMSNorm(self.head_dim) if kv_norm else None
+        self.v_norm = nn.RMSNorm(self.head_dim) if kv_norm else None
         # Gated attention (as in recursive_compressor.MultiHeadAttention):
         # the per-head attention output is multiplied element-wise by
         # sigmoid(W_g x + b) computed from the same input as the query,
@@ -149,6 +158,8 @@ class LogKV(nn.Module):
         q_new = self._split_heads(self.lq(x))
         k_new = self._split_heads(self.lk(x))
         v_new = self._split_heads(self.lv(x))
+        if self.k_norm is not None:
+            k_new, v_new = self.k_norm(k_new), self.v_norm(v_new)
         v_out, hidden = self._attend(q_new, k_new, v_new, hidden)
         if self.lg is not None:
             v_out = v_out * torch.sigmoid(self._split_heads(self.lg(x)))
@@ -195,6 +206,8 @@ class LogKV(nn.Module):
                     all_q[:, :comp_len].reshape(batch_size * n_chunks, C, d_model),
                     all_k[:, :comp_len].reshape(batch_size * n_chunks, C, d_model),
                     all_v[:, :comp_len].reshape(batch_size * n_chunks, C, d_model))
+                if self.k_norm is not None:
+                    k_, v_ = self.k_norm(k_), self.v_norm(v_)
                 # last completed chunk becomes this level's previous block
                 lvl[3] = all_k[:, comp_len - C:comp_len]
                 lvl[4] = all_v[:, comp_len - C:comp_len]
@@ -336,11 +349,11 @@ class LogKVBlock(nn.Module):
     x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
-                 learnable_decay=False, gated_attention=False):
+                 learnable_decay=False, gated_attention=False, kv_norm=False):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
-                               gated_attention)
+                               gated_attention, kv_norm)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 
