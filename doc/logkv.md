@@ -428,12 +428,14 @@ doc 末尾。
 ### 6.8 標準構成の確定
 
 LM の標準構成は **固定 log C のレベル減衰 + 位相埋め込み（phase_levels=2）+ マルチヘッド
-+ gated attention（§6.9）** とする（`--phase-emb --phase-levels 2 --gated-attention`、
-`learnable_decay` は使わない）。学習可能減衰は検索を要するタスク（Selective 系）向けの
++ gated attention（§6.9）+ kv_norm（§6.11）** とする
+（`--phase-emb --phase-levels 2 --gated-attention --kv-norm`、`learnable_decay` は使わない）。学習可能減衰は検索を要するタスク（Selective 系）向けの
 オプションとして残す。
 
 gated 版（`d1024-h8-l16-ph2-gated/checkpoint-5000`）は predict_stream.py で複数回試行し、
 安定した回では **30,000 トークン以上**（訓練 ctx の 15 倍超）の連続生成が確認された。
+kv_norm 版（`d1024-h8-l16-ph2-gated-kvnorm/checkpoint-5000`）も約 15,000 トークンの連続生成で
+安定を確認。
 
 ### 6.9 Gated attention（`gated_attention`）
 
@@ -535,14 +537,12 @@ head_dim 単位の RMSNorm を射影直後（レベル 0）と各圧縮後に同
 
 ## 7. 未解決・今後の候補
 
-- kv_norm を標準構成に加えるかの決定（→ 加える場合 §6.8 と §8 を更新）
-
 - **長期訓練**: 標準構成（§6.8）で 20000 ステップ以上回し、執着の再発有無（1024 / 10k トークン
   生成の反復指標、temperature 0.7 / 1.0）と loss の推移を確認
 - Selective 域内の順序符号強化（conv 版との差 T=64 str 0.30 vs 0.86 の要因分解）
 - 残る局所反復（リスト様式・同一トークン連続）への repetition penalty 適用と chat_server 対応
-- config デフォルトの切替（`phase_emb=True, phase_levels=2, gated_attention=True`）— 旧
-  チェックポイントを読む用途が終わった時点で
+- config デフォルトの切替（`phase_emb=True, phase_levels=2, gated_attention=True, kv_norm=True`）
+  — 旧チェックポイントを読む用途が終わった時点で
 
 ## 8. コマンド
 
@@ -551,9 +551,9 @@ uv run pytest test_logkv.py test_logkv_lm.py -v
 
 # 標準構成 (§6.8) での訓練
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --max-steps 5000
+    --phase-emb --phase-levels 2 --gated-attention --kv-norm --max-steps 5000
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --resume latest
+    --phase-emb --phase-levels 2 --gated-attention --kv-norm --resume latest
 
 # 生成 (config.json から構成を自動判別)
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-5000/model \
@@ -562,12 +562,12 @@ uv run python predict_stream.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/c
     --temperature 0.7 --top-p 0.9
 
 # Copying / Selective (標準構成)
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention \
+uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention --kv-norm \
     --run-name <name> --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name <name> --max-t-exp 17
 ```
 
 主なチェックポイント（`$DATA_DIR/checkpoints_logkv/`、いずれも 5000 步）:
-`d1024-h8-l16-ph2-gated`（**標準構成**）、`d1024-h8-l16-ld-phase2`（gated なし）、
+`d1024-h8-l16-ph2-gated-kvnorm`（**標準構成**）、`d1024-h8-l16-ph2-gated`（kv_norm なし）、`d1024-h8-l16-ld-phase2`（gated なし）、
 `d1024-h8-l16-ph2-ldecay`（学習可能減衰）、`d1024-h8-l16-leveldecay`（位相なし）。
 シングルヘッド時代の `d1024-l16`（補正なし）と `d1024-l16-leveldecay` はコード 3f7cc40 が必要。
