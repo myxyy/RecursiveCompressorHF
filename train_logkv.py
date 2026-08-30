@@ -5,7 +5,11 @@ Usage:
     uv run torchrun --nproc_per_node=6 train_logkv.py
     uv run torchrun --nproc_per_node=6 train_logkv.py --resume latest
 
-Control commands (write to control.cmd file during training):
+Pause/resume (process keeps running, GPUs idle) vs save_and_exit + --resume latest
+(process exits; resume continues from the checkpoint step with the epoch's
+remaining data — consumed samples are skipped — and --max-steps is absolute).
+
+Control commands (write to control.cmd file during training, or `just pause` etc.):
     echo "pause"         > control.cmd   # Pause training
     echo "resume"        > control.cmd   # Resume training
     echo "save_and_exit" > control.cmd   # Save checkpoint and exit
@@ -77,7 +81,9 @@ def parse_args():
     p.add_argument("--lr", type=float, default=2e-4)
     p.add_argument("--warmup", type=int, default=1000, help="linear warmup steps")
     p.add_argument("--grad-clip", type=float, default=1.0)
-    p.add_argument("--max-steps", type=int, default=0, help="0 = full epoch(s)")
+    p.add_argument("--max-steps", type=int, default=0,
+                   help="この(絶対)ステップ数に達したら保存して終了。0 = エポック終了まで。"
+                        "再開時も絶対値なので、--max-steps 5000 で再開すれば step 5000 で止まる")
     p.add_argument("--num-epochs", type=int, default=1)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--log-interval", type=int, default=10)
@@ -135,7 +141,7 @@ def _list_checkpoints(run_dir):
     return sorted(names, key=lambda n: int(n.rsplit("-", 1)[1]))
 
 
-def save_checkpoint(run_dir, step, epoch, model, optimizers, max_checkpoints):
+def save_checkpoint(run_dir, step, epoch, model, optimizers, max_checkpoints, ema_loss=None):
     """rank 0 only. Saves HF model dir + trainer state for resume."""
     ckpt_dir = os.path.join(run_dir, f"checkpoint-{step}")
     tmp_dir = ckpt_dir + ".tmp"
@@ -145,6 +151,7 @@ def save_checkpoint(run_dir, step, epoch, model, optimizers, max_checkpoints):
     torch.save({
         "step": step,
         "epoch": epoch,
+        "ema_loss": ema_loss,
         "optimizers_state_dict": [opt.state_dict() for opt in optimizers],
     }, os.path.join(tmp_dir, "trainer_state.pt"))
     if os.path.exists(ckpt_dir):
@@ -270,7 +277,31 @@ def main():
 
     sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank,
                                  shuffle=True, seed=args.seed, drop_last=True)
-    loader = DataLoader(dataset, batch_size=args.batch_size, sampler=sampler,
+
+    class SkipSampler(torch.utils.data.Sampler):
+        """Wraps the DistributedSampler and drops the first `skip` per-rank
+        indices of one epoch, so a resumed run continues with unseen data
+        instead of replaying the epoch from its start (the order itself is
+        reproducible via seed + set_epoch)."""
+        def __init__(self, base):
+            self.base, self.skip = base, 0
+        def set_epoch(self, epoch):
+            self.base.set_epoch(epoch)
+        def __iter__(self):
+            it = iter(self.base)
+            for _ in range(self.skip):
+                next(it, None)
+            self.skip = 0  # only the first (resumed) epoch is partial
+            return it
+        def __len__(self):
+            return len(self.base)
+
+    skip_sampler = SkipSampler(sampler)
+    if resume_state is not None:
+        # micro-batches consumed so far on this rank in the resumed epoch
+        skip_sampler.skip = start_step * args.grad_accum * args.batch_size
+        log(f"Resume: skipping {skip_sampler.skip} consumed samples per rank in epoch {start_epoch}")
+    loader = DataLoader(dataset, batch_size=args.batch_size, sampler=skip_sampler,
                         num_workers=2, pin_memory=True, drop_last=True)
 
     writer = SummaryWriter(
@@ -279,16 +310,13 @@ def main():
     sample_path = os.path.join(run_dir, "samples.log")
 
     step = start_step
-    ema_loss = None
+    ema_loss = resume_state.get("ema_loss") if resume_state is not None else None
     paused = False
     stop = False
     t0 = time.time()
     for epoch in range(start_epoch, args.num_epochs):
-        sampler.set_epoch(epoch)
+        skip_sampler.set_epoch(epoch)
         micro_iter = iter(loader)
-        # NOTE: resume replays the epoch's shuffled order from its start (the
-        # sampler order is reproducible via seed+set_epoch, but we do not skip
-        # already-seen batches; acceptable for these experiments).
         while True:
             cmd = read_control_command_synced(device)
             if cmd == CMD_PAUSE and not paused:
@@ -358,11 +386,11 @@ def main():
             if step % args.checkpoint_interval == 0:
                 if rank == 0:
                     ckpt = save_checkpoint(run_dir, step, epoch, model, optimizers,
-                                           args.max_checkpoints)
+                                           args.max_checkpoints, ema_loss=ema_loss)
                     log(f"Saved {ckpt}")
                 dist.barrier()
 
-            if args.max_steps and step - start_step >= args.max_steps:
+            if args.max_steps and step >= args.max_steps:
                 stop = True
                 break
         if stop:
@@ -370,7 +398,7 @@ def main():
 
     if rank == 0:
         ckpt = save_checkpoint(run_dir, step, epoch, model, optimizers,
-                               args.max_checkpoints)
+                               args.max_checkpoints, ema_loss=ema_loss)
         log(f"Final checkpoint: {ckpt}")
     dist.barrier()
     dist.destroy_process_group()
