@@ -500,3 +500,8 @@ recursive_compressor.MultiHeadAttention と同形のゲート(sigmoid(W_g x+b) �
 **T=1〜131072 の全ホライズンで string 1.000 を維持**(収束は 44700 と固定版 23100 より遅い)。
 ゲートは bias≈0.5 のままだが内容依存でほぼ二値的(第1層: <0.1 が 53%、>0.9 が 28%)に働き、
 答え(マーカー)位置では平均 0.15 と attention 出力を強く絞る次元選択器になっている。
+
+### kv_norm (2026-08-30, logkv-d512-logu-phase2-gated-kvnorm, best ckpt 50000)
+k/v に head_dim 単位の RMSNorm を射影直後と各圧縮後に適用し全レベルのスロットを同一スケールにする
+`--kv-norm`(doc/logkv.md §6.10–6.11)を gated 版に追加。**T=1〜131072 で string 1.000**(98304 のみ
+0.996 = 256 中 1 件)。EMA loss 7e-10 で過去最小。完全解は不変。
