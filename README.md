@@ -4,6 +4,8 @@
 
 階層的なkv圧縮による独自アーキテクチャ **LogKV** の言語モデル実装です。
 
+![LogKVのKVキャッシュ構造](logkv.drawio.png)
+
 ## アーキテクチャ（LogKV）
 
 LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattentionプーリング圧縮し、各クエリ位置が「直近C個のトークン、直近C個のC トークン要約、直近C個のC²トークン要約、…」という**多解像度の窓（C×log L 個のkvスロット）を単一のsoftmaxで参照**するattention機構です。

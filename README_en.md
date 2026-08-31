@@ -4,6 +4,8 @@ English | [日本語](README.md)
 
 A language model implementation of **LogKV**, a custom architecture based on hierarchical kv compression.
 
+![LogKV kv-cache structure](logkv.drawio.png)
+
 ## Architecture (LogKV)
 
 LogKV recursively compresses the sequence chunk by chunk (C = chunk_size) with attention pooling, and every query position attends — through a **single softmax over C × log L kv slots** — to a multi-resolution window: the last C tokens, the last C summaries of C tokens each, the last C summaries of C² tokens each, and so on.
