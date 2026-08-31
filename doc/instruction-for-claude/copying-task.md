@@ -505,3 +505,8 @@ recursive_compressor.MultiHeadAttention と同形のゲート(sigmoid(W_g x+b) �
 k/v に head_dim 単位の RMSNorm を射影直後と各圧縮後に適用し全レベルのスロットを同一スケールにする
 `--kv-norm`(doc/logkv.md §6.10–6.11)を gated 版に追加。**T=1〜131072 で string 1.000**(98304 のみ
 0.996 = 256 中 1 件)。EMA loss 7e-10 で過去最小。完全解は不変。
+
+### level_amplify (2026-08-31, logkv-d512-logu-std-amplify)
+レベルバイアスの符号を反転(+i*log C、`--level-amplify`)。他は標準構成と同一。
+T≤2048は1.000を維持するが、16384から崩れ始め131072でstr 0.926(減衰は全域1.000)。
+収束も遅い(best 36500)。増幅の事前重みが遠距離で内容マッチを侵食する。
