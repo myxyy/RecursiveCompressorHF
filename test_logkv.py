@@ -169,7 +169,9 @@ def _reference_core(m, q, k, v):
     batch_size, seq_len, d_model = q.size()
     x = q
     if m.k_norm is not None:  # kv_norm: level-0 slots
-        k, v = m.k_norm(k), m.v_norm(v)
+        k = m.k_norm(k)
+    if m.v_norm is not None:
+        v = m.v_norm(v)
 
     # build per-level kv chunks by recursive compression
     k_list, v_list = [], []
@@ -190,7 +192,9 @@ def _reference_core(m, q, k, v):
             kl.reshape(batch_size * n, C, d_model),
             vl.reshape(batch_size * n, C, d_model))
         if m.k_norm is not None:  # kv_norm: after every compression
-            k_, v_ = m.k_norm(k_), m.v_norm(v_)
+            k_ = m.k_norm(k_)
+        if m.v_norm is not None:
+            v_ = m.v_norm(v_)
         ql = q_.reshape(batch_size, n, d_model)
         kl = k_.reshape(batch_size, n, d_model)
         vl = v_.reshape(batch_size, n, d_model)
@@ -534,3 +538,34 @@ def test_level_amplify_matches_reference_and_step_fp64():
                gated_attention=True, kv_norm=True).double().eval()
     with torch.no_grad():
         assert not torch.allclose(m2(x), y)
+
+
+def test_v_norm_only_matches_reference_and_step_fp64():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+              gated_attention=True, v_norm_only=True).double().eval()
+    assert m.k_norm is None and m.v_norm is not None
+    with torch.no_grad():
+        m.v_norm.weight.normal_(1.0, 0.3)
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, _ = m.step(x[:, 57:], h)
+        assert (torch.cat([y1, y2], 1) - y).abs().max().item() < 1e-12
+
+
+def test_v_norm_only_normalizes_v_not_k():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, v_norm_only=True).eval()
+    x = torch.randn(1, 200, 32) * 5.0
+    with torch.no_grad():
+        _, (levels, _) = m.step(x)
+    v_rms, k_rms = [], []
+    for cur_q, cur_k, cur_v, prev_k, prev_v in levels:
+        for t, acc in [(cur_v, v_rms), (prev_v, v_rms), (cur_k, k_rms), (prev_k, k_rms)]:
+            if t is not None and t.numel():
+                acc.append(t.pow(2).mean(-1).sqrt().flatten())
+    v_rms, k_rms = torch.cat(v_rms), torch.cat(k_rms)
+    assert torch.allclose(v_rms, torch.ones_like(v_rms), atol=1e-4)
+    assert not torch.allclose(k_rms, torch.ones_like(k_rms), atol=0.1)
