@@ -23,9 +23,17 @@ class Compressor(nn.Module):
 
 class LogKV(nn.Module):
     def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
-                 learnable_decay=False, gated_attention=False, kv_norm=False):
+                 learnable_decay=False, gated_attention=False, kv_norm=False,
+                 level_amplify=False):
         super(LogKV, self).__init__()
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
+        assert not (level_amplify and learnable_decay), "level_amplify is a fixed-bias variant"
+        # Sign of the fixed level bias: -1 = decay (level-i slots get -i*log C,
+        # the multiplicity-collapsing recency prior), +1 = amplify (+i*log C,
+        # compensating the 1/C**i value dilution of mixed pooling; see
+        # doc/logkv.md §6.10 — which regime applies depends on pooling
+        # sharpness, so both are kept as options).
+        self.level_sign = 1.0 if level_amplify else -1.0
         self.dim = dim
         self.chunk_size = chunk_size
         self.num_heads = num_heads
@@ -280,7 +288,7 @@ class LogKV(nn.Module):
             # into a geometric series ~= one count, removing the
             # multiplicity amplification behind topic fixation (and inducing
             # a parameter-free ~1/distance recency prior).
-            level_bias = -i * math.log(C) if self.level_decay is None else -i * slope
+            level_bias = self.level_sign * i * math.log(C) if self.level_decay is None else -i * slope
             m_i, l_i, acc_i = self._level_attention(
                 q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
             if m is None:
@@ -349,11 +357,11 @@ class LogKVBlock(nn.Module):
     x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
-                 learnable_decay=False, gated_attention=False, kv_norm=False):
+                 learnable_decay=False, gated_attention=False, kv_norm=False, level_amplify=False):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
-                               gated_attention, kv_norm)
+                               gated_attention, kv_norm, level_amplify)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 

@@ -19,7 +19,7 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
         self.layers = nn.ModuleList([
             LogKVBlock(config.d_model, config.chunk_size, config.d_ff, config.num_heads,
                        config.phase_emb, config.phase_levels, config.learnable_decay,
-                       config.gated_attention, config.kv_norm)
+                       config.gated_attention, config.kv_norm, config.level_amplify)
             for _ in range(config.num_layers)
         ])
         self.norm = nn.RMSNorm(config.d_model)

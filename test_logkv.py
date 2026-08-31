@@ -223,7 +223,7 @@ def _reference_core(m, q, k, v):
         if m.level_decay is not None:   # per-head learnable slope (rows are batch-major, head-minor)
             logits = logits - i * m.level_decay.repeat(batch_size // m.num_heads)[:, None, None]
         else:
-            logits = logits - i * math.log(C)  # fixed level-decay bias (see LogKV.step)
+            logits = logits + m.level_sign * i * math.log(C)  # fixed level bias (see LogKV.step)
         logits_list.append(logits.masked_fill(invalid[None, :, :], float('-inf')))
         v_slots_list.append(vc[:, blk, cexp, :])
     weights = torch.nan_to_num(
@@ -515,3 +515,22 @@ def test_kv_norm_gets_gradient():
     m = LogKV(dim=32, chunk_size=4, num_heads=4, kv_norm=True)
     m(torch.randn(2, 60, 32)).square().sum().backward()
     assert m.k_norm.weight.grad.abs().sum() > 0 and m.v_norm.weight.grad.abs().sum() > 0
+
+
+def test_level_amplify_matches_reference_and_step_fp64():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+              gated_attention=True, kv_norm=True, level_amplify=True).double().eval()
+    assert m.level_sign == 1.0
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, _ = m.step(x[:, 57:], h)
+        assert (torch.cat([y1, y2], 1) - y).abs().max().item() < 1e-12
+    # sign actually flips the output relative to decay
+    torch.manual_seed(0)
+    m2 = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+               gated_attention=True, kv_norm=True).double().eval()
+    with torch.no_grad():
+        assert not torch.allclose(m2(x), y)

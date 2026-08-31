@@ -76,6 +76,8 @@ def parse_args():
                    help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--kv-norm", action="store_true",
                    help="k/vにhead_dim単位のRMSNormを射影直後と各圧縮後に適用し全レベルを同一スケールにする")
+    p.add_argument("--level-amplify", action="store_true",
+                   help="レベルバイアスの符号を反転し +i*log C (増幅) にする (§6.10の希釈補正側)")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
@@ -233,6 +235,7 @@ def main():
         learnable_decay=args.learnable_decay,
         gated_attention=args.gated_attention,
         kv_norm=args.kv_norm,
+        level_amplify=args.level_amplify,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
