@@ -230,6 +230,9 @@ def _reference_core(m, q, k, v):
             logits = logits + m.level_sign * i * math.log(C)  # fixed level bias (see LogKV.step)
         logits_list.append(logits.masked_fill(invalid[None, :, :], float('-inf')))
         v_slots_list.append(vc[:, blk, cexp, :])
+    if m.self_slot:  # the query's own token as one extra slot (bias 0)
+        logits_list.append(torch.einsum('bld,bld->bl', q, k)[..., None] * scale)
+        v_slots_list.append(v[:, :, None, :])
     weights = torch.nan_to_num(
         torch.softmax(torch.cat(logits_list, dim=-1), dim=-1))
     all_v = torch.cat(v_slots_list, dim=2)
@@ -569,3 +572,45 @@ def test_v_norm_only_normalizes_v_not_k():
     v_rms, k_rms = torch.cat(v_rms), torch.cat(k_rms)
     assert torch.allclose(v_rms, torch.ones_like(v_rms), atol=1e-4)
     assert not torch.allclose(k_rms, torch.ones_like(k_rms), atol=0.1)
+
+
+# ---------------------------------------------------------------------------
+# self_slot
+# ---------------------------------------------------------------------------
+
+def test_self_slot_matches_reference_step_predict_fp64():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, phase_emb=True, phase_levels=2,
+              gated_attention=True, self_slot=True).double().eval()
+    x = torch.randn(2, 130, 32, dtype=torch.float64)
+    with torch.no_grad():
+        y = m(x)
+        assert (y - reference_forward(m, x)).abs().max().item() < 1e-12
+        y1, h = m.step(x[:, :57]); y2, h = m.step(x[:, 57:120], h)
+        parts = [y1, y2]
+        for t in range(120, 130):
+            yt, h = m.predict(x[:, t], h); parts.append(yt.unsqueeze(1))
+        assert (torch.cat(parts, 1) - y).abs().max().item() < 1e-12
+
+
+def test_self_slot_position0_attends_to_itself():
+    """位置0は従来ゼロ出力だったが、self_slotでは自分のvalueに基づく出力になる"""
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, self_slot=True).eval()
+    x = torch.randn(1, 5, 32)
+    with torch.no_grad():
+        y = m(x)
+        v0 = m._split_heads(m.lv(x))[:, 0]                       # (H, dh)
+        expect = m.lo(v0.reshape(1, 1, -1))[0, 0]
+    assert torch.allclose(y[0, 0], expect, atol=1e-5)
+    m0 = LogKV(dim=32, chunk_size=4, num_heads=4).eval()
+    with torch.no_grad():
+        assert m0(x)[0, 0].abs().max().item() == 0.0
+
+
+def test_self_slot_changes_output_and_gets_grad():
+    torch.manual_seed(0)
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, self_slot=True)
+    x = torch.randn(2, 40, 32, requires_grad=True)
+    m(x).square().sum().backward()
+    assert torch.isfinite(x.grad).all() and m.lk.weight.grad.abs().sum() > 0

@@ -24,7 +24,7 @@ class Compressor(nn.Module):
 class LogKV(nn.Module):
     def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False,
-                 level_amplify=False, v_norm_only=False):
+                 level_amplify=False, v_norm_only=False, self_slot=False):
         super(LogKV, self).__init__()
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         assert not (level_amplify and learnable_decay), "level_amplify is a fixed-bias variant"
@@ -34,6 +34,12 @@ class LogKV(nn.Module):
         # doc/logkv.md §6.10 — which regime applies depends on pooling
         # sharpness, so both are kept as options).
         self.level_sign = 1.0 if level_amplify else -1.0
+        # self_slot: add one extra slot per query holding the CURRENT token's
+        # own k/v (bias 0, like level 0). Without it a query only sees strictly
+        # past slots, so the softmax has no "attend to nothing / to myself"
+        # option and must dump its mass on some past slot (the attention-sink
+        # problem); with it the semantics match a standard causal mask.
+        self.self_slot = self_slot
         self.dim = dim
         self.chunk_size = chunk_size
         self.num_heads = num_heads
@@ -248,7 +254,7 @@ class LogKV(nn.Module):
             ctxs.append((base, torch.cat(k_parts, dim=1), torch.cat(v_parts, dim=1)))
 
         # ---- (B) attention for all queries of the segment at once ----
-        if not ctxs:
+        if not ctxs and not self.self_slot:
             return torch.zeros_like(q_new), (levels, offset + seq_len)
 
         s_abs = offset + torch.arange(seq_len, device=x.device)  # (seq_len,)
@@ -263,6 +269,8 @@ class LogKV(nn.Module):
             invalids.append(a < 0)
         n_levels = len(ctxs)
         flat = (*k_ctxs, *v_ctxs, *locals_, *invalids)
+        if self.self_slot:
+            flat = flat + (k_new, v_new)   # trailing pair = the query's own token
         # The whole attention pass is one checkpoint region: autograd keeps
         # only its inputs (per-level contexts, ~1.33*L*d total) and output,
         # and recomputes gathers / partial softmaxes in backward.
@@ -282,7 +290,8 @@ class LogKV(nn.Module):
         concatenation."""
         C = self.chunk_size
         k_ctxs, v_ctxs = flat[:n_levels], flat[n_levels:2 * n_levels]
-        locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:]
+        locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:4 * n_levels]
+        self_kv = flat[4 * n_levels:]   # (k_self, v_self) when self_slot, else ()
         if self.level_decay is not None:
             # rows of q are batch-major then head (see _split_heads):
             # row b*H + h -> head h
@@ -311,6 +320,23 @@ class LogKV(nn.Module):
                 beta = torch.exp(m_i - m_ref)
                 l = l * alpha + l_i * beta
                 acc = acc * alpha[..., None] + acc_i * beta[..., None]
+                m = m_new
+        if self_kv:
+            # self slot: logit q.k_t (no level bias), value v_t; merged like a level
+            k_s, v_s = self_kv
+            logit_s = (q * k_s).sum(-1) * scale                          # (B*H, L)
+            acc_dtype = torch.promote_types(logit_s.dtype, torch.float32)
+            m_s = logit_s.to(acc_dtype)
+            l_s = torch.ones_like(m_s)
+            acc_s = v_s.to(acc_dtype)
+            if m is None:
+                m, l, acc = m_s, l_s, acc_s
+            else:
+                m_new = torch.maximum(m, m_s)
+                alpha = torch.exp(m - m_new)
+                beta = torch.exp(m_s - m_new)
+                l = l * alpha + l_s * beta
+                acc = acc * alpha[..., None] + acc_s * beta[..., None]
                 m = m_new
         # positions with no valid kv at all (sequence start) -> zero output
         l_safe = torch.where(l > 0, l, torch.ones_like(l))
@@ -367,11 +393,11 @@ class LogKVBlock(nn.Module):
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False, level_amplify=False,
-                 v_norm_only=False):
+                 v_norm_only=False, self_slot=False):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
-                               gated_attention, kv_norm, level_amplify, v_norm_only)
+                               gated_attention, kv_norm, level_amplify, v_norm_only, self_slot)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
 

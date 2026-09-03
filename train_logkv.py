@@ -80,6 +80,8 @@ def parse_args():
                    help="レベルバイアスの符号を反転し +i*log C (増幅) にする (§6.10の希釈補正側)")
     p.add_argument("--v-norm-only", action="store_true",
                    help="vのみRMSNorm(kは非正規化)。kv_normの希釈補正をkeyノルム符号化を保ったまま適用")
+    p.add_argument("--self-slot", action="store_true",
+                   help="クエリ自身のトークンのk/vを1スロット追加 (通常のcausal maskと同じ意味論)")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)
@@ -239,6 +241,7 @@ def main():
         kv_norm=args.kv_norm,
         level_amplify=args.level_amplify,
         v_norm_only=args.v_norm_only,
+        self_slot=args.self_slot,
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,

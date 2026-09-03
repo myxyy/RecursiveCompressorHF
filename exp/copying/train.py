@@ -59,6 +59,8 @@ def parse_args():
                    help="レベルバイアスの符号を反転し +i*log C (増幅) にする (§6.10の希釈補正側)")
     p.add_argument("--v-norm-only", action="store_true",
                    help="vのみRMSNorm(kは非正規化)。kv_normの希釈補正をkeyノルム符号化を保ったまま適用")
+    p.add_argument("--self-slot", action="store_true",
+                   help="クエリ自身のトークンのk/vを1スロット追加 (通常のcausal maskと同じ意味論)")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -156,6 +158,7 @@ def main():
             kv_norm=args.kv_norm,
             level_amplify=args.level_amplify,
             v_norm_only=args.v_norm_only,
+            self_slot=args.self_slot,
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)

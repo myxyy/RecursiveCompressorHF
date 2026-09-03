@@ -26,6 +26,7 @@ class LogKVConfig(PretrainedConfig):
         kv_norm=False,
         level_amplify=False,
         v_norm_only=False,
+        self_slot=False,
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
@@ -43,6 +44,7 @@ class LogKVConfig(PretrainedConfig):
         self.kv_norm = kv_norm
         self.level_amplify = level_amplify
         self.v_norm_only = v_norm_only
+        self.self_slot = self_slot
         super().__init__(
             vocab_size=vocab_size,
             pad_token_id=pad_token_id,
