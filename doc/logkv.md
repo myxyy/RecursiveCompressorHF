@@ -428,8 +428,8 @@ doc 末尾。
 ### 6.8 標準構成の確定
 
 LM の標準構成は **固定 log C のレベル減衰 + 位相埋め込み（phase_levels=2）+ マルチヘッド
-+ gated attention（§6.9）** とする（`--phase-emb --phase-levels 2 --gated-attention`、
-`learnable_decay` は使わない）。
++ gated attention（§6.9）+ self slot（§6.16）** とする
+（`--phase-emb --phase-levels 2 --gated-attention --self-slot`、`learnable_decay` は使わない）。
 
 **kv_norm はオプション**（一時は標準に含めたが §6.13 の結果で外した）: LM の loss 改善は僅か
 （3.489→3.452）な一方、key ノルム符号化を塞いで完全記憶の限界を 26–52 万トークンまで縮める
@@ -644,8 +644,11 @@ online softmax にマージする `self_slot`（無パラメータ、位置 0 �
   署名（1/3 → 0/3）。ただし n=3 なので効果量の確度は低い
 - 残る崩壊は温度 0.7 の mode-seeking によるリスト反復（心臓病・脳卒中、組織名、日付）で、
   逃げ場の有無とは別の機構
-- 判断材料: 無パラメータ・loss 中立・意味論が通常 causal と一致し、生成は悪化しないため
-  標準構成に入れて損はない。序盤執着への効果は大規模（32 層・29k 步）構成での再確認が必要
+- **勾配の安定化**: warmup 後の grad_norm は平均 1.14→0.74、標準偏差 0.40→0.19、最大
+  4.39→3.13（最終 1000 步: 0.89→0.66）。softmax が過去スロットに mass を強制注入しなくて
+  済む分、attention 経路の勾配が穏やかになる
+- **標準構成に採用**（2026-09-04）: 無パラメータ・loss 中立・意味論が通常 causal と一致・
+  生成は悪化せず・勾配が安定。序盤執着への効果は大規模（32 層・29k 步）構成での再確認が必要
 
 ## 7. 未解決・今後の候補
 
@@ -663,9 +666,9 @@ uv run pytest test_logkv.py test_logkv_lm.py -v
 
 # 標準構成 (§6.8) での訓練
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --max-steps 5000
+    --phase-emb --phase-levels 2 --gated-attention --self-slot --max-steps 5000
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --resume latest
+    --phase-emb --phase-levels 2 --gated-attention --self-slot --resume latest
 
 # 生成 (config.json から構成を自動判別)
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-5000/model \

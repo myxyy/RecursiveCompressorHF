@@ -22,6 +22,7 @@ The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the
 | Phase embedding | Learned vectors for the low base-C digits of the position (period 16). Fixes positional degeneracy inside runs of identical tokens |
 | Multi-head | Heads folded into the batch dimension |
 | Gated attention | Per-head attention output multiplied by sigmoid(W_g x) |
+| Self slot | One extra slot holding the query token's own k/v (same semantics as a standard causal mask); gives the softmax an "attend to nothing" option and stabilizes gradients |
 
 The language model (LogKVLM) is `Embedding → LogKVBlock × num_layers → RMSNorm → Linear`, extending HuggingFace's `PreTrainedModel` (`save_pretrained` / `from_pretrained` / `generate`).
 
@@ -41,7 +42,7 @@ cp .env.example .env
 
 ```bash
 uv run torchrun --nproc_per_node=6 train_logkv.py \
-    --run-name myrun --phase-emb --phase-levels 2 --gated-attention
+    --run-name myrun --phase-emb --phase-levels 2 --gated-attention --self-slot
 ```
 
 Trains in mixed precision (fp32 master weights + bfloat16 autocast) with a two-optimizer setup: Muon (2D hidden weights) + AdamW. The attention pass uses online softmax + activation checkpointing to reduce VRAM.
@@ -75,7 +76,7 @@ uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV (incl. fp64 machine-pr
 uv run pytest test_lm.py -v                       # legacy architecture
 
 # Copy Memory Problem / Selective Copying (long-range memory benchmarks)
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention \
+uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
 ```

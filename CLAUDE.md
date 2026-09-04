@@ -5,7 +5,7 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 
 ## Architecture
 ### LogKV (main)
-- `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends to a sliding window of the last C sub-unit summaries; all levels share one softmax (C·log L slots, full-sequence receptive field). Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.
+- `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends to a sliding window of the last C sub-unit summaries; all levels share one softmax (C·log L slots, full-sequence receptive field). Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.
 - `logkv_lm.py` - LogKVLM language model (PreTrainedModel + generate; `past_key_values` carries the opaque per-layer hidden list).
 - `configuration_logkv.py` - LogKVConfig.
 - `train_logkv.py` - **DDP data-parallel** training (the model fits on one GPU). Muon + AdamW, bf16 autocast, control.cmd, `--resume latest` (skips consumed data, absolute `--max-steps`, EMA carry-over), periodic Japanese sample generations to `samples.log`.
@@ -29,7 +29,7 @@ uv run pytest test_lm.py -v                            # Legacy tests
 
 # LogKV standard-config training (DDP, 6 GPUs)
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention
+    --phase-emb --phase-levels 2 --gated-attention --self-slot
 
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-<step>/model \
     --max-new-tokens 1024 --temperature 0.7 --top-p 0.9
@@ -57,7 +57,7 @@ uv run tensorboard --logdir $DATA_DIR/tensorboard/
 
 ## Key Design Decisions — LogKV
 Details and evidence live in `doc/logkv.md`; summary:
-- **Standard config**: fixed level decay (−i·log C) + phase embedding (levels=2, period 16) + multi-head + gated attention. `kv_norm`/`learnable_decay`/`level_amplify`/`v_norm_only` exist as options but are NOT standard (each was tested and rejected for the LM: kv_norm caps the key-norm retrieval margin, learnable decay and amplification worsen temp-0.7 repetition, v_norm alone helps little).
+- **Standard config**: fixed level decay (−i·log C) + phase embedding (levels=2, period 16) + multi-head + gated attention + self slot (the query's own k/v as one extra slot = standard causal-mask semantics; loss-neutral, gives the softmax an "attend to nothing" option, stabilizes grad_norm ~1.14→0.74). `kv_norm`/`learnable_decay`/`level_amplify`/`v_norm_only` exist as options but are NOT standard (each was tested and rejected for the LM: kv_norm caps the key-norm retrieval margin, learnable decay and amplification worsen temp-0.7 repetition, v_norm alone helps little).
 - **Level decay** collapses the cross-level multiplicity of a token (attention pooling keeps salient values undiluted, so one occurrence appears in ~log L slots) into ~one count; this fixed the exponential topic-fixation feedback. The induced prior is ∝1/distance, so retrieval needs only a ln(d) logit margin — Copying stays perfect at 16.7M tokens (8273× the training horizon) in the standard-config-minus-norm setup.
 - **Phase embedding** (base-C digits of the absolute position, small period) breaks the positional degeneracy inside runs of identical tokens (multi-scale windows coincide there, making "how many so far" uncountable). Longer periods alias beyond the training range and hurt extrapolation; period 16 is the robust choice.
 - **step()/forward()/predict() equivalence** is the core invariant, tested at fp64 <1e-12 against an independent `reference_forward` in `test_logkv.py` (forward delegates to step, so the test oracle must stay independent). Any semantic change (biases, norms, gates) must be mirrored in the reference.
@@ -86,7 +86,7 @@ Details and evidence live in `doc/logkv.md`; summary:
 
 ## Current Model Parameters (LogKV standard)
 - d_model=1024, num_heads=8, d_ff=3072, chunk_size=4, num_layers=16 (~310M params)
-- phase_emb=True (phase_levels=2), gated_attention=True; decay fixed at log C
+- phase_emb=True (phase_levels=2), gated_attention=True, self_slot=True; decay fixed at log C
 - context_length=2048, lr=2e-4 (linear warmup 1000), DDP batch 4/GPU × 6 GPUs
 - mixed precision: fp32 master / bfloat16 autocast
 - (Legacy pipeline model: d_model=2048, num_heads=16, d_ff=6144, num_layers=16, lr=5e-5)

@@ -22,6 +22,7 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 | 位相埋め込み | 位置のC進数下位桁（周期16）の学習ベクトル。同一トークン連続区間の位置縮退を解消 |
 | マルチヘッド | ヘッドをバッチ次元に折り畳んで適用 |
 | Gated attention | sigmoid(W_g x) を各ヘッドのattention出力に乗算 |
+| Self slot | クエリ自身のトークンのk/vを1スロット追加（通常のcausal maskと同じ意味論）。softmaxに「聞かない」逃げ場を与え勾配を安定化 |
 
 言語モデル（LogKVLM）は `Embedding → LogKVBlock × num_layers → RMSNorm → Linear` で、HuggingFaceの `PreTrainedModel` を継承しています（`save_pretrained` / `from_pretrained` / `generate` 対応）。
 
@@ -41,7 +42,7 @@ cp .env.example .env
 
 ```bash
 uv run torchrun --nproc_per_node=6 train_logkv.py \
-    --run-name myrun --phase-emb --phase-levels 2 --gated-attention
+    --run-name myrun --phase-emb --phase-levels 2 --gated-attention --self-slot
 ```
 
 混合精度（fp32マスター重み + bfloat16 autocast）、Muon（隠れ層の2D重み）+ AdamW の2段オプティマイザで学習します。attention部はonline softmax + activation checkpointingでVRAMを削減しています。
@@ -75,7 +76,7 @@ uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV（fp64機械精度の�
 uv run pytest test_lm.py -v                       # 旧アーキテクチャ
 
 # Copy Memory Problem / Selective Copying（長距離記憶の基礎検証）
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention \
+uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
 ```
