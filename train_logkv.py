@@ -178,7 +178,7 @@ def generate_samples(model, tokenizer, device, step, sample_path):
         with torch.autocast(device_type="cuda", dtype=torch.bfloat16):
             out = model.generate(
                 input_ids, max_new_tokens=80, do_sample=True,
-                temperature=0.7, top_p=0.9,
+                temperature=1.0, top_p=0.95,
                 pad_token_id=tokenizer.pad_token_id,
             )
         text = tokenizer.decode(out[0], skip_special_tokens=True)
