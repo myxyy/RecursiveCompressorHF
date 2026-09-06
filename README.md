@@ -26,7 +26,7 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 
 言語モデル（LogKVLM）は `Embedding → LogKVBlock × num_layers → RMSNorm → Linear` で、HuggingFaceの `PreTrainedModel` を継承しています（`save_pretrained` / `from_pretrained` / `generate` 対応）。
 
-**従来の重複あり構造では、Copyingタスクで訓練ホライズン2028トークンのモデルが1670万トークン（8273倍）先からの完全コピーに成功**しています（[doc/logkv.md](doc/logkv.md) §6.13）。重複除去後の学習・生成品質は未評価です（§6.17）。旧チェックポイントの重みは読込可能ですが、新構造での出力は変わります。
+**重複なし構造でも、訓練ホライズン2,028に対し、CopyingのT=131,072までの全41評価点で完全一致率100%**を確認しました（各256例、best/finalとも）。追加のT=16,777,216でも8例中8例が完全一致しました。一方、同条件の旧構造との比較ではSelective Copyingの精度が低下しています（[実験詳細](doc/logkv-refine-experiments.md)、学習seedは各条件1個）。新構造のLM生成品質は未評価です。旧チェックポイントの重みは読込可能ですが、新構造での出力は変わります。
 
 ## セットアップ
 

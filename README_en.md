@@ -26,7 +26,7 @@ The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the
 
 The language model (LogKVLM) is `Embedding → LogKVBlock × num_layers → RMSNorm → Linear`, extending HuggingFace's `PreTrainedModel` (`save_pretrained` / `from_pretrained` / `generate`).
 
-**With the original overlapping layout, a model trained with horizon 2,028 tokens performs perfect copying from 16.7M tokens away (8,273× the training horizon)** ([doc/logkv.md](doc/logkv.md) §6.13). Training and generation quality with the refined layout have not yet been evaluated (§6.17). Existing checkpoint weights can be loaded, but outputs change under the new layout.
+**The refined layout achieves 100% exact-match Copying accuracy at all 41 evaluated horizons through T=131,072 after training through T=2,028** (256 samples per horizon, both best and final checkpoints). An additional probe at T=16,777,216 also copies all 8 samples correctly. Selective Copying accuracy decreases against the original layout under matched conditions ([experiment details](doc/logkv-refine-experiments.md), one training seed per condition). LM generation quality with the refined layout remains unevaluated. Existing checkpoint weights can be loaded, but outputs change under the new layout.
 
 ## Setup
 

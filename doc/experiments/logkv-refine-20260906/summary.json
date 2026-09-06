@@ -1,0 +1,86 @@
+[
+  {
+    "task": "copying",
+    "layout": "overlap",
+    "commit": "c9c51c93324c868b6ed07c3e66eeda40cad37f9b",
+    "best": {
+      "step": 48100,
+      "string_acc": 1.0,
+      "token_acc": 1.0,
+      "ema_loss": 2.8727971837451507e-08
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 4.582164365274366e-06,
+      "ema_loss": 4.933356741160752e-06,
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "lr": 0.0003,
+      "elapsed_sec": 10722.1
+    },
+    "first_interval_string_099": 5300
+  },
+  {
+    "task": "copying",
+    "layout": "refined",
+    "commit": "3b0ce51692550510a88610d9c3054fd1bc2d4b80",
+    "best": {
+      "step": 49700,
+      "string_acc": 1.0,
+      "token_acc": 1.0,
+      "ema_loss": 5.338996891616406e-10
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 1.6211910702779164e-09,
+      "ema_loss": 6.652717684755606e-10,
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "lr": 0.0003,
+      "elapsed_sec": 8257.2
+    },
+    "first_interval_string_099": 10900
+  },
+  {
+    "task": "selective-copying",
+    "layout": "overlap",
+    "commit": "c9c51c93324c868b6ed07c3e66eeda40cad37f9b",
+    "best": {
+      "step": 49000,
+      "string_acc": 0.65046875,
+      "token_acc": 0.927078125,
+      "ema_loss": 0.011677242720156506
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.009915284812450409,
+      "ema_loss": 0.01164031456613887,
+      "token_acc": 0.90740625,
+      "string_acc": 0.5746875,
+      "lr": 0.0003,
+      "elapsed_sec": 9194.9
+    },
+    "first_interval_string_099": null
+  },
+  {
+    "task": "selective-copying",
+    "layout": "refined",
+    "commit": "3b0ce51692550510a88610d9c3054fd1bc2d4b80",
+    "best": {
+      "step": 49000,
+      "string_acc": 0.59234375,
+      "token_acc": 0.905515625,
+      "ema_loss": 0.01846792733212287
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.046398136764764786,
+      "ema_loss": 0.02322485057422264,
+      "token_acc": 0.870359375,
+      "string_acc": 0.46515625,
+      "lr": 0.0003,
+      "elapsed_sec": 8464.1
+    },
+    "first_interval_string_099": null
+  }
+]

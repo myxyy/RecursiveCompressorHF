@@ -1,0 +1,48 @@
+[
+  {
+    "layout": "overlap",
+    "gpu": 4,
+    "batch": 64,
+    "sequence_length": 2048,
+    "iterations": 10,
+    "seconds_per_forward_backward": 1.1978731495328248,
+    "times": [
+      1.1802398790605366,
+      1.1954640520270914,
+      1.1843415391631424,
+      1.1986468110699207,
+      1.2022701820824295,
+      1.195832994999364,
+      1.204204902984202,
+      1.2101942820008844,
+      1.2071838739793748,
+      1.2003529779613018
+    ],
+    "peak_allocated_gib": 16.964462280273438,
+    "optimizer_step_included": false,
+    "dtype": "fp32 master + bf16 autocast"
+  },
+  {
+    "layout": "refined",
+    "gpu": 4,
+    "batch": 64,
+    "sequence_length": 2048,
+    "iterations": 10,
+    "seconds_per_forward_backward": 1.1380150523036718,
+    "times": [
+      1.131417244905606,
+      1.1297218918334693,
+      1.1323860362172127,
+      1.137028228957206,
+      1.1403679291252047,
+      1.1396932010538876,
+      1.1390938479453325,
+      1.1411717340815812,
+      1.1424212330020964,
+      1.146849175915122
+    ],
+    "peak_allocated_gib": 14.763084411621094,
+    "optimizer_step_included": false,
+    "dtype": "fp32 master + bf16 autocast"
+  }
+]

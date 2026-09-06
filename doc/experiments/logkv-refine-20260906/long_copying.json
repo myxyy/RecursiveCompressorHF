@@ -1,0 +1,53 @@
+{
+  "commit": "3b0ce51692550510a88610d9c3054fd1bc2d4b80",
+  "checkpoint": "final",
+  "seed": 54321,
+  "samples": 8,
+  "precision": "bf16",
+  "train_max_t": 2028,
+  "gpu": 4,
+  "results": {
+    "262144": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 6.104510582983494
+    },
+    "524288": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 11.804497767006978
+    },
+    "1048576": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 24.69828610890545
+    },
+    "2097152": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 53.74516580393538
+    },
+    "4194304": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 116.30456781503744
+    },
+    "8388608": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 244.91231985902414
+    },
+    "16777216": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8,
+      "elapsed_sec": 491.17124906391837
+    }
+  }
+}
