@@ -26,10 +26,11 @@ class LogKV(nn.Module):
                  learnable_decay=False, gated_attention=False, kv_norm=False,
                  level_amplify=False, v_norm_only=False, self_slot=False):
         super(LogKV, self).__init__()
+        assert chunk_size >= 2, "chunk_size must be at least 2"
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         assert not (level_amplify and learnable_decay), "level_amplify is a fixed-bias variant"
         # Sign of the fixed level bias: -1 = decay (level-i slots get -i*log C,
-        # the multiplicity-collapsing recency prior), +1 = amplify (+i*log C,
+        # retained coarse-level penalty), +1 = amplify (+i*log C,
         # compensating the 1/C**i value dilution of mixed pooling; see
         # doc/logkv.md §6.10 — which regime applies depends on pooling
         # sharpness, so both are kept as options).
@@ -64,10 +65,10 @@ class LogKV(nn.Module):
         # before the output projection. Standard init (bias 0 -> gate 0.5).
         self.lg = nn.Linear(dim, dim) if gated_attention else None
         # Level-decay slope: level-i slots get logit bias -i * beta. Fixed
-        # beta = log C (weight C**-i) collapses the cross-level copies of a
-        # token into ~one count (see _attend_levels). With learnable_decay
+        # beta = log C (weight C**-i) retains the original coarse-level
+        # penalty; refined slots no longer overlap. With learnable_decay
         # each head learns its own beta, initialized at log C (unconstrained:
-        # 0 = no decay, log C = the analytic value, larger = stronger recency).
+        # 0 = no decay, log C = the original value, larger = stronger penalty).
         if learnable_decay:
             self.level_decay = nn.Parameter(torch.full((num_heads,), math.log(chunk_size)))
         else:
@@ -94,7 +95,7 @@ class LogKV(nn.Module):
         self.compressor = Compressor()
         # Recompute each level's slot gather + partial softmax in backward
         # (activation checkpointing) instead of storing the gathered
-        # (B*H, L, C, head_dim) slot tensors for every level — the dominant
+        # (B*H, L, C-1, head_dim) slot tensors for every level — the dominant
         # VRAM term. Numerically identical to storing them; costs one extra
         # gather/einsum per level in backward. Inference is unaffected.
         self.recompute_attention = True
@@ -125,15 +126,11 @@ class LogKV(nn.Module):
 
         Semantics (per level i, sub-unit = chunk_size**i tokens, block =
         chunk_size sub-units): a query at position s, sitting in sub-unit
-        j (0..C-1) of block u, attends to C slots — the compressed kv of the
-        C sub-units immediately PRECEDING its own sub-unit. Slots c < j come
-        from the query's own block u (already-complete sub-units); slots
-        c >= j come from the previous block u-1 (their own-block versions are
-        incomplete or would contain the query's local future, so using them
-        would break causality). Together they form a sliding window of the
-        last C sub-unit summaries at every scale; the top level (the fully
-        compressed remainder) extends the receptive field to the whole
-        sequence. One softmax normalizes across all levels jointly.
+        j (0..C-1) of block u, attends only to completed sub-units c < j
+        of that SAME block. Previous blocks are represented at higher
+        levels. These intervals partition [0, s) without gaps or overlap,
+        using at most C-1 slots per level. One softmax normalizes across
+        all levels jointly, plus the current token when self_slot is on.
 
         step() is the single authoritative implementation (its chunked pass
         reproduces these semantics exactly — see its docstring); forward is a
@@ -150,21 +147,17 @@ class LogKV(nn.Module):
         any split of the input reproduces forward(x).
 
         Key facts making this possible:
-        * The block-aligned slot selection (c < j from own block, c >= j from
-          the previous block) is exactly the C sub-units immediately
-          preceding the query's sub-unit — a plain sliding window — with the
-          slot order given in closed form by
-              a_c = q_sub - C + ((c - q_sub) mod C).
-        * Every window element ends strictly before its query (element
+        * At level i, q_sub = s // C**i and j = q_sub % C. The selected
+          indices are a_c = q_sub - j + c for 0 <= c < j.
+        * Every selected element ends strictly before its query (element
           a <= q_sub-1 completes at token (a+1)*sub_len - 1 < s), so the
           whole hierarchy can be updated FIRST and attention computed
           afterwards for all queries at once without breaking causality.
-        * The oldest window position of the segment's first query is
-          >= the absolute start of [prev, cur], so per level the context
-          [prev, cur, entries completed this call] covers every access.
+        * The current partial chunk plus entries arriving this call cover
+          every access; completed previous chunks need no separate cache.
 
-        hidden: (levels, offset) — levels[i] = [cur_q, cur_k, cur_v,
-        prev_k, prev_v] (incomplete current chunk + last completed chunk;
+        hidden: (levels, offset) — levels[i] = [cur_q, cur_k, cur_v]
+        (incomplete current chunk only;
         heads are folded into the batch dimension, i.e. batch B*H),
         offset = number of tokens processed so far. The caller's hidden is
         not mutated. Returns (out, new_hidden).
@@ -187,7 +180,7 @@ class LogKV(nn.Module):
         return self.lo(self._merge_heads(v_out, batch_size)), hidden
 
     def _attend(self, q_new, k_new, v_new, hidden):
-        """Hierarchy update + windowed attention on projected, head-folded
+        """Hierarchy update + disjoint attention on projected, head-folded
         (B*H, L, head_dim) tensors. See step() for the semantics."""
         C = self.chunk_size
         batch_size, seq_len, d_model = q_new.size()
@@ -201,25 +194,23 @@ class LogKV(nn.Module):
             levels = [list(lvl) for lvl in levels]
 
         # ---- (A) update the hierarchy, recording per-level attention
-        #      contexts (base absolute index, [prev | cur | new] kv) ----
+        #      contexts (base absolute index, [cur | new] kv) ----
         ctxs = []  # per level: (base_abs, k_ctx, v_ctx)
         empty = x.new_zeros(batch_size, 0, d_model)
         nq, nk, nv = q_new, k_new, v_new  # entries arriving at level i
         i = 0
         while nq.size(1) > 0:
             if i == len(levels):
-                levels.append([empty, empty, empty, None, None])
+                levels.append([empty, empty, empty])
             lvl = levels[i]
-            cur_q, cur_k, cur_v, prev_k, prev_v = lvl
+            cur_q, cur_k, cur_v = lvl
             m = cur_q.size(1)
-            base = offset // (C ** i) - m - (C if prev_k is not None else 0)
-            k_parts = ([prev_k] if prev_k is not None else []) + [cur_k, nk]
-            v_parts = ([prev_v] if prev_v is not None else []) + [cur_v, nv]
-            ctxs.append((base, torch.cat(k_parts, dim=1), torch.cat(v_parts, dim=1)))
+            base = offset // (C ** i) - m
 
             all_q = torch.cat([cur_q, nq], dim=1)
             all_k = torch.cat([cur_k, nk], dim=1)
             all_v = torch.cat([cur_v, nv], dim=1)
+            ctxs.append((base, all_k, all_v))
             n_chunks = all_q.size(1) // C
             if n_chunks > 0:
                 comp_len = n_chunks * C
@@ -231,12 +222,11 @@ class LogKV(nn.Module):
                     k_ = self.k_norm(k_)
                 if self.v_norm is not None:
                     v_ = self.v_norm(v_)
-                # last completed chunk becomes this level's previous block
-                lvl[3] = all_k[:, comp_len - C:comp_len]
-                lvl[4] = all_v[:, comp_len - C:comp_len]
-                lvl[0] = all_q[:, comp_len:]
-                lvl[1] = all_k[:, comp_len:]
-                lvl[2] = all_v[:, comp_len:]
+                # Only the unfinished chunk survives. Clone the small slices
+                # so inference state does not pin the full segment's storage.
+                lvl[0] = all_q[:, comp_len:].clone()
+                lvl[1] = all_k[:, comp_len:].clone()
+                lvl[2] = all_v[:, comp_len:].clone()
                 nq = q_.reshape(batch_size, n_chunks, d_model)
                 nk = k_.reshape(batch_size, n_chunks, d_model)
                 nv = v_.reshape(batch_size, n_chunks, d_model)
@@ -246,27 +236,30 @@ class LogKV(nn.Module):
             i += 1
         # levels above the cascade keep their state but still serve attention
         for i2 in range(i, len(levels)):
-            cur_q, cur_k, cur_v, prev_k, prev_v = levels[i2]
+            cur_q, cur_k, cur_v = levels[i2]
             m = cur_q.size(1)
-            base = offset // (C ** i2) - m - (C if prev_k is not None else 0)
-            k_parts = ([prev_k] if prev_k is not None else []) + [cur_k]
-            v_parts = ([prev_v] if prev_v is not None else []) + [cur_v]
-            ctxs.append((base, torch.cat(k_parts, dim=1), torch.cat(v_parts, dim=1)))
+            base = offset // (C ** i2) - m
+            ctxs.append((base, cur_k, cur_v))
 
         # ---- (B) attention for all queries of the segment at once ----
         if not ctxs and not self.self_slot:
             return torch.zeros_like(q_new), (levels, offset + seq_len)
 
         s_abs = offset + torch.arange(seq_len, device=x.device)  # (seq_len,)
-        c_idx = torch.arange(C, device=x.device)
+        c_idx = torch.arange(C - 1, device=x.device)
         k_ctxs, v_ctxs, locals_, invalids = [], [], [], []
         for i, (base, k_ctx, v_ctx) in enumerate(ctxs):
             q_sub = s_abs // (C ** i)                                    # (seq_len,)
-            a = q_sub[:, None] - C + ((c_idx[None, :] - q_sub[:, None]) % C)  # (seq_len, C)
+            j = q_sub % C
+            a = (q_sub - j)[:, None] + c_idx[None, :]  # same block, (L, C-1)
+            # An untouched empty level (e.g. level 1 just after position 16)
+            # has j=0 for every query. Provide a masked dummy for the gather.
+            if k_ctx.size(1) == 0:
+                k_ctx = v_ctx = x.new_zeros(batch_size, 1, d_model)
             k_ctxs.append(k_ctx)
             v_ctxs.append(v_ctx)
             locals_.append((a - base).clamp(min=0, max=max(k_ctx.size(1) - 1, 0)))
-            invalids.append(a < 0)
+            invalids.append(c_idx[None, :] >= j[:, None])
         n_levels = len(ctxs)
         flat = (*k_ctxs, *v_ctxs, *locals_, *invalids)
         if self.self_slot:
@@ -286,7 +279,7 @@ class LogKV(nn.Module):
         max m_i, denominator l_i and value numerator acc_i (relative to
         m_i); these are merged with the standard rescaling so the result
         equals one joint softmax over the concatenated slots of all levels —
-        without ever materializing the (B*H, L, C*levels, head_dim)
+        without ever materializing the (B*H, L, (C-1)*levels, head_dim)
         concatenation."""
         C = self.chunk_size
         k_ctxs, v_ctxs = flat[:n_levels], flat[n_levels:2 * n_levels]
@@ -299,13 +292,10 @@ class LogKV(nn.Module):
             slope = self.level_decay.repeat(batch_size)[:, None, None]  # (B*H, 1, 1)
         m = l = acc = None
         for i in range(n_levels):
-            # Level-decay bias: a level-i slot summarizes C**i tokens, and a
-            # salient token survives attention-pooled compression undiluted,
-            # so it appears in ~log(L) slots across levels at full strength.
-            # Weighting level i by C**-i collapses those cross-level copies
-            # into a geometric series ~= one count, removing the
-            # multiplicity amplification behind topic fixation (and inducing
-            # a parameter-free ~1/distance recency prior).
+            # Keep the existing level bias while changing slot selection.
+            # Slots now partition the past, so this is a coarse-level penalty,
+            # no longer a correction for cross-level multiplicity. Its quality
+            # under the refined layout needs fresh training experiments.
             level_bias = self.level_sign * i * math.log(C) if self.level_decay is None else -i * slope
             m_i, l_i, acc_i = self._level_attention(
                 q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
@@ -348,7 +338,7 @@ class LogKV(nn.Module):
         level_bias: python float, or a (B*H, 1, 1) tensor for per-head slopes.
         Returns (m, l, acc): per-row max logit (-inf if no valid slot),
         sum of exp(logit - m), and sum of exp(logit - m) * v."""
-        k_slots = k_ctx[:, local, :]                                 # (B*H, L, C, head_dim)
+        k_slots = k_ctx[:, local, :]                                 # (B*H, L, C-1, head_dim)
         v_slots = v_ctx[:, local, :]
         logits = torch.einsum('bld,blcd->blc', q, k_slots) * scale + level_bias
         logits = logits.masked_fill(invalid[None, :, :], float('-inf'))

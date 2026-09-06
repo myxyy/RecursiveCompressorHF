@@ -4,21 +4,21 @@ English | [日本語](README.md)
 
 A language model implementation of **LogKV**, a custom architecture based on hierarchical kv compression.
 
-![LogKV kv-cache structure](logkv.drawio.png)
+![LogKV kv-cache structure (without overlap)](logkv-refine.drawio.png)
 
 ## Architecture (LogKV)
 
-LogKV recursively compresses the sequence chunk by chunk (C = chunk_size) with attention pooling, and every query position attends — through a **single softmax over C × log L kv slots** — to a multi-resolution window: the last C tokens, the last C summaries of C tokens each, the last C summaries of C² tokens each, and so on.
+LogKV recursively compresses the sequence chunk by chunk (C = chunk_size) with attention pooling. Every query attends through a **single softmax to completed sub-units in its current chunk at each level**. These intervals partition the entire past without gaps or overlap, using at most C−1 kv slots per level. For C=4, position 4 sees only summary 0–3; position 5 sees summary 0–3 and token 4.
 
 - The receptive field covers the whole sequence with only O(C·log L) kv entries per attention
-- The sequential-inference hidden state is also O(C·log L·d) — logarithmic in sequence length, so memory does not grow no matter how long generation runs
+- The sequential-inference hidden state is also O(C·log L·d), logarithmic in sequence length; only the unfinished chunk is retained at each level
 - `forward` / `step` (arbitrary-length chunked processing with hidden-state carry-over) / `predict` (single token) are implemented and tested to agree to machine precision in fp64
 
 The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the experimental record, in Japanese):
 
 | Component | Description |
 |---|---|
-| Level decay | Logit bias −i·log C for level-i slots. Removes topic fixation (a multiplicity feedback loop) and induces a ~1/distance recency prior |
+| Level decay | Logit bias −i·log C for level-i slots. Retains the original coarse-level penalty; its effectiveness after overlap removal needs evaluation |
 | Phase embedding | Learned vectors for the low base-C digits of the position (period 16). Fixes positional degeneracy inside runs of identical tokens |
 | Multi-head | Heads folded into the batch dimension |
 | Gated attention | Per-head attention output multiplied by sigmoid(W_g x) |
@@ -26,7 +26,7 @@ The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the
 
 The language model (LogKVLM) is `Embedding → LogKVBlock × num_layers → RMSNorm → Linear`, extending HuggingFace's `PreTrainedModel` (`save_pretrained` / `from_pretrained` / `generate`).
 
-**On the Copy Memory Problem, a model trained with horizon 2,028 tokens performs perfect copying from 16.7M tokens away (8,273× the training horizon)** ([doc/logkv.md](doc/logkv.md) §6.13).
+**With the original overlapping layout, a model trained with horizon 2,028 tokens performs perfect copying from 16.7M tokens away (8,273× the training horizon)** ([doc/logkv.md](doc/logkv.md) §6.13). Training and generation quality with the refined layout have not yet been evaluated (§6.17). Existing checkpoint weights can be loaded, but outputs change under the new layout.
 
 ## Setup
 

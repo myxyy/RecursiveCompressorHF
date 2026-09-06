@@ -93,17 +93,19 @@ def test_hidden_not_mutated():
 def test_state_size_logarithmic():
     """hiddenのレベル数がO(log_C L)"""
     m = make(chunk_size=4)
-    for L in [16, 64, 256, 1024]:
+    for L in [15, 16, 17, 63, 64, 65, 255, 256, 257, 1024]:
         with torch.no_grad():
             _, (levels, offset) = m.step(torch.randn(1, L, 32), None)
         assert offset == L
         expected_max = math.ceil(math.log(L, 4)) + 1
         assert len(levels) <= expected_max, (L, len(levels), expected_max)
-        # each level holds < C current entries and at most one C-sized prev chunk
-        for lvl in levels:
-            assert lvl[0].size(1) < 4
-            if lvl[3] is not None:
-                assert lvl[3].size(1) == 4
+        # Only the incomplete chunk remains, with no full-segment backing
+        # storage retained by a small (or empty) tensor view.
+        for i, lvl in enumerate(levels):
+            assert len(lvl) == 3
+            for t in lvl:
+                assert t.size(1) == (L // 4**i) % 4
+                assert t.untyped_storage().nbytes() == t.numel() * t.element_size()
 
 
 def test_step_causal_matches_incremental_prefix():
@@ -115,6 +117,98 @@ def test_step_causal_matches_incremental_prefix():
         _, h = m.step(x[:, :23], None)
         y_tail, _ = m.step(x[:, 23:], h)
     torch.testing.assert_close(y_tail, y_full[:, 23:], atol=1e-5, rtol=1e-4)
+
+
+@pytest.mark.parametrize("chunk_size", [2, 3, 4])
+@pytest.mark.parametrize("segmented", [False, True])
+def test_visible_slots_partition_the_past(monkeypatch, chunk_size, segmented):
+    """Trace actual gathered slots: every past token occurs exactly once.
+
+    One-hot keys preserve the support of each summary under uniform pooling,
+    exposing gaps, duplicated intervals and future leakage independently of
+    the reference's slot-index arithmetic.
+    """
+    C = chunk_size
+    L = C**3 + 3
+    m = LogKV(dim=L, chunk_size=C).double().eval()
+    q = torch.zeros(1, L, L, dtype=torch.float64)
+    k = v = torch.eye(L, dtype=torch.float64).unsqueeze(0)
+    attend = m._level_attention
+    captured = []
+
+    def trace(q, k_ctx, v_ctx, local, invalid, level_bias, scale):
+        support = k_ctx[0, local, :] > 0
+        captured.append((support & ~invalid[..., None]).sum(dim=1))
+        return attend(q, k_ctx, v_ctx, local, invalid, level_bias, scale)
+
+    monkeypatch.setattr(m, "_level_attention", trace)
+    # Cross powers of C with both single-token calls and non-aligned chunks.
+    cuts = sorted({0, 1, C-1, C, C+1, C**2-1, C**2, C**2+1,
+                   C**3-1, C**3, C**3+1, L}) if segmented else [0, L]
+    hidden = None
+    with torch.no_grad():
+        for start, end in zip(cuts, cuts[1:]):
+            captured.clear()
+            _, hidden = m._attend(q[:, start:end], k[:, start:end], v[:, start:end], hidden)
+            counts = torch.stack(captured).sum(dim=0)
+            expected = torch.arange(L)[None, :] < torch.arange(start, end)[:, None]
+            assert torch.equal(counts, expected.long())
+
+
+@pytest.mark.parametrize("self_slot", [False, True])
+def test_refined_diagram_boundary_values(self_slot):
+    """At 4 only [0..3] survives; at 5 it is joined by token 4."""
+    m = LogKV(dim=1, chunk_size=4, self_slot=self_slot).double().eval()
+    q = k = torch.zeros(1, 18, 1, dtype=torch.float64)
+    v = torch.arange(18, dtype=torch.float64).view(1, 18, 1)
+    # Explicit diagram intervals, independent of the implementation formula.
+    intervals = {0: [], 3: [(0, 1), (1, 2), (2, 3)], 4: [(0, 4)],
+                 5: [(0, 4), (4, 5)], 16: [(0, 16)], 17: [(0, 16), (16, 17)]}
+    with torch.no_grad():
+        out, _ = m._attend(q, k, v, None)
+    for s, spans in intervals.items():
+        spans = spans + ([(s, s + 1)] if self_slot else [])
+        weights = [1 / (end - start) for start, end in spans]
+        expected = sum(v[0, start:end, 0].mean().item() * w
+                       for (start, end), w in zip(spans, weights)) / sum(weights) if spans else 0.0
+        assert out[0, s, 0].item() == pytest.approx(expected, abs=1e-12)
+
+
+@pytest.mark.parametrize("self_slot", [False, True])
+def test_refined_attention_is_causal(self_slot):
+    torch.manual_seed(0)
+    m = LogKV(dim=16, chunk_size=4, num_heads=4, phase_emb=True,
+              phase_levels=2, gated_attention=True, self_slot=self_slot).double().eval()
+    x = torch.randn(1, 70, 16, dtype=torch.float64)
+    with torch.no_grad():
+        original = m(x)
+        for end in [1, 4, 5, 16, 17, 64, 65]:
+            changed = x.clone()
+            changed[:, end:] = torch.randn_like(changed[:, end:]) * 10
+            torch.testing.assert_close(m(changed)[:, :end], original[:, :end], atol=1e-12, rtol=0)
+
+
+def test_refined_split_backward_matches_full():
+    """Partial-state copies must preserve gradients across compression carries."""
+    torch.manual_seed(0)
+    m = LogKV(dim=16, chunk_size=4, num_heads=4, phase_emb=True,
+              phase_levels=2, gated_attention=True, self_slot=True,
+              learnable_decay=True).double()
+    x = torch.randn(2, 70, 16, dtype=torch.float64, requires_grad=True)
+    m(x).square().sum().backward()
+    expected = [x.grad.clone()] + [p.grad.clone() for p in m.parameters()]
+    m.zero_grad()
+    x.grad = None
+    hidden = None
+    parts = []
+    cuts = [0, 3, 4, 5, 15, 16, 17, 63, 64, 65, 70]
+    for start, end in zip(cuts, cuts[1:]):
+        out, hidden = m.step(x[:, start:end], hidden)
+        parts.append(out)
+    torch.cat(parts, dim=1).square().sum().backward()
+    actual = [x.grad] + [p.grad for p in m.parameters()]
+    for a, e in zip(actual, expected):
+        torch.testing.assert_close(a, e, atol=1e-12, rtol=1e-12)
 
 
 @pytest.mark.parametrize("chunk_size", [2, 4])
@@ -136,9 +230,9 @@ def test_chunked_step_large_awkward_splits(chunk_size):
 
 
 # ---------------------------------------------------------------------------
-# Standalone reference implementation of the LogKV semantics (the original
-# parallel forward: build all levels via recursive compression, then gather
-# block-aligned slots). forward() now delegates to step(), so equivalence
+# Standalone reference implementation of the refined LogKV semantics:
+# build all levels via recursive compression, then gather only completed
+# sub-units in the query's own block. forward() delegates to step(), so equivalence
 # tests would be tautological without this independent oracle.
 # ---------------------------------------------------------------------------
 
@@ -218,10 +312,8 @@ def _reference_core(m, q, k, v):
         unit_len = C ** (i + 1)
         u = s // unit_len
         j = (s % unit_len) // sub_len
-        use_prev = c_idx[None, :] >= j[:, None]
-        blk = u[:, None] - use_prev.long()
-        invalid = blk < 0
-        blk = blk.clamp(min=0)
+        invalid = c_idx[None, :] >= j[:, None]
+        blk = u[:, None]
         cexp = c_idx[None, :].expand(seq_len, C)
         logits = torch.einsum('bld,blcd->blc', q, kc[:, blk, cexp, :]) * scale
         if m.level_decay is not None:   # per-head learnable slope (rows are batch-major, head-minor)
@@ -331,10 +423,11 @@ def test_heads_are_independent():
     assert not torch.allclose(out[1], ref[1])
 
 
-def test_recompute_attention_matches_stored():
+@pytest.mark.parametrize("self_slot", [False, True])
+def test_recompute_attention_matches_stored(self_slot):
     """activation checkpoint経路(訓練時)と非checkpoint経路で出力・勾配が一致"""
     torch.manual_seed(0)
-    m = LogKV(dim=32, chunk_size=4, num_heads=4).double()
+    m = LogKV(dim=32, chunk_size=4, num_heads=4, self_slot=self_slot).double()
     x = torch.randn(2, 100, 32, dtype=torch.float64, requires_grad=True)
     outs, grads = [], []
     for flag in [True, False]:
@@ -510,8 +603,8 @@ def test_kv_norm_equalizes_slot_scale_across_levels():
     x = torch.randn(1, 200, 32) * 5.0
     with torch.no_grad():
         _, (levels, _) = m.step(x)
-    for i, (cur_q, cur_k, cur_v, prev_k, prev_v) in enumerate(levels):
-        for t in (cur_k, cur_v, prev_k, prev_v):
+    for i, (cur_q, cur_k, cur_v) in enumerate(levels):
+        for t in (cur_k, cur_v):
             if t is not None and t.numel():
                 rms = t.pow(2).mean(-1).sqrt()
                 assert torch.allclose(rms, torch.ones_like(rms), atol=1e-4), (i, rms)
@@ -565,8 +658,8 @@ def test_v_norm_only_normalizes_v_not_k():
     with torch.no_grad():
         _, (levels, _) = m.step(x)
     v_rms, k_rms = [], []
-    for cur_q, cur_k, cur_v, prev_k, prev_v in levels:
-        for t, acc in [(cur_v, v_rms), (prev_v, v_rms), (cur_k, k_rms), (prev_k, k_rms)]:
+    for cur_q, cur_k, cur_v in levels:
+        for t, acc in [(cur_v, v_rms), (cur_k, k_rms)]:
             if t is not None and t.numel():
                 acc.append(t.pow(2).mean(-1).sqrt().flatten())
     v_rms, k_rms = torch.cat(v_rms), torch.cat(k_rms)

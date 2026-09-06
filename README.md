@@ -4,21 +4,21 @@
 
 階層的なkv圧縮による独自アーキテクチャ **LogKV** の言語モデル実装です。
 
-![LogKVのKVキャッシュ構造](logkv.drawio.png)
+![LogKVのKVキャッシュ構造（重複なし）](logkv-refine.drawio.png)
 
 ## アーキテクチャ（LogKV）
 
-LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattentionプーリング圧縮し、各クエリ位置が「直近C個のトークン、直近C個のC トークン要約、直近C個のC²トークン要約、…」という**多解像度の窓（C×log L 個のkvスロット）を単一のsoftmaxで参照**するattention機構です。
+LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattentionプーリング圧縮し、各クエリ位置が各階層の**現在チャンク内の完成済み部分だけを、単一のsoftmaxで参照**するattention機構です。過去全体を重複も欠落もない区間に分割し、各階層で最大C−1個のkvスロットを使います。例えばC=4の位置4では要約0〜3だけ、位置5では要約0〜3とトークン4を参照します。
 
 - 受容野は全系列、attentionあたりのkv数は O(C·log L)
-- 逐次推論の隠れ状態も O(C·log L·d)（系列長に対して対数）— 生成が何万トークン続いてもメモリが増えません
+- 逐次推論の隠れ状態も O(C·log L·d)（系列長に対して対数）。各階層では未完成チャンクだけを保持します
 - `forward` / `step`（隠れ状態持ち回りの任意長チャンク処理）/ `predict`（1トークン）が fp64 で機械精度一致するよう実装・テストされています
 
 標準構成は以下の要素からなります（検証記録は [doc/logkv.md](doc/logkv.md)）:
 
 | 要素 | 内容 |
 |---|---|
-| レベル減衰 | レベルiのロジットに −i·log C。話題執着（多重計上の正帰還）を解消し、~1/距離のrecency priorを誘導 |
+| レベル減衰 | レベルiのロジットに −i·log C。従来の粗い階層へのペナルティを維持。重複除去後の有効性は再検証予定 |
 | 位相埋め込み | 位置のC進数下位桁（周期16）の学習ベクトル。同一トークン連続区間の位置縮退を解消 |
 | マルチヘッド | ヘッドをバッチ次元に折り畳んで適用 |
 | Gated attention | sigmoid(W_g x) を各ヘッドのattention出力に乗算 |
@@ -26,7 +26,7 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 
 言語モデル（LogKVLM）は `Embedding → LogKVBlock × num_layers → RMSNorm → Linear` で、HuggingFaceの `PreTrainedModel` を継承しています（`save_pretrained` / `from_pretrained` / `generate` 対応）。
 
-**Copyingタスクでは、訓練ホライズン2028トークンのモデルが1670万トークン（8273倍）先からの完全コピーに成功**しています（[doc/logkv.md](doc/logkv.md) §6.13）。
+**従来の重複あり構造では、Copyingタスクで訓練ホライズン2028トークンのモデルが1670万トークン（8273倍）先からの完全コピーに成功**しています（[doc/logkv.md](doc/logkv.md) §6.13）。重複除去後の学習・生成品質は未評価です（§6.17）。旧チェックポイントの重みは読込可能ですが、新構造での出力は変わります。
 
 ## セットアップ
 

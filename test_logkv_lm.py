@@ -169,10 +169,12 @@ class TestLogKVLM:
         assert torch.equal(out[:, 10:], manual)
 
 
-def test_lm_with_phase_emb_roundtrip(tmp_path):
+@pytest.mark.parametrize("self_slot", [False, True])
+def test_lm_with_phase_emb_roundtrip(tmp_path, self_slot):
     """phase_emb有効なLMの保存/読込・step/predict一致"""
     cfg = LogKVConfig(vocab_size=32, d_model=16, num_heads=4, d_ff=32, chunk_size=4,
                       num_layers=2, phase_emb=True, phase_levels=8,
+                      gated_attention=True, self_slot=self_slot,
                       pad_token_id=None, bos_token_id=None, eos_token_id=None)
     torch.manual_seed(0)
     model = LogKVLM(cfg).double().eval()
