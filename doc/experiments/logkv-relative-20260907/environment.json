@@ -1,0 +1,17 @@
+{
+  "python": "3.12.3",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.4.0",
+  "cuda": "12.8",
+  "gpu": [
+    "0, NVIDIA GeForce RTX 3090, 595.84",
+    "1, NVIDIA GeForce RTX 3090, 595.84",
+    "2, NVIDIA GeForce RTX 3090, 595.84",
+    "3, NVIDIA GeForce RTX 3090, 595.84",
+    "4, NVIDIA GeForce RTX 3090, 595.84",
+    "5, NVIDIA GeForce RTX 3090, 595.84"
+  ],
+  "OMP_NUM_THREADS": 1,
+  "MKL_NUM_THREADS": 1,
+  "float32_matmul_precision": "high"
+}

@@ -11,6 +11,7 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 - `train_logkv.py` - **DDP data-parallel** training (the model fits on one GPU). Muon + AdamW, bf16 autocast, control.cmd, `--resume latest` (skips consumed data, absolute `--max-steps`, EMA carry-over), periodic Japanese sample generations to `samples.log`.
 - `predict_logkv.py` - Text generation for LogKV checkpoints.
 - `exp/copying/`, `exp/selective-copying/` - Copy Memory Problem / Selective Copying suites (`--arch logkv` supported; selective wraps copying via task-module injection).
+- `doc/logkv-experiments.md` - Index of all experiment reports, including experimental-branch positional encodings. Those reports do not imply their optional implementations are present on main.
 - `doc/logkv.md` - **The design/experiment record for LogKV. Read this first for any LogKV work.**
 
 ### Shared

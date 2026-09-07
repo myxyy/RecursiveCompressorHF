@@ -1,0 +1,14 @@
+[
+  {
+    "learnable_compressor_decay": false,
+    "loss": 0.7626082301139832,
+    "params": 5786112,
+    "peak_allocated_gib": 14.80561351776123
+  },
+  {
+    "learnable_compressor_decay": true,
+    "loss": 0.7619404792785645,
+    "params": 5786128,
+    "peak_allocated_gib": 14.80610990524292
+  }
+]

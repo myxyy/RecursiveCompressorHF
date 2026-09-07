@@ -1,0 +1,17 @@
+[
+  {
+    "phase_emb": false,
+    "relative_position_bias": false,
+    "max_abs_difference_from_position_0": 2.220446049250313e-16
+  },
+  {
+    "phase_emb": false,
+    "relative_position_bias": true,
+    "max_abs_difference_from_position_0": 2.220446049250313e-16
+  },
+  {
+    "phase_emb": true,
+    "relative_position_bias": false,
+    "max_abs_difference_from_position_0": 0.022573240554682312
+  }
+]

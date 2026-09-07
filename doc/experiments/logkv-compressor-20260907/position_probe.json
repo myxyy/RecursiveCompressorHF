@@ -1,0 +1,17 @@
+[
+  {
+    "mode": "none",
+    "local_swap_1_2_max_difference": 0.0,
+    "two_level_swap_1_4_max_difference": 0.0
+  },
+  {
+    "mode": "base",
+    "local_swap_1_2_max_difference": 0.10238455614765926,
+    "two_level_swap_1_4_max_difference": 0.0
+  },
+  {
+    "mode": "learned",
+    "local_swap_1_2_max_difference": 0.10238455358510201,
+    "two_level_swap_1_4_max_difference": 0.0
+  }
+]

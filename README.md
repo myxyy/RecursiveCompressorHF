@@ -2,6 +2,8 @@
 
 # RecursiveCompressor / LogKV
 
+各方式の比較と再現用commitは[実験記録一覧](doc/logkv-experiments.md)にまとめています。
+
 階層的なkv圧縮による独自アーキテクチャ **LogKV** の言語モデル実装です。
 
 ![LogKVのKVキャッシュ構造（重複なし）](logkv-refine.drawio.png)

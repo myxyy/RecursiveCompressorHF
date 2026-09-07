@@ -2,6 +2,8 @@ English | [日本語](README.md)
 
 # RecursiveCompressor / LogKV
 
+See the [experiment index](doc/logkv-experiments.md) for comparisons, evaluation artifacts and reproduction commits (in Japanese).
+
 A language model implementation of **LogKV**, a custom architecture based on hierarchical kv compression.
 
 ![LogKV kv-cache structure (without overlap)](logkv-refine.drawio.png)

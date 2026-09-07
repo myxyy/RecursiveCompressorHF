@@ -1,0 +1,140 @@
+[
+  {
+    "task": "copying",
+    "mode": "phase2",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 4,
+    "num_params": 5794304,
+    "best": {
+      "step": 49200,
+      "string_acc": 1.0,
+      "token_acc": 1.0,
+      "ema_loss": 4.1927201598120446e-09
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 3.380355551030334e-09,
+      "ema_loss": 6.007967737216567e-09,
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "lr": 0.0003,
+      "elapsed_sec": 8761.7
+    },
+    "first_interval_string_099": 9900
+  },
+  {
+    "task": "copying",
+    "mode": "none",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 2,
+    "num_params": 5786112,
+    "best": {
+      "step": 49800,
+      "string_acc": 0.40640625,
+      "token_acc": 0.87165625,
+      "ema_loss": 0.0413420982849729
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.05579494684934616,
+      "ema_loss": 0.04396120119328596,
+      "token_acc": 0.85415625,
+      "string_acc": 0.31046875,
+      "lr": 0.0003,
+      "elapsed_sec": 10151.7
+    },
+    "first_interval_string_099": null
+  },
+  {
+    "task": "copying",
+    "mode": "relative",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 0,
+    "num_params": 5786112,
+    "best": {
+      "step": 49400,
+      "string_acc": 0.44,
+      "token_acc": 0.87475,
+      "ema_loss": 0.03908037856619318
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.029357437044382095,
+      "ema_loss": 0.04911500485035146,
+      "token_acc": 0.87959375,
+      "string_acc": 0.42796875,
+      "lr": 0.0003,
+      "elapsed_sec": 8347.9
+    },
+    "first_interval_string_099": null
+  },
+  {
+    "task": "selective-copying",
+    "mode": "phase2",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 5,
+    "num_params": 5794304,
+    "best": {
+      "step": 49000,
+      "string_acc": 0.5509375,
+      "token_acc": 0.897359375,
+      "ema_loss": 0.02158819369935603
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.030337095260620117,
+      "ema_loss": 0.022981949532464616,
+      "token_acc": 0.870359375,
+      "string_acc": 0.4790625,
+      "lr": 0.0003,
+      "elapsed_sec": 8621.6
+    },
+    "first_interval_string_099": null
+  },
+  {
+    "task": "selective-copying",
+    "mode": "none",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 3,
+    "num_params": 5786112,
+    "best": {
+      "step": 49800,
+      "string_acc": 0.194375,
+      "token_acc": 0.679296875,
+      "ema_loss": 0.10152014656580988
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.18206770718097687,
+      "ema_loss": 0.10987978173515853,
+      "token_acc": 0.67865625,
+      "string_acc": 0.1490625,
+      "lr": 0.0003,
+      "elapsed_sec": 8645.4
+    },
+    "first_interval_string_099": null
+  },
+  {
+    "task": "selective-copying",
+    "mode": "relative",
+    "commit": "7261652f2ede90badc5b241035f51a379d15a540",
+    "gpu": 1,
+    "num_params": 5786112,
+    "best": {
+      "step": 41000,
+      "string_acc": 0.17859375,
+      "token_acc": 0.672328125,
+      "ema_loss": 0.12451773222151609
+    },
+    "final_train": {
+      "step": 50000,
+      "loss": 0.1940598487854004,
+      "ema_loss": 0.12345435659636829,
+      "token_acc": 0.649546875,
+      "string_acc": 0.11484375,
+      "lr": 0.0003,
+      "elapsed_sec": 8560.2
+    },
+    "first_interval_string_099": null
+  }
+]
