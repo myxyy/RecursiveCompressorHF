@@ -1,0 +1,18 @@
+{
+  "mode": "relative-kv",
+  "initial_common_sha256": "2898927c4fec087b5f0d10ab5886d8bc40184c79bdff06bed551da9fe73369b5",
+  "loss": 0.12039004266262054,
+  "seconds": 2.347883462905884,
+  "peak_allocated_gib": 8.53929853439331,
+  "extra_parameter_updates": {
+    "layers.0.attention.relative_key": 0.0005992311052978039,
+    "layers.0.attention.relative_value": 0.0006003919988870621,
+    "layers.1.attention.relative_key": 0.0005978364497423172,
+    "layers.1.attention.relative_value": 0.0006003864109516144
+  },
+  "all_gradients_finite": true,
+  "all_master_fp32": true,
+  "microbatch": 32,
+  "length": 2219,
+  "optimizer_steps": 2
+}

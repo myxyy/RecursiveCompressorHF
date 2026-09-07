@@ -1,0 +1,58 @@
+{
+  "mode": "combined-no-decay",
+  "task": "selective-copying",
+  "gpu": 5,
+  "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source",
+  "commit": "24b360cf85712fde3ee7a2da4d61e2eb45350a51",
+  "run_dir": "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/combined-no-decay-selective-copying",
+  "state": "complete",
+  "commands": [
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/train.py",
+        "--mode",
+        "combined-no-decay",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/combined-no-decay-selective-copying"
+      ],
+      "started": "2026-09-07T14:03:13.464649+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T18:56:20.541112+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/evaluate.py",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/combined-no-decay-selective-copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-07T18:56:20.541689+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T19:43:36.841710+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/evaluate.py",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/combined-no-decay-selective-copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-07T19:43:36.842402+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T20:30:39.304597+00:00"
+    }
+  ],
+  "started": "2026-09-07T14:03:13.464498+00:00",
+  "finished": "2026-09-07T20:30:39.305281+00:00"
+}

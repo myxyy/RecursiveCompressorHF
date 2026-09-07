@@ -1,0 +1,20 @@
+{
+  "mode": "combined-no-decay",
+  "initial_common_sha256": "2898927c4fec087b5f0d10ab5886d8bc40184c79bdff06bed551da9fe73369b5",
+  "loss": 0.1557740420103073,
+  "seconds": 2.535126209259033,
+  "peak_allocated_gib": 10.89980173110962,
+  "extra_parameter_updates": {
+    "layers.0.attention.relative_key": 0.0006001219153404236,
+    "layers.0.attention.relative_value": 0.0006003957241773605,
+    "layers.0.attention.compressor.position_vectors": 0.0006002187728881836,
+    "layers.1.attention.relative_key": 0.0005999928107485175,
+    "layers.1.attention.relative_value": 0.0006003957241773605,
+    "layers.1.attention.compressor.position_vectors": 0.0006000101566314697
+  },
+  "all_gradients_finite": true,
+  "all_master_fp32": true,
+  "microbatch": 32,
+  "length": 2219,
+  "optimizer_steps": 2
+}

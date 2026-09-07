@@ -1,0 +1,58 @@
+{
+  "mode": "none",
+  "task": "copying",
+  "gpu": 0,
+  "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source",
+  "commit": "24b360cf85712fde3ee7a2da4d61e2eb45350a51",
+  "run_dir": "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/none-copying",
+  "state": "complete",
+  "commands": [
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/train.py",
+        "--mode",
+        "none",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/none-copying"
+      ],
+      "started": "2026-09-07T07:27:33.601865+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T10:31:08.208113+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/evaluate.py",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/none-copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-07T10:31:08.208781+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T10:56:52.434815+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/position_study/evaluate.py",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/runs/none-copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-07T10:56:52.435561+00:00",
+      "returncode": 0,
+      "finished": "2026-09-07T11:22:28.754910+00:00"
+    }
+  ],
+  "started": "2026-09-07T07:27:33.600269+00:00",
+  "finished": "2026-09-07T11:22:28.755435+00:00"
+}

@@ -1,0 +1,16 @@
+{
+  "mode": "binding",
+  "initial_common_sha256": "2898927c4fec087b5f0d10ab5886d8bc40184c79bdff06bed551da9fe73369b5",
+  "loss": 0.13309980928897858,
+  "seconds": 2.106502056121826,
+  "peak_allocated_gib": 10.805821895599365,
+  "extra_parameter_updates": {
+    "layers.0.attention.compressor.position_vectors": 0.0006000995635986328,
+    "layers.1.attention.compressor.position_vectors": 0.0005997419357299805
+  },
+  "all_gradients_finite": true,
+  "all_master_fp32": true,
+  "microbatch": 32,
+  "length": 2219,
+  "optimizer_steps": 2
+}

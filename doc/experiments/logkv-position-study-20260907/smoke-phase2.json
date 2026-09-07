@@ -1,0 +1,13 @@
+{
+  "mode": "phase2",
+  "initial_common_sha256": "2898927c4fec087b5f0d10ab5886d8bc40184c79bdff06bed551da9fe73369b5",
+  "loss": 0.12220823764801025,
+  "seconds": 1.8394734859466553,
+  "peak_allocated_gib": 8.441994667053223,
+  "extra_parameter_updates": {},
+  "all_gradients_finite": true,
+  "all_master_fp32": true,
+  "microbatch": 32,
+  "length": 2219,
+  "optimizer_steps": 2
+}
