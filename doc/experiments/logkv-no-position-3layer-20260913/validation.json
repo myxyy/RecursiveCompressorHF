@@ -1,0 +1,28 @@
+{
+  "passed": true,
+  "source_commit": "0932d8c73ed9e48ac8ada467a06c53206d0a61cc",
+  "all_frozen_files_identical_to_refine": true,
+  "frozen_files_verified": 27,
+  "current_main_runtime_identical": true,
+  "scripts_syntax_passed": true,
+  "model_code_changed": false,
+  "num_layers": 3,
+  "num_params": 8673792,
+  "shared_two_layer_initial_weights_identical": true,
+  "extra_parameters_only_in_third_block": true,
+  "paired_depth_smoke_cells": 12,
+  "paired_rescue_regression_identities_passed": true,
+  "data_mismatch_rejected": true,
+  "script_hashes": {
+    "evaluation_smoke.py": "fff948809cd570f2d7fa2b573a31fc65cbc9d9c58d8a706997170b1584175be1",
+    "summarize.py": "fff0f8ff8fcd8b6bee9c0353f999ec42668b1e5e53374b9369017a673a029932",
+    "train_entry.py": "47bd406438adc2e1ef76fa197eb8da1c9b07468b743dd910fe6b8428c97cfcf7",
+    "compare_depth.py": "fd4b961cd80552189dabfbb3d4284adecd6bf2b14c7ccbbec63fd1bd0b913de2",
+    "evaluate.py": "fd82c97e1b1c141ba3a4eab023d2d9f9d86dd99281ff363da5327e925dff3b98",
+    "run.py": "cc532298589a35f03c01884b1f6d1cb15f9cf5a9f5c7e3c62504e5aa47f299b6",
+    "worker.py": "ea5f5cc4bce28b6a8a5000c17b3cfa534b02fa9ae1c05f60f7a3dca9b2b0f969",
+    "fullsize_smoke.py": "a9a2ab922107ce504c179b475251bedd304472c5ef0a886c44954e6c5fffa2b5",
+    "common.py": "16dd9f0435f515854b3f52531187b3ab1cac3bf892d141bed18835b18a0c793a",
+    "preflight.py": "a54087ef766d6ccd9f3d71009a12fdf8ab9bb964fa030381a9859886e4b8530f"
+  }
+}

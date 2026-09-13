@@ -19,6 +19,12 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 - All preparation changes are documentation and experiment scripts under `doc/`; main model/trainer remain unchanged. See `doc/logkv-no-position-main.md` and `doc/experiments/logkv-no-position-main-20260913/`.
 
 ## Architecture
+### Authorized three-layer no-position comparison (2026-09-13)
+- User explicitly authorized two additional GPUs for three-layer Copying/Selective alongside the running two-layer control. For this comparison only, GPU 0/1 remain the existing control and GPU 2/3 run the new task models (four total). This is not a general increase for later work.
+- Only num_layers changes to 3 (stacked LogKVBlocks, not a cap on compression depth), 8,673,792 parameters. Same main source, fixed M10, 50k steps and best/final 41 horizons through T131072 x256. Shared parameters match the saved untrained two-layer initial state; only the extra block is newly initialized. No trained checkpoint transfer.
+- Full batch64/T2028 smoke and both task repeat/evaluation checks passed. Preflight began 2026-09-13 23:33:24 JST; projected 6.29h including margins/evaluation, hard stop 2026-09-14 07:03:24 JST. Separate fail-stop supervisor; do not alter the ongoing two-layer scripts/source or their deadline. No further variants/seeds/16M are queued.
+- See `doc/logkv-no-position-3layer.md` and `doc/experiments/logkv-no-position-3layer-20260913/`. Historical positional degeneracy was diagnosed on the overlapping layout; do not claim it is a proof for current main. Compare paired digit errors and acknowledge parameter-count growth and one seed.
+
 ### LogKV (main)
 - `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends only to completed sub-units in its current block (c < j); these disjoint intervals partition the entire past. All levels share one softmax (at most C−1 slots per level). See `logkv-refine.drawio.png` and `doc/logkv.md` §6.17. Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.
 - `logkv_lm.py` - LogKVLM language model (PreTrainedModel + generate; `past_key_values` carries the opaque per-layer hidden list).

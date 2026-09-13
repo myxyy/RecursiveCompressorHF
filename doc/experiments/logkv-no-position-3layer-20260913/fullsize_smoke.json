@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "physical_gpu": "2",
+  "num_layers": 3,
+  "batch_size": 64,
+  "T": 2028,
+  "sequence_length": 2048,
+  "updates": 2,
+  "losses": [
+    2.847429037094116,
+    0.04715012013912201
+  ],
+  "peak_allocated_bytes": 19625115136,
+  "peak_reserved_bytes": 20250099712,
+  "initial_weights_sha256": "f259ab679fa96875a39b3e011aabcdd706c327bb77713f2513071b9fc27c1579",
+  "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862"
+}
