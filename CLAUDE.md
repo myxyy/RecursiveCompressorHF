@@ -15,7 +15,7 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 ## Authorized no-position baseline rerun (2026-09-13)
 - User requested fixed-M10 Copying/Selective evaluation with phase embeddings disabled on main's refined architecture. Historical `none` runs already exist in the 2026-09-07 relative-bias study; record them as prior data, not as an unmeasured condition.
 - This new main-only rerun uses frozen source `0932d8c`; all 27 captured runtime/dependency/task files are identical to `3b0ce51`. Keep gate/self slot/fixed level decay and model size; no RoPE or added positional corrections. Two independent 50k task models, best/final 41 horizons through T131072 x256 (164 cells).
-- GPUs 0/1 only. Deterministic kernels, shared initial weights, 20-step repeat per task bitexact across GPUs. Measured 300-step benchmark predicts 4.11h including 15% margin, one hour evaluation and preflight. Whole batch cap 7.5h from preflight start; stop all on failure, no retries or extra runs/16M.
+- Started 2026-09-13 22:18:53 JST, supervisor PID 2086202, GPUs 0/1 only. Both first 100-step intervals match their benchmarks exactly. Hard deadline 2026-09-14 05:43:53 JST. Deterministic kernels, shared initial weights, 20-step repeat per task bitexact across GPUs. Measured 300-step benchmark predicts 4.11h including 15% margin, one hour evaluation and preflight. Whole batch cap 7.5h from preflight start; stop all on failure, no retries or extra runs/16M.
 - All preparation changes are documentation and experiment scripts under `doc/`; main model/trainer remain unchanged. See `doc/logkv-no-position-main.md` and `doc/experiments/logkv-no-position-main-20260913/`.
 
 ## Architecture
