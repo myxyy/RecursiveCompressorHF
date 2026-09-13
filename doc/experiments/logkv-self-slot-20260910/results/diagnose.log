@@ -1,0 +1,56 @@
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 6254.62it/s]
+self-on-best-bf16-paired-T3 string 15 / 16 token 159
+self-on-best-bf16-paired-T16 string 15 / 16 token 159
+self-on-best-bf16-paired-T8192 string 15 / 16 token 159
+self-on-best-bf16-paired-T32768 string 15 / 16 token 159
+self-on-best-bf16-paired-T49151 string 15 / 16 token 159
+self-on-best-bf16-paired-T49152 string 3 / 16 token 146
+self-on-best-bf16-paired-T49153 string 5 / 16 token 149
+self-on-best-bf16-paired-T65536 string 15 / 16 token 159
+self-on-best-bf16-paired-T131072 string 15 / 16 token 159
+self-on-best-bf16-standard-T131072 string 247 / 256 token 2551
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 4499.25it/s]
+self-on-best-fp32-paired-T49152 string 5 / 16 token 148
+self-on-best-fp32-paired-T131072 string 15 / 16 token 159
+self-on-best-fp32-bf16-errors-T131072 string 3 / 9 token 84
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 4343.76it/s]
+self-on-final-bf16-paired-T3 string 1 / 16 token 134
+self-on-final-bf16-paired-T16 string 16 / 16 token 160
+self-on-final-bf16-paired-T8192 string 16 / 16 token 160
+self-on-final-bf16-paired-T32768 string 16 / 16 token 160
+self-on-final-bf16-paired-T49151 string 14 / 16 token 158
+self-on-final-bf16-paired-T49152 string 16 / 16 token 160
+self-on-final-bf16-paired-T49153 string 16 / 16 token 160
+self-on-final-bf16-paired-T65536 string 16 / 16 token 160
+self-on-final-bf16-paired-T131072 string 16 / 16 token 160
+self-on-final-bf16-standard-T131072 string 247 / 256 token 2551
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 4629.29it/s]
+self-on-final-fp32-paired-T49152 string 16 / 16 token 160
+self-on-final-fp32-paired-T131072 string 16 / 16 token 160
+self-on-final-fp32-bf16-errors-T131072 string 0 / 9 token 81
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5711.14it/s]
+self-off-best-bf16-paired-T3 string 16 / 16 token 160
+self-off-best-bf16-paired-T16 string 10 / 16 token 154
+self-off-best-bf16-paired-T8192 string 10 / 16 token 154
+self-off-best-bf16-paired-T32768 string 10 / 16 token 154
+self-off-best-bf16-paired-T49151 string 0 / 16 token 123
+self-off-best-bf16-paired-T49152 string 10 / 16 token 154
+self-off-best-bf16-paired-T49153 string 16 / 16 token 160
+self-off-best-bf16-paired-T65536 string 10 / 16 token 154
+self-off-best-bf16-paired-T131072 string 10 / 16 token 154
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5845.27it/s]
+self-off-best-fp32-paired-T49152 string 10 / 16 token 154
+self-off-best-fp32-paired-T131072 string 10 / 16 token 154
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5483.55it/s]
+self-off-final-bf16-paired-T3 string 16 / 16 token 160
+self-off-final-bf16-paired-T16 string 0 / 16 token 107
+self-off-final-bf16-paired-T8192 string 0 / 16 token 107
+self-off-final-bf16-paired-T32768 string 0 / 16 token 107
+self-off-final-bf16-paired-T49151 string 0 / 16 token 108
+self-off-final-bf16-paired-T49152 string 0 / 16 token 107
+self-off-final-bf16-paired-T49153 string 0 / 16 token 96
+self-off-final-bf16-paired-T65536 string 0 / 16 token 107
+self-off-final-bf16-paired-T131072 string 0 / 16 token 107
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 4611.38it/s]
+self-off-final-fp32-paired-T49152 string 0 / 16 token 107
+self-off-final-fp32-paired-T131072 string 0 / 16 token 107

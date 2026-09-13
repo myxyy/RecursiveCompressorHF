@@ -1,0 +1,68 @@
+[
+  {
+    "mode": "phase2",
+    "T": 2048,
+    "samples": 256,
+    "elapsed_sec": 1.5619019030127674,
+    "peak_allocated_GiB": 10.57305383682251,
+    "random_model_accuracies": [
+      0.090625,
+      0.0
+    ]
+  },
+  {
+    "mode": "phase2",
+    "T": 8192,
+    "samples": 256,
+    "elapsed_sec": 4.556437762919813,
+    "peak_allocated_GiB": 10.425264835357666,
+    "random_model_accuracies": [
+      0.090625,
+      0.0
+    ]
+  },
+  {
+    "mode": "retrieval-rope",
+    "T": 2048,
+    "samples": 256,
+    "elapsed_sec": 2.144519147928804,
+    "peak_allocated_GiB": 17.94288158416748,
+    "random_model_accuracies": [
+      0.025390625,
+      0.0
+    ]
+  },
+  {
+    "mode": "retrieval-rope",
+    "T": 8192,
+    "samples": 256,
+    "elapsed_sec": 10.029575852910057,
+    "peak_allocated_GiB": 17.701754570007324,
+    "random_model_accuracies": [
+      0.025390625,
+      0.0
+    ]
+  },
+  {
+    "mode": "compressor-rope",
+    "T": 2048,
+    "samples": 256,
+    "elapsed_sec": 1.159273881930858,
+    "peak_allocated_GiB": 10.57305383682251,
+    "random_model_accuracies": [
+      0.12890625,
+      0.0
+    ]
+  },
+  {
+    "mode": "compressor-rope",
+    "T": 8192,
+    "samples": 256,
+    "elapsed_sec": 4.937684558099136,
+    "peak_allocated_GiB": 10.425264835357666,
+    "random_model_accuracies": [
+      0.12890625,
+      0.0
+    ]
+  }
+]

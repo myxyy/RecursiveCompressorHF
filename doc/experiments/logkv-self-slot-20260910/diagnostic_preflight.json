@@ -1,0 +1,5 @@
+{
+  "instrumentation_preserves_logits": true,
+  "attention_distribution_matches_online_softmax": true,
+  "memory_span_classification_passed": true
+}

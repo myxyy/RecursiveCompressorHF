@@ -1,0 +1,46 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5635.82it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-self-slot-20260910/exp/copying/retrieval-rope-no-phase-no-self-fixed10-20260910/model_best on 41 horizons (T=1..131072), 256 samples each, device=cuda:0
+T=      1 | token 0.9949 | string 0.9570 | 0.6s <= train horizon
+T=      2 | token 0.9988 | string 0.9883 | 0.0s <= train horizon
+T=      3 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=      4 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=      5 | token 0.9984 | string 0.9844 | 0.0s <= train horizon
+T=      6 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=      7 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      8 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      9 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=     10 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     11 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     12 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     13 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     14 | token 0.9988 | string 0.9883 | 0.0s <= train horizon
+T=     16 | token 0.9621 | string 0.6836 | 0.0s <= train horizon
+T=     24 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     32 | token 0.9617 | string 0.6641 | 0.0s <= train horizon
+T=     48 | token 0.9801 | string 0.8047 | 0.0s <= train horizon
+T=     64 | token 0.9598 | string 0.6406 | 0.1s <= train horizon
+T=     96 | token 0.9164 | string 0.3555 | 0.1s <= train horizon
+T=    128 | token 0.9590 | string 0.6719 | 0.1s <= train horizon
+T=    192 | token 0.9578 | string 0.6484 | 0.2s <= train horizon
+T=    256 | token 0.9703 | string 0.7422 | 0.3s <= train horizon
+T=    384 | token 0.9605 | string 0.6523 | 0.4s <= train horizon
+T=    512 | token 0.9652 | string 0.7109 | 0.5s <= train horizon
+T=    768 | token 0.9664 | string 0.7227 | 0.7s <= train horizon
+T=   1024 | token 0.9629 | string 0.6914 | 1.1s <= train horizon
+T=   1536 | token 0.9586 | string 0.6680 | 1.6s <= train horizon
+T=   2048 | token 0.9633 | string 0.6875 | 2.2s
+T=   3072 | token 0.9590 | string 0.6523 | 3.3s
+T=   4096 | token 0.9621 | string 0.6602 | 5.1s
+T=   6144 | token 0.9629 | string 0.7070 | 7.7s
+T=   8192 | token 0.9680 | string 0.7305 | 10.3s
+T=  12288 | token 0.9625 | string 0.6680 | 15.3s
+T=  16384 | token 0.9660 | string 0.7031 | 21.8s
+T=  24576 | token 0.9574 | string 0.6289 | 33.5s
+T=  32768 | token 0.9609 | string 0.6719 | 45.4s
+T=  49152 | token 0.9656 | string 0.7070 | 67.8s
+T=  65536 | token 0.9609 | string 0.6719 | 92.0s
+T=  98304 | token 0.9629 | string 0.6719 | 142.7s
+T= 131072 | token 0.9613 | string 0.6836 | 194.2s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-self-slot-20260910/exp/copying/retrieval-rope-no-phase-no-self-fixed10-20260910/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-self-slot-20260910/exp/copying/retrieval-rope-no-phase-no-self-fixed10-20260910/plot.png

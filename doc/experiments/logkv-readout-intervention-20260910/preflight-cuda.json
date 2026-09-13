@@ -1,0 +1,7 @@
+{
+  "device": "cuda:0",
+  "observation_identity": true,
+  "sham_patches_identity": true,
+  "single_position_patch_locality": true,
+  "score_interventions_independent_oracle": true
+}

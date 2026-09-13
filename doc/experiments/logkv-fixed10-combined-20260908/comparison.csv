@@ -1,0 +1,329 @@
+task,mode,checkpoint,T,token_acc,string_acc,n
+copying,phase2 (historical),best,1,1.0,1.0,256
+copying,phase2 (historical),best,2,1.0,1.0,256
+copying,phase2 (historical),best,3,1.0,1.0,256
+copying,phase2 (historical),best,4,1.0,1.0,256
+copying,phase2 (historical),best,5,1.0,1.0,256
+copying,phase2 (historical),best,6,1.0,1.0,256
+copying,phase2 (historical),best,7,1.0,1.0,256
+copying,phase2 (historical),best,8,1.0,1.0,256
+copying,phase2 (historical),best,9,1.0,1.0,256
+copying,phase2 (historical),best,10,1.0,1.0,256
+copying,phase2 (historical),best,11,1.0,1.0,256
+copying,phase2 (historical),best,12,1.0,1.0,256
+copying,phase2 (historical),best,13,1.0,1.0,256
+copying,phase2 (historical),best,14,1.0,1.0,256
+copying,phase2 (historical),best,16,1.0,1.0,256
+copying,phase2 (historical),best,24,1.0,1.0,256
+copying,phase2 (historical),best,32,1.0,1.0,256
+copying,phase2 (historical),best,48,1.0,1.0,256
+copying,phase2 (historical),best,64,1.0,1.0,256
+copying,phase2 (historical),best,96,1.0,1.0,256
+copying,phase2 (historical),best,128,1.0,1.0,256
+copying,phase2 (historical),best,192,1.0,1.0,256
+copying,phase2 (historical),best,256,1.0,1.0,256
+copying,phase2 (historical),best,384,1.0,1.0,256
+copying,phase2 (historical),best,512,1.0,1.0,256
+copying,phase2 (historical),best,768,1.0,1.0,256
+copying,phase2 (historical),best,1024,1.0,1.0,256
+copying,phase2 (historical),best,1536,1.0,1.0,256
+copying,phase2 (historical),best,2048,1.0,1.0,256
+copying,phase2 (historical),best,3072,1.0,1.0,256
+copying,phase2 (historical),best,4096,1.0,1.0,256
+copying,phase2 (historical),best,6144,1.0,1.0,256
+copying,phase2 (historical),best,8192,1.0,1.0,256
+copying,phase2 (historical),best,12288,1.0,1.0,256
+copying,phase2 (historical),best,16384,1.0,1.0,256
+copying,phase2 (historical),best,24576,1.0,1.0,256
+copying,phase2 (historical),best,32768,1.0,1.0,256
+copying,phase2 (historical),best,49152,1.0,1.0,256
+copying,phase2 (historical),best,65536,1.0,1.0,256
+copying,phase2 (historical),best,98304,1.0,1.0,256
+copying,phase2 (historical),best,131072,1.0,1.0,256
+copying,phase2 (historical),final,1,1.0,1.0,256
+copying,phase2 (historical),final,2,1.0,1.0,256
+copying,phase2 (historical),final,3,1.0,1.0,256
+copying,phase2 (historical),final,4,1.0,1.0,256
+copying,phase2 (historical),final,5,1.0,1.0,256
+copying,phase2 (historical),final,6,1.0,1.0,256
+copying,phase2 (historical),final,7,1.0,1.0,256
+copying,phase2 (historical),final,8,1.0,1.0,256
+copying,phase2 (historical),final,9,1.0,1.0,256
+copying,phase2 (historical),final,10,1.0,1.0,256
+copying,phase2 (historical),final,11,1.0,1.0,256
+copying,phase2 (historical),final,12,1.0,1.0,256
+copying,phase2 (historical),final,13,1.0,1.0,256
+copying,phase2 (historical),final,14,1.0,1.0,256
+copying,phase2 (historical),final,16,1.0,1.0,256
+copying,phase2 (historical),final,24,1.0,1.0,256
+copying,phase2 (historical),final,32,1.0,1.0,256
+copying,phase2 (historical),final,48,1.0,1.0,256
+copying,phase2 (historical),final,64,1.0,1.0,256
+copying,phase2 (historical),final,96,1.0,1.0,256
+copying,phase2 (historical),final,128,1.0,1.0,256
+copying,phase2 (historical),final,192,1.0,1.0,256
+copying,phase2 (historical),final,256,1.0,1.0,256
+copying,phase2 (historical),final,384,1.0,1.0,256
+copying,phase2 (historical),final,512,1.0,1.0,256
+copying,phase2 (historical),final,768,1.0,1.0,256
+copying,phase2 (historical),final,1024,1.0,1.0,256
+copying,phase2 (historical),final,1536,1.0,1.0,256
+copying,phase2 (historical),final,2048,1.0,1.0,256
+copying,phase2 (historical),final,3072,1.0,1.0,256
+copying,phase2 (historical),final,4096,1.0,1.0,256
+copying,phase2 (historical),final,6144,1.0,1.0,256
+copying,phase2 (historical),final,8192,1.0,1.0,256
+copying,phase2 (historical),final,12288,1.0,1.0,256
+copying,phase2 (historical),final,16384,1.0,1.0,256
+copying,phase2 (historical),final,24576,1.0,1.0,256
+copying,phase2 (historical),final,32768,1.0,1.0,256
+copying,phase2 (historical),final,49152,1.0,1.0,256
+copying,phase2 (historical),final,65536,1.0,1.0,256
+copying,phase2 (historical),final,98304,1.0,1.0,256
+copying,phase2 (historical),final,131072,1.0,1.0,256
+copying,combined-no-decay,best,1,1.0,1.0,256
+copying,combined-no-decay,best,2,1.0,1.0,256
+copying,combined-no-decay,best,3,1.0,1.0,256
+copying,combined-no-decay,best,4,1.0,1.0,256
+copying,combined-no-decay,best,5,1.0,1.0,256
+copying,combined-no-decay,best,6,1.0,1.0,256
+copying,combined-no-decay,best,7,1.0,1.0,256
+copying,combined-no-decay,best,8,1.0,1.0,256
+copying,combined-no-decay,best,9,1.0,1.0,256
+copying,combined-no-decay,best,10,1.0,1.0,256
+copying,combined-no-decay,best,11,1.0,1.0,256
+copying,combined-no-decay,best,12,1.0,1.0,256
+copying,combined-no-decay,best,13,1.0,1.0,256
+copying,combined-no-decay,best,14,1.0,1.0,256
+copying,combined-no-decay,best,16,1.0,1.0,256
+copying,combined-no-decay,best,24,1.0,1.0,256
+copying,combined-no-decay,best,32,1.0,1.0,256
+copying,combined-no-decay,best,48,1.0,1.0,256
+copying,combined-no-decay,best,64,1.0,1.0,256
+copying,combined-no-decay,best,96,1.0,1.0,256
+copying,combined-no-decay,best,128,1.0,1.0,256
+copying,combined-no-decay,best,192,1.0,1.0,256
+copying,combined-no-decay,best,256,1.0,1.0,256
+copying,combined-no-decay,best,384,1.0,1.0,256
+copying,combined-no-decay,best,512,1.0,1.0,256
+copying,combined-no-decay,best,768,1.0,1.0,256
+copying,combined-no-decay,best,1024,1.0,1.0,256
+copying,combined-no-decay,best,1536,1.0,1.0,256
+copying,combined-no-decay,best,2048,1.0,1.0,256
+copying,combined-no-decay,best,3072,1.0,1.0,256
+copying,combined-no-decay,best,4096,0.627734375,0.00390625,256
+copying,combined-no-decay,best,6144,0.630859375,0.0078125,256
+copying,combined-no-decay,best,8192,0.637890625,0.0,256
+copying,combined-no-decay,best,12288,0.63828125,0.0,256
+copying,combined-no-decay,best,16384,0.38671875,0.0,256
+copying,combined-no-decay,best,24576,0.4140625,0.0,256
+copying,combined-no-decay,best,32768,0.40546875,0.0,256
+copying,combined-no-decay,best,49152,0.416015625,0.0,256
+copying,combined-no-decay,best,65536,0.332421875,0.0,256
+copying,combined-no-decay,best,98304,0.32265625,0.0,256
+copying,combined-no-decay,best,131072,0.334375,0.0,256
+copying,combined-no-decay,final,1,1.0,1.0,256
+copying,combined-no-decay,final,2,1.0,1.0,256
+copying,combined-no-decay,final,3,1.0,1.0,256
+copying,combined-no-decay,final,4,1.0,1.0,256
+copying,combined-no-decay,final,5,1.0,1.0,256
+copying,combined-no-decay,final,6,1.0,1.0,256
+copying,combined-no-decay,final,7,1.0,1.0,256
+copying,combined-no-decay,final,8,1.0,1.0,256
+copying,combined-no-decay,final,9,1.0,1.0,256
+copying,combined-no-decay,final,10,1.0,1.0,256
+copying,combined-no-decay,final,11,1.0,1.0,256
+copying,combined-no-decay,final,12,1.0,1.0,256
+copying,combined-no-decay,final,13,1.0,1.0,256
+copying,combined-no-decay,final,14,1.0,1.0,256
+copying,combined-no-decay,final,16,1.0,1.0,256
+copying,combined-no-decay,final,24,1.0,1.0,256
+copying,combined-no-decay,final,32,1.0,1.0,256
+copying,combined-no-decay,final,48,1.0,1.0,256
+copying,combined-no-decay,final,64,1.0,1.0,256
+copying,combined-no-decay,final,96,1.0,1.0,256
+copying,combined-no-decay,final,128,1.0,1.0,256
+copying,combined-no-decay,final,192,1.0,1.0,256
+copying,combined-no-decay,final,256,1.0,1.0,256
+copying,combined-no-decay,final,384,1.0,1.0,256
+copying,combined-no-decay,final,512,1.0,1.0,256
+copying,combined-no-decay,final,768,1.0,1.0,256
+copying,combined-no-decay,final,1024,1.0,1.0,256
+copying,combined-no-decay,final,1536,1.0,1.0,256
+copying,combined-no-decay,final,2048,1.0,1.0,256
+copying,combined-no-decay,final,3072,1.0,1.0,256
+copying,combined-no-decay,final,4096,0.627734375,0.00390625,256
+copying,combined-no-decay,final,6144,0.630859375,0.0078125,256
+copying,combined-no-decay,final,8192,0.637890625,0.0,256
+copying,combined-no-decay,final,12288,0.63828125,0.0,256
+copying,combined-no-decay,final,16384,0.38671875,0.0,256
+copying,combined-no-decay,final,24576,0.4140625,0.0,256
+copying,combined-no-decay,final,32768,0.40546875,0.0,256
+copying,combined-no-decay,final,49152,0.416015625,0.0,256
+copying,combined-no-decay,final,65536,0.332421875,0.0,256
+copying,combined-no-decay,final,98304,0.32265625,0.0,256
+copying,combined-no-decay,final,131072,0.334375,0.0,256
+selective-copying,phase2 (historical),best,1,1.0,1.0,256
+selective-copying,phase2 (historical),best,2,1.0,1.0,256
+selective-copying,phase2 (historical),best,3,0.9921875,0.921875,256
+selective-copying,phase2 (historical),best,4,0.99296875,0.9375,256
+selective-copying,phase2 (historical),best,5,0.99453125,0.9453125,256
+selective-copying,phase2 (historical),best,6,0.991015625,0.921875,256
+selective-copying,phase2 (historical),best,7,0.977734375,0.828125,256
+selective-copying,phase2 (historical),best,8,0.99140625,0.921875,256
+selective-copying,phase2 (historical),best,9,0.994921875,0.953125,256
+selective-copying,phase2 (historical),best,10,0.99375,0.9453125,256
+selective-copying,phase2 (historical),best,11,0.99375,0.9375,256
+selective-copying,phase2 (historical),best,12,0.98671875,0.87890625,256
+selective-copying,phase2 (historical),best,13,0.991796875,0.92578125,256
+selective-copying,phase2 (historical),best,14,0.991015625,0.921875,256
+selective-copying,phase2 (historical),best,16,0.9671875,0.72265625,256
+selective-copying,phase2 (historical),best,24,0.949609375,0.63671875,256
+selective-copying,phase2 (historical),best,32,0.909765625,0.390625,256
+selective-copying,phase2 (historical),best,48,0.857421875,0.23046875,256
+selective-copying,phase2 (historical),best,64,0.84375,0.17578125,256
+selective-copying,phase2 (historical),best,96,0.81875,0.1015625,256
+selective-copying,phase2 (historical),best,128,0.7734375,0.08203125,256
+selective-copying,phase2 (historical),best,192,0.7390625,0.03515625,256
+selective-copying,phase2 (historical),best,256,0.757421875,0.0390625,256
+selective-copying,phase2 (historical),best,384,0.751171875,0.0625,256
+selective-copying,phase2 (historical),best,512,0.7,0.01953125,256
+selective-copying,phase2 (historical),best,768,0.6890625,0.0078125,256
+selective-copying,phase2 (historical),best,1024,0.686328125,0.015625,256
+selective-copying,phase2 (historical),best,1536,0.703125,0.0078125,256
+selective-copying,phase2 (historical),best,2048,0.658984375,0.0078125,256
+selective-copying,phase2 (historical),best,3072,0.65546875,0.0078125,256
+selective-copying,phase2 (historical),best,4096,0.569140625,0.0078125,256
+selective-copying,phase2 (historical),best,6144,0.634765625,0.00390625,256
+selective-copying,phase2 (historical),best,8192,0.567578125,0.00390625,256
+selective-copying,phase2 (historical),best,12288,0.53671875,0.0,256
+selective-copying,phase2 (historical),best,16384,0.4484375,0.0,256
+selective-copying,phase2 (historical),best,24576,0.503125,0.0,256
+selective-copying,phase2 (historical),best,32768,0.438671875,0.0,256
+selective-copying,phase2 (historical),best,49152,0.4125,0.0,256
+selective-copying,phase2 (historical),best,65536,0.34921875,0.0,256
+selective-copying,phase2 (historical),best,98304,0.36875,0.0,256
+selective-copying,phase2 (historical),best,131072,0.327734375,0.0,256
+selective-copying,phase2 (historical),final,1,0.99921875,0.9921875,256
+selective-copying,phase2 (historical),final,2,0.996484375,0.96875,256
+selective-copying,phase2 (historical),final,3,0.9671875,0.73046875,256
+selective-copying,phase2 (historical),final,4,0.991015625,0.9140625,256
+selective-copying,phase2 (historical),final,5,0.972265625,0.77734375,256
+selective-copying,phase2 (historical),final,6,0.974609375,0.79296875,256
+selective-copying,phase2 (historical),final,7,0.978125,0.8203125,256
+selective-copying,phase2 (historical),final,8,0.9828125,0.84375,256
+selective-copying,phase2 (historical),final,9,0.98359375,0.86328125,256
+selective-copying,phase2 (historical),final,10,0.9859375,0.8671875,256
+selective-copying,phase2 (historical),final,11,0.985546875,0.875,256
+selective-copying,phase2 (historical),final,12,0.972265625,0.76953125,256
+selective-copying,phase2 (historical),final,13,0.960546875,0.6640625,256
+selective-copying,phase2 (historical),final,14,0.95390625,0.65625,256
+selective-copying,phase2 (historical),final,16,0.944140625,0.56640625,256
+selective-copying,phase2 (historical),final,24,0.9359375,0.55078125,256
+selective-copying,phase2 (historical),final,32,0.883984375,0.30859375,256
+selective-copying,phase2 (historical),final,48,0.830859375,0.15625,256
+selective-copying,phase2 (historical),final,64,0.80234375,0.12890625,256
+selective-copying,phase2 (historical),final,96,0.805078125,0.12109375,256
+selective-copying,phase2 (historical),final,128,0.7390625,0.03125,256
+selective-copying,phase2 (historical),final,192,0.70546875,0.0390625,256
+selective-copying,phase2 (historical),final,256,0.726953125,0.03125,256
+selective-copying,phase2 (historical),final,384,0.720703125,0.0234375,256
+selective-copying,phase2 (historical),final,512,0.680859375,0.01953125,256
+selective-copying,phase2 (historical),final,768,0.65859375,0.01171875,256
+selective-copying,phase2 (historical),final,1024,0.6171875,0.00390625,256
+selective-copying,phase2 (historical),final,1536,0.656640625,0.015625,256
+selective-copying,phase2 (historical),final,2048,0.595703125,0.00390625,256
+selective-copying,phase2 (historical),final,3072,0.598828125,0.0,256
+selective-copying,phase2 (historical),final,4096,0.527734375,0.0,256
+selective-copying,phase2 (historical),final,6144,0.5625,0.0,256
+selective-copying,phase2 (historical),final,8192,0.503125,0.0,256
+selective-copying,phase2 (historical),final,12288,0.479296875,0.0,256
+selective-copying,phase2 (historical),final,16384,0.308984375,0.0,256
+selective-copying,phase2 (historical),final,24576,0.370703125,0.0,256
+selective-copying,phase2 (historical),final,32768,0.317578125,0.0,256
+selective-copying,phase2 (historical),final,49152,0.343359375,0.0,256
+selective-copying,phase2 (historical),final,65536,0.180078125,0.0,256
+selective-copying,phase2 (historical),final,98304,0.225390625,0.0,256
+selective-copying,phase2 (historical),final,131072,0.204296875,0.0,256
+selective-copying,combined-no-decay,best,1,1.0,1.0,256
+selective-copying,combined-no-decay,best,2,1.0,1.0,256
+selective-copying,combined-no-decay,best,3,0.999609375,0.99609375,256
+selective-copying,combined-no-decay,best,4,1.0,1.0,256
+selective-copying,combined-no-decay,best,5,0.99921875,0.9921875,256
+selective-copying,combined-no-decay,best,6,0.994921875,0.953125,256
+selective-copying,combined-no-decay,best,7,0.99609375,0.9609375,256
+selective-copying,combined-no-decay,best,8,0.998046875,0.98046875,256
+selective-copying,combined-no-decay,best,9,0.99921875,0.9921875,256
+selective-copying,combined-no-decay,best,10,0.9953125,0.9609375,256
+selective-copying,combined-no-decay,best,11,0.998046875,0.98046875,256
+selective-copying,combined-no-decay,best,12,0.9984375,0.984375,256
+selective-copying,combined-no-decay,best,13,0.996484375,0.96484375,256
+selective-copying,combined-no-decay,best,14,0.997265625,0.97265625,256
+selective-copying,combined-no-decay,best,16,0.99296875,0.9375,256
+selective-copying,combined-no-decay,best,24,0.995703125,0.9609375,256
+selective-copying,combined-no-decay,best,32,0.97421875,0.7734375,256
+selective-copying,combined-no-decay,best,48,0.85390625,0.1328125,256
+selective-copying,combined-no-decay,best,64,0.702734375,0.03125,256
+selective-copying,combined-no-decay,best,96,0.885546875,0.29296875,256
+selective-copying,combined-no-decay,best,128,0.68515625,0.01953125,256
+selective-copying,combined-no-decay,best,192,0.67109375,0.01171875,256
+selective-copying,combined-no-decay,best,256,0.602734375,0.0,256
+selective-copying,combined-no-decay,best,384,0.62734375,0.0,256
+selective-copying,combined-no-decay,best,512,0.5984375,0.00390625,256
+selective-copying,combined-no-decay,best,768,0.582421875,0.0,256
+selective-copying,combined-no-decay,best,1024,0.46875,0.0,256
+selective-copying,combined-no-decay,best,1536,0.49453125,0.0,256
+selective-copying,combined-no-decay,best,2048,0.3828125,0.0,256
+selective-copying,combined-no-decay,best,3072,0.3359375,0.0,256
+selective-copying,combined-no-decay,best,4096,0.23515625,0.0,256
+selective-copying,combined-no-decay,best,6144,0.219140625,0.0,256
+selective-copying,combined-no-decay,best,8192,0.193359375,0.0,256
+selective-copying,combined-no-decay,best,12288,0.172265625,0.0,256
+selective-copying,combined-no-decay,best,16384,0.138671875,0.0,256
+selective-copying,combined-no-decay,best,24576,0.140234375,0.0,256
+selective-copying,combined-no-decay,best,32768,0.1546875,0.0,256
+selective-copying,combined-no-decay,best,49152,0.131640625,0.0,256
+selective-copying,combined-no-decay,best,65536,0.127734375,0.0,256
+selective-copying,combined-no-decay,best,98304,0.128125,0.0,256
+selective-copying,combined-no-decay,best,131072,0.128125,0.0,256
+selective-copying,combined-no-decay,final,1,1.0,1.0,256
+selective-copying,combined-no-decay,final,2,0.999609375,0.99609375,256
+selective-copying,combined-no-decay,final,3,1.0,1.0,256
+selective-copying,combined-no-decay,final,4,0.99921875,0.9921875,256
+selective-copying,combined-no-decay,final,5,0.99765625,0.9765625,256
+selective-copying,combined-no-decay,final,6,0.996875,0.96875,256
+selective-copying,combined-no-decay,final,7,0.996875,0.96875,256
+selective-copying,combined-no-decay,final,8,0.995703125,0.95703125,256
+selective-copying,combined-no-decay,final,9,0.998046875,0.98046875,256
+selective-copying,combined-no-decay,final,10,0.998046875,0.98046875,256
+selective-copying,combined-no-decay,final,11,0.99453125,0.9453125,256
+selective-copying,combined-no-decay,final,12,0.99609375,0.9609375,256
+selective-copying,combined-no-decay,final,13,0.996875,0.97265625,256
+selective-copying,combined-no-decay,final,14,0.996484375,0.96875,256
+selective-copying,combined-no-decay,final,16,0.99453125,0.953125,256
+selective-copying,combined-no-decay,final,24,0.990625,0.91796875,256
+selective-copying,combined-no-decay,final,32,0.98828125,0.88671875,256
+selective-copying,combined-no-decay,final,48,0.87578125,0.22265625,256
+selective-copying,combined-no-decay,final,64,0.917578125,0.4609375,256
+selective-copying,combined-no-decay,final,96,0.896484375,0.31640625,256
+selective-copying,combined-no-decay,final,128,0.879296875,0.28125,256
+selective-copying,combined-no-decay,final,192,0.80390625,0.078125,256
+selective-copying,combined-no-decay,final,256,0.711328125,0.0234375,256
+selective-copying,combined-no-decay,final,384,0.763671875,0.05859375,256
+selective-copying,combined-no-decay,final,512,0.683984375,0.015625,256
+selective-copying,combined-no-decay,final,768,0.63046875,0.00390625,256
+selective-copying,combined-no-decay,final,1024,0.494921875,0.0,256
+selective-copying,combined-no-decay,final,1536,0.50625,0.0,256
+selective-copying,combined-no-decay,final,2048,0.416015625,0.0,256
+selective-copying,combined-no-decay,final,3072,0.345703125,0.0,256
+selective-copying,combined-no-decay,final,4096,0.23359375,0.0,256
+selective-copying,combined-no-decay,final,6144,0.193359375,0.0,256
+selective-copying,combined-no-decay,final,8192,0.20703125,0.0,256
+selective-copying,combined-no-decay,final,12288,0.168359375,0.0,256
+selective-copying,combined-no-decay,final,16384,0.13125,0.0,256
+selective-copying,combined-no-decay,final,24576,0.1296875,0.0,256
+selective-copying,combined-no-decay,final,32768,0.140625,0.0,256
+selective-copying,combined-no-decay,final,49152,0.128125,0.0,256
+selective-copying,combined-no-decay,final,65536,0.119140625,0.0,256
+selective-copying,combined-no-decay,final,98304,0.127734375,0.0,256
+selective-copying,combined-no-decay,final,131072,0.12265625,0.0,256

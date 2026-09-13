@@ -1,0 +1,30 @@
+{
+  "local-control": {
+    "step": 100,
+    "benchmark_metrics_bitexact": true,
+    "initial_weights_match": true,
+    "metrics": {
+      "step": 100,
+      "loss": 1.092259407043457,
+      "ema_loss": 1.351006836633613,
+      "token_acc": 0.122671875,
+      "string_acc": 0.0,
+      "lr": 2.9999999999999997e-05,
+      "elapsed_sec": 31.4
+    }
+  },
+  "aligned": {
+    "step": 100,
+    "benchmark_metrics_bitexact": true,
+    "initial_weights_match": true,
+    "metrics": {
+      "step": 100,
+      "loss": 1.0906822681427002,
+      "ema_loss": 1.3511276491789406,
+      "token_acc": 0.1218125,
+      "string_acc": 0.0,
+      "lr": 2.9999999999999997e-05,
+      "elapsed_sec": 32.6
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "tests_passed": 327,
+  "test_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_aligned_rope.py -q",
+  "cpu_legacy_compatibility": [
+    {
+      "flags": {},
+      "initial_weights_and_rng": true,
+      "forward_and_gradients_bitexact": true
+    },
+    {
+      "flags": {
+        "retrieval_rope": true
+      },
+      "initial_weights_and_rng": true,
+      "forward_and_gradients_bitexact": true
+    },
+    {
+      "flags": {
+        "compressor_rope": true
+      },
+      "initial_weights_and_rng": true,
+      "forward_and_gradients_bitexact": true
+    }
+  ]
+}

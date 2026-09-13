@@ -1,0 +1,5 @@
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 6611.76it/s]
+discovery 0 prefix seconds 5.61
+validation 0 prefix seconds 5.29
+validation 16 prefix seconds 5.33
+Completed best-fp32 98 cases in 21.9 s

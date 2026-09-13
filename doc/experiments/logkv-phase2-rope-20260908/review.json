@@ -1,0 +1,105 @@
+{
+  "reviewed": "2026-09-09T02:36:21.832035+00:00",
+  "evaluation_cells": 396,
+  "exit_code_checks": 18,
+  "checks": [
+    {
+      "task": "copying",
+      "mode": "phase2",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "copying",
+      "mode": "phase2",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "copying",
+      "mode": "retrieval-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "copying",
+      "mode": "retrieval-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "copying",
+      "mode": "compressor-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "copying",
+      "mode": "compressor-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "phase2",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "phase2",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "retrieval-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "retrieval-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "compressor-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    },
+    {
+      "task": "selective-copying",
+      "mode": "compressor-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "source_files_equal": true,
+      "log_values_equal": true
+    }
+  ],
+  "all_checks_passed": true,
+  "gpu_experiments_started_during_review": false
+}

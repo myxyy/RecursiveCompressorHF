@@ -1,0 +1,61 @@
+{
+  "stage": {
+    "task": "selective-copying",
+    "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+    "commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+    "started": "2026-09-08T17:43:27.691398+00:00",
+    "gpu_limit": 2,
+    "steps": 50000,
+    "max_t_exp": 13,
+    "samples": 256,
+    "state": "complete-awaiting-review",
+    "next_stage_queued": false,
+    "finished": "2026-09-08T22:22:42.227972+00:00"
+  },
+  "runs": [
+    {
+      "mode": "phase2",
+      "best_step": 49000,
+      "final_ema_loss": 0.02993292587296346,
+      "train_elapsed_sec": 8144.5,
+      "weight_sha256": {
+        "best": "2ec846db357cbbe9b334b5471140957f29d4f850e891f8ec8b09a21673dcce60",
+        "final": "181b241f46ee1421b5a7e910b0c22851ce9656c7f3c945bfae13698ba979f114"
+      },
+      "checkpoints_identical": false
+    },
+    {
+      "mode": "retrieval-rope",
+      "best_step": 48100,
+      "final_ema_loss": 0.016865714713346424,
+      "train_elapsed_sec": 13666.6,
+      "weight_sha256": {
+        "best": "f9421f7a5043c553d9c0294f57fa336ba3306fc3e0a72e625a99d301d0b56f6d",
+        "final": "3d17f89908099b8c5205154f3434af1d6f327fc1c3fd9ad4b244ffe146282a48"
+      },
+      "checkpoints_identical": false
+    },
+    {
+      "mode": "compressor-rope",
+      "best_step": 49000,
+      "final_ema_loss": 0.02012853962878761,
+      "train_elapsed_sec": 8499.2,
+      "weight_sha256": {
+        "best": "c530f8bd04796ccaf3da1b1582ae9d8c9124710d182a3ff28d142dbfd7f27bed",
+        "final": "a982afcb1e90214eb2e5b6f338858e68181fc5221975b0708f765a7da1caa0f8"
+      },
+      "checkpoints_identical": false
+    }
+  ],
+  "evaluation_cells": 198,
+  "all_checks_passed": true,
+  "scope": "Fixed M=10, P=0; 33 horizons through T8192, n256 per checkpoint; not a 16M test",
+  "first_imperfect": {
+    "phase2/best": 2,
+    "phase2/final": 2,
+    "retrieval-rope/best": 2,
+    "retrieval-rope/final": 3,
+    "compressor-rope/best": 2,
+    "compressor-rope/final": 2
+  }
+}

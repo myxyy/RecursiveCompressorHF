@@ -1,0 +1,37 @@
+{
+  "state": "complete",
+  "started": "2026-09-10T07:10:29.621274+00:00",
+  "job": {
+    "name": "best-bf16",
+    "checkpoint": "best",
+    "precision": "bf16",
+    "gpu": 0
+  },
+  "weight_sha256": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533",
+  "case_groups": 3,
+  "finished": "2026-09-10T07:10:55.507069+00:00",
+  "elapsed_seconds": 25.885830994229764,
+  "checks": [
+    {
+      "T": 49151,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    },
+    {
+      "T": 49152,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    },
+    {
+      "T": 49153,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    }
+  ],
+  "case_count": 126,
+  "prefix_immutable": true,
+  "payload_KV_equal_across_horizons": true,
+  "observation_and_sham_identity": true,
+  "earlier_answers_unchanged": true,
+  "weight_hash_unchanged": true
+}

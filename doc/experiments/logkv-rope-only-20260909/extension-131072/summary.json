@@ -1,0 +1,58 @@
+{
+  "evaluation_cells": 82,
+  "new_horizons_per_checkpoint": [
+    12288,
+    16384,
+    24576,
+    32768,
+    49152,
+    65536,
+    98304,
+    131072
+  ],
+  "overlapping_horizons": {
+    "best": {
+      "cells": 33,
+      "exact": true
+    },
+    "final": {
+      "cells": 33,
+      "exact": true
+    }
+  },
+  "weight_sha256": {
+    "best": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533",
+    "final": "f13dd110cfba6013f434e7aa1be40883c28dff73f880d2afb580e7193f498933"
+  },
+  "all_checks_passed": true,
+  "final_horizon": [
+    {
+      "checkpoint": "best",
+      "T": 131072,
+      "token_correct": 2551,
+      "string_correct": 247,
+      "token_acc": 0.996484375,
+      "string_acc": 0.96484375,
+      "n": 256
+    },
+    {
+      "checkpoint": "final",
+      "T": 131072,
+      "token_correct": 2551,
+      "string_correct": 247,
+      "token_acc": 0.996484375,
+      "string_acc": 0.96484375,
+      "n": 256
+    }
+  ],
+  "all_horizons_string_acc_range": {
+    "best": [
+      0.34765625,
+      1.0
+    ],
+    "final": [
+      0.0390625,
+      1.0
+    ]
+  }
+}

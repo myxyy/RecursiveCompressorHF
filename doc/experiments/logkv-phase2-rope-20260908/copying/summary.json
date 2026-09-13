@@ -1,0 +1,61 @@
+{
+  "stage": {
+    "task": "copying",
+    "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+    "commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+    "started": "2026-09-08T13:01:02.169081+00:00",
+    "gpu_limit": 2,
+    "steps": 50000,
+    "max_t_exp": 13,
+    "samples": 256,
+    "state": "complete-awaiting-review",
+    "next_stage_queued": false,
+    "finished": "2026-09-08T17:43:21.966537+00:00"
+  },
+  "runs": [
+    {
+      "mode": "phase2",
+      "best_step": 37800,
+      "final_ema_loss": 1.101225266493871e-06,
+      "train_elapsed_sec": 8266.7,
+      "weight_sha256": {
+        "best": "251a4879f5b4b747b3fb34902753fba10a5bceb35d9ded150604dc532b0c1911",
+        "final": "aed32b8d59babbea54c19735f6e4e4cab74911473c7b26f673674da9528f8d76"
+      },
+      "checkpoints_identical": false
+    },
+    {
+      "mode": "retrieval-rope",
+      "best_step": 31100,
+      "final_ema_loss": 3.7061623824212e-07,
+      "train_elapsed_sec": 13899.8,
+      "weight_sha256": {
+        "best": "f91e8c5bc393e89e2c051d06cc881e8e43906e1f4f45cefbdea79f5fdfa65d5b",
+        "final": "90f35cc24dcf74d5c0eaa81c81ad253e0c3df8881f4ab5e289e6d46d1d70da16"
+      },
+      "checkpoints_identical": false
+    },
+    {
+      "mode": "compressor-rope",
+      "best_step": 49800,
+      "final_ema_loss": 1.7692942196268686e-06,
+      "train_elapsed_sec": 8562.8,
+      "weight_sha256": {
+        "best": "b19aac04b5ee2584e15aed29ca743887669f9ef047ad75c32f55d7f540addb20",
+        "final": "6224d1250b615326e9bc524cde973e28b534b22d43641ab23fc3a9d61c76a106"
+      },
+      "checkpoints_identical": false
+    }
+  ],
+  "evaluation_cells": 198,
+  "all_checks_passed": true,
+  "scope": "Fixed M=10, P=0; 33 horizons through T8192, n256 per checkpoint; not a 16M test",
+  "first_imperfect": {
+    "phase2/best": null,
+    "phase2/final": null,
+    "retrieval-rope/best": null,
+    "retrieval-rope/final": null,
+    "compressor-rope/best": null,
+    "compressor-rope/final": null
+  }
+}

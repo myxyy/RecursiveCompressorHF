@@ -1,0 +1,319 @@
+{
+  "reviewed": "2026-09-10T05:41:52.609224+00:00",
+  "replay": {
+    "best": {
+      "bf16_error_count_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        5,
+        3,
+        0
+      ],
+      "fp32_error_count_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        5,
+        0,
+        0
+      ],
+      "fp32_fixed_strings": 3,
+      "selected_strings": 9,
+      "bf16_wrong_margins": [
+        -1.375,
+        -0.9375,
+        -3.03125,
+        -1.03125,
+        -1.34375,
+        -0.28125,
+        -0.3125,
+        -1.296875,
+        -0.78125
+      ],
+      "attention_by_digit": [
+        {
+          "digit": 7,
+          "layer": 1,
+          "error_examples": 1,
+          "self_mass_incorrect": 0.4266519844532013,
+          "self_mass_correct": 0.4266425371170044,
+          "memory_overlap_mass_incorrect": 0.12499669939279556,
+          "memory_overlap_mass_correct": 0.12500618398189545
+        },
+        {
+          "digit": 7,
+          "layer": 2,
+          "error_examples": 1,
+          "self_mass_incorrect": 6.227206770208422e-23,
+          "self_mass_correct": 8.249311982747663e-19,
+          "memory_overlap_mass_incorrect": 0.625,
+          "memory_overlap_mass_correct": 0.625
+        },
+        {
+          "digit": 8,
+          "layer": 1,
+          "error_examples": 5,
+          "self_mass_incorrect": 0.19890691339969635,
+          "self_mass_correct": 0.19890637695789337,
+          "memory_overlap_mass_incorrect": 0.1250033974647522,
+          "memory_overlap_mass_correct": 0.12500396370887756
+        },
+        {
+          "digit": 8,
+          "layer": 2,
+          "error_examples": 5,
+          "self_mass_incorrect": 5.740767785249491e-17,
+          "self_mass_correct": 1.225133631832043e-16,
+          "memory_overlap_mass_incorrect": 0.625,
+          "memory_overlap_mass_correct": 0.625
+        },
+        {
+          "digit": 9,
+          "layer": 1,
+          "error_examples": 3,
+          "self_mass_incorrect": 0.1449863612651825,
+          "self_mass_correct": 0.14498336613178253,
+          "memory_overlap_mass_incorrect": 0.056680042296648026,
+          "memory_overlap_mass_correct": 0.06852265447378159
+        },
+        {
+          "digit": 9,
+          "layer": 2,
+          "error_examples": 3,
+          "self_mass_incorrect": 7.248744180841017e-18,
+          "self_mass_correct": 5.096102258750573e-16,
+          "memory_overlap_mass_incorrect": 0.5,
+          "memory_overlap_mass_correct": 0.5
+        }
+      ]
+    },
+    "final": {
+      "bf16_error_count_by_digit": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        8,
+        0,
+        0,
+        0
+      ],
+      "fp32_error_count_by_digit": [
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        8,
+        0,
+        0,
+        0
+      ],
+      "fp32_fixed_strings": 0,
+      "selected_strings": 9,
+      "bf16_wrong_margins": [
+        -1.1875,
+        -0.25,
+        -0.40625,
+        -0.5625,
+        -0.6875,
+        -1.03125,
+        -0.40625,
+        0.0,
+        -1.15625
+      ],
+      "attention_by_digit": [
+        {
+          "digit": 3,
+          "layer": 1,
+          "error_examples": 1,
+          "self_mass_incorrect": 0.2950429320335388,
+          "self_mass_correct": 0.2950429320335388,
+          "memory_overlap_mass_incorrect": 4.239619102008874e-06,
+          "memory_overlap_mass_correct": 4.23589290221571e-06
+        },
+        {
+          "digit": 3,
+          "layer": 2,
+          "error_examples": 1,
+          "self_mass_incorrect": 2.9222210277825982e-30,
+          "self_mass_correct": 2.0598576922772568e-22,
+          "memory_overlap_mass_incorrect": 0.625,
+          "memory_overlap_mass_correct": 0.625
+        },
+        {
+          "digit": 7,
+          "layer": 1,
+          "error_examples": 8,
+          "self_mass_incorrect": 0.4329216182231903,
+          "self_mass_correct": 0.43292179703712463,
+          "memory_overlap_mass_incorrect": 0.12503156065940857,
+          "memory_overlap_mass_correct": 0.12503135204315186
+        },
+        {
+          "digit": 7,
+          "layer": 2,
+          "error_examples": 8,
+          "self_mass_incorrect": 3.737655154462087e-23,
+          "self_mass_correct": 1.3120153831825264e-21,
+          "memory_overlap_mass_incorrect": 0.625,
+          "memory_overlap_mass_correct": 0.625
+        }
+      ]
+    }
+  },
+  "best_final_failed_sample_overlap": 0,
+  "next_digit_errors": [
+    {
+      "precision": "bf16",
+      "T": 49152,
+      "digit": 9,
+      "absolute_position_zero_based": 49170,
+      "errors": 13,
+      "errors_matching_next_digit": 13
+    },
+    {
+      "precision": "bf16",
+      "T": 49153,
+      "digit": 8,
+      "absolute_position_zero_based": 49170,
+      "errors": 11,
+      "errors_matching_next_digit": 11
+    },
+    {
+      "precision": "fp32",
+      "T": 49152,
+      "digit": 9,
+      "absolute_position_zero_based": 49170,
+      "errors": 11,
+      "errors_matching_next_digit": 11
+    }
+  ],
+  "repeated_paired_error_across_lengths": [
+    {
+      "T": 16,
+      "errors": [
+        {
+          "sample": 1,
+          "digit": 8,
+          "target": 1,
+          "prediction": 3
+        }
+      ]
+    },
+    {
+      "T": 8192,
+      "errors": [
+        {
+          "sample": 1,
+          "digit": 8,
+          "target": 1,
+          "prediction": 3
+        }
+      ]
+    },
+    {
+      "T": 32768,
+      "errors": [
+        {
+          "sample": 1,
+          "digit": 8,
+          "target": 1,
+          "prediction": 3
+        }
+      ]
+    },
+    {
+      "T": 65536,
+      "errors": [
+        {
+          "sample": 1,
+          "digit": 8,
+          "target": 1,
+          "prediction": 3
+        }
+      ]
+    },
+    {
+      "T": 131072,
+      "errors": [
+        {
+          "sample": 1,
+          "digit": 8,
+          "target": 1,
+          "prediction": 3
+        }
+      ]
+    }
+  ],
+  "training_tail": [
+    {
+      "step": 49000,
+      "string_acc": 0.6840625,
+      "ema_loss": 0.009443939752387602
+    },
+    {
+      "step": 49100,
+      "string_acc": 0.6990625,
+      "ema_loss": 0.010180034052751225
+    },
+    {
+      "step": 49200,
+      "string_acc": 0.1178125,
+      "ema_loss": 0.10724785531354097
+    },
+    {
+      "step": 49300,
+      "string_acc": 0.04953125,
+      "ema_loss": 0.11103569966572412
+    },
+    {
+      "step": 49400,
+      "string_acc": 0.1346875,
+      "ema_loss": 0.1039122344062543
+    },
+    {
+      "step": 49500,
+      "string_acc": 0.18828125,
+      "ema_loss": 0.09407134108846321
+    },
+    {
+      "step": 49600,
+      "string_acc": 0.258125,
+      "ema_loss": 0.07172066143863104
+    },
+    {
+      "step": 49700,
+      "string_acc": 0.35359375,
+      "ema_loss": 0.05669583412469429
+    },
+    {
+      "step": 49800,
+      "string_acc": 0.30015625,
+      "ema_loss": 0.05781309155413638
+    },
+    {
+      "step": 49900,
+      "string_acc": 0.2884375,
+      "ema_loss": 0.051695654220064134
+    },
+    {
+      "step": 50000,
+      "string_acc": 0.2890625,
+      "ema_loss": 0.05947887972929844
+    }
+  ],
+  "interpretation": "Self removal worsens this seed; numerical precision explains some but not all failures; observed next-digit substitutions at a fixed absolute position do not identify the causal layer"
+}

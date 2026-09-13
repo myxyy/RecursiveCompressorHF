@@ -1,0 +1,72 @@
+{
+  "state": "complete-awaiting-review",
+  "started": "2026-09-10T07:10:24.781471+00:00",
+  "pid": 2733038,
+  "gpu_limit": 3,
+  "gpus": [
+    0,
+    1,
+    2
+  ],
+  "time_limit_hours": 2,
+  "authorization": "User explicitly authorized up to three parallel GPUs for this verification",
+  "source_commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+  "experiment_commit": "6eee1e902645d56920345f8b00a24b800b6ab56c",
+  "script_sha256": {
+    "probe.py": "338845e9642a612da8dcaa8e9301045ff6cd2ae30aef1311bcbbdcf2ce978503",
+    "summarize.py": "f51dec334b0f329218722bff5a2a88dcaf90142aedc1d58dc668cc1b6a88a6f2",
+    "run.py": "eb5b32a07a722e987c3ffb255f3f08d6aa770c75dbf225a0fe2efcf164c009a7",
+    "worker.py": "1d8a472b2c562c017f1d955adbc9b2cf3b7b17e295fa4f0a119a90210c10e707",
+    "common.py": "6e3a9063ec4e1e982b63f32009d44090a3dc0a89635e51fbfeef6ab96ebec0cd",
+    "preflight.py": "c55e8465b665f95e2f13f63d3ac6d830343370a996fbf1fd6454ccac5af552b2"
+  },
+  "jobs": [
+    {
+      "name": "best-bf16",
+      "checkpoint": "best",
+      "precision": "bf16",
+      "gpu": 0,
+      "pid": 2733042,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-readout-intervention-20260910/worker.py",
+        "--job",
+        "best-bf16"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "final-bf16",
+      "checkpoint": "final",
+      "precision": "bf16",
+      "gpu": 1,
+      "pid": 2733043,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-readout-intervention-20260910/worker.py",
+        "--job",
+        "final-bf16"
+      ],
+      "returncode": 0
+    },
+    {
+      "name": "best-fp32",
+      "checkpoint": "best",
+      "precision": "fp32",
+      "gpu": 2,
+      "pid": 2733044,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-readout-intervention-20260910/worker.py",
+        "--job",
+        "best-fp32"
+      ],
+      "returncode": 0
+    }
+  ],
+  "next_stage_queued": false,
+  "gpu_finished": "2026-09-10T07:10:56.800662+00:00",
+  "summary_returncode": 0,
+  "finished": "2026-09-10T07:11:00.525891+00:00",
+  "elapsed_seconds": 35.74445840436965
+}

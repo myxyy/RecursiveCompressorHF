@@ -1,0 +1,72 @@
+{
+  "state": "complete-awaiting-review",
+  "started": "2026-09-09T16:19:16.430819+00:00",
+  "pid": 1818224,
+  "gpu": 2,
+  "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+  "source_commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+  "task": "copying",
+  "mode": "retrieval-rope",
+  "phase_emb": false,
+  "samples": 256,
+  "max_t_exp": 17,
+  "checkpoints_sha256": {
+    "best": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533",
+    "final": "f13dd110cfba6013f434e7aa1be40883c28dff73f880d2afb580e7193f498933"
+  },
+  "commands": [
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/copying/evaluate.py",
+        "--run-name",
+        "retrieval-rope-no-phase-fixed10-20260909",
+        "--samples",
+        "256",
+        "--max-t-exp",
+        "17",
+        "--seed",
+        "12345",
+        "--precision",
+        "bf16",
+        "--checkpoint",
+        "best",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-09T16:19:16.431213+00:00",
+      "returncode": 0,
+      "finished": "2026-09-09T16:33:05.573458+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/copying/evaluate.py",
+        "--run-name",
+        "retrieval-rope-no-phase-fixed10-20260909",
+        "--samples",
+        "256",
+        "--max-t-exp",
+        "17",
+        "--seed",
+        "12345",
+        "--precision",
+        "bf16",
+        "--checkpoint",
+        "final",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-09T16:33:05.574739+00:00",
+      "returncode": 0,
+      "finished": "2026-09-09T16:47:22.334431+00:00"
+    }
+  ],
+  "next_stage_queued": false,
+  "authorization": "User explicitly authorized one extra GPU for this T131072 evaluation",
+  "time_limit_hours": 1,
+  "original_results_untouched": true,
+  "finished": "2026-09-09T16:47:22.368066+00:00"
+}

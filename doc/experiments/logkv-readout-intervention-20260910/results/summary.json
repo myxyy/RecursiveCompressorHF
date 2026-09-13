@@ -1,0 +1,11 @@
+{
+  "all_checks_passed": true,
+  "cases": 350,
+  "jobs": 3,
+  "discovery_samples": 16,
+  "validation_samples": 32,
+  "weights_unchanged": true,
+  "prefix_states_unchanged": true,
+  "sham_and_observation_identity": true,
+  "scope": "Counterfactual single-answer interventions, not a deployable positional encoding or a new trained model"
+}

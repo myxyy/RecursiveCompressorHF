@@ -1,0 +1,38 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5417.18it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-selective-20260913/exp/selective-copying/aligned-fixed10-20260913/model_best on 33 horizons (T=1..8192), 256 samples each, device=cuda:0
+T=      1 | token 0.9996 | string 0.9961 | 0.6s <= train horizon
+T=      2 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=      3 | token 0.9895 | string 0.8984 | 0.0s <= train horizon
+T=      4 | token 0.9859 | string 0.8672 | 0.0s <= train horizon
+T=      5 | token 0.9617 | string 0.6953 | 0.0s <= train horizon
+T=      6 | token 0.9398 | string 0.5469 | 0.0s <= train horizon
+T=      7 | token 0.9316 | string 0.4766 | 0.0s <= train horizon
+T=      8 | token 0.9461 | string 0.6016 | 0.0s <= train horizon
+T=      9 | token 0.9402 | string 0.5469 | 0.0s <= train horizon
+T=     10 | token 0.9434 | string 0.5781 | 0.0s <= train horizon
+T=     11 | token 0.8961 | string 0.3281 | 0.0s <= train horizon
+T=     12 | token 0.9090 | string 0.3906 | 0.0s <= train horizon
+T=     13 | token 0.9121 | string 0.4297 | 0.0s <= train horizon
+T=     14 | token 0.9105 | string 0.3984 | 0.0s <= train horizon
+T=     16 | token 0.8949 | string 0.3086 | 0.0s <= train horizon
+T=     24 | token 0.8680 | string 0.2500 | 0.0s <= train horizon
+T=     32 | token 0.8402 | string 0.1602 | 0.0s <= train horizon
+T=     48 | token 0.8242 | string 0.1367 | 0.1s <= train horizon
+T=     64 | token 0.7996 | string 0.0977 | 0.1s <= train horizon
+T=     96 | token 0.8031 | string 0.0859 | 0.1s <= train horizon
+T=    128 | token 0.7512 | string 0.0391 | 0.1s <= train horizon
+T=    192 | token 0.7426 | string 0.0352 | 0.2s <= train horizon
+T=    256 | token 0.6656 | string 0.0078 | 0.3s <= train horizon
+T=    384 | token 0.6984 | string 0.0078 | 0.4s <= train horizon
+T=    512 | token 0.6289 | string 0.0039 | 0.5s <= train horizon
+T=    768 | token 0.6121 | string 0.0000 | 0.8s <= train horizon
+T=   1024 | token 0.5254 | string 0.0000 | 1.2s <= train horizon
+T=   1536 | token 0.5727 | string 0.0000 | 1.8s <= train horizon
+T=   2048 | token 0.4480 | string 0.0000 | 2.4s
+T=   3072 | token 0.2625 | string 0.0000 | 3.6s
+T=   4096 | token 0.2102 | string 0.0000 | 5.5s
+T=   6144 | token 0.2113 | string 0.0000 | 8.5s
+T=   8192 | token 0.1934 | string 0.0000 | 11.0s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-selective-20260913/exp/selective-copying/aligned-fixed10-20260913/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-selective-20260913/exp/selective-copying/aligned-fixed10-20260913/plot.png

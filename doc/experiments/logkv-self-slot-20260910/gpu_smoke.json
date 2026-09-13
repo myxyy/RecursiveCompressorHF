@@ -1,0 +1,8 @@
+{
+  "bf16_instrumentation_output_identical": true,
+  "self_slot_modes": [
+    true,
+    false
+  ],
+  "gpu": 0
+}

@@ -1,0 +1,34 @@
+| Task | checkpoint | T | token % | string % | old phase2 string % |
+|---|---|---:|---:|---:|---:|
+| copying | best | 1 | 100.00 | 100.00 | 100.00 |
+| copying | best | 16 | 100.00 | 100.00 | 100.00 |
+| copying | best | 64 | 100.00 | 100.00 | 100.00 |
+| copying | best | 256 | 100.00 | 100.00 | 100.00 |
+| copying | best | 1,024 | 100.00 | 100.00 | 100.00 |
+| copying | best | 2,048 | 100.00 | 100.00 | 100.00 |
+| copying | best | 16,384 | 38.67 | 0.00 | 100.00 |
+| copying | best | 131,072 | 33.44 | 0.00 | 100.00 |
+| copying | final | 1 | 100.00 | 100.00 | 100.00 |
+| copying | final | 16 | 100.00 | 100.00 | 100.00 |
+| copying | final | 64 | 100.00 | 100.00 | 100.00 |
+| copying | final | 256 | 100.00 | 100.00 | 100.00 |
+| copying | final | 1,024 | 100.00 | 100.00 | 100.00 |
+| copying | final | 2,048 | 100.00 | 100.00 | 100.00 |
+| copying | final | 16,384 | 38.67 | 0.00 | 100.00 |
+| copying | final | 131,072 | 33.44 | 0.00 | 100.00 |
+| selective-copying | best | 1 | 100.00 | 100.00 | 100.00 |
+| selective-copying | best | 16 | 99.30 | 93.75 | 72.27 |
+| selective-copying | best | 64 | 70.27 | 3.12 | 17.58 |
+| selective-copying | best | 256 | 60.27 | 0.00 | 3.91 |
+| selective-copying | best | 1,024 | 46.88 | 0.00 | 1.56 |
+| selective-copying | best | 2,048 | 38.28 | 0.00 | 0.78 |
+| selective-copying | best | 16,384 | 13.87 | 0.00 | 0.00 |
+| selective-copying | best | 131,072 | 12.81 | 0.00 | 0.00 |
+| selective-copying | final | 1 | 100.00 | 100.00 | 99.22 |
+| selective-copying | final | 16 | 99.45 | 95.31 | 56.64 |
+| selective-copying | final | 64 | 91.76 | 46.09 | 12.89 |
+| selective-copying | final | 256 | 71.13 | 2.34 | 3.12 |
+| selective-copying | final | 1,024 | 49.49 | 0.00 | 0.39 |
+| selective-copying | final | 2,048 | 41.60 | 0.00 | 0.39 |
+| selective-copying | final | 16,384 | 13.12 | 0.00 | 0.00 |
+| selective-copying | final | 131,072 | 12.27 | 0.00 | 0.00 |

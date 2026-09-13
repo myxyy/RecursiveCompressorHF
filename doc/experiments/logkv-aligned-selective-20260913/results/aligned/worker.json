@@ -1,0 +1,94 @@
+{
+  "mode": "aligned",
+  "position_mode": "aligned",
+  "task": "selective-copying",
+  "deterministic_training": true,
+  "started": "2026-09-13T08:19:05.282906+00:00",
+  "state": "complete",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/train_entry.py",
+        "--run-name",
+        "aligned-fixed10-20260913",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--self-slot",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0",
+        "--aligned-rope",
+        "--aligned-rope-scale",
+        "1.0"
+      ],
+      "started": "2026-09-13T08:19:05.283016+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:34:30.148629+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/evaluate.py",
+        "--mode",
+        "aligned",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-13T12:34:30.209390+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:35:13.684552+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/evaluate.py",
+        "--mode",
+        "aligned",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-13T12:35:13.685256+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:35:57.069838+00:00"
+    }
+  ],
+  "weights": {
+    "best": "988c4a8878317e6de3cc80d516a0d46b43f4a2263c0b91d0c8734075cde4301d",
+    "final": "5fd8353cdc75f302687226c60ece8c6a15bac57193a46259fa9cc2ab6caabe6a"
+  },
+  "finished": "2026-09-13T12:35:57.119680+00:00"
+}

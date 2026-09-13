@@ -3,6 +3,15 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Current direction and experiment archive (2026-09-13)
+- User explicitly paused positional-encoding tuning and requested documentation/experiment-code-only cherry-picks into main. This authorizes the archive integration even though replacement encodings did not pass the 16M Copying gate; it does not authorize merging their model implementation.
+- Main's model, configuration, training entry points, baseline task suites, dependency files and normal tests remain exactly as at `658f63e`. Use that existing architecture for subsequent training.
+- All planned positional comparisons are complete and GPUs are released. Do not restart archived campaigns merely because an old report contains a launch command or historical continuation permission.
+- Reports and historical launch/analysis scripts live under `doc/`. `doc/logkv-experiments.md` indexes their frozen source commits and reproduction requirements. Experimental APIs described there are not present in main.
+- `doc/experiments/position-code-archive-20260913/experiment-code.tar.gz` preserves the variable-length study code, experimental Copying CLI and model tests, without collecting/running those tests against main. Use the appropriate original commit in a separate worktree for reproduction. The source branch `logkv-aligned-rope` remains intact.
+- Retain the user's power constraints: continuous work on at most 2 GPUs is authorized; confirm before a proposed experiment/batch expected to take 8 hours or longer. Earlier campaign-specific 3-GPU permissions are not a general increase. Respect meaningful experiment boundaries and keep Copying/Selective as separate training/checkpoint/evaluation tasks.
+- No training is started by this archive integration. Checkpoints and frozen source directories stay under `/mnt/raid0/RecursiveCompressor/experiments/`; archived absolute paths refer to that machine.
+
 ## Architecture
 ### LogKV (main)
 - `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends only to completed sub-units in its current block (c < j); these disjoint intervals partition the entire past. All levels share one softmax (at most C−1 slots per level). See `logkv-refine.drawio.png` and `doc/logkv.md` §6.17. Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.

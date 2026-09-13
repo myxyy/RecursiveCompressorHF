@@ -1,0 +1,81 @@
+Using checkpoint: model
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 6737.64it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-scale-20260910/exp/copying/alpha-1-fixed10-20260910/model on 41 horizons (T=1..131072), 256 samples each, device=cuda:0
+T=      1 | token 1.0000 | string 1.0000 | 0.6s <= train horizon
+T=      2 | token 0.9969 | string 0.9844 | 0.0s <= train horizon
+T=      3 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=      4 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      5 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      6 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      7 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      8 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      9 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     10 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=     11 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     12 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=     13 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     14 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     16 | token 0.9797 | string 0.7969 | 0.0s <= train horizon
+T=     24 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=     32 | token 0.9777 | string 0.7773 | 0.0s <= train horizon
+T=     48 | token 0.9770 | string 0.7695 | 0.0s <= train horizon
+T=     64 | token 0.9301 | string 0.3008 | 0.1s <= train horizon
+T=     96 | token 0.8824 | string 0.1523 | 0.1s <= train horizon
+T=    128 | token 0.9383 | string 0.3828 | 0.1s <= train horizon
+T=    192 | token 0.9324 | string 0.3242 | 0.2s <= train horizon
+T=    256 | token 0.9133 | string 0.1523 | 0.3s <= train horizon
+T=    384 | token 0.9496 | string 0.4961 | 0.4s <= train horizon
+T=    512 | token 0.9160 | string 0.1797 | 0.5s <= train horizon
+T=    768 | token 0.9180 | string 0.1797 | 0.7s <= train horizon
+T=   1024 | token 0.9129 | string 0.1367 | 1.1s <= train horizon
+T=   1536 | token 0.9137 | string 0.1406 | 1.7s <= train horizon
+T=   2048 | token 0.9125 | string 0.1328 | 2.2s
+T=   3072 | token 0.9121 | string 0.1289 | 3.4s
+T=   4096 | token 0.9102 | string 0.1133 | 5.2s
+T=   6144 | token 0.9109 | string 0.1172 | 7.9s
+T=   8192 | token 0.9125 | string 0.1289 | 10.5s
+T=  12288 | token 0.9148 | string 0.1523 | 15.7s
+T=  16384 | token 0.9129 | string 0.1406 | 22.3s
+T=  24576 | token 0.9102 | string 0.1094 | 34.1s
+T=  32768 | token 0.9133 | string 0.1367 | 47.2s
+T=  49152 | token 0.9125 | string 0.1289 | 68.5s
+T=  65536 | token 0.9102 | string 0.1094 | 93.4s
+T=  98304 | token 0.9098 | string 0.1133 | 144.5s
+T= 131072 | token 0.9121 | string 0.1289 | 196.7s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-scale-20260910/exp/copying/alpha-1-fixed10-20260910/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-scale-20260910/exp/copying/alpha-1-fixed10-20260910/plot.png
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5639.75it/s]
+paired T=3 token=1.0 string=1.0
+paired T=16 token=0.975 string=0.75
+paired T=8192 token=0.91875 string=0.1875
+paired T=16383 token=0.9875 string=0.875
+paired T=16384 token=0.91875 string=0.1875
+paired T=16385 token=0.83125 string=0.0625
+paired T=32767 token=1.0 string=1.0
+paired T=32768 token=0.91875 string=0.1875
+paired T=32769 token=0.83125 string=0.0625
+paired T=49144 token=0.871875 string=0.125
+paired T=49145 token=0.74375 string=0.0
+paired T=49146 token=0.759375 string=0.03125
+paired T=49147 token=0.871875 string=0.125
+paired T=49148 token=0.934375 string=0.46875
+paired T=49149 token=0.890625 string=0.0
+paired T=49150 token=0.85625 string=0.03125
+paired T=49151 token=0.990625 string=0.90625
+paired T=49152 token=0.91875 string=0.1875
+paired T=49153 token=0.83125 string=0.0625
+paired T=49154 token=0.9 string=0.0625
+paired T=49155 token=0.909375 string=0.09375
+paired T=49156 token=0.8375 string=0.03125
+paired T=49157 token=0.83125 string=0.03125
+paired T=49158 token=0.825 string=0.0
+paired T=49159 token=0.825 string=0.03125
+paired T=49160 token=0.8375 string=0.03125
+paired T=65535 token=0.934375 string=0.34375
+paired T=65536 token=0.91875 string=0.1875
+paired T=65537 token=0.83125 string=0.0625
+paired T=98303 token=0.934375 string=0.34375
+paired T=98304 token=0.91875 string=0.1875
+paired T=98305 token=0.83125 string=0.0625
+paired T=131071 token=1.0 string=1.0
+paired T=131072 token=0.91875 string=0.1875

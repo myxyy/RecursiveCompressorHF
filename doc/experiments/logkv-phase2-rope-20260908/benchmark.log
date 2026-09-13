@@ -1,0 +1,6 @@
+/home/myxy/RecursiveCompressor/doc/experiments/logkv-phase2-rope-20260908/benchmark.py:25: UserWarning: Converting a tensor with requires_grad=True to a scalar may lead to unexpected behavior.
+Consider using tensor.detach() first. (Triggered internally at /pytorch/torch/csrc/autograd/generated/python_variable_methods.cpp:836.)
+  out.loss.backward();loss=float(out.loss)
+{"mode": "phase2", "steps": 200, "elapsed_sec": 36.58254701108672, "sec_per_step": 0.1829127350554336, "train_50k_hours": 2.540454653547689, "peak_allocated_GiB": 14.806743621826172, "initial_weights_sha256": "dfdf16904070ac75685d2142f426c2b7aa09e0a764ba2773846375cedf58df32"}
+{"mode": "retrieval-rope", "steps": 200, "elapsed_sec": 61.764910525875166, "sec_per_step": 0.3088245526293758, "train_50k_hours": 4.28922989763022, "peak_allocated_GiB": 14.99894380569458, "initial_weights_sha256": "dfdf16904070ac75685d2142f426c2b7aa09e0a764ba2773846375cedf58df32"}
+{"mode": "compressor-rope", "steps": 200, "elapsed_sec": 40.50526896282099, "sec_per_step": 0.20252634481410495, "train_50k_hours": 2.812865900195902, "peak_allocated_GiB": 15.139760971069336, "initial_weights_sha256": "dfdf16904070ac75685d2142f426c2b7aa09e0a764ba2773846375cedf58df32"}

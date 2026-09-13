@@ -28,7 +28,13 @@ The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the
 
 The language model (LogKVLM) is `Embedding → LogKVBlock × num_layers → RMSNorm → Linear`, extending HuggingFace's `PreTrainedModel` (`save_pretrained` / `from_pretrained` / `generate`).
 
-**The refined layout achieves 100% exact-match Copying accuracy at all 41 evaluated horizons through T=131,072 after training through T=2,028** (256 samples per horizon, both best and final checkpoints). An additional probe at T=16,777,216 also copies all 8 samples correctly. Selective Copying accuracy decreases against the original layout under matched conditions ([experiment details](doc/logkv-refine-experiments.md), one training seed per condition). LM generation quality with the refined layout remains unevaluated. Existing checkpoint weights can be loaded, but outputs change under the new layout.
+**In the earlier experiment with two-level phase embeddings and fixed Copying memory length M=10, the refined layout achieved 100% exact-match Copying accuracy at all 41 evaluated horizons through T=131,072 after training through T=2,028** (256 samples per horizon, both best and final checkpoints). An additional probe using that final checkpoint at T=16,777,216 also copied all 8 samples correctly. This is a historical result for that configuration, not an achievement of the alternative positional encodings on the experimental branches. Selective Copying accuracy decreases against the original layout under matched conditions ([experiment details](doc/logkv-refine-experiments.md), one training seed per condition). LM generation quality with the refined layout remains unevaluated. Existing checkpoint weights can be loaded, but outputs change under the new layout.
+
+As of 2026-09-13, positional-encoding tuning is paused and training will use the existing main architecture.
+Only documentation, results, and experiment code have been imported; model code, configuration, and training CLIs are unchanged.
+See the [experiment index and reproduction instructions](doc/logkv-experiments.md), including
+[Copying](doc/logkv-aligned-rope.md) and [Selective Copying](doc/logkv-aligned-selective.md).
+Experimental positional-encoding flags are not available on main.
 
 ## Setup
 

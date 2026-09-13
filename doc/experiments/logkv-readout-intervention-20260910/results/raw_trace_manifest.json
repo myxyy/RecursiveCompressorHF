@@ -1,0 +1,1752 @@
+[
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49144-d9-baseline.npz",
+    "sha256": "e64c3b21c151ef68e76e2f0cfc90aa0cc67056ff7c82b6fe42e9c252f991c4e2",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49145-d9-baseline.npz",
+    "sha256": "4ae196dbcfdd454b5f8cf21ebc18b04ff8e49928d224a8e919a44887d0dbe380",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49146-d9-baseline.npz",
+    "sha256": "cc5c87d24e624577244fe8b72d98046eb701e9cbb1ba59ec196406ba8566f5c7",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49147-d9-baseline.npz",
+    "sha256": "d630352b2fe952d19e7972a5db9aa7d0d0a7a24100b04559d7f17f9b5303e9e0",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49148-d9-baseline.npz",
+    "sha256": "661a95fd225ecf63680e60ac1feef48875f9ab40ff02c7fe335b32c7aa595881",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49149-d9-baseline.npz",
+    "sha256": "f4e21754367fbb2920ce036b987901f7049a7d8976f14c774fde30337df0a992",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49150-d9-baseline.npz",
+    "sha256": "a141199da0648b85b9e2996c228e91039176dcc7ecfd27805f585c93d0488313",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49151-d10-baseline.npz",
+    "sha256": "16e370429e3cc68e4a00f9e618da9e2476af1087d343e1878941eb3286441551",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-baseline.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-baseline.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49154-d9-baseline.npz",
+    "sha256": "7331f2f84e8250e1a3f418d25f6c913979be1f903ebb1cf4197c969a6db6c2f3",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49155-d9-baseline.npz",
+    "sha256": "03a3d4f3f9a761798e79607c44786aafa2f8174f559601b021273e3fda0042d3",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49156-d9-baseline.npz",
+    "sha256": "c74894b0e12ff36e645fcadb36caf9ffe6cf5c05e3595ea6b198d767847d500e",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49157-d9-baseline.npz",
+    "sha256": "34058ba9cccd3bb3e3cb3a2edc36f54535b0e5e81d31ec023462a862973e8afe",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49158-d9-baseline.npz",
+    "sha256": "0683b86924121c8373738dae341292b792fcec0e674caa31ad361c3a1ae6efee",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49159-d9-baseline.npz",
+    "sha256": "2dc54c69eaed50521ee274a0cf888acd3dc39c2fb748242db438042faac7559f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49160-d9-baseline.npz",
+    "sha256": "87470ab82728b57e3e657227fdf56759f1a07e7faf495728de1aea3e3c362892",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-baseline.npz",
+    "sha256": "026c913ff64850c9dc57cb4ba58a4bfcb83e1788c4170a392b07e67cc6eb86d9",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-sham_head8.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-head8.npz",
+    "sha256": "6da88dcf26575141002ca5370c8782513ac8989b58f61a21a7babfef0cd362f5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-head1.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-l1_block.npz",
+    "sha256": "0149d04620dc37b92d012f1bd1ebc8ad14c69159dc088826439b1dfc2bcaf20c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-sham_phase.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-phase.npz",
+    "sha256": "664841e4ef3fc66704bfab3cb7dbaf13485f74012b7df4618e15ed1dd2c22948",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-mask.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-phase_mask.npz",
+    "sha256": "664841e4ef3fc66704bfab3cb7dbaf13485f74012b7df4618e15ed1dd2c22948",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-sham_gate.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-l2_gate.npz",
+    "sha256": "c8ba25c09b00e2b590f2194e170704b41ece7f19a686a45c99b05fbc37737f10",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-l2_raw.npz",
+    "sha256": "c3f393b1c4927d0303d4a93edd7bb534c80616b86bd3fc36a8a5cde7388ee802",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-l2_raw_gate.npz",
+    "sha256": "6fe7213297901f7e975a0ac9158b8b0db7ba17a56c0ed9d52ce36dd6b18113e4",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-sham_ffn.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-l2_ffn.npz",
+    "sha256": "928d13dc33f8acc22fc49d3bcaf841515c28c46efb35ab8db333af446f171ef8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49152-d9-sham_block.npz",
+    "sha256": "f2c5001ba4bd97e95080117d4ac1e989de4f202773ed0b8c90e6844aa0d5705b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-head8.npz",
+    "sha256": "428777c119bb793106fac489c4b185f0d3481b4a4579b8ef9003892cb7dff14e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-head1.npz",
+    "sha256": "026c913ff64850c9dc57cb4ba58a4bfcb83e1788c4170a392b07e67cc6eb86d9",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-l1_block.npz",
+    "sha256": "2f8d2978e9f95728e68b0346a1433b77132ebd4f37e3f11d62817c673951b986",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "de52768ecfc1df5e1086a0055996466f4a20cc7aa3996af562347a09269022e2",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "90848fbd8f23a9f0aefda3b56c56dc2660f42223e2deee068f63113db40a3d98",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "d8ee8d5d59934bd9bdc8e2d3698cf806a75809264fd0412255e2f75985d826c3",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "b5d142c9eff07d36c33eb6f88a70a81012fe03fb292eb6f1e6fac5dbb83f903d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-baseline.npz",
+    "sha256": "e64014e5fc55d028c41bcadf7b47f7205d606830a77c933842f8df511e1e9a07",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-sham_head8.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-head8.npz",
+    "sha256": "6f92a2b8a8532e861cd2ecde315439896c0ee25bf3962490ef8db7e37921374c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-head1.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-l1_block.npz",
+    "sha256": "495ab9067ed2755f2c98961e870a052b7952534804adbb8e88a631749bbd3a00",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-sham_phase.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-phase.npz",
+    "sha256": "fecc47c10cb5e15052193b434c6e4fff0b7ab542e12e4eb87e73ed12b5d94a93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-mask.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-phase_mask.npz",
+    "sha256": "fecc47c10cb5e15052193b434c6e4fff0b7ab542e12e4eb87e73ed12b5d94a93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-sham_gate.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-l2_gate.npz",
+    "sha256": "5ed2c03ac9e66ae038089b08066105b38492c4b63b06fda266276e19d237b4da",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-l2_raw.npz",
+    "sha256": "abb50dd4abb4eec46cb80e6be1bdc7b107064594280e83ee6687ea09c1ea4d48",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-l2_raw_gate.npz",
+    "sha256": "03d8c613728c6eb4f85c8a9978eef43539c72155df67cdea466532a1438fcf47",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-sham_ffn.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-l2_ffn.npz",
+    "sha256": "dcd39c2db2903a3abe56e1d89ee31a35fee835ecc79b06d86cc92ff9dbb44530",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T49153-d8-sham_block.npz",
+    "sha256": "fd35ef0a7dc975deb3227a5137d1fac9214b79acb84227478edbe1c07a7132a5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-head8.npz",
+    "sha256": "b6075e2f7cbde7e81803bad92865c5bb5a475c24df8c3febe2b4b7164d7cc0d3",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-head1.npz",
+    "sha256": "e64014e5fc55d028c41bcadf7b47f7205d606830a77c933842f8df511e1e9a07",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-l1_block.npz",
+    "sha256": "e16ff42cc830d842d1b51bc1ef02eaad8bc25d9c4c91fa62c9e2f852b323e892",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "a6e66d09910a1076aea2faefefb165e81a0516f0e9f6211b13247b62271d45cf",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "4df1d6ae2a66b4fa4c5519d2b3d79bedd4ba63f68c630b0998959e18f3408590",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "72b873a7d2648f2b1359e7f935f548622c1228360359bb7582ca14835175fea8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/discovery__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "ae2ca63d1e4b4ccb1161b51bf749a212f91d5ee9b7f19f0ea5564c760c8c337b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49144-d9-baseline.npz",
+    "sha256": "c5493a5e27527c4e83d8d5c2507ee297fedd29ca9cc45574abbe38ad5bbf423d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49145-d9-baseline.npz",
+    "sha256": "5957e57db94203cc61fb91f64b2391b9207aeb0187df67efa4136b0d524de9c5",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49146-d9-baseline.npz",
+    "sha256": "59ff271b69077eb2af8946dc78eb394a0f61611ac8d6ae2b21e1c8d595a77f31",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49147-d9-baseline.npz",
+    "sha256": "65cb036f088fbe9c23c765a2574feb383b2932218eb15da53c344bbe4aabd675",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49148-d9-baseline.npz",
+    "sha256": "d014fdd754ea9120f8af032f363b98784d698637c90f8b5d9468f1c910478704",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49149-d9-baseline.npz",
+    "sha256": "f18bee1f1d4105c63a9c1da2001b6c701697748f8610559fa3e048919526728f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49150-d9-baseline.npz",
+    "sha256": "b2938e0f9ff53ba41c5ef7fa2867b6739ee1f752c0c42f3e659c6e6d8da37f6d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49151-d10-baseline.npz",
+    "sha256": "b6d3ef65c9b378d9298bcbdd6cabf5732a4f549123355f42bdbb30f16e1ac996",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-baseline.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-baseline.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49154-d9-baseline.npz",
+    "sha256": "b65ba88a2e869453f3fa0fea042b23b3945787e55877adbe5b8d43cbbe71a2d2",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49155-d9-baseline.npz",
+    "sha256": "11de59a8a80aeee7f4bbd4bc9b2ba141e972d10407d9b90bacd5b567365e3a5b",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49156-d9-baseline.npz",
+    "sha256": "a1c6bb45f38403e568374c070f4db2a305e52e51e73c8d26b4355a83f2e7728d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49157-d9-baseline.npz",
+    "sha256": "2de083fe960bf923b21526f1b2ef2989f95c597a1e92c40e25b6747137b4a830",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49158-d9-baseline.npz",
+    "sha256": "10eb8b7850a72bf66d6debb3dc06e468d218a81199f70fe7f4e399653dd15603",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49159-d9-baseline.npz",
+    "sha256": "d6f1c0224f1d0f35d2b99096e051937df651d96eff2506008768fe16e476cc1d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49160-d9-baseline.npz",
+    "sha256": "bb886c607d13aa1e6c61294edba94e3fff6d4c21e477f770286fa5083883c591",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-baseline.npz",
+    "sha256": "3f7889d29229fa9cdc1f1759633ec31a6cc7f1a1ec7aacc10284de5b5e1b3dd9",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-sham_head8.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-head8.npz",
+    "sha256": "1c7f67bb16aeaadb99d68baed40f8074bed3440aaacee582dc81afa3269ad021",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-head1.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-l1_block.npz",
+    "sha256": "0f0b9131afcd45634e1d553eb422c29473244f29a299ee375e8226c1eb61c84e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-sham_phase.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-phase.npz",
+    "sha256": "860476b3734f4dcbea5412a838eb0a46861e143c939da73ffbecdbc1b7a7e995",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-mask.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-phase_mask.npz",
+    "sha256": "860476b3734f4dcbea5412a838eb0a46861e143c939da73ffbecdbc1b7a7e995",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-sham_gate.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-l2_gate.npz",
+    "sha256": "09f0863f86fde6f7fc42e4149d054e4c2c587acfb4e8bd01e0acd3454117d702",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-l2_raw.npz",
+    "sha256": "f0363703d9d374695c1427ee2e7f75341bb28f790fcd42ac13969ca2ff441ebc",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-l2_raw_gate.npz",
+    "sha256": "5d9f57f5e6877378788e36cd49dc0389aed3de45f305c527bd317bc1f214c5d6",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-sham_ffn.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-l2_ffn.npz",
+    "sha256": "2064f8c9a49db6a653b0637ad00b4fbcb8ec7026cc740330a1187910dad0bb6b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49152-d9-sham_block.npz",
+    "sha256": "337e0c4b5ceeb1505c8b616f204fd4f800667342024674d370c510886b1843e8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-head8.npz",
+    "sha256": "7f4cd9c5ee8cd7882765210efcc2c2f4acad00daf6315f3ca977c31b61421cbe",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-head1.npz",
+    "sha256": "3f7889d29229fa9cdc1f1759633ec31a6cc7f1a1ec7aacc10284de5b5e1b3dd9",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-l1_block.npz",
+    "sha256": "262f3371ee6143910797da19d23602bac382bfb92e8eab1118e04b33b28cb3d7",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "b668c08634fdfe83d4167c5ae92db79a4893eee7d5a88dffcd961089cb489249",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "5fa56b17b039b287964150f6273b695cde13a5da83bf88b8ed6d95720ca81bf6",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "feb287990e8b2df4fb587e32597eaa58c3df768892c03cb1d053f6a0cadefa32",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "88938a91da8cebf5cdd3b3e6eb7eddc97b9ee371d2d1700a94c29136a653d25a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-baseline.npz",
+    "sha256": "11bd35800d8fd22a154ffe1a13a9db0e313e563683d01db977ec754e9be17c4f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-sham_head8.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-head8.npz",
+    "sha256": "27b3a475fc57e32949aae82768f5e161c2e0272725dea9de9e63cb244a3a8837",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-head1.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-l1_block.npz",
+    "sha256": "371185963a1016c071a7f6ca4ffead769e4a4f339336ba890ad25bfaa583a759",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-sham_phase.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-phase.npz",
+    "sha256": "733a4b65393390ac83bb17aeda198d8bfd7ad4faad3a9fc1197b670229ce81fc",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-mask.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-phase_mask.npz",
+    "sha256": "733a4b65393390ac83bb17aeda198d8bfd7ad4faad3a9fc1197b670229ce81fc",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-sham_gate.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-l2_gate.npz",
+    "sha256": "c97f5e0105b30a15d692f7022b0c689f980395ccb9e95f68fb59fd05313303aa",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-l2_raw.npz",
+    "sha256": "7714f8a85b629ef205374d779c985a8f0128ec724cd1846ad431dc65080ce781",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-l2_raw_gate.npz",
+    "sha256": "e43f8aa5d4d0e6cdf59c54dde9d1a4756bfd5901e7d6a306ee4b6e8b32a0babd",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-sham_ffn.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-l2_ffn.npz",
+    "sha256": "8aad498d18a022ab1d7cbf15f8723fe59002b6834bbef6cbf629bf08a50b5948",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T49153-d8-sham_block.npz",
+    "sha256": "3ad4f7f2be53e7da90864b45cc5e18479db94bf0db212aa2abf2a00bb4077dea",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-head8.npz",
+    "sha256": "833db9a01091e0e8e70a4c8c957ded470a2def16f7ab69dcd4292c8430fb6759",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-head1.npz",
+    "sha256": "11bd35800d8fd22a154ffe1a13a9db0e313e563683d01db977ec754e9be17c4f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-l1_block.npz",
+    "sha256": "6547488a6d6c9e7d24c52e8c8217e8ed60e68f3e824934b5ff6b0c90ce02f88f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "523bc2491dea182094f37ecd146dbc6ee70a691fbf7fdb8b432e6aefad068c2f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "173df036c76a04849a5a088d43868c04e8c639fa7be33124378afe64c99a3bbd",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "ced57131597c246f11b68120f73695a93b4a018e702d66e58ce58774ca021e10",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-bf16/validation__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "f9e83be017e1adc398ae2597434d3dfc6a3e893b8ea303ba4b66da1bbc99dee9",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49144-d9-baseline.npz",
+    "sha256": "a9bc330440c565ae00e360303e446b7c38f717182f2c79c3276057277e22bfa0",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49145-d9-baseline.npz",
+    "sha256": "d8817a09409fedc4802dd5682e28ae50b4bd2b2f167eeb5e4f9f26b89b4c62c2",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49146-d9-baseline.npz",
+    "sha256": "8ad0b40d46f55543bfbc761131e80d26adc5185553ff89f8832d6d784561825f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49147-d9-baseline.npz",
+    "sha256": "17d69bed936b2a3ee6aecf4599ac15c33028a86371715c4fb983a2d3597d239f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49148-d9-baseline.npz",
+    "sha256": "42f76334f9992a3c4b5a70b341c2cc697814101a071a9677aa1e208cfff01dc6",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49149-d9-baseline.npz",
+    "sha256": "fe99b142ec4d397b908d1a66e0735ca583ce3e3f8f00d33616b616f7e7d5dce1",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49150-d9-baseline.npz",
+    "sha256": "17024809442e16e31b1aef36a12fbcf0cb37e70158541f7657aa4a8fd3c42c11",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49151-d10-baseline.npz",
+    "sha256": "2975ad864362440ca7a8683c31bc1791ed5643df31d462e3afa6d66dd49c74bf",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-baseline.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-baseline.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49154-d9-baseline.npz",
+    "sha256": "b44d9844f330876171864ad5ee979247ac55cf5b0b0c9452b79d71e8cf567779",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49155-d9-baseline.npz",
+    "sha256": "08242fc145f0884bc06b77fca5e25321823e032320280961ea1451689c030faa",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49156-d9-baseline.npz",
+    "sha256": "756945e31f9cc0b5765e95c08fe985b8b0dac547cb16af6c424b647797e962fa",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49157-d9-baseline.npz",
+    "sha256": "3ff221fdcd7d32761c7f77da63dce56a0a26d482f4449af3ca926e951d6ce887",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49158-d9-baseline.npz",
+    "sha256": "7ad2680be0b8b8db581f515644e4d11f1621c3bc082b045ff797514d07656188",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49159-d9-baseline.npz",
+    "sha256": "860c9ea5fca40a8d709cf2d5b99d1a1e1d285dc32cfd3b5dfc0d92d4d464b187",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49160-d9-baseline.npz",
+    "sha256": "a59acc910ed5a889dd2ffb1d529a82a7e670786de38423484b5e44872c23a51c",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-baseline.npz",
+    "sha256": "312e629dc9a7860bde281d92d98ae3f9ab61c62f0f216dff4e1e9177214f2a1b",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-sham_head8.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-head8.npz",
+    "sha256": "c666ac7d9fbc1ab8bbe34ca247c7eaeaaf2370bbc1f68746c864f228a894e94b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-head1.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-l1_block.npz",
+    "sha256": "c6131e92df9abd060104861644045906e8f7f8881aaa25b1ed73a053b0a3a171",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-sham_phase.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-phase.npz",
+    "sha256": "c666ac7d9fbc1ab8bbe34ca247c7eaeaaf2370bbc1f68746c864f228a894e94b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-mask.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-phase_mask.npz",
+    "sha256": "c666ac7d9fbc1ab8bbe34ca247c7eaeaaf2370bbc1f68746c864f228a894e94b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-sham_gate.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-l2_gate.npz",
+    "sha256": "5f60c384cdf24878ec57f5d9cad21fdef63c89b4b8583813180a11b1822433be",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-l2_raw.npz",
+    "sha256": "1849197d06cba485ae2c899254bfcde5fbe864ac0ccc18d6d7b0ff41e2c58221",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-l2_raw_gate.npz",
+    "sha256": "2314a9204d355971aa0819986fdaa0c52a0bc44b19c9b8b1bb54e8a0fbaeb589",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-sham_ffn.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-l2_ffn.npz",
+    "sha256": "924c720ed96cd53c14ff5daa1885aa27dd5f8e2a0173797e4c214b39da6a2d05",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49152-d9-sham_block.npz",
+    "sha256": "388f09c67e5a4057ede71695f60bb124d3abadeac021996cda5294379b339a13",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-head8.npz",
+    "sha256": "370a8e93a4a6091cf938c59776eb6021dd7655c46fe4c95d2c76f97ab7aada7a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-head1.npz",
+    "sha256": "312e629dc9a7860bde281d92d98ae3f9ab61c62f0f216dff4e1e9177214f2a1b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-l1_block.npz",
+    "sha256": "9ebf7c3928ef7bba2f76f722495f8f3cac43efddeb94901300969f3bb643fb8a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "19de6e7984f7c4b87649b822e1dda19764a17b6349738be6b4606cc4a736b8c8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "ad67fdb33d648859ea375eacdd52df86d013d037b99488179af7c0c7feb04738",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "d413bbccc5e77335fdc7eb6bfb875280b24df720327e1d73fd41bd0b1903dd98",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "eb4d6e062911708d9919f3a9ebabadd8420142a314e6ae55a51c095e7b038597",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-baseline.npz",
+    "sha256": "65c2c69628d1f9a7d0d901331ba737980f93f3db3769658d6d409b9f3ebfed51",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-sham_head8.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-head8.npz",
+    "sha256": "7315ebb8d68d85e002210be373d99defe4bd335bc673b6cfbdfce98fa8c2018f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-head1.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-l1_block.npz",
+    "sha256": "4a9d20ec3c4f3f8be261ca1c4e19c40524648fbe116c867d7ad67b7127a4a3eb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-sham_phase.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-phase.npz",
+    "sha256": "7315ebb8d68d85e002210be373d99defe4bd335bc673b6cfbdfce98fa8c2018f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-mask.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-phase_mask.npz",
+    "sha256": "7315ebb8d68d85e002210be373d99defe4bd335bc673b6cfbdfce98fa8c2018f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-sham_gate.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-l2_gate.npz",
+    "sha256": "551cd49db49a2efd9506f18507fbc5d8d4b6de9f984b9d9f74249dab9825c55c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-l2_raw.npz",
+    "sha256": "e56d4a1d390c09fb2dfc64db637acc75f27a3f2ecf034cc3b425ef0305a38c2d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-l2_raw_gate.npz",
+    "sha256": "437ffa3bb41fc97d528134c03abbed4a7a1bc1ec8305ee7d8350b894eff672f5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-sham_ffn.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-l2_ffn.npz",
+    "sha256": "a9a4056885eeb930d391b327501a13ba6971ee45adc6180fa9051baba0d65fc9",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T49153-d8-sham_block.npz",
+    "sha256": "faea4a5993347c88964f34f74ed00b836f1bc2d905771d99b2fdb704c25f5c62",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-head8.npz",
+    "sha256": "0289b5022af138111ffdca61044e60e146a8c941c572b5a837e07080d2585d14",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-head1.npz",
+    "sha256": "65c2c69628d1f9a7d0d901331ba737980f93f3db3769658d6d409b9f3ebfed51",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-l1_block.npz",
+    "sha256": "af9397a31c3acd35f0cfbb80a106e0a3bd4747c78b9d6c54a63e049571c335a0",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "e42739976acf034a5127a5c4b42b3f3b8530d9f3c1488681546e01090ec112fb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "54f4c10c4df220320393294158f7a51cc95d98c65e74161025d244e600b54588",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "33592d31394f6d436aabac3f593b2ae2ae0b419b6290b9b4ec777b25e4444222",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/discovery__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "9d34fa8e250a68800b5c9d61f7782b56ab24cb1a777e1a2122d6e403a01d124b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49144-d9-baseline.npz",
+    "sha256": "73060ec22c66e3094753ccc69633ea9a049d0917517cefb5b2c5560638c2deb7",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49145-d9-baseline.npz",
+    "sha256": "e24d4bf556cabe0220cde9961d3f5a51372d8659bfdb716bc744f3e90b869c25",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49146-d9-baseline.npz",
+    "sha256": "f88b0fba50ec3496cace3b291f065e5c95ef879e36e5892945b835c2dad12497",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49147-d9-baseline.npz",
+    "sha256": "1305382770f45b9016f627b1e2d3bcc0c1e94de395f5b82c9a42f7cd99964890",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49148-d9-baseline.npz",
+    "sha256": "b60fb40fb1bd6d4924ecd01fa863d557c93ce5a7f271bab21fa343a1deef11ca",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49149-d9-baseline.npz",
+    "sha256": "1882d0ccda64e18485e8bbde19608f7945bab6a438855d1c317409645cf2f36a",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49150-d9-baseline.npz",
+    "sha256": "e0c48b16879ac6783d9a24bb7bdd9e0a6ec09ba139cd6f33cffa4f80bbd01b8f",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49151-d10-baseline.npz",
+    "sha256": "189e6f36e714bddaa39807cf05072e78e8488054f0c9dec644cff8922424a1af",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-baseline.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-baseline.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49154-d9-baseline.npz",
+    "sha256": "a784c49b48a34acf72f680cf6b5b8181ae7ce5ee417e6f1f09784d7587b40660",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49155-d9-baseline.npz",
+    "sha256": "ffd9f7eadabd7ed79387a3c04c760481c8b9f2cd8dcf356250d0a1a835403229",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49156-d9-baseline.npz",
+    "sha256": "a9166836af95d418836e856c7353f169f7df8ba590847590a5f2485bf36d94b5",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49157-d9-baseline.npz",
+    "sha256": "5bf8bbcaaaaa40614d757f2688a32ecb98307a88c8adcc4bfaffaea09e77714e",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49158-d9-baseline.npz",
+    "sha256": "e955510e19eccda0985238fdb7c2a4373056f83ca08f41cbdf098ef655896320",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49159-d9-baseline.npz",
+    "sha256": "5e5950d2d4b1f853a91e86a08b2053e099c67ac4a2dcdf46511015c5165ee8b9",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49160-d9-baseline.npz",
+    "sha256": "fec985281407530a83bfe7a527932a0f9d73b5e8bb419ba45cbf8c4b1aaae177",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-baseline.npz",
+    "sha256": "22f5f21d0f49a2314cf9aae9eb9a57f6053a91212e467e8a2a928ed1bab29944",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-sham_head8.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-head8.npz",
+    "sha256": "8ec3c908e9ef0ff9e981c612af54f24c105f812f1f99291d7354095b6579247a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-head1.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-l1_block.npz",
+    "sha256": "057190b1aedfb69c05018cfafb50ab2586bcb212cd05b722193cec5466f58fb8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-sham_phase.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-phase.npz",
+    "sha256": "dab08ac4cd6faef1bf6306e2e73a7a4a563387f483b13a70d4c46e43980cd35d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-mask.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-phase_mask.npz",
+    "sha256": "dab08ac4cd6faef1bf6306e2e73a7a4a563387f483b13a70d4c46e43980cd35d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-sham_gate.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-l2_gate.npz",
+    "sha256": "6840cb3ef958ab0fc2793060f5d00fef830aaec61dac1e507f995ca4e2a25e2f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-l2_raw.npz",
+    "sha256": "652a8be49ea1b834a3e07a7a768726b8d435089f6a3d93f0f023e76436b812ed",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-l2_raw_gate.npz",
+    "sha256": "63d1acc92d2e3352baacfa9bef5bfbe055a70630ab6cd357e41dd90bf4d0cbf3",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-sham_ffn.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-l2_ffn.npz",
+    "sha256": "2aee0fe248cd8eefa9a9ebae3fd7996ce23f2834234c0b1c2ad0958ff2d435d1",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49152-d9-sham_block.npz",
+    "sha256": "8f9f17723ef5f12b4701ed3b7b755b0611c638719a80ddabd006e3f32b8bde78",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-head8.npz",
+    "sha256": "5d1849a1f95f685e37b35fc31935e944f4990865bcc9c4d7d0a6193de1009d48",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-head1.npz",
+    "sha256": "22f5f21d0f49a2314cf9aae9eb9a57f6053a91212e467e8a2a928ed1bab29944",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-l1_block.npz",
+    "sha256": "fa8f96ac8145aea854e5117cf4f4c43ce3a5f3ed4dacb38484aae8ce5f8da7f7",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "404cf5c9d9baceb9879a3a01e78d62a6817c87785f9ed3542c0ad3c87524f7c6",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "87ba5d2b2f03499606a95c13f8e574817f3e5ee93339e4d86cbd8e6f1bc209f2",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "8bb9148de5adf37a6728e086fa0303db5c13299abb8ef6225d8bf636fe68c2e0",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "6c15224f94c15dd0e405a52d6eea30fef5525893aed58f5413de019264c72700",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-baseline.npz",
+    "sha256": "03e5a657713c7441ecfa32d1c7c3b837b9070ce487a4a3a127e5d076a3371684",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-sham_head8.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-head8.npz",
+    "sha256": "578a93d207af814a021baf929ad8a49dedb9954ad3f52c1b4ddc5dcae7994ba2",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-head1.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-l1_block.npz",
+    "sha256": "95276a0896ea3798e8bbffdf699558de4135145285375ef124e8d9f4d244a580",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-sham_phase.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-phase.npz",
+    "sha256": "4374016038dd01f466efcdbf81719eea5deeb1bf8dd112885d1e0dfc16652253",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-mask.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-phase_mask.npz",
+    "sha256": "4374016038dd01f466efcdbf81719eea5deeb1bf8dd112885d1e0dfc16652253",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-sham_gate.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-l2_gate.npz",
+    "sha256": "5898f514fee834ee436bc77284e825e5c4badf8ca7dcd61c3bc51a98a7b1b832",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-l2_raw.npz",
+    "sha256": "f1325bd5af4d54745ea2fe2f80de14401dacbb04fb1dadaad7a116aa53d2c50a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-l2_raw_gate.npz",
+    "sha256": "3f718237b7af95eaa2d4d3b450e3c4f60302c79c5e223885551a4bf559b7f236",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-sham_ffn.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-l2_ffn.npz",
+    "sha256": "f4810ebb81c26757468ac1363467eff1a82a70d4573d4132035583cbdd1fae2a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T49153-d8-sham_block.npz",
+    "sha256": "d75a04ec35bab879e90fd3a2c4e50734318938e30fd82aecbe5cf293cc8d8f46",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-head8.npz",
+    "sha256": "f88b57e3f10fd549d590ec5d461a28b04d2eb3db0795ecdfd97cac3c777556eb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-head1.npz",
+    "sha256": "03e5a657713c7441ecfa32d1c7c3b837b9070ce487a4a3a127e5d076a3371684",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-l1_block.npz",
+    "sha256": "d30770821297e12b57c7e731ab4a746bd56eb75b101fbd12fd2b77c6e8a01d8e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "96c00a51a09a9016698fd08dedf049deb3e8189c4c070f08d3b1972d823e558b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "94f8c54845a82152e52a01713c871693ff44de53705651e23237b4f590f9fe3e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "554f1d83a5b516e52968e987d55a98ab3a6f1f0b1c8c1ad840e01ff19dce9be2",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/final-bf16/validation__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "985e564b2cf3b5e45fa3ebe7d08d2f5020776fbdc2cc81ea99e5a5657a36801a",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49151-d10-baseline.npz",
+    "sha256": "fa5ba1dd8e29f6fd17c6b4b96bb2fc0329b743c306aa9219a8692b7d012ab7cb",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-baseline.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-baseline.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-baseline.npz",
+    "sha256": "027d74209af66c3e14fa9a4c6e15c370538b49c8fa9a2ddda4dc45443f9af91d",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-sham_head8.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-head8.npz",
+    "sha256": "8be803d1cc741ca1edbbaa0640cda341d14279d196a9f512444c26e7e3c4cffd",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-head1.npz",
+    "sha256": "ff6737ab9ae871ba2e9e136336782e92c0d743bc0810b1a928b9e3bb03a83420",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-l1_block.npz",
+    "sha256": "3f0673a180fc8d45b2f1db6644c0976426ea9466eccf7b2b3841634d7ab8cecc",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-sham_phase.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-phase.npz",
+    "sha256": "f0ed2a113c84d211949560b422c73c4c464787e67d2211cd28c5e3462909b780",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-mask.npz",
+    "sha256": "40e83053eeb42bf3f4f69d3c2f584a9dc356e125b44fbbd414e0b3e8a1c1a44f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-phase_mask.npz",
+    "sha256": "f0ed2a113c84d211949560b422c73c4c464787e67d2211cd28c5e3462909b780",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-sham_gate.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-l2_gate.npz",
+    "sha256": "b40a1cdda92ff46722a9f2b3f1ecd99a656ee2db3e55bba8af7f75127402ddf2",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-l2_raw.npz",
+    "sha256": "df805b1f8b29bb665517d49b42d87b5403bdaf0c23982bee5f43f88a1c1f569f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-l2_raw_gate.npz",
+    "sha256": "54110305ae3258b00ad56e06b77b30d74f96c92d5200837e8fe362740a2e4133",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-sham_ffn.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-l2_ffn.npz",
+    "sha256": "f36a8810572d7abd7cfc88527fcc324c97d25de151e6ba525ec755743874a68b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49152-d9-sham_block.npz",
+    "sha256": "383087901d1780a582cc9f9311b85605e7e0b6cbaedb7eb82b1787d49885078d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-head8.npz",
+    "sha256": "42257efce856cdf6f6245b50fc37fb1ff39008ddcb7b9fc80ef46fbb08d311e0",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-head1.npz",
+    "sha256": "018e5aa52267e5b672ca1eab1fdba2985e5f792dd061e23c2e3faea6901a77b5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-l1_block.npz",
+    "sha256": "1445f092b29d95b9ad4f070d2128b7d594cfd3f2bc22a6f84301639ba44c55c9",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "f32ee03daafbc465a7a5a3847f11ba29f0a88d6e9d1647524bca22a4c1a80feb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "b7d76a7e3ca65e21b0685ca3a8b19211195805f7dd5b8628e00275423416d68d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "c7f44b7b7cd729670a600bffaad9cc559193020a505ef04f8ad1504f1c4fd3fe",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "6a6423ea60fb4ec26a74936b1b80789070198698a679a1692fd1fd292f1fb56f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-baseline.npz",
+    "sha256": "8b936961e9a60f82bb44bfbbe9eb37a3ca8a09689a1bff3820133014dc4e8661",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-sham_head8.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-head8.npz",
+    "sha256": "cfecc2dd5bc070258700424b0a0ef08367c236dc505b921ddd17d9aeca0f2069",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-head1.npz",
+    "sha256": "50728df8c0787b661ddf0f4f756324941a1dd0b980bf9f0cdf02c65eb2b26a87",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-l1_block.npz",
+    "sha256": "8ffca48bf1bdc33a88791d3012f5f95fc50433b6fe281e8e0c778edc9caeab86",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-sham_phase.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-phase.npz",
+    "sha256": "e4f08802ff4c85183a26084a99ccfc290ae76a55efe2b49cab86dbbcf00469b8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-mask.npz",
+    "sha256": "af753d5ecd4f0403e11147deae24f7448fc0f31101f89b97e61703e3f3a6f6f3",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-phase_mask.npz",
+    "sha256": "e4f08802ff4c85183a26084a99ccfc290ae76a55efe2b49cab86dbbcf00469b8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-sham_gate.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-l2_gate.npz",
+    "sha256": "02fc5f5043c88ea43959b3f3274df36694d61f5424c8d08f6e24253d2908876c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-l2_raw.npz",
+    "sha256": "c62f788d2bb339ec8af196f20de7965d128c3dd841494ff782994f804b817fa8",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-l2_raw_gate.npz",
+    "sha256": "0bbb449c2dd59857b61597af9e42d6ed53b7c723da4c248acfaf9787cb9d876f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-sham_ffn.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-l2_ffn.npz",
+    "sha256": "69a86bf0ce201932bf4302c3e66d33dc50fd044223cf609ad9315c520f729f68",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T49153-d8-sham_block.npz",
+    "sha256": "26090ed8e272b6a3e61ca64a1ffa4724bacc238cb49848434b8aed039fcc71d5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-head8.npz",
+    "sha256": "9996354b5f5f212cb18c9f3c199a6562add8a71318e7ab6e4e5607019cd5dd6b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-head1.npz",
+    "sha256": "6693560f60dd60d0598196ca78713c4d86e8105a46691ab23ed2124b65879a71",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-l1_block.npz",
+    "sha256": "474c67b07c2c39c170c44d5ded7621ab443616d92a98bc2c75a9569b9ac3c7be",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "f2e01cd0e606c8e226c4e54fddac668b6bf115194f901054e7706d0a0976ca0c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "adcc52e69aa7011cca6e935f3171b9256c6638fa606285115e8c4296ffc7f807",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "2ec79a5d374a348c39853fe238913b693f8f96e528462f4a299260b96d81fa95",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/discovery__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "967965dbf88a3c8effeb17a1bcda2d21e59c18397bc726ae7e969c8ce0ed36eb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49151-d10-baseline.npz",
+    "sha256": "bcc9f7212306c38a4552cd1a144dbcadfaca0fb187d0895f615e09b499351760",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-baseline.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-baseline.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-baseline.npz",
+    "sha256": "c78ced8fee8f08a8aaa314b602e3c9127a9b7aaa747ba28b08257b904bf7ab3a",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-sham_head8.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-head8.npz",
+    "sha256": "cd6aef2895613c2ad754721a36758d2f0766d4c9ccd8f65c2bc6f43bb582a564",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-head1.npz",
+    "sha256": "75ed7e84321120782e327ee7f486a5cbce01741c15bd35a51663d2d6e7f2ad1d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-l1_block.npz",
+    "sha256": "fe97b13c1c17e1dfdf34e6f0d119912796c46ae57d88a4f3b7109c5bf07db83c",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-sham_phase.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-phase.npz",
+    "sha256": "62e5effe7227d3e9df589fd8f3c7e6caf88ab9af7a894aa651f8a7add62f1d68",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-mask.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-phase_mask.npz",
+    "sha256": "62e5effe7227d3e9df589fd8f3c7e6caf88ab9af7a894aa651f8a7add62f1d68",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-sham_gate.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-l2_gate.npz",
+    "sha256": "0527970596dfed1b20922061c88d49646258dfe97b4d1c868afc8deabd516995",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-l2_raw.npz",
+    "sha256": "2ce58e49778ddcc2daa763ad27ad3250259badfc918e8d5bd330f3944ff14788",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-l2_raw_gate.npz",
+    "sha256": "f8fc07ee5155793fc0feea5f2a9f0279bef692597886b32f60c77e34e405ea4b",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-sham_ffn.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-l2_ffn.npz",
+    "sha256": "dbc71e23cc276686cc8be5fa430bb4722496747128b317b089e1c9f9eb5e792e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49152-d9-sham_block.npz",
+    "sha256": "fe3ff13fffc4f6bca4e4e36e36929ff166d4f468916c5b076b5762d4f289f145",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-head8.npz",
+    "sha256": "7895e74c80834e2675fa58c4d8d8a82c4ab79d592775aa898dbf6cee84bc22cb",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-head1.npz",
+    "sha256": "48b96ca1ea372e5dc2d4a585a43e72bf8ff7c42d00a5d46b2ab948fe07a12f36",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-l1_block.npz",
+    "sha256": "7a3ccc00c31d43aac3b97aadcc03ea73cf9cbe5aeb20639fcd87c9c0beda5102",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-l2_gate.npz",
+    "sha256": "a73eb6bb4f8b45619301e13e2c44e79859ac3f866f888f0ff027e80a35e55e94",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-l2_raw.npz",
+    "sha256": "90c50498347910140b7d1fe2248fa5141e8d6775e4f0b543ba7c0a629a52e344",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-l2_raw_gate.npz",
+    "sha256": "30565f5404932aebc9b5c8cd0ccd8cd169a1e70626963042471d316274113c82",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32768-d9-reverse-l2_ffn.npz",
+    "sha256": "c966a511eea291c4554e68e68eca52495a01dd456076a23ef84734ae09d47209",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-baseline.npz",
+    "sha256": "32484c603bd8e44949603177f1acc6e5b0773f3dbfb4c72fd133097cf44e1ee3",
+    "archived_full_vectors": true
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-sham_head8.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-head8.npz",
+    "sha256": "34a492fb0cae8929bf3951665df3343188cb027fed4be2535635be9eacbf12c5",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-head1.npz",
+    "sha256": "c153aef1622a455204397e57c13f83b884bd5898e45cee2cb1747c98c12b5999",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-l1_block.npz",
+    "sha256": "6e154fae24285829c764e12e240d462d30561cf1d4363384a51ed3d97e23609f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-sham_phase.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-phase.npz",
+    "sha256": "a1b2b4da1b6de6c60dc3adbac3ed3415f82ec740faefca48ae9cde95f4c5c29d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-mask.npz",
+    "sha256": "49fc126b93427be9ba3178ddbe76faa28034bd9779569f78d5ebf2530e57130e",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-phase_mask.npz",
+    "sha256": "a1b2b4da1b6de6c60dc3adbac3ed3415f82ec740faefca48ae9cde95f4c5c29d",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-sham_gate.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-l2_gate.npz",
+    "sha256": "9880e78a756c1744097706ef0c7d264c1b45a0d69d26b50a17fd943bf94d4b17",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-l2_raw.npz",
+    "sha256": "f1f682dad70dd2356740e8b46877c42eb3358ca1561b1d09b61476edefd61d8f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-l2_raw_gate.npz",
+    "sha256": "bb434bfccf7b892193b3c327d9ddb385ddc7eb1c665ebacb08d32d630b4fbc40",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-sham_ffn.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-l2_ffn.npz",
+    "sha256": "07f57649a3275b641cc7817dddf15d9f71b34c1fb661b788dbe0de30330aec65",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T49153-d8-sham_block.npz",
+    "sha256": "25ba0f0fa361f5ba28aec5eb651f128a069e848b3f00cf166dfb978f2e2a1d93",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-head8.npz",
+    "sha256": "bcc68416cb46ab667ec9d0c497a35090f455ece6138771e5edc6058bcc370107",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-head1.npz",
+    "sha256": "99e3b4836c0b71f7b08c5a8b7f14a28c0c7e02e049917a18d99883793f83c507",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-l1_block.npz",
+    "sha256": "9025f34a887db2848851091f269333dcbddd82f70fdc8b19c4097b9a5ebcc680",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-l2_gate.npz",
+    "sha256": "2aa9bc3fd9b7eb142b03680604225eb09ed4788c94a4534dfb5f4dc469cd41ff",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-l2_raw.npz",
+    "sha256": "0a72a42d999f0c61c50a5caa3f77a077044b01a1ec92ac7f8c180f39da6ba13f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-l2_raw_gate.npz",
+    "sha256": "d5f7333eb0edf964f22551ae419e602bc76a968266c65f3c187b50cc60230c3f",
+    "archived_full_vectors": false
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-readout-intervention-20260910/best-fp32/validation__T32769-d8-reverse-l2_ffn.npz",
+    "sha256": "0fceabc65b12f848c1107ce13f5a61ce5e18f7062f58cdc7ed2cd3d1cf15f3eb",
+    "archived_full_vectors": false
+  }
+]

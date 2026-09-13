@@ -1,0 +1,15 @@
+{
+  "passed": true,
+  "initial_weights_identical": true,
+  "initial_rng_identical": true,
+  "num_params": 5786112,
+  "legacy_alpha_one_output_bitexact": true,
+  "gpu_bf16_backward_and_streaming": true,
+  "initial_weights_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+  "gpu_smoke_losses": {
+    "alpha-1": 2.4169445037841797,
+    "alpha-2over3": 2.420008420944214,
+    "alpha-half": 2.38865327835083
+  },
+  "unit_tests": "293 passed (test_logkv.py and test_logkv_lm.py)"
+}

@@ -1,0 +1,37 @@
+{
+  "reviewed": "2026-09-10T01:04:05.617082+00:00",
+  "evaluation_cells": 132,
+  "successful_commands": 6,
+  "archive_checksums_passed": true,
+  "source_files_match": true,
+  "phase_on_references_verified": true,
+  "checkpoint_hashes_verified": true,
+  "checks": [
+    {
+      "mode": "retrieval-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "retrieval-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "compressor-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "compressor-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "passed": true
+    }
+  ],
+  "campaign_status": "complete; GPUs released",
+  "new_gpu_experiments_launched": false
+}

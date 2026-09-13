@@ -1,0 +1,5 @@
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 5403.23it/s]
+discovery 0 prefix seconds 4.39
+validation 0 prefix seconds 3.95
+validation 16 prefix seconds 3.99
+Completed final-bf16 126 cases in 24.7 s

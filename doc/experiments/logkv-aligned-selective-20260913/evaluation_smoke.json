@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "task": "selective-copying",
+  "modes": [
+    "local-control",
+    "aligned"
+  ],
+  "checkpoints": [
+    "best",
+    "final"
+  ],
+  "standard_horizons": [
+    3,
+    16,
+    65
+  ],
+  "standard_samples": 256,
+  "checkpoint_training_steps": 300,
+  "exact_sample_stream_replayed": true,
+  "target_positions_and_predictions_audited": true
+}

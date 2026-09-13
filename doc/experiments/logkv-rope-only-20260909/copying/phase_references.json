@@ -1,0 +1,22 @@
+{
+  "references": [
+    {
+      "path": "/home/myxy/RecursiveCompressor/doc/experiments/logkv-phase2-rope-20260908/copying/retrieval-rope/results_best.json",
+      "sha256": "7bbada5dfa33dcefe75bf56fafa6fb15f0270b19ace543e1c6af2efb63a02fb5"
+    },
+    {
+      "path": "/home/myxy/RecursiveCompressor/doc/experiments/logkv-phase2-rope-20260908/copying/retrieval-rope/results_final.json",
+      "sha256": "7bbada5dfa33dcefe75bf56fafa6fb15f0270b19ace543e1c6af2efb63a02fb5"
+    },
+    {
+      "path": "/home/myxy/RecursiveCompressor/doc/experiments/logkv-phase2-rope-20260908/copying/compressor-rope/results_best.json",
+      "sha256": "7bbada5dfa33dcefe75bf56fafa6fb15f0270b19ace543e1c6af2efb63a02fb5"
+    },
+    {
+      "path": "/home/myxy/RecursiveCompressor/doc/experiments/logkv-phase2-rope-20260908/copying/compressor-rope/results_final.json",
+      "sha256": "7bbada5dfa33dcefe75bf56fafa6fb15f0270b19ace543e1c6af2efb63a02fb5"
+    }
+  ],
+  "common_training_flags_match_except_phase": true,
+  "common_initial_weights_matched": false
+}

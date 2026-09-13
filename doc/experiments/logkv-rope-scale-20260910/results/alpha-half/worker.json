@@ -1,0 +1,92 @@
+{
+  "mode": "alpha-half",
+  "alpha": 0.5,
+  "started": "2026-09-10T12:49:02.665214+00:00",
+  "state": "complete",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/copying/train.py",
+        "--run-name",
+        "alpha-half-fixed10-20260910",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--self-slot",
+        "--retrieval-rope",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0",
+        "--retrieval-rope-scale",
+        "0.5"
+      ],
+      "started": "2026-09-10T12:49:02.665324+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T17:25:17.226417+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-rope-scale-20260910/evaluate.py",
+        "--mode",
+        "alpha-half",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-10T17:25:17.288376+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T17:44:03.673890+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-rope-scale-20260910/evaluate.py",
+        "--mode",
+        "alpha-half",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-10T17:44:03.674566+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T18:02:42.403941+00:00"
+    }
+  ],
+  "weights": {
+    "best": "a1a8005181674abded55b56560e5c82be93b72b6e3fffaf69fdcf93097cd71b9",
+    "final": "7f885fc22aa39001388e5aad7bf7f7514ac7e45291497edfbb20e7285d39dc09"
+  },
+  "finished": "2026-09-10T18:02:42.456161+00:00"
+}

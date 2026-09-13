@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "initial_weights_identical": true,
+  "deterministic_algorithms": true,
+  "cublas_workspace_config": ":4096:8",
+  "visible_gpu": "0",
+  "torch_version": "2.11.0+cu128",
+  "cuda_version": "12.8",
+  "device_name": "NVIDIA GeForce RTX 3090",
+  "rng_sha256": "94d7cbf863adbe051c3edd0fa0f90b52465820b998cafd502427cfb02e65425a"
+}

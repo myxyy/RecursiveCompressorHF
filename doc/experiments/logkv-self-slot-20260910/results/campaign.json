@@ -1,0 +1,123 @@
+{
+  "state": "complete-awaiting-review",
+  "started": "2026-09-10T01:30:06.383389+00:00",
+  "pid": 2391510,
+  "gpu": 0,
+  "gpu_limit": 1,
+  "time_limit_hours": 7.5,
+  "estimated_hours": "5-6",
+  "task": "copying",
+  "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+  "source_commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+  "experiment_commit": "7be979f88f5a426ee87cc5e97b3bb2202905e38f",
+  "script_sha256": {
+    "summarize.py": "415f0981edf620f57600458855d2c28b6b716bf1f8fb52cf37af31fa1e6f64e4",
+    "run.py": "0f3d77755a9c324a0168f7be2954a9161749bc36ff060a67014d6d37e6f70527",
+    "evaluate_detail.py": "89cc36424578ee7ff9e28795f26b08f8bddd9d4d4cfac85a4a0863933c10a628",
+    "diagnose.py": "621cb8027e5c331dd881fe3d5a0a76d8970f5ad3cdc2eb41e2b75588e29cc92b",
+    "common.py": "b89ea1885eec37db9ddd73eef996f4f2cb69339d3595320c9dd61b70fbf14595",
+    "preflight.py": "fcbd4674110bd7cc27c5c0d3e1020c62b834564679b452d296cad69f554351b7"
+  },
+  "baseline_weights": {
+    "best": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533",
+    "final": "f13dd110cfba6013f434e7aa1be40883c28dff73f880d2afb580e7193f498933"
+  },
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "exp/copying/train.py",
+        "--run-name",
+        "retrieval-rope-no-phase-no-self-fixed10-20260910",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--retrieval-rope",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-10T01:30:06.447236+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T05:03:11.068321+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-self-slot-20260910/evaluate_detail.py",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-10T05:03:11.069331+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T05:14:04.648536+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-self-slot-20260910/evaluate_detail.py",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-10T05:14:04.649928+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T05:24:56.958351+00:00"
+    },
+    {
+      "stage": "diagnose",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-self-slot-20260910/diagnose.py"
+      ],
+      "started": "2026-09-10T05:24:56.959439+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T05:35:34.193097+00:00"
+    },
+    {
+      "stage": "summarize",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-self-slot-20260910/summarize.py"
+      ],
+      "started": "2026-09-10T05:35:34.247560+00:00",
+      "returncode": 0,
+      "finished": "2026-09-10T05:35:35.815862+00:00"
+    }
+  ],
+  "next_stage_queued": false,
+  "scope": "One no-self training run; T131072 eval; paired/precision/attention diagnosis; no Selective or 16M",
+  "finished": "2026-09-10T05:35:35.816630+00:00",
+  "elapsed_hours": 4.091509241429675
+}

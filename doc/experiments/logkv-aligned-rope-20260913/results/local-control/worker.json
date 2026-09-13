@@ -1,0 +1,91 @@
+{
+  "mode": "local-control",
+  "position_mode": "local-control",
+  "deterministic_training": true,
+  "started": "2026-09-13T03:16:15.915030+00:00",
+  "state": "complete",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/train_entry.py",
+        "--run-name",
+        "local-control-fixed10-20260913",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--self-slot",
+        "--retrieval-rope",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-13T03:16:15.915143+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T07:17:42.543229+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/evaluate.py",
+        "--mode",
+        "local-control",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-13T07:17:42.603621+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T07:33:55.694543+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/evaluate.py",
+        "--mode",
+        "local-control",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-13T07:33:55.695306+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T07:50:08.632734+00:00"
+    }
+  ],
+  "weights": {
+    "best": "1f7c47db309c90d6cdc00a3c10351d2bc1fce1f9a03dd4158bec9ef60e7ea2f6",
+    "final": "8275207a47d7b67fa14acec4b5476e8dd01832e95d23d518fb14f45c83d4d4af"
+  },
+  "finished": "2026-09-13T07:50:08.684316+00:00"
+}

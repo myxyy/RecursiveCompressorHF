@@ -1,0 +1,11 @@
+{
+  "python": "3.12.3",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.4.0",
+  "numpy": "2.4.4",
+  "matplotlib": "3.11.1",
+  "probe_source_commit": "24b360cf85712fde3ee7a2da4d61e2eb45350a51",
+  "phase2_original_source_commit": "3b0ce51692550510a88610d9c3054fd1bc2d4b80",
+  "gpu": "NVIDIA GeForce RTX 3090, GPU 0 only",
+  "training": false
+}

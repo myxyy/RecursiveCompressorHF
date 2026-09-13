@@ -1,0 +1,12 @@
+{
+  "reviewed": "2026-09-10T07:13:09.569031+00:00",
+  "all_checks_passed": true,
+  "cases": 350,
+  "full_raw_hashes_verified": true,
+  "archive_logits_match_raw": true,
+  "live_checkpoint_hashes_verified": true,
+  "discovery_reference_logits_bit_exact": true,
+  "sham_identity": true,
+  "prefix_and_earlier_answers_unchanged": true,
+  "new_gpu_work_during_review": false
+}

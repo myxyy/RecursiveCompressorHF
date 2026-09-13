@@ -1,0 +1,8 @@
+{
+  "T": 3,
+  "checkpoint": "final",
+  "samples": 256,
+  "string_correct": 10,
+  "token_correct": 2089,
+  "matches_archived_baseline": true
+}

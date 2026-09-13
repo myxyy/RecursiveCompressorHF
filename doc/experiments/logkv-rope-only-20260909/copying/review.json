@@ -1,0 +1,36 @@
+{
+  "reviewed": "2026-09-09T16:14:19.372917+00:00",
+  "evaluation_cells": 132,
+  "successful_commands": 6,
+  "archive_checksums_passed": true,
+  "source_files_match": true,
+  "phase_on_references_verified": true,
+  "checks": [
+    {
+      "mode": "retrieval-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "retrieval-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "compressor-rope",
+      "checkpoint": "best",
+      "cells": 33,
+      "passed": true
+    },
+    {
+      "mode": "compressor-rope",
+      "checkpoint": "final",
+      "cells": 33,
+      "passed": true
+    }
+  ],
+  "selective_status": "running; no final results yet",
+  "new_gpu_experiments_launched": false
+}

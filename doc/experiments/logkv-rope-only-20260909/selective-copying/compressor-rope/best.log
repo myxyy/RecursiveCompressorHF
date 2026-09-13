@@ -1,0 +1,38 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/27 [00:00<?, ?it/s]Loading weights: 100%|██████████| 27/27 [00:00<00:00, 8767.90it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-only-20260909/exp/selective-copying/compressor-rope-no-phase-fixed10-20260909/model_best on 33 horizons (T=1..8192), 256 samples each, device=cuda:0
+T=      1 | token 0.9980 | string 0.9805 | 0.6s <= train horizon
+T=      2 | token 0.9871 | string 0.8906 | 0.0s <= train horizon
+T=      3 | token 0.9469 | string 0.5742 | 0.0s <= train horizon
+T=      4 | token 0.8047 | string 0.0977 | 0.0s <= train horizon
+T=      5 | token 0.7926 | string 0.0820 | 0.0s <= train horizon
+T=      6 | token 0.6492 | string 0.0039 | 0.0s <= train horizon
+T=      7 | token 0.5668 | string 0.0000 | 0.0s <= train horizon
+T=      8 | token 0.7207 | string 0.0195 | 0.0s <= train horizon
+T=      9 | token 0.6320 | string 0.0000 | 0.0s <= train horizon
+T=     10 | token 0.6520 | string 0.0000 | 0.0s <= train horizon
+T=     11 | token 0.6250 | string 0.0000 | 0.0s <= train horizon
+T=     12 | token 0.7156 | string 0.0078 | 0.0s <= train horizon
+T=     13 | token 0.6813 | string 0.0000 | 0.0s <= train horizon
+T=     14 | token 0.7293 | string 0.0156 | 0.0s <= train horizon
+T=     16 | token 0.7445 | string 0.0352 | 0.0s <= train horizon
+T=     24 | token 0.6641 | string 0.0078 | 0.0s <= train horizon
+T=     32 | token 0.5051 | string 0.0000 | 0.0s <= train horizon
+T=     48 | token 0.5426 | string 0.0000 | 0.0s <= train horizon
+T=     64 | token 0.5578 | string 0.0000 | 0.0s <= train horizon
+T=     96 | token 0.5758 | string 0.0000 | 0.0s <= train horizon
+T=    128 | token 0.5133 | string 0.0000 | 0.1s <= train horizon
+T=    192 | token 0.5234 | string 0.0000 | 0.1s <= train horizon
+T=    256 | token 0.5547 | string 0.0000 | 0.1s <= train horizon
+T=    384 | token 0.5484 | string 0.0000 | 0.2s <= train horizon
+T=    512 | token 0.5270 | string 0.0000 | 0.3s <= train horizon
+T=    768 | token 0.5207 | string 0.0000 | 0.4s <= train horizon
+T=   1024 | token 0.5465 | string 0.0000 | 0.6s <= train horizon
+T=   1536 | token 0.5344 | string 0.0000 | 0.9s <= train horizon
+T=   2048 | token 0.5051 | string 0.0000 | 1.2s
+T=   3072 | token 0.4918 | string 0.0000 | 1.8s
+T=   4096 | token 0.4715 | string 0.0000 | 2.6s
+T=   6144 | token 0.4883 | string 0.0000 | 3.9s
+T=   8192 | token 0.4211 | string 0.0000 | 5.2s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-only-20260909/exp/selective-copying/compressor-rope-no-phase-fixed10-20260909/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-rope-only-20260909/exp/selective-copying/compressor-rope-no-phase-fixed10-20260909/plot.png

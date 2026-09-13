@@ -1,0 +1,92 @@
+{
+  "mode": "local-control",
+  "position_mode": "local-control",
+  "task": "selective-copying",
+  "deterministic_training": true,
+  "started": "2026-09-13T08:19:05.274699+00:00",
+  "state": "complete",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/train_entry.py",
+        "--run-name",
+        "local-control-fixed10-20260913",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--self-slot",
+        "--retrieval-rope",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-13T08:19:05.274830+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:18:45.113658+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/evaluate.py",
+        "--mode",
+        "local-control",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-13T12:18:45.175054+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:19:26.568532+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-selective-20260913/evaluate.py",
+        "--mode",
+        "local-control",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-13T12:19:26.571100+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T12:20:07.896823+00:00"
+    }
+  ],
+  "weights": {
+    "best": "d3ecf83a877750251482cfb8f7f39cf71a7f9926089f272775874df7cfbe2bca",
+    "final": "2c6bcd96c6a073c77af0bd1c4144295372b7cd73494c749a1eea382f006b546d"
+  },
+  "finished": "2026-09-13T12:20:07.951175+00:00"
+}

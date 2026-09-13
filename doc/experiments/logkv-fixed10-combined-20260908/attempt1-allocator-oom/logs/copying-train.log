@@ -1,0 +1,8 @@
+Copy task training (logkv): 5,802,496 params on cuda:0, T~U[1,2028], 50000 steps, loss=all
+Run dir: /mnt/raid0/RecursiveCompressor/experiments/logkv-fixed10-combined-20260908/exp/copying/combined-no-decay-fixed10-20260908
+step 100/50000 | loss 1.2387 | tok_acc 0.1247 | str_acc 0.0000 | lr 3.00e-05 | 28s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.83it/s]
+step 200/50000 | loss 0.7116 | tok_acc 0.1454 | str_acc 0.0000 | lr 6.00e-05 | 59s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.43it/s]
+step 300/50000 | loss 0.5458 | tok_acc 0.2028 | str_acc 0.0000 | lr 9.00e-05 | 83s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.00it/s]

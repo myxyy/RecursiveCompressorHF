@@ -28,7 +28,13 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 
 言語モデル（LogKVLM）は `Embedding → LogKVBlock × num_layers → RMSNorm → Linear` で、HuggingFaceの `PreTrainedModel` を継承しています（`save_pretrained` / `from_pretrained` / `generate` 対応）。
 
-**重複なし構造でも、訓練ホライズン2,028に対し、CopyingのT=131,072までの全41評価点で完全一致率100%**を確認しました（各256例、best/finalとも）。追加のT=16,777,216でも8例中8例が完全一致しました。一方、同条件の旧構造との比較ではSelective Copyingの精度が低下しています（[実験詳細](doc/logkv-refine-experiments.md)、学習seedは各条件1個）。新構造のLM生成品質は未評価です。旧チェックポイントの重みは読込可能ですが、新構造での出力は変わります。
+**従来の2階層の位置埋め込みを用いた重複なし構造の実験（Copyingの記憶長M=10固定）では、訓練ホライズン2,028に対し、CopyingのT=131,072までの全41評価点で完全一致率100%**を確認しました（各256例、best/finalとも）。そのfinalチェックポイントによる追加のT=16,777,216でも8例中8例が完全一致しました。これは過去の構成での結果であり、実験ブランチの代替位置表現で達成した結果ではありません。一方、同条件の旧構造との比較ではSelective Copyingの精度が低下しています（[実験詳細](doc/logkv-refine-experiments.md)、学習seedは各条件1個）。新構造のLM生成品質は未評価です。旧チェックポイントの重みは読込可能ですが、新構造での出力は変わります。
+
+2026-09-13、位置表現の調整は一旦区切りとし、mainの既存アーキテクチャでの訓練へ戻る方針としました。
+実験ブランチからはドキュメント・結果・実験コードのみを取り込み、モデル・設定・訓練CLIは変更していません。
+[Copying](doc/logkv-aligned-rope.md)・[Selective Copying](doc/logkv-aligned-selective.md)を含む
+[全実験の一覧と再現方法](doc/logkv-experiments.md)を参照してください。
+位置表現の実験専用フラグはmainでは利用できません。
 
 ## セットアップ
 

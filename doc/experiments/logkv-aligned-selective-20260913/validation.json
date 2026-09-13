@@ -1,0 +1,12 @@
+{
+  "passed": true,
+  "source_commit": "8dcfea400cf9b92396cd2c06e6de3cc50ab22021",
+  "source_manifest_sha256": "7efc55c749304a0f3aa30f93669258e69bf5baeac55cb621a7cde9c3d2da5bad",
+  "source_files_checked": 36,
+  "reused_model_validation_path": "doc/experiments/logkv-aligned-rope-20260913/validation.json",
+  "reused_model_validation_sha256": "df962a735f42350d8f45f041d97ef196ddda6473781e2114497f8c0a0643b68c",
+  "reused_model_tests": 327,
+  "selective_task_tests_passed": 11,
+  "selective_task_test_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-rope-20260913/source/exp/selective-copying/test_selective_task.py -q",
+  "script_syntax_passed": true
+}

@@ -1,0 +1,175 @@
+{
+  "train_max_t": 2028,
+  "samples": 256,
+  "precision": "bf16",
+  "results": {
+    "1": {
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "n": 256
+    },
+    "2": {
+      "token_acc": 0.998828125,
+      "string_acc": 0.98828125,
+      "n": 256
+    },
+    "3": {
+      "token_acc": 0.988671875,
+      "string_acc": 0.90625,
+      "n": 256
+    },
+    "4": {
+      "token_acc": 0.972265625,
+      "string_acc": 0.80078125,
+      "n": 256
+    },
+    "5": {
+      "token_acc": 0.96015625,
+      "string_acc": 0.73828125,
+      "n": 256
+    },
+    "6": {
+      "token_acc": 0.90546875,
+      "string_acc": 0.39453125,
+      "n": 256
+    },
+    "7": {
+      "token_acc": 0.91484375,
+      "string_acc": 0.48046875,
+      "n": 256
+    },
+    "8": {
+      "token_acc": 0.934375,
+      "string_acc": 0.56640625,
+      "n": 256
+    },
+    "9": {
+      "token_acc": 0.953125,
+      "string_acc": 0.640625,
+      "n": 256
+    },
+    "10": {
+      "token_acc": 0.969140625,
+      "string_acc": 0.77734375,
+      "n": 256
+    },
+    "11": {
+      "token_acc": 0.92734375,
+      "string_acc": 0.453125,
+      "n": 256
+    },
+    "12": {
+      "token_acc": 0.93359375,
+      "string_acc": 0.55859375,
+      "n": 256
+    },
+    "13": {
+      "token_acc": 0.9375,
+      "string_acc": 0.578125,
+      "n": 256
+    },
+    "14": {
+      "token_acc": 0.930859375,
+      "string_acc": 0.5234375,
+      "n": 256
+    },
+    "16": {
+      "token_acc": 0.9046875,
+      "string_acc": 0.38671875,
+      "n": 256
+    },
+    "24": {
+      "token_acc": 0.911328125,
+      "string_acc": 0.44921875,
+      "n": 256
+    },
+    "32": {
+      "token_acc": 0.86796875,
+      "string_acc": 0.25,
+      "n": 256
+    },
+    "48": {
+      "token_acc": 0.791796875,
+      "string_acc": 0.09375,
+      "n": 256
+    },
+    "64": {
+      "token_acc": 0.8,
+      "string_acc": 0.109375,
+      "n": 256
+    },
+    "96": {
+      "token_acc": 0.791015625,
+      "string_acc": 0.08984375,
+      "n": 256
+    },
+    "128": {
+      "token_acc": 0.773828125,
+      "string_acc": 0.0546875,
+      "n": 256
+    },
+    "192": {
+      "token_acc": 0.74609375,
+      "string_acc": 0.06640625,
+      "n": 256
+    },
+    "256": {
+      "token_acc": 0.683203125,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "384": {
+      "token_acc": 0.726953125,
+      "string_acc": 0.03515625,
+      "n": 256
+    },
+    "512": {
+      "token_acc": 0.669921875,
+      "string_acc": 0.01171875,
+      "n": 256
+    },
+    "768": {
+      "token_acc": 0.66484375,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "1024": {
+      "token_acc": 0.64765625,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "1536": {
+      "token_acc": 0.637109375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "2048": {
+      "token_acc": 0.619921875,
+      "string_acc": 0.0078125,
+      "n": 256
+    },
+    "3072": {
+      "token_acc": 0.605859375,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "4096": {
+      "token_acc": 0.56640625,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "6144": {
+      "token_acc": 0.571875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "8192": {
+      "token_acc": 0.536328125,
+      "string_acc": 0.0,
+      "n": 256
+    }
+  },
+  "task": "selective-copying",
+  "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-rope-20260913/source/exp/selective-copying/task.py",
+  "task_sha256": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528"
+}

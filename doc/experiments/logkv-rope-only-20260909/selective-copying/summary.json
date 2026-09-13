@@ -1,0 +1,49 @@
+{
+  "stage": {
+    "task": "selective-copying",
+    "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+    "commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+    "started": "2026-09-09T16:05:14.773861+00:00",
+    "gpu_limit": 2,
+    "steps": 50000,
+    "max_t_exp": 13,
+    "samples": 256,
+    "state": "complete-awaiting-review",
+    "phase_emb": false,
+    "next_stage_queued": false,
+    "finished": "2026-09-09T19:52:45.797680+00:00"
+  },
+  "runs": [
+    {
+      "mode": "retrieval-rope",
+      "best_step": 48100,
+      "final_ema_loss": 0.030047813371363766,
+      "train_elapsed_sec": 13557.6,
+      "weight_sha256": {
+        "best": "ec4094498c1bc7f0be0052a3a477af951ad60b478ff6f7d33b9e11b2e2fcaf31",
+        "final": "3ebae1b5a0c225c92933cf59a3fdd72a4340c17a8b6e25b5acf983cb3cda272d"
+      },
+      "checkpoints_identical": false
+    },
+    {
+      "mode": "compressor-rope",
+      "best_step": 47700,
+      "final_ema_loss": 0.11136819593821169,
+      "train_elapsed_sec": 8418.6,
+      "weight_sha256": {
+        "best": "b36160ecc2b20058f896a43fcb6949beda485bd540842260c33d6943ea48f317",
+        "final": "842c4667cf981f0cf4564db68b829158339953da15ec603d8b5f359cd358896c"
+      },
+      "checkpoints_identical": false
+    }
+  ],
+  "evaluation_cells": 132,
+  "all_checks_passed": true,
+  "scope": "Fixed M=10, P=0; 33 horizons through T8192, n256 per checkpoint; not a 16M test",
+  "first_imperfect": {
+    "retrieval-rope/best": 1,
+    "retrieval-rope/final": 1,
+    "compressor-rope/best": 1,
+    "compressor-rope/final": 1
+  }
+}

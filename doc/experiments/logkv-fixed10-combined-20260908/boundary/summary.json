@@ -1,0 +1,29 @@
+{
+  "first_nonperfect_T": 4077,
+  "perfect_T": [
+    4064,
+    4065,
+    4066,
+    4067,
+    4068,
+    4069,
+    4070,
+    4071,
+    4072,
+    4073,
+    4074,
+    4075,
+    4076
+  ],
+  "before_boundary": {
+    "correct": 44800,
+    "total": 44800
+  },
+  "from_boundary": {
+    "correct": 47905,
+    "total": 80640
+  },
+  "elapsed_sec": 184.63456658204086,
+  "batch_size_control_identical_predictions": true,
+  "batch_size_control_elapsed_sec": 7.947105357889086
+}

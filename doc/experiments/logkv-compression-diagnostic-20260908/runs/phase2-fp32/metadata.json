@@ -1,0 +1,102 @@
+{
+  "mode": "phase2",
+  "precision": "fp32",
+  "samples": 16,
+  "seed": 12345,
+  "depths": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8
+  ],
+  "prefix": "digits at positions 0..9, then blanks to N=4**depth; 11 marker tokens",
+  "blank_control": "all-zero prefix at the identical positions, then the same markers",
+  "checkpoint": "/mnt/raid0/RecursiveCompressor/exp/copying/logkv-d512-logu-ph2-gated-self-refined-20260906/model",
+  "checkpoint_sha256": "4fd0e204c78e0b663314993fdfe9e3422e2828366a94e9e15f3c3e16839766ef",
+  "source_commit": "24b360cf85712fde3ee7a2da4d61e2eb45350a51",
+  "gpu": "0",
+  "torch_version": "2.11.0+cu128",
+  "tf32": false,
+  "started": "2026-09-08T07:09:35.127186+00:00",
+  "complete": true,
+  "results": [
+    {
+      "depth": 2,
+      "N": 16,
+      "T": 7,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.658987045288086,
+      "correct_logit_margin_min": 15.645289421081543
+    },
+    {
+      "depth": 3,
+      "N": 64,
+      "T": 55,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.631366729736328,
+      "correct_logit_margin_min": 15.616225242614746
+    },
+    {
+      "depth": 4,
+      "N": 256,
+      "T": 247,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.591093063354492,
+      "correct_logit_margin_min": 15.48000717163086
+    },
+    {
+      "depth": 5,
+      "N": 1024,
+      "T": 1015,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.513025283813477,
+      "correct_logit_margin_min": 13.8252534866333
+    },
+    {
+      "depth": 6,
+      "N": 4096,
+      "T": 4087,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.352508544921875,
+      "correct_logit_margin_min": 12.816493034362793
+    },
+    {
+      "depth": 7,
+      "N": 16384,
+      "T": 16375,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 19.15229606628418,
+      "correct_logit_margin_min": 12.407522201538086
+    },
+    {
+      "depth": 8,
+      "N": 65536,
+      "T": 65527,
+      "token_correct": 160,
+      "string_correct": 16,
+      "n": 16,
+      "correct_logit_margin_mean": 18.933490753173828,
+      "correct_logit_margin_min": 12.258578300476074
+    }
+  ],
+  "instrumentation_output_exact": true,
+  "elapsed_sec": 8.286313177086413,
+  "finished": "2026-09-08T07:09:43.907506+00:00",
+  "pooling_reconstruction_max_abs": 0.0,
+  "peak_allocated_GiB": 2.151116371154785
+}

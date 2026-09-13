@@ -1,0 +1,93 @@
+{
+  "mode": "aligned",
+  "position_mode": "aligned",
+  "deterministic_training": true,
+  "started": "2026-09-13T03:16:15.918861+00:00",
+  "state": "complete",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/train_entry.py",
+        "--run-name",
+        "aligned-fixed10-20260913",
+        "--arch",
+        "logkv",
+        "--phase-levels",
+        "2",
+        "--gated-attention",
+        "--self-slot",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0",
+        "--aligned-rope",
+        "--aligned-rope-scale",
+        "1.0"
+      ],
+      "started": "2026-09-13T03:16:15.918977+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T07:31:06.971434+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/evaluate.py",
+        "--mode",
+        "aligned",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-13T07:31:07.031670+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T07:48:47.940263+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-aligned-rope-20260913/evaluate.py",
+        "--mode",
+        "aligned",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-13T07:48:47.940973+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T08:06:02.195855+00:00"
+    }
+  ],
+  "weights": {
+    "best": "64d2d2d5b068ba9eee14f9c5b5920915ee978240198a351e965ad2fdc7860002",
+    "final": "22981b03c6d23eee26f57b6aaaea71d3624bc44b18ddc870a23d841e7a03348d"
+  },
+  "finished": "2026-09-13T08:06:02.248738+00:00"
+}

@@ -1,0 +1,206 @@
+{
+  "passed": true,
+  "reviewed": "2026-09-11T03:12:15.666975+00:00",
+  "gpu_used": false,
+  "audited_cells": 450,
+  "all_original_hashes_passed": true,
+  "raw_archive_matches": true,
+  "legacy_reconstructed_initial_weights_match_saved_initial": true,
+  "legacy_initial_rng_matches": true,
+  "legacy_cpu_fullsize_forward_and_gradients_bitexact": true,
+  "checkpoint_checks": {
+    "historical_best": {
+      "cpu_fp32_logits_bitexact": true,
+      "weight_sha256": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533"
+    },
+    "current_alpha_one_best": {
+      "cpu_fp32_logits_bitexact": true,
+      "weight_sha256": "f6930b3716e2ea0c9c1ce0bfc4a33f85455e33a473b921822700349b8fc4bcee"
+    }
+  },
+  "first_historical_training_difference": {
+    "old": {
+      "step": 100,
+      "loss": 1.092259407043457,
+      "ema_loss": 1.3510070272100496,
+      "token_acc": 0.122265625,
+      "string_acc": 0.0,
+      "lr": 2.9999999999999997e-05,
+      "elapsed_sec": 28.5
+    },
+    "new": {
+      "step": 100,
+      "loss": 1.0922362804412842,
+      "ema_loss": 1.3510059036439577,
+      "token_acc": 0.122390625,
+      "string_acc": 0.0,
+      "lr": 2.9999999999999997e-05,
+      "elapsed_sec": 28.9
+    }
+  },
+  "summary": [
+    {
+      "mode": "alpha-1",
+      "checkpoint": "best",
+      "perfect_horizons": 5,
+      "worst_horizons": [
+        {
+          "T": 3072,
+          "exact": 21
+        },
+        {
+          "T": 6144,
+          "exact": 26
+        },
+        {
+          "T": 65536,
+          "exact": 26
+        },
+        {
+          "T": 98304,
+          "exact": 26
+        },
+        {
+          "T": 64,
+          "exact": 28
+        }
+      ]
+    },
+    {
+      "mode": "alpha-1",
+      "checkpoint": "final",
+      "perfect_horizons": 10,
+      "worst_horizons": [
+        {
+          "T": 24576,
+          "exact": 28
+        },
+        {
+          "T": 65536,
+          "exact": 28
+        },
+        {
+          "T": 4096,
+          "exact": 29
+        },
+        {
+          "T": 98304,
+          "exact": 29
+        },
+        {
+          "T": 6144,
+          "exact": 30
+        }
+      ]
+    },
+    {
+      "mode": "alpha-2over3",
+      "checkpoint": "best",
+      "perfect_horizons": 22,
+      "worst_horizons": [
+        {
+          "T": 98304,
+          "exact": 209
+        },
+        {
+          "T": 65536,
+          "exact": 212
+        },
+        {
+          "T": 16384,
+          "exact": 248
+        },
+        {
+          "T": 24576,
+          "exact": 251
+        },
+        {
+          "T": 24,
+          "exact": 254
+        }
+      ]
+    },
+    {
+      "mode": "alpha-2over3",
+      "checkpoint": "final",
+      "perfect_horizons": 0,
+      "worst_horizons": [
+        {
+          "T": 1,
+          "exact": 82
+        },
+        {
+          "T": 3,
+          "exact": 224
+        },
+        {
+          "T": 512,
+          "exact": 240
+        },
+        {
+          "T": 4096,
+          "exact": 242
+        },
+        {
+          "T": 48,
+          "exact": 243
+        }
+      ]
+    },
+    {
+      "mode": "alpha-half",
+      "checkpoint": "best",
+      "perfect_horizons": 14,
+      "worst_horizons": [
+        {
+          "T": 98304,
+          "exact": 53
+        },
+        {
+          "T": 65536,
+          "exact": 56
+        },
+        {
+          "T": 16384,
+          "exact": 146
+        },
+        {
+          "T": 24576,
+          "exact": 161
+        },
+        {
+          "T": 131072,
+          "exact": 213
+        }
+      ]
+    },
+    {
+      "mode": "alpha-half",
+      "checkpoint": "final",
+      "perfect_horizons": 6,
+      "worst_horizons": [
+        {
+          "T": 98304,
+          "exact": 23
+        },
+        {
+          "T": 65536,
+          "exact": 30
+        },
+        {
+          "T": 24576,
+          "exact": 80
+        },
+        {
+          "T": 16384,
+          "exact": 97
+        },
+        {
+          "T": 131072,
+          "exact": 104
+        }
+      ]
+    }
+  ],
+  "limitation": "GPU training trajectories diverge by step100 despite matching configuration and reconstructed initialization; root cause unisolated. CPU equality is not proof of GPU bitwise determinism. One training seed per alpha."
+}

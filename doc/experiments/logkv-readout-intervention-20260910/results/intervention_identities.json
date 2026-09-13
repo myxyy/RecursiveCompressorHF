@@ -1,0 +1,110 @@
+[
+  {
+    "job": "best-bf16",
+    "cohort": "discovery",
+    "T": 49152,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-bf16",
+    "cohort": "discovery",
+    "T": 49153,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-bf16",
+    "cohort": "validation",
+    "T": 49152,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-bf16",
+    "cohort": "validation",
+    "T": 49153,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "final-bf16",
+    "cohort": "discovery",
+    "T": 49152,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "final-bf16",
+    "cohort": "discovery",
+    "T": 49153,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "final-bf16",
+    "cohort": "validation",
+    "T": 49152,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "final-bf16",
+    "cohort": "validation",
+    "T": 49153,
+    "phase_matches_head8_logits": true,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 0.0,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-fp32",
+    "cohort": "discovery",
+    "T": 49152,
+    "phase_matches_head8_logits": false,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 4.76837158203125e-06,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-fp32",
+    "cohort": "discovery",
+    "T": 49153,
+    "phase_matches_head8_logits": false,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 2.86102294921875e-06,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-fp32",
+    "cohort": "validation",
+    "T": 49152,
+    "phase_matches_head8_logits": false,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 3.814697265625e-06,
+    "mask_baseline_max_logit_difference": 0.0
+  },
+  {
+    "job": "best-fp32",
+    "cohort": "validation",
+    "T": 49153,
+    "phase_matches_head8_logits": false,
+    "mask_matches_baseline_logits": true,
+    "phase_head8_max_logit_difference": 2.86102294921875e-06,
+    "mask_baseline_max_logit_difference": 0.0
+  }
+]

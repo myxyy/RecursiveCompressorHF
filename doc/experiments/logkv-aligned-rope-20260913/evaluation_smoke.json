@@ -1,0 +1,20 @@
+{
+  "passed": true,
+  "modes": [
+    "local-control",
+    "aligned"
+  ],
+  "standard_horizons": [
+    3,
+    16,
+    65
+  ],
+  "standard_samples": 256,
+  "paired_horizons": [
+    15,
+    16,
+    17
+  ],
+  "paired_samples": 32,
+  "checkpoint_training_steps": 300
+}

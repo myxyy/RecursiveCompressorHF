@@ -1,0 +1,41 @@
+Copy task training (logkv): 5,802,496 params on cuda:0, T~U[1,2028], 50000 steps, loss=all
+Run dir: /mnt/raid0/RecursiveCompressor/experiments/logkv-fixed10-combined-20260908/exp/selective-copying/combined-no-decay-fixed10-20260908
+step 100/50000 | loss 1.2682 | tok_acc 0.1255 | str_acc 0.0000 | lr 3.00e-05 | 23s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.45it/s]
+Traceback (most recent call last):
+  File "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source/exp/selective-copying/train.py", line 24, in <module>
+    runpy.run_path(str(HERE.parent / "copying" / "train.py"), run_name="__main__")
+  File "<frozen runpy>", line 286, in run_path
+  File "<frozen runpy>", line 98, in _run_module_code
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source/exp/copying/train.py", line 300, in <module>
+    main()
+  File "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source/exp/copying/train.py", line 250, in main
+    (out.loss / args.grad_accum).backward()
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/_tensor.py", line 631, in backward
+    torch.autograd.backward(
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/autograd/__init__.py", line 381, in backward
+    _engine_run_backward(
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/autograd/graph.py", line 869, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1173, in unpack_hook
+    _run_fn_with_dynamo_disabled(frame.recompute_fn, *args)
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/_compile.py", line 54, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 1263, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1139, in _run_fn_with_dynamo_disabled
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 1607, in recompute_fn
+    fn(*args, **kwargs)
+  File "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source/logkv.py", line 403, in _attend_levels
+    m_i, l_i, acc_i = self._level_attention(
+                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/raid0/RecursiveCompressor/experiments/logkv-position-study-20260907/source/logkv.py", line 457, in _level_attention
+    k_slots = k_slots + rk.to(k_slots.dtype)
+              ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 376.00 MiB. GPU 0 has a total capacity of 23.56 GiB of which 249.38 MiB is free. Including non-PyTorch memory, this process has 23.29 GiB memory in use. Of the allocated memory 17.88 GiB is allocated by PyTorch, and 5.10 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)

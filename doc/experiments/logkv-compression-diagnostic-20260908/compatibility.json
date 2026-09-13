@@ -1,0 +1,18 @@
+{
+  "bf16_16": {
+    "exact": true,
+    "max_abs": 0.0
+  },
+  "bf16_4096": {
+    "exact": true,
+    "max_abs": 0.0
+  },
+  "fp32_16": {
+    "exact": true,
+    "max_abs": 0.0
+  },
+  "fp32_4096": {
+    "exact": true,
+    "max_abs": 0.0
+  }
+}

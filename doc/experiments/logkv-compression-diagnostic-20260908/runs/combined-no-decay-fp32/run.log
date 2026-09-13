@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/35 [00:00<?, ?it/s]Loading weights: 100%|██████████| 35/35 [00:00<00:00, 6948.48it/s]
+combined-no-decay fp32 {'depth': 2, 'N': 16, 'T': 7, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 15.630472183227539, 'correct_logit_margin_min': 12.233795166015625}
+combined-no-decay fp32 {'depth': 3, 'N': 64, 'T': 55, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 15.062952041625977, 'correct_logit_margin_min': 10.626358032226562}
+combined-no-decay fp32 {'depth': 4, 'N': 256, 'T': 247, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 14.056985855102539, 'correct_logit_margin_min': 9.157979011535645}
+combined-no-decay fp32 {'depth': 5, 'N': 1024, 'T': 1015, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 12.141999244689941, 'correct_logit_margin_min': 5.745121002197266}
+combined-no-decay fp32 {'depth': 6, 'N': 4096, 'T': 4087, 'token_correct': 107, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': 1.6090744733810425, 'correct_logit_margin_min': -21.97793197631836}
+combined-no-decay fp32 {'depth': 7, 'N': 16384, 'T': 16375, 'token_correct': 69, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': -2.9390573501586914, 'correct_logit_margin_min': -22.863304138183594}
+combined-no-decay fp32 {'depth': 8, 'N': 65536, 'T': 65527, 'token_correct': 48, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': -4.841482639312744, 'correct_logit_margin_min': -29.520606994628906}
+COMPLETE /mnt/raid0/RecursiveCompressor/experiments/logkv-compression-diagnostic-20260908/combined-no-decay-fp32 12.755413212114945

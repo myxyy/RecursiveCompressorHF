@@ -1,0 +1,46 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/35 [00:00<?, ?it/s]Loading weights: 100%|██████████| 35/35 [00:00<00:00, 6950.46it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-fixed10-combined-20260908/exp/copying/combined-no-decay-fixed10-20260908/model_best on 41 horizons (T=1..131072), 256 samples each, device=cuda:0
+T=      1 | token 1.0000 | string 1.0000 | 0.5s <= train horizon
+T=      2 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      3 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      4 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      5 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      6 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      7 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      8 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      9 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     10 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     11 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     12 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     13 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     14 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     16 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     24 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     32 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     48 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     64 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     96 | token 1.0000 | string 1.0000 | 0.1s <= train horizon
+T=    128 | token 1.0000 | string 1.0000 | 0.1s <= train horizon
+T=    192 | token 1.0000 | string 1.0000 | 0.1s <= train horizon
+T=    256 | token 1.0000 | string 1.0000 | 0.2s <= train horizon
+T=    384 | token 1.0000 | string 1.0000 | 0.3s <= train horizon
+T=    512 | token 1.0000 | string 1.0000 | 0.4s <= train horizon
+T=    768 | token 1.0000 | string 1.0000 | 0.6s <= train horizon
+T=   1024 | token 1.0000 | string 1.0000 | 0.8s <= train horizon
+T=   1536 | token 1.0000 | string 1.0000 | 1.3s <= train horizon
+T=   2048 | token 1.0000 | string 1.0000 | 1.8s
+T=   3072 | token 1.0000 | string 1.0000 | 2.6s
+T=   4096 | token 0.6277 | string 0.0039 | 4.0s
+T=   6144 | token 0.6309 | string 0.0078 | 5.9s
+T=   8192 | token 0.6379 | string 0.0000 | 7.8s
+T=  12288 | token 0.6383 | string 0.0000 | 11.4s
+T=  16384 | token 0.3867 | string 0.0000 | 15.9s
+T=  24576 | token 0.4141 | string 0.0000 | 24.3s
+T=  32768 | token 0.4055 | string 0.0000 | 32.5s
+T=  49152 | token 0.4160 | string 0.0000 | 49.4s
+T=  65536 | token 0.3324 | string 0.0000 | 67.5s
+T=  98304 | token 0.3227 | string 0.0000 | 105.0s
+T= 131072 | token 0.3344 | string 0.0000 | 144.6s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-fixed10-combined-20260908/exp/copying/combined-no-decay-fixed10-20260908/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-fixed10-combined-20260908/exp/copying/combined-no-decay-fixed10-20260908/plot.png

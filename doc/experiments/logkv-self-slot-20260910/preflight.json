@@ -1,0 +1,12 @@
+{
+  "source_commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+  "parameter_count": 5786112,
+  "initial_weights_identical": true,
+  "initial_rng_state_identical": true,
+  "phase_disabled_both": true,
+  "no_self_reference_gradients_streaming_passed": true,
+  "training_data_seed": 1,
+  "training_seed": 0,
+  "original_initial_checkpoint_available": false,
+  "initialization_note": "Reconstructed from frozen code and saved config; original step-zero weights were not archived"
+}

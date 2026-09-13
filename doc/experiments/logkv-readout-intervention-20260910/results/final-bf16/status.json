@@ -1,0 +1,37 @@
+{
+  "state": "complete",
+  "started": "2026-09-10T07:10:29.734294+00:00",
+  "job": {
+    "name": "final-bf16",
+    "checkpoint": "final",
+    "precision": "bf16",
+    "gpu": 1
+  },
+  "weight_sha256": "f13dd110cfba6013f434e7aa1be40883c28dff73f880d2afb580e7193f498933",
+  "case_groups": 3,
+  "finished": "2026-09-10T07:10:54.410695+00:00",
+  "elapsed_seconds": 24.676434671971947,
+  "checks": [
+    {
+      "T": 49151,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    },
+    {
+      "T": 49152,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    },
+    {
+      "T": 49153,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    }
+  ],
+  "case_count": 126,
+  "prefix_immutable": true,
+  "payload_KV_equal_across_horizons": true,
+  "observation_and_sham_identity": true,
+  "earlier_answers_unchanged": true,
+  "weight_hash_unchanged": true
+}

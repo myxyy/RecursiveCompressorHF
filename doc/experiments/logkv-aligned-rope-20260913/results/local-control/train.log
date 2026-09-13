@@ -1,0 +1,587 @@
+Copy task training (logkv): 5,786,112 params on cuda:0, T~U[1,2028], 50000 steps, loss=all
+Run dir: /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-rope-20260913/exp/copying/local-control-fixed10-20260913
+step 100/50000 | loss 1.3510 | tok_acc 0.1227 | str_acc 0.0000 | lr 3.00e-05 | 31s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.41it/s]
+step 200/50000 | loss 0.7489 | tok_acc 0.1781 | str_acc 0.0000 | lr 6.00e-05 | 65s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.05it/s]
+step 300/50000 | loss 0.5372 | tok_acc 0.2834 | str_acc 0.0000 | lr 9.00e-05 | 93s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.35it/s]
+step 400/50000 | loss 0.4870 | tok_acc 0.2824 | str_acc 0.0000 | lr 1.20e-04 | 119s
+step 500/50000 | loss 0.4137 | tok_acc 0.2916 | str_acc 0.0000 | lr 1.50e-04 | 144s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.54it/s]
+step 600/50000 | loss 0.3814 | tok_acc 0.2865 | str_acc 0.0000 | lr 1.80e-04 | 168s
+step 700/50000 | loss 0.4067 | tok_acc 0.2952 | str_acc 0.0000 | lr 2.10e-04 | 192s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.69it/s]
+step 800/50000 | loss 0.3493 | tok_acc 0.3051 | str_acc 0.0000 | lr 2.40e-04 | 227s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.05it/s]
+step 900/50000 | loss 0.3050 | tok_acc 0.3240 | str_acc 0.0000 | lr 2.70e-04 | 268s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.10it/s]
+step 1000/50000 | loss 0.3170 | tok_acc 0.3171 | str_acc 0.0000 | lr 3.00e-04 | 299s
+step 1100/50000 | loss 0.3182 | tok_acc 0.3428 | str_acc 0.0000 | lr 3.00e-04 | 328s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.17it/s]
+step 1200/50000 | loss 0.2982 | tok_acc 0.3565 | str_acc 0.0000 | lr 3.00e-04 | 358s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.01it/s]
+step 1300/50000 | loss 0.3013 | tok_acc 0.3489 | str_acc 0.0000 | lr 3.00e-04 | 387s
+step 1400/50000 | loss 0.3005 | tok_acc 0.3662 | str_acc 0.0000 | lr 3.00e-04 | 411s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.22it/s]
+step 1500/50000 | loss 0.2712 | tok_acc 0.3839 | str_acc 0.0000 | lr 3.00e-04 | 450s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.39it/s]
+step 1600/50000 | loss 0.2725 | tok_acc 0.3860 | str_acc 0.0000 | lr 3.00e-04 | 475s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.26it/s]
+step 1700/50000 | loss 0.2777 | tok_acc 0.3990 | str_acc 0.0000 | lr 3.00e-04 | 509s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.85it/s]
+step 1800/50000 | loss 0.2737 | tok_acc 0.4179 | str_acc 0.0000 | lr 3.00e-04 | 541s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.29it/s]
+step 1900/50000 | loss 0.2791 | tok_acc 0.4341 | str_acc 0.0000 | lr 3.00e-04 | 569s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.70it/s]
+step 2000/50000 | loss 0.2751 | tok_acc 0.4309 | str_acc 0.0003 | lr 3.00e-04 | 596s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.48it/s]
+step 2100/50000 | loss 0.2566 | tok_acc 0.4468 | str_acc 0.0000 | lr 3.00e-04 | 626s
+step 2200/50000 | loss 0.2450 | tok_acc 0.4528 | str_acc 0.0002 | lr 3.00e-04 | 650s
+step 2300/50000 | loss 0.2459 | tok_acc 0.4427 | str_acc 0.0000 | lr 3.00e-04 | 680s
+step 2400/50000 | loss 0.2358 | tok_acc 0.4697 | str_acc 0.0005 | lr 3.00e-04 | 707s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.87it/s]
+step 2500/50000 | loss 0.2427 | tok_acc 0.4754 | str_acc 0.0002 | lr 3.00e-04 | 730s
+step 2600/50000 | loss 0.2426 | tok_acc 0.4877 | str_acc 0.0019 | lr 3.00e-04 | 759s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.88it/s]
+step 2700/50000 | loss 0.2250 | tok_acc 0.4889 | str_acc 0.0008 | lr 3.00e-04 | 779s
+step 2800/50000 | loss 0.2229 | tok_acc 0.4882 | str_acc 0.0025 | lr 3.00e-04 | 803s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.86it/s]
+step 2900/50000 | loss 0.2021 | tok_acc 0.4889 | str_acc 0.0011 | lr 3.00e-04 | 840s
+step 3000/50000 | loss 0.1951 | tok_acc 0.4721 | str_acc 0.0009 | lr 3.00e-04 | 876s
+step 3100/50000 | loss 0.1947 | tok_acc 0.5011 | str_acc 0.0028 | lr 3.00e-04 | 910s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.35it/s]
+step 3200/50000 | loss 0.2027 | tok_acc 0.4961 | str_acc 0.0056 | lr 3.00e-04 | 945s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.90it/s]
+step 3300/50000 | loss 0.2164 | tok_acc 0.4913 | str_acc 0.0017 | lr 3.00e-04 | 971s
+step 3400/50000 | loss 0.1997 | tok_acc 0.4998 | str_acc 0.0056 | lr 3.00e-04 | 1004s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.86it/s]
+step 3500/50000 | loss 0.2305 | tok_acc 0.4828 | str_acc 0.0073 | lr 3.00e-04 | 1035s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.30it/s]
+step 3600/50000 | loss 0.2015 | tok_acc 0.5004 | str_acc 0.0194 | lr 3.00e-04 | 1069s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.91it/s]
+step 3700/50000 | loss 0.1934 | tok_acc 0.5373 | str_acc 0.0308 | lr 3.00e-04 | 1091s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.86it/s]
+step 3800/50000 | loss 0.1906 | tok_acc 0.5514 | str_acc 0.0369 | lr 3.00e-04 | 1123s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 20.97it/s]
+step 3900/50000 | loss 0.1752 | tok_acc 0.5539 | str_acc 0.0392 | lr 3.00e-04 | 1147s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.69it/s]
+step 4000/50000 | loss 0.1737 | tok_acc 0.5333 | str_acc 0.0211 | lr 3.00e-04 | 1171s
+step 4100/50000 | loss 0.1837 | tok_acc 0.5634 | str_acc 0.0447 | lr 3.00e-04 | 1206s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.57it/s]
+step 4200/50000 | loss 0.1819 | tok_acc 0.5747 | str_acc 0.0647 | lr 3.00e-04 | 1235s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.68it/s]
+step 4300/50000 | loss 0.1790 | tok_acc 0.5170 | str_acc 0.0241 | lr 3.00e-04 | 1269s
+step 4400/50000 | loss 0.1627 | tok_acc 0.5679 | str_acc 0.0652 | lr 3.00e-04 | 1301s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.72it/s]
+step 4500/50000 | loss 0.1536 | tok_acc 0.5846 | str_acc 0.0972 | lr 3.00e-04 | 1330s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.33it/s]
+step 4600/50000 | loss 0.1555 | tok_acc 0.5425 | str_acc 0.0383 | lr 3.00e-04 | 1357s
+step 4700/50000 | loss 0.1605 | tok_acc 0.5921 | str_acc 0.0880 | lr 3.00e-04 | 1382s
+step 4800/50000 | loss 0.1608 | tok_acc 0.5635 | str_acc 0.0895 | lr 3.00e-04 | 1415s
+step 4900/50000 | loss 0.1727 | tok_acc 0.5661 | str_acc 0.0506 | lr 3.00e-04 | 1438s
+step 5000/50000 | loss 0.1558 | tok_acc 0.5940 | str_acc 0.0963 | lr 3.00e-04 | 1467s
+  quick_eval (string acc): T=507:0.000 T=1014:0.000 T=2028:0.000 T=4056:0.000 T=8112:0.000
+step 5100/50000 | loss 0.1584 | tok_acc 0.5404 | str_acc 0.0317 | lr 3.00e-04 | 1502s
+step 5200/50000 | loss 0.1627 | tok_acc 0.5973 | str_acc 0.1017 | lr 3.00e-04 | 1531s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.28it/s]
+step 5300/50000 | loss 0.1489 | tok_acc 0.5909 | str_acc 0.0762 | lr 3.00e-04 | 1564s
+step 5400/50000 | loss 0.1379 | tok_acc 0.6071 | str_acc 0.0902 | lr 3.00e-04 | 1590s
+step 5500/50000 | loss 0.1435 | tok_acc 0.6155 | str_acc 0.0980 | lr 3.00e-04 | 1619s
+step 5600/50000 | loss 0.1316 | tok_acc 0.5622 | str_acc 0.0205 | lr 3.00e-04 | 1654s
+step 5700/50000 | loss 0.1270 | tok_acc 0.5865 | str_acc 0.0828 | lr 3.00e-04 | 1688s
+step 5800/50000 | loss 0.1441 | tok_acc 0.5691 | str_acc 0.0316 | lr 3.00e-04 | 1717s
+step 5900/50000 | loss 0.1405 | tok_acc 0.6210 | str_acc 0.0928 | lr 3.00e-04 | 1743s
+step 6000/50000 | loss 0.1406 | tok_acc 0.6130 | str_acc 0.0988 | lr 3.00e-04 | 1768s
+step 6100/50000 | loss 0.1434 | tok_acc 0.6161 | str_acc 0.0798 | lr 3.00e-04 | 1794s
+step 6200/50000 | loss 0.1376 | tok_acc 0.5974 | str_acc 0.0745 | lr 3.00e-04 | 1822s
+step 6300/50000 | loss 0.1155 | tok_acc 0.6182 | str_acc 0.0953 | lr 3.00e-04 | 1852s
+step 6400/50000 | loss 0.1212 | tok_acc 0.6296 | str_acc 0.0958 | lr 3.00e-04 | 1882s
+step 6500/50000 | loss 0.1258 | tok_acc 0.6262 | str_acc 0.0731 | lr 3.00e-04 | 1910s
+step 6600/50000 | loss 0.1128 | tok_acc 0.6310 | str_acc 0.0609 | lr 3.00e-04 | 1941s
+step 6700/50000 | loss 0.1332 | tok_acc 0.6480 | str_acc 0.1019 | lr 3.00e-04 | 1956s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.31it/s]
+step 6800/50000 | loss 0.1136 | tok_acc 0.6673 | str_acc 0.1220 | lr 3.00e-04 | 1985s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 20.94it/s]
+step 6900/50000 | loss 0.1091 | tok_acc 0.6740 | str_acc 0.1289 | lr 3.00e-04 | 2010s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.82it/s]
+step 7000/50000 | loss 0.1102 | tok_acc 0.6738 | str_acc 0.1227 | lr 3.00e-04 | 2038s
+step 7100/50000 | loss 0.1194 | tok_acc 0.6001 | str_acc 0.0441 | lr 3.00e-04 | 2066s
+step 7200/50000 | loss 0.1126 | tok_acc 0.6470 | str_acc 0.1014 | lr 3.00e-04 | 2096s
+step 7300/50000 | loss 0.1159 | tok_acc 0.6650 | str_acc 0.1236 | lr 3.00e-04 | 2126s
+step 7400/50000 | loss 0.1242 | tok_acc 0.6496 | str_acc 0.0616 | lr 3.00e-04 | 2152s
+step 7500/50000 | loss 0.1403 | tok_acc 0.6331 | str_acc 0.0570 | lr 3.00e-04 | 2178s
+step 7600/50000 | loss 0.1259 | tok_acc 0.6329 | str_acc 0.0775 | lr 3.00e-04 | 2208s
+step 7700/50000 | loss 0.1118 | tok_acc 0.6970 | str_acc 0.1497 | lr 3.00e-04 | 2235s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.21it/s]
+step 7800/50000 | loss 0.1089 | tok_acc 0.6641 | str_acc 0.0711 | lr 3.00e-04 | 2269s
+step 7900/50000 | loss 0.1052 | tok_acc 0.6588 | str_acc 0.1106 | lr 3.00e-04 | 2302s
+step 8000/50000 | loss 0.1005 | tok_acc 0.7142 | str_acc 0.1288 | lr 3.00e-04 | 2327s
+step 8100/50000 | loss 0.1177 | tok_acc 0.6638 | str_acc 0.1217 | lr 3.00e-04 | 2349s
+step 8200/50000 | loss 0.1085 | tok_acc 0.6433 | str_acc 0.0617 | lr 3.00e-04 | 2390s
+step 8300/50000 | loss 0.1057 | tok_acc 0.6807 | str_acc 0.0983 | lr 3.00e-04 | 2418s
+step 8400/50000 | loss 0.0969 | tok_acc 0.6810 | str_acc 0.1322 | lr 3.00e-04 | 2450s
+step 8500/50000 | loss 0.1094 | tok_acc 0.6727 | str_acc 0.0970 | lr 3.00e-04 | 2480s
+step 8600/50000 | loss 0.1091 | tok_acc 0.6603 | str_acc 0.0967 | lr 3.00e-04 | 2504s
+step 8700/50000 | loss 0.1161 | tok_acc 0.6364 | str_acc 0.0777 | lr 3.00e-04 | 2533s
+step 8800/50000 | loss 0.1249 | tok_acc 0.6475 | str_acc 0.0861 | lr 3.00e-04 | 2564s
+step 8900/50000 | loss 0.1324 | tok_acc 0.6638 | str_acc 0.0580 | lr 3.00e-04 | 2603s
+step 9000/50000 | loss 0.1425 | tok_acc 0.6304 | str_acc 0.0589 | lr 3.00e-04 | 2627s
+step 9100/50000 | loss 0.1155 | tok_acc 0.7053 | str_acc 0.0964 | lr 3.00e-04 | 2650s
+step 9200/50000 | loss 0.1136 | tok_acc 0.7136 | str_acc 0.0841 | lr 3.00e-04 | 2675s
+step 9300/50000 | loss 0.1406 | tok_acc 0.6681 | str_acc 0.0580 | lr 3.00e-04 | 2701s
+step 9400/50000 | loss 0.1103 | tok_acc 0.7160 | str_acc 0.1586 | lr 3.00e-04 | 2725s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.95it/s]
+step 9500/50000 | loss 0.1074 | tok_acc 0.7193 | str_acc 0.1131 | lr 3.00e-04 | 2750s
+step 9600/50000 | loss 0.0972 | tok_acc 0.7037 | str_acc 0.1072 | lr 3.00e-04 | 2780s
+step 9700/50000 | loss 0.0925 | tok_acc 0.7080 | str_acc 0.1136 | lr 3.00e-04 | 2809s
+step 9800/50000 | loss 0.0918 | tok_acc 0.7381 | str_acc 0.1445 | lr 3.00e-04 | 2833s
+step 9900/50000 | loss 0.1256 | tok_acc 0.6702 | str_acc 0.0769 | lr 3.00e-04 | 2851s
+step 10000/50000 | loss 0.1102 | tok_acc 0.6621 | str_acc 0.0569 | lr 3.00e-04 | 2892s
+  quick_eval (string acc): T=507:0.000 T=1014:0.000 T=2028:0.000 T=4056:0.000 T=8112:0.031
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.94it/s]
+step 10100/50000 | loss 0.0891 | tok_acc 0.7213 | str_acc 0.1445 | lr 3.00e-04 | 2926s
+step 10200/50000 | loss 0.0780 | tok_acc 0.7127 | str_acc 0.1294 | lr 3.00e-04 | 2955s
+step 10300/50000 | loss 0.0819 | tok_acc 0.7311 | str_acc 0.1436 | lr 3.00e-04 | 2980s
+step 10400/50000 | loss 0.1069 | tok_acc 0.6665 | str_acc 0.1255 | lr 3.00e-04 | 3014s
+step 10500/50000 | loss 0.1034 | tok_acc 0.7113 | str_acc 0.0977 | lr 3.00e-04 | 3047s
+step 10600/50000 | loss 0.0905 | tok_acc 0.7388 | str_acc 0.1288 | lr 3.00e-04 | 3074s
+step 10700/50000 | loss 0.0922 | tok_acc 0.7375 | str_acc 0.1391 | lr 3.00e-04 | 3100s
+step 10800/50000 | loss 0.0886 | tok_acc 0.7290 | str_acc 0.1502 | lr 3.00e-04 | 3127s
+step 10900/50000 | loss 0.0861 | tok_acc 0.7329 | str_acc 0.1475 | lr 3.00e-04 | 3158s
+step 11000/50000 | loss 0.0891 | tok_acc 0.7510 | str_acc 0.1695 | lr 3.00e-04 | 3179s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.60it/s]
+step 11100/50000 | loss 0.0761 | tok_acc 0.7378 | str_acc 0.1661 | lr 3.00e-04 | 3213s
+step 11200/50000 | loss 0.0722 | tok_acc 0.7512 | str_acc 0.1678 | lr 3.00e-04 | 3239s
+step 11300/50000 | loss 0.0756 | tok_acc 0.7417 | str_acc 0.1470 | lr 3.00e-04 | 3275s
+step 11400/50000 | loss 0.1150 | tok_acc 0.7215 | str_acc 0.1509 | lr 3.00e-04 | 3301s
+step 11500/50000 | loss 0.1053 | tok_acc 0.7118 | str_acc 0.1503 | lr 3.00e-04 | 3325s
+step 11600/50000 | loss 0.0853 | tok_acc 0.7525 | str_acc 0.1573 | lr 3.00e-04 | 3359s
+step 11700/50000 | loss 0.1144 | tok_acc 0.7561 | str_acc 0.1503 | lr 3.00e-04 | 3388s
+step 11800/50000 | loss 0.1012 | tok_acc 0.7439 | str_acc 0.1686 | lr 3.00e-04 | 3411s
+step 11900/50000 | loss 0.0930 | tok_acc 0.7806 | str_acc 0.2105 | lr 3.00e-04 | 3434s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.92it/s]
+step 12000/50000 | loss 0.0931 | tok_acc 0.7430 | str_acc 0.1753 | lr 3.00e-04 | 3463s
+step 12100/50000 | loss 0.0727 | tok_acc 0.7725 | str_acc 0.1839 | lr 3.00e-04 | 3495s
+step 12200/50000 | loss 0.0694 | tok_acc 0.7444 | str_acc 0.1502 | lr 3.00e-04 | 3526s
+step 12300/50000 | loss 0.0670 | tok_acc 0.7798 | str_acc 0.2227 | lr 3.00e-04 | 3557s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.66it/s]
+step 12400/50000 | loss 0.0766 | tok_acc 0.7544 | str_acc 0.1755 | lr 3.00e-04 | 3585s
+step 12500/50000 | loss 0.0734 | tok_acc 0.7767 | str_acc 0.1864 | lr 3.00e-04 | 3616s
+step 12600/50000 | loss 0.0833 | tok_acc 0.7502 | str_acc 0.1820 | lr 3.00e-04 | 3644s
+step 12700/50000 | loss 0.0835 | tok_acc 0.7608 | str_acc 0.1780 | lr 3.00e-04 | 3668s
+step 12800/50000 | loss 0.0709 | tok_acc 0.7905 | str_acc 0.2523 | lr 3.00e-04 | 3696s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.46it/s]
+step 12900/50000 | loss 0.0783 | tok_acc 0.7636 | str_acc 0.1600 | lr 3.00e-04 | 3724s
+step 13000/50000 | loss 0.0756 | tok_acc 0.7872 | str_acc 0.2100 | lr 3.00e-04 | 3749s
+step 13100/50000 | loss 0.0618 | tok_acc 0.8033 | str_acc 0.2481 | lr 3.00e-04 | 3782s
+step 13200/50000 | loss 0.0577 | tok_acc 0.7916 | str_acc 0.1650 | lr 3.00e-04 | 3816s
+step 13300/50000 | loss 0.0706 | tok_acc 0.7788 | str_acc 0.1820 | lr 3.00e-04 | 3838s
+step 13400/50000 | loss 0.0661 | tok_acc 0.7827 | str_acc 0.2005 | lr 3.00e-04 | 3873s
+step 13500/50000 | loss 0.0673 | tok_acc 0.8111 | str_acc 0.2680 | lr 3.00e-04 | 3904s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.09it/s]
+step 13600/50000 | loss 0.1124 | tok_acc 0.7544 | str_acc 0.1627 | lr 3.00e-04 | 3927s
+step 13700/50000 | loss 0.0779 | tok_acc 0.7979 | str_acc 0.1958 | lr 3.00e-04 | 3966s
+step 13800/50000 | loss 0.1646 | tok_acc 0.7105 | str_acc 0.0894 | lr 3.00e-04 | 3996s
+step 13900/50000 | loss 0.1368 | tok_acc 0.7103 | str_acc 0.0469 | lr 3.00e-04 | 4029s
+step 14000/50000 | loss 0.1432 | tok_acc 0.7425 | str_acc 0.0653 | lr 3.00e-04 | 4057s
+step 14100/50000 | loss 0.1234 | tok_acc 0.7350 | str_acc 0.0677 | lr 3.00e-04 | 4087s
+step 14200/50000 | loss 0.0934 | tok_acc 0.8138 | str_acc 0.2295 | lr 3.00e-04 | 4107s
+step 14300/50000 | loss 0.0884 | tok_acc 0.7950 | str_acc 0.1669 | lr 3.00e-04 | 4127s
+step 14400/50000 | loss 0.0860 | tok_acc 0.7955 | str_acc 0.1850 | lr 3.00e-04 | 4151s
+step 14500/50000 | loss 0.0813 | tok_acc 0.7881 | str_acc 0.2291 | lr 3.00e-04 | 4180s
+step 14600/50000 | loss 0.0724 | tok_acc 0.8044 | str_acc 0.1967 | lr 3.00e-04 | 4210s
+step 14700/50000 | loss 0.0690 | tok_acc 0.8383 | str_acc 0.2498 | lr 3.00e-04 | 4234s
+step 14800/50000 | loss 0.0772 | tok_acc 0.8444 | str_acc 0.2850 | lr 3.00e-04 | 4261s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.93it/s]
+step 14900/50000 | loss 0.0780 | tok_acc 0.7922 | str_acc 0.1772 | lr 3.00e-04 | 4292s
+step 15000/50000 | loss 0.0735 | tok_acc 0.8237 | str_acc 0.2694 | lr 3.00e-04 | 4321s
+  quick_eval (string acc): T=507:0.000 T=1014:0.000 T=2028:0.562 T=4056:0.516 T=8112:0.109
+step 15100/50000 | loss 0.0622 | tok_acc 0.8534 | str_acc 0.2598 | lr 3.00e-04 | 4354s
+step 15200/50000 | loss 0.0814 | tok_acc 0.7996 | str_acc 0.1908 | lr 3.00e-04 | 4384s
+step 15300/50000 | loss 0.0722 | tok_acc 0.8261 | str_acc 0.2708 | lr 3.00e-04 | 4415s
+step 15400/50000 | loss 0.0590 | tok_acc 0.8478 | str_acc 0.3144 | lr 3.00e-04 | 4447s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.26it/s]
+step 15500/50000 | loss 0.0527 | tok_acc 0.8561 | str_acc 0.2806 | lr 3.00e-04 | 4467s
+step 15600/50000 | loss 0.0557 | tok_acc 0.8738 | str_acc 0.3605 | lr 3.00e-04 | 4497s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.56it/s]
+step 15700/50000 | loss 0.0446 | tok_acc 0.8823 | str_acc 0.4495 | lr 3.00e-04 | 4521s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.22it/s]
+step 15800/50000 | loss 0.0499 | tok_acc 0.8676 | str_acc 0.3837 | lr 3.00e-04 | 4556s
+step 15900/50000 | loss 0.0564 | tok_acc 0.8175 | str_acc 0.2719 | lr 3.00e-04 | 4587s
+step 16000/50000 | loss 0.0515 | tok_acc 0.8509 | str_acc 0.3056 | lr 3.00e-04 | 4624s
+step 16100/50000 | loss 0.0446 | tok_acc 0.8727 | str_acc 0.4169 | lr 3.00e-04 | 4648s
+step 16200/50000 | loss 0.0500 | tok_acc 0.8713 | str_acc 0.3602 | lr 3.00e-04 | 4678s
+step 16300/50000 | loss 0.0380 | tok_acc 0.8849 | str_acc 0.3667 | lr 3.00e-04 | 4708s
+step 16400/50000 | loss 0.0407 | tok_acc 0.8762 | str_acc 0.4102 | lr 3.00e-04 | 4738s
+step 16500/50000 | loss 0.0382 | tok_acc 0.8908 | str_acc 0.4156 | lr 3.00e-04 | 4766s
+step 16600/50000 | loss 0.0359 | tok_acc 0.8953 | str_acc 0.4523 | lr 3.00e-04 | 4795s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 20.99it/s]
+step 16700/50000 | loss 0.0454 | tok_acc 0.9079 | str_acc 0.4639 | lr 3.00e-04 | 4818s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.43it/s]
+step 16800/50000 | loss 0.0500 | tok_acc 0.8558 | str_acc 0.3500 | lr 3.00e-04 | 4851s
+step 16900/50000 | loss 0.0584 | tok_acc 0.8612 | str_acc 0.3780 | lr 3.00e-04 | 4871s
+step 17000/50000 | loss 0.0388 | tok_acc 0.8966 | str_acc 0.4273 | lr 3.00e-04 | 4908s
+step 17100/50000 | loss 0.0274 | tok_acc 0.9230 | str_acc 0.5416 | lr 3.00e-04 | 4935s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.87it/s]
+step 17200/50000 | loss 0.0287 | tok_acc 0.9022 | str_acc 0.5041 | lr 3.00e-04 | 4965s
+step 17300/50000 | loss 0.0423 | tok_acc 0.8851 | str_acc 0.4113 | lr 3.00e-04 | 4988s
+step 17400/50000 | loss 0.0425 | tok_acc 0.9039 | str_acc 0.4847 | lr 3.00e-04 | 5015s
+step 17500/50000 | loss 0.0432 | tok_acc 0.8988 | str_acc 0.4527 | lr 3.00e-04 | 5043s
+step 17600/50000 | loss 0.0363 | tok_acc 0.9035 | str_acc 0.4677 | lr 3.00e-04 | 5077s
+step 17700/50000 | loss 0.0682 | tok_acc 0.8891 | str_acc 0.4259 | lr 3.00e-04 | 5098s
+step 17800/50000 | loss 0.0576 | tok_acc 0.8670 | str_acc 0.3627 | lr 3.00e-04 | 5125s
+step 17900/50000 | loss 0.0466 | tok_acc 0.9077 | str_acc 0.4856 | lr 3.00e-04 | 5150s
+step 18000/50000 | loss 0.0352 | tok_acc 0.9078 | str_acc 0.4891 | lr 3.00e-04 | 5183s
+step 18100/50000 | loss 0.0317 | tok_acc 0.9027 | str_acc 0.5062 | lr 3.00e-04 | 5207s
+step 18200/50000 | loss 0.0238 | tok_acc 0.9140 | str_acc 0.5202 | lr 3.00e-04 | 5243s
+step 18300/50000 | loss 0.0184 | tok_acc 0.9427 | str_acc 0.6538 | lr 3.00e-04 | 5264s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.04it/s]
+step 18400/50000 | loss 0.0306 | tok_acc 0.8997 | str_acc 0.4387 | lr 3.00e-04 | 5300s
+step 18500/50000 | loss 0.0342 | tok_acc 0.8910 | str_acc 0.4492 | lr 3.00e-04 | 5333s
+step 18600/50000 | loss 0.0310 | tok_acc 0.9117 | str_acc 0.5230 | lr 3.00e-04 | 5365s
+step 18700/50000 | loss 0.0224 | tok_acc 0.9515 | str_acc 0.6792 | lr 3.00e-04 | 5382s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.51it/s]
+step 18800/50000 | loss 0.0206 | tok_acc 0.9413 | str_acc 0.6431 | lr 3.00e-04 | 5409s
+step 18900/50000 | loss 0.0273 | tok_acc 0.9175 | str_acc 0.5441 | lr 3.00e-04 | 5437s
+step 19000/50000 | loss 0.0384 | tok_acc 0.8847 | str_acc 0.3947 | lr 3.00e-04 | 5468s
+step 19100/50000 | loss 0.0314 | tok_acc 0.9356 | str_acc 0.5684 | lr 3.00e-04 | 5488s
+step 19200/50000 | loss 0.0287 | tok_acc 0.9293 | str_acc 0.5891 | lr 3.00e-04 | 5512s
+step 19300/50000 | loss 0.0196 | tok_acc 0.9472 | str_acc 0.6364 | lr 3.00e-04 | 5539s
+step 19400/50000 | loss 0.0232 | tok_acc 0.9239 | str_acc 0.5652 | lr 3.00e-04 | 5563s
+step 19500/50000 | loss 0.0243 | tok_acc 0.9165 | str_acc 0.5144 | lr 3.00e-04 | 5590s
+step 19600/50000 | loss 0.0359 | tok_acc 0.9169 | str_acc 0.4942 | lr 3.00e-04 | 5611s
+step 19700/50000 | loss 0.0574 | tok_acc 0.8687 | str_acc 0.3623 | lr 3.00e-04 | 5634s
+step 19800/50000 | loss 0.0422 | tok_acc 0.8760 | str_acc 0.3823 | lr 3.00e-04 | 5671s
+step 19900/50000 | loss 0.0259 | tok_acc 0.9449 | str_acc 0.6158 | lr 3.00e-04 | 5704s
+step 20000/50000 | loss 0.0267 | tok_acc 0.9332 | str_acc 0.6102 | lr 3.00e-04 | 5734s
+  quick_eval (string acc): T=507:0.203 T=1014:0.000 T=2028:0.859 T=4056:0.891 T=8112:0.656
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.26it/s]
+step 20100/50000 | loss 0.0217 | tok_acc 0.9437 | str_acc 0.6162 | lr 3.00e-04 | 5770s
+step 20200/50000 | loss 0.0216 | tok_acc 0.9407 | str_acc 0.6450 | lr 3.00e-04 | 5794s
+step 20300/50000 | loss 0.0272 | tok_acc 0.9461 | str_acc 0.6852 | lr 3.00e-04 | 5823s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.25it/s]
+step 20400/50000 | loss 0.0304 | tok_acc 0.9239 | str_acc 0.5361 | lr 3.00e-04 | 5858s
+step 20500/50000 | loss 0.0339 | tok_acc 0.9291 | str_acc 0.5600 | lr 3.00e-04 | 5887s
+step 20600/50000 | loss 0.0233 | tok_acc 0.9446 | str_acc 0.6495 | lr 3.00e-04 | 5913s
+step 20700/50000 | loss 0.0227 | tok_acc 0.9380 | str_acc 0.6544 | lr 3.00e-04 | 5942s
+step 20800/50000 | loss 0.0248 | tok_acc 0.9436 | str_acc 0.6578 | lr 3.00e-04 | 5970s
+step 20900/50000 | loss 0.0212 | tok_acc 0.9540 | str_acc 0.6864 | lr 3.00e-04 | 5994s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.06it/s]
+step 21000/50000 | loss 0.0153 | tok_acc 0.9667 | str_acc 0.7336 | lr 3.00e-04 | 6019s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.18it/s]
+step 21100/50000 | loss 0.0183 | tok_acc 0.9442 | str_acc 0.6247 | lr 3.00e-04 | 6054s
+step 21200/50000 | loss 0.0388 | tok_acc 0.9316 | str_acc 0.5780 | lr 3.00e-04 | 6088s
+step 21300/50000 | loss 0.0296 | tok_acc 0.9470 | str_acc 0.6594 | lr 3.00e-04 | 6114s
+step 21400/50000 | loss 0.0194 | tok_acc 0.9459 | str_acc 0.6867 | lr 3.00e-04 | 6139s
+step 21500/50000 | loss 0.0179 | tok_acc 0.9475 | str_acc 0.6672 | lr 3.00e-04 | 6160s
+step 21600/50000 | loss 0.0112 | tok_acc 0.9633 | str_acc 0.7644 | lr 3.00e-04 | 6195s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.71it/s]
+step 21700/50000 | loss 0.0092 | tok_acc 0.9620 | str_acc 0.7373 | lr 3.00e-04 | 6223s
+step 21800/50000 | loss 0.0091 | tok_acc 0.9595 | str_acc 0.7491 | lr 3.00e-04 | 6254s
+step 21900/50000 | loss 0.0217 | tok_acc 0.9392 | str_acc 0.6578 | lr 3.00e-04 | 6286s
+step 22000/50000 | loss 0.0195 | tok_acc 0.9530 | str_acc 0.7000 | lr 3.00e-04 | 6314s
+step 22100/50000 | loss 0.0429 | tok_acc 0.9141 | str_acc 0.5356 | lr 3.00e-04 | 6340s
+step 22200/50000 | loss 0.0685 | tok_acc 0.9136 | str_acc 0.4958 | lr 3.00e-04 | 6370s
+step 22300/50000 | loss 0.0375 | tok_acc 0.9415 | str_acc 0.6348 | lr 3.00e-04 | 6395s
+step 22400/50000 | loss 0.0237 | tok_acc 0.9364 | str_acc 0.6773 | lr 3.00e-04 | 6421s
+step 22500/50000 | loss 0.0143 | tok_acc 0.9501 | str_acc 0.6997 | lr 3.00e-04 | 6454s
+step 22600/50000 | loss 0.0367 | tok_acc 0.9492 | str_acc 0.7183 | lr 3.00e-04 | 6482s
+step 22700/50000 | loss 0.0216 | tok_acc 0.9634 | str_acc 0.7698 | lr 3.00e-04 | 6510s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.25it/s]
+step 22800/50000 | loss 0.0168 | tok_acc 0.9535 | str_acc 0.7044 | lr 3.00e-04 | 6539s
+step 22900/50000 | loss 0.0164 | tok_acc 0.9449 | str_acc 0.6875 | lr 3.00e-04 | 6565s
+step 23000/50000 | loss 0.0168 | tok_acc 0.9545 | str_acc 0.7059 | lr 3.00e-04 | 6598s
+step 23100/50000 | loss 0.0138 | tok_acc 0.9617 | str_acc 0.7375 | lr 3.00e-04 | 6625s
+step 23200/50000 | loss 0.0206 | tok_acc 0.9371 | str_acc 0.6266 | lr 3.00e-04 | 6661s
+step 23300/50000 | loss 0.0162 | tok_acc 0.9597 | str_acc 0.7198 | lr 3.00e-04 | 6693s
+step 23400/50000 | loss 0.0148 | tok_acc 0.9549 | str_acc 0.7120 | lr 3.00e-04 | 6720s
+step 23500/50000 | loss 0.0113 | tok_acc 0.9655 | str_acc 0.7891 | lr 3.00e-04 | 6749s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.03it/s]
+step 23600/50000 | loss 0.0179 | tok_acc 0.9618 | str_acc 0.7447 | lr 3.00e-04 | 6776s
+step 23700/50000 | loss 0.0173 | tok_acc 0.9556 | str_acc 0.7372 | lr 3.00e-04 | 6808s
+step 23800/50000 | loss 0.0158 | tok_acc 0.9707 | str_acc 0.7970 | lr 3.00e-04 | 6842s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.31it/s]
+step 23900/50000 | loss 0.0144 | tok_acc 0.9590 | str_acc 0.7377 | lr 3.00e-04 | 6870s
+step 24000/50000 | loss 0.0156 | tok_acc 0.9658 | str_acc 0.7561 | lr 3.00e-04 | 6893s
+step 24100/50000 | loss 0.0118 | tok_acc 0.9725 | str_acc 0.8192 | lr 3.00e-04 | 6923s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.81it/s]
+step 24200/50000 | loss 0.0213 | tok_acc 0.9537 | str_acc 0.6775 | lr 3.00e-04 | 6945s
+step 24300/50000 | loss 0.0179 | tok_acc 0.9621 | str_acc 0.7322 | lr 3.00e-04 | 6973s
+step 24400/50000 | loss 0.0198 | tok_acc 0.9564 | str_acc 0.7723 | lr 3.00e-04 | 6999s
+step 24500/50000 | loss 0.0134 | tok_acc 0.9639 | str_acc 0.7534 | lr 3.00e-04 | 7033s
+step 24600/50000 | loss 0.0108 | tok_acc 0.9640 | str_acc 0.7700 | lr 3.00e-04 | 7062s
+step 24700/50000 | loss 0.0086 | tok_acc 0.9812 | str_acc 0.8547 | lr 3.00e-04 | 7088s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.10it/s]
+step 24800/50000 | loss 0.0137 | tok_acc 0.9590 | str_acc 0.7356 | lr 3.00e-04 | 7124s
+step 24900/50000 | loss 0.0130 | tok_acc 0.9657 | str_acc 0.7648 | lr 3.00e-04 | 7149s
+step 25000/50000 | loss 0.0110 | tok_acc 0.9704 | str_acc 0.7964 | lr 3.00e-04 | 7174s
+  quick_eval (string acc): T=507:0.266 T=1014:0.000 T=2028:0.734 T=4056:0.719 T=8112:0.812
+step 25100/50000 | loss 0.0107 | tok_acc 0.9677 | str_acc 0.7753 | lr 3.00e-04 | 7211s
+step 25200/50000 | loss 0.0114 | tok_acc 0.9544 | str_acc 0.7053 | lr 3.00e-04 | 7245s
+step 25300/50000 | loss 0.0220 | tok_acc 0.9394 | str_acc 0.6913 | lr 3.00e-04 | 7277s
+step 25400/50000 | loss 0.0245 | tok_acc 0.9360 | str_acc 0.7080 | lr 3.00e-04 | 7304s
+step 25500/50000 | loss 0.0162 | tok_acc 0.9440 | str_acc 0.7048 | lr 3.00e-04 | 7332s
+step 25600/50000 | loss 0.0283 | tok_acc 0.9562 | str_acc 0.7203 | lr 3.00e-04 | 7359s
+step 25700/50000 | loss 0.0279 | tok_acc 0.9275 | str_acc 0.6275 | lr 3.00e-04 | 7389s
+step 25800/50000 | loss 0.0211 | tok_acc 0.9528 | str_acc 0.7186 | lr 3.00e-04 | 7414s
+step 25900/50000 | loss 0.0153 | tok_acc 0.9617 | str_acc 0.8013 | lr 3.00e-04 | 7445s
+step 26000/50000 | loss 0.0143 | tok_acc 0.9686 | str_acc 0.7842 | lr 3.00e-04 | 7474s
+step 26100/50000 | loss 0.0129 | tok_acc 0.9758 | str_acc 0.8139 | lr 3.00e-04 | 7490s
+step 26200/50000 | loss 0.0104 | tok_acc 0.9615 | str_acc 0.7725 | lr 3.00e-04 | 7522s
+step 26300/50000 | loss 0.0060 | tok_acc 0.9790 | str_acc 0.8430 | lr 3.00e-04 | 7558s
+step 26400/50000 | loss 0.0052 | tok_acc 0.9877 | str_acc 0.8953 | lr 3.00e-04 | 7594s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 23.09it/s]
+step 26500/50000 | loss 0.0056 | tok_acc 0.9791 | str_acc 0.8602 | lr 3.00e-04 | 7619s
+step 26600/50000 | loss 0.0065 | tok_acc 0.9760 | str_acc 0.8197 | lr 3.00e-04 | 7645s
+step 26700/50000 | loss 0.0064 | tok_acc 0.9848 | str_acc 0.8759 | lr 3.00e-04 | 7683s
+step 26800/50000 | loss 0.0074 | tok_acc 0.9707 | str_acc 0.7933 | lr 3.00e-04 | 7712s
+step 26900/50000 | loss 0.0053 | tok_acc 0.9849 | str_acc 0.8741 | lr 3.00e-04 | 7739s
+step 27000/50000 | loss 0.0064 | tok_acc 0.9815 | str_acc 0.8478 | lr 3.00e-04 | 7766s
+step 27100/50000 | loss 0.0096 | tok_acc 0.9739 | str_acc 0.8048 | lr 3.00e-04 | 7796s
+step 27200/50000 | loss 0.0129 | tok_acc 0.9617 | str_acc 0.7386 | lr 3.00e-04 | 7818s
+step 27300/50000 | loss 0.0295 | tok_acc 0.9490 | str_acc 0.7106 | lr 3.00e-04 | 7847s
+step 27400/50000 | loss 0.0314 | tok_acc 0.9422 | str_acc 0.6477 | lr 3.00e-04 | 7882s
+step 27500/50000 | loss 0.0171 | tok_acc 0.9761 | str_acc 0.8291 | lr 3.00e-04 | 7908s
+step 27600/50000 | loss 0.0111 | tok_acc 0.9813 | str_acc 0.8658 | lr 3.00e-04 | 7935s
+step 27700/50000 | loss 0.0066 | tok_acc 0.9813 | str_acc 0.8728 | lr 3.00e-04 | 7956s
+step 27800/50000 | loss 0.0064 | tok_acc 0.9656 | str_acc 0.7567 | lr 3.00e-04 | 7991s
+step 27900/50000 | loss 0.0168 | tok_acc 0.9564 | str_acc 0.7616 | lr 3.00e-04 | 8017s
+step 28000/50000 | loss 0.0153 | tok_acc 0.9624 | str_acc 0.7547 | lr 3.00e-04 | 8039s
+step 28100/50000 | loss 0.0102 | tok_acc 0.9765 | str_acc 0.8478 | lr 3.00e-04 | 8067s
+step 28200/50000 | loss 0.0144 | tok_acc 0.9583 | str_acc 0.7320 | lr 3.00e-04 | 8100s
+step 28300/50000 | loss 0.0098 | tok_acc 0.9773 | str_acc 0.8334 | lr 3.00e-04 | 8124s
+step 28400/50000 | loss 0.0113 | tok_acc 0.9737 | str_acc 0.7933 | lr 3.00e-04 | 8160s
+step 28500/50000 | loss 0.0092 | tok_acc 0.9710 | str_acc 0.7945 | lr 3.00e-04 | 8200s
+step 28600/50000 | loss 0.0195 | tok_acc 0.9621 | str_acc 0.7608 | lr 3.00e-04 | 8230s
+step 28700/50000 | loss 0.0160 | tok_acc 0.9715 | str_acc 0.8248 | lr 3.00e-04 | 8258s
+step 28800/50000 | loss 0.0099 | tok_acc 0.9775 | str_acc 0.8128 | lr 3.00e-04 | 8294s
+step 28900/50000 | loss 0.0080 | tok_acc 0.9807 | str_acc 0.8661 | lr 3.00e-04 | 8325s
+step 29000/50000 | loss 0.0044 | tok_acc 0.9872 | str_acc 0.9164 | lr 3.00e-04 | 8360s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.01it/s]
+step 29100/50000 | loss 0.0064 | tok_acc 0.9829 | str_acc 0.8642 | lr 3.00e-04 | 8390s
+step 29200/50000 | loss 0.0090 | tok_acc 0.9779 | str_acc 0.8208 | lr 3.00e-04 | 8421s
+step 29300/50000 | loss 0.0080 | tok_acc 0.9775 | str_acc 0.8317 | lr 3.00e-04 | 8452s
+step 29400/50000 | loss 0.0113 | tok_acc 0.9739 | str_acc 0.7919 | lr 3.00e-04 | 8485s
+step 29500/50000 | loss 0.0304 | tok_acc 0.9337 | str_acc 0.6280 | lr 3.00e-04 | 8514s
+step 29600/50000 | loss 0.0334 | tok_acc 0.9223 | str_acc 0.5705 | lr 3.00e-04 | 8544s
+step 29700/50000 | loss 0.0228 | tok_acc 0.9583 | str_acc 0.7559 | lr 3.00e-04 | 8570s
+step 29800/50000 | loss 0.0116 | tok_acc 0.9751 | str_acc 0.8452 | lr 3.00e-04 | 8604s
+step 29900/50000 | loss 0.0109 | tok_acc 0.9699 | str_acc 0.8058 | lr 3.00e-04 | 8629s
+step 30000/50000 | loss 0.0065 | tok_acc 0.9886 | str_acc 0.9016 | lr 3.00e-04 | 8653s
+  quick_eval (string acc): T=507:0.016 T=1014:0.000 T=2028:1.000 T=4056:1.000 T=8112:1.000
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.78it/s]
+step 30100/50000 | loss 0.0072 | tok_acc 0.9723 | str_acc 0.8033 | lr 3.00e-04 | 8687s
+step 30200/50000 | loss 0.0065 | tok_acc 0.9817 | str_acc 0.8520 | lr 3.00e-04 | 8719s
+step 30300/50000 | loss 0.0041 | tok_acc 0.9852 | str_acc 0.8842 | lr 3.00e-04 | 8742s
+step 30400/50000 | loss 0.0035 | tok_acc 0.9864 | str_acc 0.8886 | lr 3.00e-04 | 8766s
+step 30500/50000 | loss 0.0041 | tok_acc 0.9860 | str_acc 0.8995 | lr 3.00e-04 | 8788s
+step 30600/50000 | loss 0.0069 | tok_acc 0.9751 | str_acc 0.8270 | lr 3.00e-04 | 8814s
+step 30700/50000 | loss 0.0093 | tok_acc 0.9790 | str_acc 0.8564 | lr 3.00e-04 | 8847s
+step 30800/50000 | loss 0.0059 | tok_acc 0.9848 | str_acc 0.8756 | lr 3.00e-04 | 8873s
+step 30900/50000 | loss 0.0094 | tok_acc 0.9531 | str_acc 0.7456 | lr 3.00e-04 | 8903s
+step 31000/50000 | loss 0.0099 | tok_acc 0.9720 | str_acc 0.8273 | lr 3.00e-04 | 8936s
+step 31100/50000 | loss 0.0176 | tok_acc 0.9652 | str_acc 0.8045 | lr 3.00e-04 | 8966s
+step 31200/50000 | loss 0.0149 | tok_acc 0.9741 | str_acc 0.8145 | lr 3.00e-04 | 8997s
+step 31300/50000 | loss 0.0146 | tok_acc 0.9575 | str_acc 0.7656 | lr 3.00e-04 | 9024s
+step 31400/50000 | loss 0.0162 | tok_acc 0.9631 | str_acc 0.7328 | lr 3.00e-04 | 9058s
+step 31500/50000 | loss 0.0190 | tok_acc 0.9724 | str_acc 0.8130 | lr 3.00e-04 | 9077s
+step 31600/50000 | loss 0.0381 | tok_acc 0.9289 | str_acc 0.6041 | lr 3.00e-04 | 9107s
+step 31700/50000 | loss 0.0229 | tok_acc 0.9634 | str_acc 0.7178 | lr 3.00e-04 | 9139s
+step 31800/50000 | loss 0.0152 | tok_acc 0.9547 | str_acc 0.7556 | lr 3.00e-04 | 9169s
+step 31900/50000 | loss 0.0092 | tok_acc 0.9775 | str_acc 0.8234 | lr 3.00e-04 | 9193s
+step 32000/50000 | loss 0.0148 | tok_acc 0.9793 | str_acc 0.8505 | lr 3.00e-04 | 9224s
+step 32100/50000 | loss 0.0090 | tok_acc 0.9691 | str_acc 0.8258 | lr 3.00e-04 | 9254s
+step 32200/50000 | loss 0.0055 | tok_acc 0.9847 | str_acc 0.8883 | lr 3.00e-04 | 9276s
+step 32300/50000 | loss 0.0052 | tok_acc 0.9725 | str_acc 0.8063 | lr 3.00e-04 | 9305s
+step 32400/50000 | loss 0.0052 | tok_acc 0.9756 | str_acc 0.8391 | lr 3.00e-04 | 9337s
+step 32500/50000 | loss 0.0033 | tok_acc 0.9828 | str_acc 0.8608 | lr 3.00e-04 | 9370s
+step 32600/50000 | loss 0.0046 | tok_acc 0.9799 | str_acc 0.8622 | lr 3.00e-04 | 9396s
+step 32700/50000 | loss 0.0227 | tok_acc 0.9510 | str_acc 0.6803 | lr 3.00e-04 | 9435s
+step 32800/50000 | loss 0.0191 | tok_acc 0.9537 | str_acc 0.7034 | lr 3.00e-04 | 9461s
+step 32900/50000 | loss 0.0112 | tok_acc 0.9735 | str_acc 0.8317 | lr 3.00e-04 | 9495s
+step 33000/50000 | loss 0.0088 | tok_acc 0.9682 | str_acc 0.7825 | lr 3.00e-04 | 9524s
+step 33100/50000 | loss 0.0059 | tok_acc 0.9817 | str_acc 0.8448 | lr 3.00e-04 | 9556s
+step 33200/50000 | loss 0.0094 | tok_acc 0.9755 | str_acc 0.8120 | lr 3.00e-04 | 9582s
+step 33300/50000 | loss 0.0201 | tok_acc 0.9371 | str_acc 0.6278 | lr 3.00e-04 | 9618s
+step 33400/50000 | loss 0.0155 | tok_acc 0.9720 | str_acc 0.8017 | lr 3.00e-04 | 9650s
+step 33500/50000 | loss 0.0292 | tok_acc 0.9652 | str_acc 0.7789 | lr 3.00e-04 | 9681s
+step 33600/50000 | loss 0.0196 | tok_acc 0.9689 | str_acc 0.7884 | lr 3.00e-04 | 9706s
+step 33700/50000 | loss 0.0150 | tok_acc 0.9774 | str_acc 0.8422 | lr 3.00e-04 | 9725s
+step 33800/50000 | loss 0.0182 | tok_acc 0.9744 | str_acc 0.8259 | lr 3.00e-04 | 9753s
+step 33900/50000 | loss 0.0102 | tok_acc 0.9767 | str_acc 0.8348 | lr 3.00e-04 | 9785s
+step 34000/50000 | loss 0.0157 | tok_acc 0.9587 | str_acc 0.7588 | lr 3.00e-04 | 9807s
+step 34100/50000 | loss 0.0107 | tok_acc 0.9692 | str_acc 0.7816 | lr 3.00e-04 | 9844s
+step 34200/50000 | loss 0.0085 | tok_acc 0.9733 | str_acc 0.8303 | lr 3.00e-04 | 9877s
+step 34300/50000 | loss 0.0088 | tok_acc 0.9818 | str_acc 0.8522 | lr 3.00e-04 | 9910s
+step 34400/50000 | loss 0.0086 | tok_acc 0.9812 | str_acc 0.8562 | lr 3.00e-04 | 9943s
+step 34500/50000 | loss 0.0177 | tok_acc 0.9691 | str_acc 0.7931 | lr 3.00e-04 | 9977s
+step 34600/50000 | loss 0.0090 | tok_acc 0.9846 | str_acc 0.8780 | lr 3.00e-04 | 9999s
+step 34700/50000 | loss 0.0120 | tok_acc 0.9673 | str_acc 0.7573 | lr 3.00e-04 | 10033s
+step 34800/50000 | loss 0.0070 | tok_acc 0.9808 | str_acc 0.8670 | lr 3.00e-04 | 10054s
+step 34900/50000 | loss 0.0074 | tok_acc 0.9813 | str_acc 0.8536 | lr 3.00e-04 | 10081s
+step 35000/50000 | loss 0.0046 | tok_acc 0.9863 | str_acc 0.9066 | lr 3.00e-04 | 10110s
+  quick_eval (string acc): T=507:0.359 T=1014:0.000 T=2028:1.000 T=4056:1.000 T=8112:1.000
+step 35100/50000 | loss 0.0051 | tok_acc 0.9845 | str_acc 0.8928 | lr 3.00e-04 | 10142s
+step 35200/50000 | loss 0.0071 | tok_acc 0.9687 | str_acc 0.8213 | lr 3.00e-04 | 10176s
+step 35300/50000 | loss 0.0086 | tok_acc 0.9827 | str_acc 0.8473 | lr 3.00e-04 | 10206s
+step 35400/50000 | loss 0.0100 | tok_acc 0.9769 | str_acc 0.8309 | lr 3.00e-04 | 10232s
+step 35500/50000 | loss 0.0148 | tok_acc 0.9543 | str_acc 0.7089 | lr 3.00e-04 | 10271s
+step 35600/50000 | loss 0.0136 | tok_acc 0.9635 | str_acc 0.7936 | lr 3.00e-04 | 10306s
+step 35700/50000 | loss 0.0077 | tok_acc 0.9743 | str_acc 0.8302 | lr 3.00e-04 | 10337s
+step 35800/50000 | loss 0.0110 | tok_acc 0.9697 | str_acc 0.7839 | lr 3.00e-04 | 10361s
+step 35900/50000 | loss 0.0179 | tok_acc 0.9597 | str_acc 0.7050 | lr 3.00e-04 | 10391s
+step 36000/50000 | loss 0.0133 | tok_acc 0.9582 | str_acc 0.7423 | lr 3.00e-04 | 10417s
+step 36100/50000 | loss 0.0070 | tok_acc 0.9868 | str_acc 0.9031 | lr 3.00e-04 | 10439s
+step 36200/50000 | loss 0.0041 | tok_acc 0.9906 | str_acc 0.9323 | lr 3.00e-04 | 10466s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.44it/s]
+step 36300/50000 | loss 0.0101 | tok_acc 0.9674 | str_acc 0.7853 | lr 3.00e-04 | 10499s
+step 36400/50000 | loss 0.0125 | tok_acc 0.9767 | str_acc 0.8244 | lr 3.00e-04 | 10537s
+step 36500/50000 | loss 0.0074 | tok_acc 0.9831 | str_acc 0.8791 | lr 3.00e-04 | 10564s
+step 36600/50000 | loss 0.0048 | tok_acc 0.9879 | str_acc 0.8978 | lr 3.00e-04 | 10588s
+step 36700/50000 | loss 0.0031 | tok_acc 0.9942 | str_acc 0.9445 | lr 3.00e-04 | 10613s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 20.99it/s]
+step 36800/50000 | loss 0.0025 | tok_acc 0.9910 | str_acc 0.9295 | lr 3.00e-04 | 10654s
+step 36900/50000 | loss 0.0042 | tok_acc 0.9836 | str_acc 0.8753 | lr 3.00e-04 | 10676s
+step 37000/50000 | loss 0.0052 | tok_acc 0.9835 | str_acc 0.8723 | lr 3.00e-04 | 10706s
+step 37100/50000 | loss 0.0036 | tok_acc 0.9895 | str_acc 0.9127 | lr 3.00e-04 | 10730s
+step 37200/50000 | loss 0.0057 | tok_acc 0.9886 | str_acc 0.9114 | lr 3.00e-04 | 10762s
+step 37300/50000 | loss 0.0089 | tok_acc 0.9877 | str_acc 0.9042 | lr 3.00e-04 | 10787s
+step 37400/50000 | loss 0.0071 | tok_acc 0.9822 | str_acc 0.8656 | lr 3.00e-04 | 10814s
+step 37500/50000 | loss 0.0080 | tok_acc 0.9673 | str_acc 0.7819 | lr 3.00e-04 | 10848s
+step 37600/50000 | loss 0.0064 | tok_acc 0.9810 | str_acc 0.8598 | lr 3.00e-04 | 10876s
+step 37700/50000 | loss 0.0067 | tok_acc 0.9804 | str_acc 0.8398 | lr 3.00e-04 | 10907s
+step 37800/50000 | loss 0.0087 | tok_acc 0.9788 | str_acc 0.8659 | lr 3.00e-04 | 10938s
+step 37900/50000 | loss 0.0087 | tok_acc 0.9810 | str_acc 0.8564 | lr 3.00e-04 | 10964s
+step 38000/50000 | loss 0.0123 | tok_acc 0.9564 | str_acc 0.7605 | lr 3.00e-04 | 10998s
+step 38100/50000 | loss 0.0084 | tok_acc 0.9714 | str_acc 0.8355 | lr 3.00e-04 | 11028s
+step 38200/50000 | loss 0.0049 | tok_acc 0.9760 | str_acc 0.8556 | lr 3.00e-04 | 11061s
+step 38300/50000 | loss 0.0039 | tok_acc 0.9806 | str_acc 0.8794 | lr 3.00e-04 | 11096s
+step 38400/50000 | loss 0.0035 | tok_acc 0.9828 | str_acc 0.8930 | lr 3.00e-04 | 11120s
+step 38500/50000 | loss 0.0037 | tok_acc 0.9852 | str_acc 0.9039 | lr 3.00e-04 | 11154s
+step 38600/50000 | loss 0.0222 | tok_acc 0.9439 | str_acc 0.7194 | lr 3.00e-04 | 11184s
+step 38700/50000 | loss 0.0496 | tok_acc 0.9120 | str_acc 0.6006 | lr 3.00e-04 | 11211s
+step 38800/50000 | loss 0.0279 | tok_acc 0.9585 | str_acc 0.7728 | lr 3.00e-04 | 11231s
+step 38900/50000 | loss 0.0127 | tok_acc 0.9846 | str_acc 0.8905 | lr 3.00e-04 | 11256s
+step 39000/50000 | loss 0.0210 | tok_acc 0.9786 | str_acc 0.8805 | lr 3.00e-04 | 11286s
+step 39100/50000 | loss 0.0092 | tok_acc 0.9869 | str_acc 0.9223 | lr 3.00e-04 | 11323s
+step 39200/50000 | loss 0.0064 | tok_acc 0.9839 | str_acc 0.8808 | lr 3.00e-04 | 11348s
+step 39300/50000 | loss 0.0044 | tok_acc 0.9874 | str_acc 0.9105 | lr 3.00e-04 | 11385s
+step 39400/50000 | loss 0.0042 | tok_acc 0.9794 | str_acc 0.8828 | lr 3.00e-04 | 11417s
+step 39500/50000 | loss 0.0044 | tok_acc 0.9863 | str_acc 0.9105 | lr 3.00e-04 | 11446s
+step 39600/50000 | loss 0.0048 | tok_acc 0.9878 | str_acc 0.9017 | lr 3.00e-04 | 11474s
+step 39700/50000 | loss 0.0070 | tok_acc 0.9779 | str_acc 0.8478 | lr 3.00e-04 | 11505s
+step 39800/50000 | loss 0.0107 | tok_acc 0.9742 | str_acc 0.8178 | lr 3.00e-04 | 11525s
+step 39900/50000 | loss 0.0055 | tok_acc 0.9892 | str_acc 0.9211 | lr 3.00e-04 | 11552s
+step 40000/50000 | loss 0.0042 | tok_acc 0.9898 | str_acc 0.9234 | lr 3.00e-04 | 11593s
+  quick_eval (string acc): T=507:0.953 T=1014:0.000 T=2028:1.000 T=4056:1.000 T=8112:0.984
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.67it/s]
+step 40100/50000 | loss 0.0035 | tok_acc 0.9885 | str_acc 0.9014 | lr 3.00e-04 | 11624s
+step 40200/50000 | loss 0.0038 | tok_acc 0.9836 | str_acc 0.8766 | lr 3.00e-04 | 11654s
+step 40300/50000 | loss 0.0048 | tok_acc 0.9863 | str_acc 0.8891 | lr 3.00e-04 | 11683s
+step 40400/50000 | loss 0.0176 | tok_acc 0.9635 | str_acc 0.7550 | lr 3.00e-04 | 11708s
+step 40500/50000 | loss 0.0121 | tok_acc 0.9685 | str_acc 0.7891 | lr 3.00e-04 | 11734s
+step 40600/50000 | loss 0.0190 | tok_acc 0.9666 | str_acc 0.8145 | lr 3.00e-04 | 11763s
+step 40700/50000 | loss 0.0093 | tok_acc 0.9881 | str_acc 0.9180 | lr 3.00e-04 | 11790s
+step 40800/50000 | loss 0.0070 | tok_acc 0.9885 | str_acc 0.9064 | lr 3.00e-04 | 11809s
+step 40900/50000 | loss 0.0046 | tok_acc 0.9908 | str_acc 0.9266 | lr 3.00e-04 | 11836s
+step 41000/50000 | loss 0.0044 | tok_acc 0.9851 | str_acc 0.9084 | lr 3.00e-04 | 11865s
+step 41100/50000 | loss 0.0039 | tok_acc 0.9853 | str_acc 0.8894 | lr 3.00e-04 | 11891s
+step 41200/50000 | loss 0.0057 | tok_acc 0.9858 | str_acc 0.8791 | lr 3.00e-04 | 11919s
+step 41300/50000 | loss 0.0050 | tok_acc 0.9774 | str_acc 0.8266 | lr 3.00e-04 | 11948s
+step 41400/50000 | loss 0.0032 | tok_acc 0.9919 | str_acc 0.9447 | lr 3.00e-04 | 11983s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.08it/s]
+step 41500/50000 | loss 0.0034 | tok_acc 0.9885 | str_acc 0.9131 | lr 3.00e-04 | 12011s
+step 41600/50000 | loss 0.0041 | tok_acc 0.9869 | str_acc 0.9087 | lr 3.00e-04 | 12036s
+step 41700/50000 | loss 0.0070 | tok_acc 0.9801 | str_acc 0.8742 | lr 3.00e-04 | 12066s
+step 41800/50000 | loss 0.0057 | tok_acc 0.9917 | str_acc 0.9289 | lr 3.00e-04 | 12105s
+step 41900/50000 | loss 0.0041 | tok_acc 0.9815 | str_acc 0.8855 | lr 3.00e-04 | 12136s
+step 42000/50000 | loss 0.0138 | tok_acc 0.9694 | str_acc 0.7948 | lr 3.00e-04 | 12164s
+step 42100/50000 | loss 0.0147 | tok_acc 0.9692 | str_acc 0.8264 | lr 3.00e-04 | 12191s
+step 42200/50000 | loss 0.0155 | tok_acc 0.9694 | str_acc 0.8084 | lr 3.00e-04 | 12226s
+step 42300/50000 | loss 0.0074 | tok_acc 0.9834 | str_acc 0.8667 | lr 3.00e-04 | 12256s
+step 42400/50000 | loss 0.0093 | tok_acc 0.9908 | str_acc 0.9355 | lr 3.00e-04 | 12279s
+step 42500/50000 | loss 0.0115 | tok_acc 0.9777 | str_acc 0.8817 | lr 3.00e-04 | 12302s
+step 42600/50000 | loss 0.0088 | tok_acc 0.9852 | str_acc 0.8703 | lr 3.00e-04 | 12328s
+step 42700/50000 | loss 0.0048 | tok_acc 0.9844 | str_acc 0.8711 | lr 3.00e-04 | 12359s
+step 42800/50000 | loss 0.0031 | tok_acc 0.9905 | str_acc 0.9353 | lr 3.00e-04 | 12381s
+step 42900/50000 | loss 0.0170 | tok_acc 0.9510 | str_acc 0.6995 | lr 3.00e-04 | 12415s
+step 43000/50000 | loss 0.0130 | tok_acc 0.9778 | str_acc 0.8673 | lr 3.00e-04 | 12441s
+step 43100/50000 | loss 0.0087 | tok_acc 0.9815 | str_acc 0.8725 | lr 3.00e-04 | 12462s
+step 43200/50000 | loss 0.0042 | tok_acc 0.9902 | str_acc 0.9223 | lr 3.00e-04 | 12494s
+step 43300/50000 | loss 0.0046 | tok_acc 0.9890 | str_acc 0.9027 | lr 3.00e-04 | 12524s
+step 43400/50000 | loss 0.0025 | tok_acc 0.9925 | str_acc 0.9328 | lr 3.00e-04 | 12556s
+step 43500/50000 | loss 0.0017 | tok_acc 0.9955 | str_acc 0.9566 | lr 3.00e-04 | 12596s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.18it/s]
+step 43600/50000 | loss 0.0038 | tok_acc 0.9831 | str_acc 0.8802 | lr 3.00e-04 | 12619s
+step 43700/50000 | loss 0.0068 | tok_acc 0.9754 | str_acc 0.8114 | lr 3.00e-04 | 12644s
+step 43800/50000 | loss 0.0070 | tok_acc 0.9812 | str_acc 0.8788 | lr 3.00e-04 | 12680s
+step 43900/50000 | loss 0.0102 | tok_acc 0.9640 | str_acc 0.7759 | lr 3.00e-04 | 12711s
+step 44000/50000 | loss 0.0068 | tok_acc 0.9789 | str_acc 0.8539 | lr 3.00e-04 | 12740s
+step 44100/50000 | loss 0.0056 | tok_acc 0.9853 | str_acc 0.8981 | lr 3.00e-04 | 12772s
+step 44200/50000 | loss 0.0047 | tok_acc 0.9890 | str_acc 0.9227 | lr 3.00e-04 | 12797s
+step 44300/50000 | loss 0.0130 | tok_acc 0.9771 | str_acc 0.8548 | lr 3.00e-04 | 12828s
+step 44400/50000 | loss 0.0096 | tok_acc 0.9779 | str_acc 0.8405 | lr 3.00e-04 | 12855s
+step 44500/50000 | loss 0.0122 | tok_acc 0.9734 | str_acc 0.8244 | lr 3.00e-04 | 12886s
+step 44600/50000 | loss 0.0179 | tok_acc 0.9749 | str_acc 0.8189 | lr 3.00e-04 | 12916s
+step 44700/50000 | loss 0.0089 | tok_acc 0.9852 | str_acc 0.8830 | lr 3.00e-04 | 12945s
+step 44800/50000 | loss 0.0049 | tok_acc 0.9859 | str_acc 0.9038 | lr 3.00e-04 | 12966s
+step 44900/50000 | loss 0.0044 | tok_acc 0.9871 | str_acc 0.9006 | lr 3.00e-04 | 13003s
+step 45000/50000 | loss 0.0043 | tok_acc 0.9858 | str_acc 0.8931 | lr 3.00e-04 | 13032s
+  quick_eval (string acc): T=507:0.734 T=1014:0.000 T=2028:0.922 T=4056:1.000 T=8112:0.016
+step 45100/50000 | loss 0.0055 | tok_acc 0.9757 | str_acc 0.8520 | lr 3.00e-04 | 13073s
+step 45200/50000 | loss 0.0077 | tok_acc 0.9645 | str_acc 0.8142 | lr 3.00e-04 | 13106s
+step 45300/50000 | loss 0.0075 | tok_acc 0.9906 | str_acc 0.9275 | lr 3.00e-04 | 13128s
+step 45400/50000 | loss 0.0037 | tok_acc 0.9946 | str_acc 0.9489 | lr 3.00e-04 | 13160s
+step 45500/50000 | loss 0.0032 | tok_acc 0.9863 | str_acc 0.9087 | lr 3.00e-04 | 13186s
+step 45600/50000 | loss 0.0018 | tok_acc 0.9950 | str_acc 0.9523 | lr 3.00e-04 | 13211s
+step 45700/50000 | loss 0.0011 | tok_acc 0.9920 | str_acc 0.9569 | lr 3.00e-04 | 13245s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.86it/s]
+step 45800/50000 | loss 0.0017 | tok_acc 0.9896 | str_acc 0.9220 | lr 3.00e-04 | 13278s
+step 45900/50000 | loss 0.0067 | tok_acc 0.9759 | str_acc 0.8334 | lr 3.00e-04 | 13303s
+step 46000/50000 | loss 0.0052 | tok_acc 0.9814 | str_acc 0.8767 | lr 3.00e-04 | 13332s
+step 46100/50000 | loss 0.0036 | tok_acc 0.9884 | str_acc 0.8991 | lr 3.00e-04 | 13367s
+step 46200/50000 | loss 0.0023 | tok_acc 0.9946 | str_acc 0.9650 | lr 3.00e-04 | 13392s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.53it/s]
+step 46300/50000 | loss 0.0026 | tok_acc 0.9874 | str_acc 0.9208 | lr 3.00e-04 | 13423s
+step 46400/50000 | loss 0.0036 | tok_acc 0.9940 | str_acc 0.9411 | lr 3.00e-04 | 13456s
+step 46500/50000 | loss 0.0070 | tok_acc 0.9670 | str_acc 0.7858 | lr 3.00e-04 | 13488s
+step 46600/50000 | loss 0.0059 | tok_acc 0.9838 | str_acc 0.8708 | lr 3.00e-04 | 13512s
+step 46700/50000 | loss 0.0110 | tok_acc 0.9715 | str_acc 0.7881 | lr 3.00e-04 | 13541s
+step 46800/50000 | loss 0.0085 | tok_acc 0.9758 | str_acc 0.8520 | lr 3.00e-04 | 13574s
+step 46900/50000 | loss 0.0045 | tok_acc 0.9919 | str_acc 0.9316 | lr 3.00e-04 | 13609s
+step 47000/50000 | loss 0.0047 | tok_acc 0.9756 | str_acc 0.8197 | lr 3.00e-04 | 13634s
+step 47100/50000 | loss 0.0032 | tok_acc 0.9927 | str_acc 0.9402 | lr 3.00e-04 | 13657s
+step 47200/50000 | loss 0.0040 | tok_acc 0.9884 | str_acc 0.9066 | lr 3.00e-04 | 13686s
+step 47300/50000 | loss 0.0024 | tok_acc 0.9972 | str_acc 0.9766 | lr 3.00e-04 | 13709s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 21.89it/s]
+step 47400/50000 | loss 0.0014 | tok_acc 0.9913 | str_acc 0.9433 | lr 3.00e-04 | 13734s
+step 47500/50000 | loss 0.0041 | tok_acc 0.9847 | str_acc 0.8964 | lr 3.00e-04 | 13755s
+step 47600/50000 | loss 0.0405 | tok_acc 0.9554 | str_acc 0.7075 | lr 3.00e-04 | 13783s
+step 47700/50000 | loss 0.0528 | tok_acc 0.9433 | str_acc 0.6753 | lr 3.00e-04 | 13805s
+step 47800/50000 | loss 0.0332 | tok_acc 0.9636 | str_acc 0.7392 | lr 3.00e-04 | 13838s
+step 47900/50000 | loss 0.0173 | tok_acc 0.9748 | str_acc 0.8416 | lr 3.00e-04 | 13871s
+step 48000/50000 | loss 0.0072 | tok_acc 0.9872 | str_acc 0.9172 | lr 3.00e-04 | 13899s
+step 48100/50000 | loss 0.0055 | tok_acc 0.9829 | str_acc 0.8761 | lr 3.00e-04 | 13916s
+step 48200/50000 | loss 0.0037 | tok_acc 0.9862 | str_acc 0.8894 | lr 3.00e-04 | 13945s
+step 48300/50000 | loss 0.0021 | tok_acc 0.9944 | str_acc 0.9494 | lr 3.00e-04 | 13974s
+step 48400/50000 | loss 0.0027 | tok_acc 0.9889 | str_acc 0.9027 | lr 3.00e-04 | 14008s
+step 48500/50000 | loss 0.0018 | tok_acc 0.9924 | str_acc 0.9364 | lr 3.00e-04 | 14047s
+step 48600/50000 | loss 0.0038 | tok_acc 0.9915 | str_acc 0.9286 | lr 3.00e-04 | 14081s
+step 48700/50000 | loss 0.0027 | tok_acc 0.9901 | str_acc 0.9220 | lr 3.00e-04 | 14108s
+step 48800/50000 | loss 0.0015 | tok_acc 0.9946 | str_acc 0.9569 | lr 3.00e-04 | 14139s
+step 48900/50000 | loss 0.0020 | tok_acc 0.9865 | str_acc 0.8944 | lr 3.00e-04 | 14166s
+step 49000/50000 | loss 0.0046 | tok_acc 0.9815 | str_acc 0.8822 | lr 3.00e-04 | 14195s
+step 49100/50000 | loss 0.0069 | tok_acc 0.9750 | str_acc 0.8542 | lr 3.00e-04 | 14224s
+step 49200/50000 | loss 0.0109 | tok_acc 0.9824 | str_acc 0.8952 | lr 3.00e-04 | 14259s
+step 49300/50000 | loss 0.0055 | tok_acc 0.9896 | str_acc 0.9111 | lr 3.00e-04 | 14288s
+step 49400/50000 | loss 0.0261 | tok_acc 0.9703 | str_acc 0.8275 | lr 3.00e-04 | 14310s
+step 49500/50000 | loss 0.0125 | tok_acc 0.9835 | str_acc 0.8753 | lr 3.00e-04 | 14340s
+step 49600/50000 | loss 0.0067 | tok_acc 0.9891 | str_acc 0.9183 | lr 3.00e-04 | 14367s
+step 49700/50000 | loss 0.0041 | tok_acc 0.9895 | str_acc 0.9445 | lr 3.00e-04 | 14392s
+step 49800/50000 | loss 0.0025 | tok_acc 0.9966 | str_acc 0.9670 | lr 3.00e-04 | 14421s
+step 49900/50000 | loss 0.0088 | tok_acc 0.9653 | str_acc 0.7847 | lr 3.00e-04 | 14453s
+step 50000/50000 | loss 0.0056 | tok_acc 0.9862 | str_acc 0.8825 | lr 3.00e-04 | 14476s
+  quick_eval (string acc): T=507:0.984 T=1014:0.000 T=2028:1.000 T=4056:1.000 T=8112:0.969
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 22.99it/s]
+Done. Model saved to /mnt/raid0/RecursiveCompressor/experiments/logkv-aligned-rope-20260913/exp/copying/local-control-fixed10-20260913/model

@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/35 [00:00<?, ?it/s]Loading weights: 100%|██████████| 35/35 [00:00<00:00, 5624.33it/s]
+combined-no-decay bf16 {'depth': 2, 'N': 16, 'T': 7, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 15.626080513000488, 'correct_logit_margin_min': 12.21875}
+combined-no-decay bf16 {'depth': 3, 'N': 64, 'T': 55, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 15.057377815246582, 'correct_logit_margin_min': 10.625}
+combined-no-decay bf16 {'depth': 4, 'N': 256, 'T': 247, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 14.038065910339355, 'correct_logit_margin_min': 9.09375}
+combined-no-decay bf16 {'depth': 5, 'N': 1024, 'T': 1015, 'token_correct': 160, 'string_correct': 16, 'n': 16, 'correct_logit_margin_mean': 12.140276908874512, 'correct_logit_margin_min': 5.71875}
+combined-no-decay bf16 {'depth': 6, 'N': 4096, 'T': 4087, 'token_correct': 107, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': 1.6079193353652954, 'correct_logit_margin_min': -22.0}
+combined-no-decay bf16 {'depth': 7, 'N': 16384, 'T': 16375, 'token_correct': 66, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': -3.6304993629455566, 'correct_logit_margin_min': -24.5}
+combined-no-decay bf16 {'depth': 8, 'N': 65536, 'T': 65527, 'token_correct': 44, 'string_correct': 0, 'n': 16, 'correct_logit_margin_mean': -5.734294414520264, 'correct_logit_margin_min': -29.5}
+COMPLETE /mnt/raid0/RecursiveCompressor/experiments/logkv-compression-diagnostic-20260908/combined-no-decay-bf16 7.804018320981413

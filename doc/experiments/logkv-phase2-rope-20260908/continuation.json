@@ -1,0 +1,17 @@
+{
+  "state": "complete-awaiting-review",
+  "started": "2026-09-08T13:22:10.718539+00:00",
+  "pid": 398803,
+  "gpu_limit": 2,
+  "authorization": "2026-09-08 user: continuous experiments permitted at up to 2 GPUs",
+  "estimate_rule": "1.25 * observed Copying two-GPU makespan + 0.25 hours",
+  "total_initial_estimate_hours": "12-14",
+  "selective_started": true,
+  "next_stage_queued": false,
+  "copying_audit_passed": true,
+  "copying_observed_hours": 4.7054979725,
+  "selective_estimate_hours": 6.131872465624999,
+  "selective_started_at": "2026-09-08T17:43:27.595866+00:00",
+  "selective_audit_passed": true,
+  "updated": "2026-09-08T22:22:43.951539+00:00"
+}

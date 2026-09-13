@@ -1,0 +1,14 @@
+{
+  "task": "copying",
+  "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-phase2-rope-20260908/source",
+  "commit": "afaea2b1d8b0bbc6e91aba25e1b9a3594297875b",
+  "started": "2026-09-09T12:16:28.267938+00:00",
+  "gpu_limit": 2,
+  "steps": 50000,
+  "max_t_exp": 13,
+  "samples": 256,
+  "state": "complete-awaiting-review",
+  "phase_emb": false,
+  "next_stage_queued": false,
+  "finished": "2026-09-09T16:05:11.976822+00:00"
+}

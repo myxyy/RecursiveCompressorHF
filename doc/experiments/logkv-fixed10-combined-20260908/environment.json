@@ -1,0 +1,21 @@
+{
+  "python": "3.12.3",
+  "torch": "2.11.0+cu128",
+  "transformers": "5.4.0",
+  "cuda": "12.8",
+  "source_commit": "24b360cf85712fde3ee7a2da4d61e2eb45350a51",
+  "source_sha256": {
+    "logkv.py": "f1b7442f1bfcd0439841a07b7057d1a4b3b80c52dd871a445d9d84d69133d210",
+    "logkv_lm.py": "bc7e6344b6fe48ac3bebe401ef7ccfb3523a7d0f4f5625c2187d461846fe3a94",
+    "configuration_logkv.py": "beae795c8b7379fdfc78885d4d7a736a4775877efd1a3effd76bcb40211e647f",
+    "exp/copying/train.py": "3b864658888122bd3446dd389a8bbe2c1d13d0176c865c363874d4674d7fcc44",
+    "exp/copying/evaluate.py": "45dcfa5804c0da20ac6b4047981317d52d03c3974efd33b3effd365e44c0bd7f",
+    "exp/copying/task.py": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4",
+    "exp/selective-copying/task.py": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528"
+  },
+  "allocator": "expandable_segments:True",
+  "gpus": [
+    0,
+    1
+  ]
+}

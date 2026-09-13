@@ -1,0 +1,5321 @@
+{
+  "passed": true,
+  "task": "selective-copying",
+  "reviewed": "2026-09-13T12:49:15.995347+00:00",
+  "gpu_used": false,
+  "all_original_hashes_passed": true,
+  "source_files_checked": 36,
+  "original_scripts_checked": 8,
+  "prerequisite_files_checked": 3,
+  "result_files_checked": 40,
+  "original_review_sha256": "3907df604fe5c1eebe4c96e7158e50eed24e3eff529cadbc0fe1dbf57422eddc",
+  "review_script_sha256": "2281cbd678c0c6a66efcdd363f1f85ca980806698b0a7fb08698b7b10707fe92",
+  "raw_archive_matches": true,
+  "audited_cells": 132,
+  "audited_answer_tokens": 337920,
+  "independently_replayed_horizons": 33,
+  "all_scatter_positions_and_memories_replayed": true,
+  "seed": 12345,
+  "all_checkpoint_shapes_match_initial": true,
+  "num_params": 5786112,
+  "initial_rng_hashes": {
+    "local-control": "94d7cbf863adbe051c3edd0fa0f90b52465820b998cafd502427cfb02e65425a",
+    "aligned": "94d7cbf863adbe051c3edd0fa0f90b52465820b998cafd502427cfb02e65425a"
+  },
+  "identical_model_dimensions_and_matched_training_config": true,
+  "copying_initial_weights_reused": true,
+  "train_intervals_per_mode": 500,
+  "campaign_started": "2026-09-13T08:19:05.211666+00:00",
+  "campaign_finished": "2026-09-13T12:36:04.210669+00:00",
+  "whole_gpu_batch_started": "2026-09-13T08:14:55.872288+00:00",
+  "elapsed_hours": 4.283047668128016,
+  "whole_gpu_batch_hours": 4.352316225767136,
+  "timing": {
+    "local-control": {
+      "train_log_seconds": 14369.1,
+      "train_process_seconds": 14379.838828,
+      "evaluation_seconds": 82.719201,
+      "best": {
+        "step": 49000,
+        "string_acc": 0.44609375,
+        "token_acc": 0.8750625,
+        "ema_loss": 0.03369920824167
+      },
+      "final_training_interval": {
+        "step": 50000,
+        "loss": 0.14248916506767273,
+        "ema_loss": 0.03259851450966565,
+        "token_acc": 0.8578125,
+        "string_acc": 0.3965625,
+        "lr": 0.0003,
+        "elapsed_sec": 14369.1
+      },
+      "last_100_intervals_string_range": [
+        0.2634375,
+        0.44609375
+      ]
+    },
+    "aligned": {
+      "train_log_seconds": 15313.9,
+      "train_process_seconds": 15324.865613,
+      "evaluation_seconds": 86.859744,
+      "best": {
+        "step": 48100,
+        "string_acc": 0.43078125,
+        "token_acc": 0.853,
+        "ema_loss": 0.03551379071535218
+      },
+      "final_training_interval": {
+        "step": 50000,
+        "loss": 0.06145983561873436,
+        "ema_loss": 0.03344920846445217,
+        "token_acc": 0.835515625,
+        "string_acc": 0.36796875,
+        "lr": 0.0003,
+        "elapsed_sec": 15313.9
+      },
+      "last_100_intervals_string_range": [
+        0.2153125,
+        0.43078125
+      ]
+    }
+  },
+  "summary": [
+    {
+      "mode": "local-control",
+      "checkpoint": "best",
+      "horizons": 33,
+      "perfect_horizons": [
+        1
+      ],
+      "zero_exact_horizons": [
+        3072,
+        4096,
+        6144,
+        8192
+      ],
+      "first_evaluated_zero_exact": 3072
+    },
+    {
+      "mode": "local-control",
+      "checkpoint": "final",
+      "horizons": 33,
+      "perfect_horizons": [],
+      "zero_exact_horizons": [
+        1024,
+        1536,
+        4096,
+        6144,
+        8192
+      ],
+      "first_evaluated_zero_exact": 1024
+    },
+    {
+      "mode": "aligned",
+      "checkpoint": "best",
+      "horizons": 33,
+      "perfect_horizons": [],
+      "zero_exact_horizons": [
+        768,
+        1024,
+        1536,
+        2048,
+        3072,
+        4096,
+        6144,
+        8192
+      ],
+      "first_evaluated_zero_exact": 768
+    },
+    {
+      "mode": "aligned",
+      "checkpoint": "final",
+      "horizons": 33,
+      "perfect_horizons": [
+        1
+      ],
+      "zero_exact_horizons": [
+        768,
+        1024,
+        2048,
+        3072,
+        4096,
+        6144,
+        8192
+      ],
+      "first_evaluated_zero_exact": 768
+    }
+  ],
+  "selected_digit_details": [
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 1,
+      "n": 256,
+      "token_correct": 2560,
+      "string_correct": 256,
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            6,
+            6,
+            2,
+            5,
+            2,
+            7,
+            7,
+            6,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            2,
+            7,
+            2,
+            4,
+            7,
+            2,
+            4,
+            8,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            2,
+            4,
+            6,
+            3,
+            2,
+            3,
+            7,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {},
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 3,
+      "n": 256,
+      "token_correct": 2513,
+      "string_correct": 216,
+      "token_acc": 0.981640625,
+      "string_acc": 0.84375,
+      "digit_errors": [
+        0,
+        0,
+        1,
+        3,
+        5,
+        11,
+        22,
+        3,
+        1,
+        1
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            7,
+            5,
+            1,
+            4,
+            7,
+            3,
+            1,
+            1,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            6,
+            1,
+            8,
+            5,
+            6,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            8,
+            8,
+            6,
+            7,
+            3,
+            7,
+            5,
+            3,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "3": 6,
+        "2": 9,
+        "6": 7,
+        "8": 8,
+        "5": 4,
+        "1": 3,
+        "4": 4,
+        "7": 6
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        0,
+        3,
+        4,
+        8,
+        12,
+        2,
+        1,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        1,
+        2,
+        1,
+        5,
+        12,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 16,
+      "n": 256,
+      "token_correct": 2337,
+      "string_correct": 107,
+      "token_acc": 0.912890625,
+      "string_acc": 0.41796875,
+      "digit_errors": [
+        0,
+        2,
+        5,
+        22,
+        33,
+        90,
+        51,
+        17,
+        2,
+        1
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            2,
+            3,
+            7,
+            6,
+            3,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            6,
+            2,
+            7,
+            3,
+            6,
+            1,
+            4,
+            1,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            1,
+            7,
+            5,
+            3,
+            8,
+            7,
+            7,
+            7,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "8": 31,
+        "7": 34,
+        "6": 34,
+        "5": 33,
+        "1": 21,
+        "3": 25,
+        "2": 23,
+        "4": 22
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        3,
+        16,
+        16,
+        55,
+        34,
+        11,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        1,
+        1,
+        9,
+        23,
+        31,
+        23,
+        9,
+        1,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 64,
+      "n": 256,
+      "token_correct": 1947,
+      "string_correct": 17,
+      "token_acc": 0.760546875,
+      "string_acc": 0.06640625,
+      "digit_errors": [
+        1,
+        7,
+        17,
+        64,
+        112,
+        154,
+        141,
+        78,
+        35,
+        4
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            7,
+            4,
+            5,
+            7,
+            7,
+            7,
+            5,
+            4,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            1,
+            6,
+            4,
+            3,
+            8,
+            4,
+            4,
+            4,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            4,
+            3,
+            8,
+            8,
+            2,
+            8,
+            2,
+            5,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 71,
+        "5": 82,
+        "4": 74,
+        "8": 75,
+        "2": 85,
+        "6": 60,
+        "3": 89,
+        "1": 77
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        6,
+        14,
+        52,
+        84,
+        82,
+        99,
+        51,
+        24,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        2,
+        6,
+        12,
+        17,
+        27,
+        39,
+        26,
+        18,
+        3
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 128,
+      "n": 256,
+      "token_correct": 1948,
+      "string_correct": 21,
+      "token_acc": 0.7609375,
+      "string_acc": 0.08203125,
+      "digit_errors": [
+        1,
+        4,
+        20,
+        55,
+        99,
+        150,
+        120,
+        104,
+        54,
+        5
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            6,
+            5,
+            2,
+            5,
+            3,
+            4,
+            4,
+            3,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            1,
+            1,
+            7,
+            1,
+            4,
+            4,
+            4,
+            4,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            4,
+            1,
+            8,
+            8,
+            8,
+            1,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 65,
+        "2": 59,
+        "5": 112,
+        "3": 77,
+        "4": 66,
+        "1": 91,
+        "7": 71,
+        "8": 71
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        2,
+        17,
+        40,
+        71,
+        91,
+        89,
+        76,
+        23,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        2,
+        5,
+        11,
+        17,
+        31,
+        34,
+        31,
+        29,
+        2
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 256,
+      "n": 256,
+      "token_correct": 1692,
+      "string_correct": 3,
+      "token_acc": 0.6609375,
+      "string_acc": 0.01171875,
+      "digit_errors": [
+        2,
+        8,
+        38,
+        65,
+        126,
+        168,
+        171,
+        150,
+        129,
+        11
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            4,
+            4,
+            5,
+            3,
+            3,
+            8,
+            3,
+            6,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            5,
+            8,
+            2,
+            3,
+            3,
+            5,
+            4,
+            2,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            1,
+            2,
+            2,
+            2,
+            1,
+            1,
+            3,
+            3,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 97,
+        "5": 124,
+        "3": 133,
+        "8": 105,
+        "6": 84,
+        "2": 116,
+        "1": 108,
+        "7": 101
+      },
+      "errors_equal_next_target_by_digit": [
+        2,
+        6,
+        28,
+        41,
+        92,
+        86,
+        136,
+        117,
+        115,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        2,
+        12,
+        20,
+        26,
+        38,
+        28,
+        41,
+        30,
+        3
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 512,
+      "n": 256,
+      "token_correct": 1679,
+      "string_correct": 6,
+      "token_acc": 0.655859375,
+      "string_acc": 0.0234375,
+      "digit_errors": [
+        0,
+        14,
+        34,
+        79,
+        134,
+        153,
+        181,
+        133,
+        124,
+        29
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            1,
+            1,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            5,
+            7,
+            1,
+            6,
+            3,
+            3,
+            1,
+            1,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            4,
+            3,
+            1,
+            1,
+            3,
+            3,
+            2,
+            6,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 93,
+        "1": 95,
+        "3": 130,
+        "6": 88,
+        "5": 143,
+        "8": 124,
+        "7": 94,
+        "2": 114
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        9,
+        21,
+        49,
+        96,
+        81,
+        128,
+        104,
+        110,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        5,
+        10,
+        21,
+        25,
+        28,
+        25,
+        39,
+        19,
+        15
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 1024,
+      "n": 256,
+      "token_correct": 1512,
+      "string_correct": 1,
+      "token_acc": 0.590625,
+      "string_acc": 0.00390625,
+      "digit_errors": [
+        3,
+        19,
+        65,
+        95,
+        137,
+        168,
+        191,
+        138,
+        198,
+        34
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            8,
+            6,
+            4,
+            3,
+            7,
+            7,
+            4,
+            4,
+            8,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            7,
+            3,
+            3,
+            1,
+            3,
+            3,
+            3,
+            4,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            1,
+            6,
+            1,
+            2,
+            2,
+            4,
+            4,
+            3,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 119,
+        "4": 131,
+        "8": 133,
+        "3": 147,
+        "1": 118,
+        "2": 147,
+        "6": 69,
+        "5": 184
+      },
+      "errors_equal_next_target_by_digit": [
+        3,
+        10,
+        41,
+        61,
+        104,
+        76,
+        107,
+        108,
+        186,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        8,
+        23,
+        35,
+        11,
+        37,
+        27,
+        37,
+        36,
+        15
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 2048,
+      "n": 256,
+      "token_correct": 1459,
+      "string_correct": 1,
+      "token_acc": 0.569921875,
+      "string_acc": 0.00390625,
+      "digit_errors": [
+        0,
+        19,
+        67,
+        112,
+        164,
+        163,
+        203,
+        149,
+        184,
+        40
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            6,
+            5,
+            3,
+            2,
+            2,
+            3,
+            8,
+            8,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            7,
+            7,
+            8,
+            4,
+            3,
+            4,
+            2,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            8,
+            7,
+            7,
+            8,
+            2,
+            7,
+            7,
+            2,
+            2
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "2": 149,
+        "8": 146,
+        "7": 115,
+        "4": 122,
+        "3": 211,
+        "5": 172,
+        "1": 117,
+        "6": 69
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        10,
+        37,
+        61,
+        93,
+        71,
+        90,
+        121,
+        168,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        6,
+        27,
+        36,
+        35,
+        44,
+        31,
+        30,
+        42,
+        14
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 4096,
+      "n": 256,
+      "token_correct": 1219,
+      "string_correct": 0,
+      "token_acc": 0.476171875,
+      "string_acc": 0.0,
+      "digit_errors": [
+        10,
+        64,
+        114,
+        129,
+        168,
+        187,
+        202,
+        167,
+        203,
+        97
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            7,
+            6,
+            6,
+            2,
+            2,
+            3,
+            3,
+            7,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            5,
+            4,
+            4,
+            3,
+            5,
+            5,
+            5,
+            4,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            1,
+            4,
+            7,
+            3,
+            3,
+            8,
+            8,
+            8,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 88,
+        "2": 230,
+        "3": 259,
+        "7": 114,
+        "1": 149,
+        "4": 127,
+        "5": 236,
+        "8": 138
+      },
+      "errors_equal_next_target_by_digit": [
+        9,
+        25,
+        56,
+        58,
+        75,
+        68,
+        80,
+        119,
+        180,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        25,
+        24,
+        56,
+        22,
+        42,
+        40,
+        42,
+        39,
+        22
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 8192,
+      "n": 256,
+      "token_correct": 1185,
+      "string_correct": 0,
+      "token_acc": 0.462890625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        15,
+        85,
+        154,
+        135,
+        180,
+        171,
+        195,
+        154,
+        179,
+        107
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            5,
+            7,
+            7,
+            1,
+            1,
+            7,
+            7,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            3,
+            5,
+            5,
+            8,
+            6,
+            3,
+            3,
+            4,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            3,
+            5,
+            5,
+            8,
+            5,
+            4,
+            4,
+            4,
+            4
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "1": 117,
+        "7": 151,
+        "3": 247,
+        "5": 246,
+        "4": 100,
+        "8": 189,
+        "2": 240,
+        "6": 85
+      },
+      "errors_equal_next_target_by_digit": [
+        15,
+        42,
+        70,
+        60,
+        73,
+        61,
+        90,
+        101,
+        158,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        29,
+        34,
+        47,
+        25,
+        37,
+        27,
+        46,
+        28,
+        34
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 1,
+      "n": 256,
+      "token_correct": 2559,
+      "string_correct": 255,
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            6,
+            6,
+            2,
+            5,
+            2,
+            7,
+            7,
+            6,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            2,
+            7,
+            2,
+            4,
+            7,
+            2,
+            4,
+            8,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            2,
+            4,
+            6,
+            3,
+            2,
+            3,
+            7,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "2": 1
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 3,
+      "n": 256,
+      "token_correct": 2531,
+      "string_correct": 232,
+      "token_acc": 0.988671875,
+      "string_acc": 0.90625,
+      "digit_errors": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        11,
+        12,
+        4,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            7,
+            5,
+            1,
+            4,
+            7,
+            3,
+            1,
+            1,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            6,
+            1,
+            8,
+            5,
+            6,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            8,
+            8,
+            6,
+            7,
+            3,
+            7,
+            5,
+            3,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 9,
+        "3": 2,
+        "2": 4,
+        "6": 4,
+        "5": 2,
+        "8": 4,
+        "7": 2,
+        "1": 2
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        10,
+        7,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        1,
+        1,
+        0,
+        0,
+        2,
+        6,
+        3,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 16,
+      "n": 256,
+      "token_correct": 2316,
+      "string_correct": 99,
+      "token_acc": 0.9046875,
+      "string_acc": 0.38671875,
+      "digit_errors": [
+        0,
+        2,
+        4,
+        30,
+        43,
+        81,
+        65,
+        15,
+        4,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            2,
+            3,
+            7,
+            6,
+            3,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            6,
+            2,
+            6,
+            3,
+            6,
+            6,
+            1,
+            1,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            1,
+            7,
+            5,
+            8,
+            7,
+            7,
+            7,
+            7,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 46,
+        "1": 35,
+        "8": 28,
+        "7": 34,
+        "5": 16,
+        "4": 33,
+        "3": 25,
+        "2": 27
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        1,
+        5,
+        17,
+        24,
+        21,
+        5,
+        1,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        1,
+        3,
+        25,
+        29,
+        64,
+        52,
+        12,
+        4,
+        0
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 64,
+      "n": 256,
+      "token_correct": 2048,
+      "string_correct": 28,
+      "token_acc": 0.8,
+      "string_acc": 0.109375,
+      "digit_errors": [
+        3,
+        1,
+        10,
+        76,
+        82,
+        113,
+        103,
+        78,
+        37,
+        9
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            3,
+            4,
+            4,
+            7,
+            4,
+            7,
+            5,
+            4,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            1,
+            6,
+            4,
+            3,
+            8,
+            5,
+            4,
+            4,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            4,
+            3,
+            3,
+            8,
+            7,
+            7,
+            2,
+            5,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 74,
+        "7": 66,
+        "8": 59,
+        "6": 49,
+        "1": 58,
+        "3": 62,
+        "5": 69,
+        "2": 75
+      },
+      "errors_equal_next_target_by_digit": [
+        2,
+        0,
+        6,
+        12,
+        48,
+        53,
+        50,
+        16,
+        6,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        1,
+        8,
+        65,
+        37,
+        45,
+        54,
+        53,
+        28,
+        7
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 128,
+      "n": 256,
+      "token_correct": 1981,
+      "string_correct": 14,
+      "token_acc": 0.773828125,
+      "string_acc": 0.0546875,
+      "digit_errors": [
+        0,
+        6,
+        12,
+        116,
+        86,
+        142,
+        107,
+        72,
+        32,
+        6
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            6,
+            5,
+            2,
+            5,
+            3,
+            3,
+            4,
+            3,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            1,
+            1,
+            1,
+            7,
+            1,
+            4,
+            4,
+            4,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            1,
+            4,
+            4,
+            8,
+            1,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "2": 64,
+        "5": 72,
+        "3": 80,
+        "1": 77,
+        "8": 60,
+        "4": 67,
+        "7": 83,
+        "6": 76
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        5,
+        8,
+        21,
+        40,
+        49,
+        41,
+        9,
+        4,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        3,
+        8,
+        108,
+        53,
+        90,
+        73,
+        59,
+        27,
+        4
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 256,
+      "n": 256,
+      "token_correct": 1749,
+      "string_correct": 1,
+      "token_acc": 0.683203125,
+      "string_acc": 0.00390625,
+      "digit_errors": [
+        2,
+        8,
+        15,
+        204,
+        120,
+        135,
+        128,
+        149,
+        45,
+        5
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            6,
+            4,
+            4,
+            4,
+            3,
+            8,
+            3,
+            3,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            5,
+            8,
+            8,
+            2,
+            3,
+            3,
+            5,
+            2,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            2,
+            2,
+            2,
+            2,
+            3,
+            2,
+            2,
+            2,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 109,
+        "8": 103,
+        "3": 108,
+        "2": 126,
+        "1": 82,
+        "6": 90,
+        "7": 103,
+        "5": 90
+      },
+      "errors_equal_next_target_by_digit": [
+        2,
+        3,
+        12,
+        27,
+        38,
+        30,
+        81,
+        29,
+        14,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        6,
+        5,
+        197,
+        87,
+        86,
+        55,
+        97,
+        28,
+        3
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 512,
+      "n": 256,
+      "token_correct": 1715,
+      "string_correct": 3,
+      "token_acc": 0.669921875,
+      "string_acc": 0.01171875,
+      "digit_errors": [
+        1,
+        6,
+        17,
+        204,
+        133,
+        139,
+        133,
+        148,
+        54,
+        10
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            4,
+            4,
+            4,
+            4,
+            1,
+            1,
+            4,
+            1,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            5,
+            7,
+            1,
+            1,
+            6,
+            3,
+            1,
+            1,
+            1,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            4,
+            3,
+            3,
+            1,
+            5,
+            3,
+            3,
+            2,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "1": 112,
+        "6": 99,
+        "3": 120,
+        "5": 84,
+        "2": 85,
+        "4": 110,
+        "7": 120,
+        "8": 115
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        4,
+        11,
+        34,
+        45,
+        38,
+        69,
+        36,
+        13,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        3,
+        6,
+        194,
+        91,
+        90,
+        53,
+        93,
+        42,
+        10
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 1024,
+      "n": 256,
+      "token_correct": 1658,
+      "string_correct": 0,
+      "token_acc": 0.64765625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        0,
+        8,
+        31,
+        198,
+        127,
+        138,
+        143,
+        151,
+        82,
+        24
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            8,
+            6,
+            4,
+            4,
+            3,
+            7,
+            4,
+            4,
+            6,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            7,
+            3,
+            3,
+            5,
+            3,
+            8,
+            8,
+            3,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            1,
+            6,
+            6,
+            2,
+            2,
+            6,
+            6,
+            4,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 135,
+        "3": 123,
+        "5": 103,
+        "8": 102,
+        "6": 95,
+        "2": 129,
+        "7": 121,
+        "1": 94
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        4,
+        21,
+        26,
+        39,
+        49,
+        73,
+        35,
+        21,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        4,
+        13,
+        194,
+        85,
+        82,
+        73,
+        83,
+        53,
+        15
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 2048,
+      "n": 256,
+      "token_correct": 1587,
+      "string_correct": 2,
+      "token_acc": 0.619921875,
+      "string_acc": 0.0078125,
+      "digit_errors": [
+        1,
+        10,
+        43,
+        192,
+        151,
+        154,
+        159,
+        154,
+        86,
+        23
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            6,
+            5,
+            5,
+            2,
+            2,
+            2,
+            2,
+            3,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            7,
+            7,
+            8,
+            8,
+            3,
+            3,
+            2,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            8,
+            7,
+            7,
+            8,
+            1,
+            8,
+            8,
+            7,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "5": 108,
+        "2": 135,
+        "3": 170,
+        "7": 99,
+        "8": 135,
+        "1": 113,
+        "6": 111,
+        "4": 102
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        4,
+        31,
+        26,
+        55,
+        56,
+        76,
+        32,
+        34,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        8,
+        11,
+        176,
+        84,
+        72,
+        60,
+        81,
+        42,
+        16
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 4096,
+      "n": 256,
+      "token_correct": 1450,
+      "string_correct": 0,
+      "token_acc": 0.56640625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        10,
+        20,
+        87,
+        174,
+        163,
+        175,
+        161,
+        170,
+        111,
+        39
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            7,
+            6,
+            6,
+            2,
+            4,
+            4,
+            4,
+            1,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            5,
+            1,
+            1,
+            3,
+            3,
+            5,
+            5,
+            4,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            1,
+            4,
+            7,
+            3,
+            8,
+            8,
+            8,
+            6,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 109,
+        "4": 131,
+        "7": 131,
+        "1": 103,
+        "3": 216,
+        "5": 116,
+        "8": 137,
+        "2": 167
+      },
+      "errors_equal_next_target_by_digit": [
+        9,
+        12,
+        55,
+        37,
+        60,
+        65,
+        68,
+        41,
+        44,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        7,
+        15,
+        149,
+        73,
+        62,
+        63,
+        78,
+        64,
+        20
+      ]
+    },
+    {
+      "mode": "local-control",
+      "position_mode": "local-control",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 8192,
+      "n": 256,
+      "token_correct": 1373,
+      "string_correct": 0,
+      "token_acc": 0.536328125,
+      "string_acc": 0.0,
+      "digit_errors": [
+        9,
+        37,
+        117,
+        160,
+        161,
+        175,
+        163,
+        175,
+        132,
+        58
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            5,
+            7,
+            7,
+            1,
+            7,
+            7,
+            7,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            7,
+            5,
+            5,
+            8,
+            8,
+            3,
+            3,
+            7,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            7,
+            5,
+            5,
+            1,
+            6,
+            3,
+            5,
+            7,
+            4
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "1": 104,
+        "7": 184,
+        "5": 160,
+        "8": 142,
+        "3": 220,
+        "6": 104,
+        "4": 113,
+        "2": 160
+      },
+      "errors_equal_next_target_by_digit": [
+        9,
+        27,
+        65,
+        29,
+        61,
+        49,
+        63,
+        42,
+        57,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        12,
+        20,
+        121,
+        45,
+        69,
+        59,
+        79,
+        57,
+        40
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 1,
+      "n": 256,
+      "token_correct": 2559,
+      "string_correct": 255,
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            6,
+            6,
+            2,
+            5,
+            2,
+            7,
+            7,
+            6,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            2,
+            7,
+            2,
+            4,
+            7,
+            2,
+            4,
+            8,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            2,
+            4,
+            6,
+            3,
+            2,
+            3,
+            7,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "3": 1
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 3,
+      "n": 256,
+      "token_correct": 2533,
+      "string_correct": 230,
+      "token_acc": 0.989453125,
+      "string_acc": 0.8984375,
+      "digit_errors": [
+        0,
+        1,
+        7,
+        1,
+        5,
+        8,
+        3,
+        2,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            7,
+            5,
+            1,
+            4,
+            7,
+            3,
+            1,
+            1,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            6,
+            1,
+            8,
+            5,
+            6,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            8,
+            8,
+            6,
+            7,
+            3,
+            7,
+            5,
+            3,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "2": 4,
+        "4": 4,
+        "3": 4,
+        "1": 3,
+        "5": 4,
+        "6": 3,
+        "8": 5
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        3,
+        0,
+        3,
+        6,
+        3,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        5,
+        1,
+        2,
+        4,
+        0,
+        2,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 16,
+      "n": 256,
+      "token_correct": 2291,
+      "string_correct": 79,
+      "token_acc": 0.894921875,
+      "string_acc": 0.30859375,
+      "digit_errors": [
+        0,
+        1,
+        7,
+        36,
+        81,
+        78,
+        42,
+        15,
+        6,
+        3
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            8,
+            2,
+            7,
+            6,
+            3,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            6,
+            2,
+            7,
+            3,
+            6,
+            1,
+            4,
+            1,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            1,
+            7,
+            5,
+            3,
+            3,
+            7,
+            7,
+            7,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "8": 30,
+        "2": 28,
+        "3": 31,
+        "5": 32,
+        "6": 42,
+        "4": 38,
+        "7": 33,
+        "1": 35
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        2,
+        12,
+        31,
+        31,
+        17,
+        9,
+        1,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        4,
+        23,
+        57,
+        54,
+        29,
+        10,
+        6,
+        3
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 64,
+      "n": 256,
+      "token_correct": 2047,
+      "string_correct": 25,
+      "token_acc": 0.799609375,
+      "string_acc": 0.09765625,
+      "digit_errors": [
+        0,
+        4,
+        23,
+        86,
+        117,
+        120,
+        95,
+        52,
+        13,
+        3
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            3,
+            4,
+            7,
+            7,
+            7,
+            5,
+            5,
+            4,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            1,
+            6,
+            4,
+            4,
+            3,
+            8,
+            4,
+            4,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            4,
+            3,
+            7,
+            8,
+            3,
+            8,
+            2,
+            5,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 75,
+        "5": 69,
+        "4": 38,
+        "3": 62,
+        "8": 78,
+        "1": 74,
+        "6": 69,
+        "2": 48
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        3,
+        9,
+        51,
+        67,
+        50,
+        29,
+        15,
+        9,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        1,
+        12,
+        32,
+        57,
+        68,
+        62,
+        34,
+        5,
+        3
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 128,
+      "n": 256,
+      "token_correct": 1923,
+      "string_correct": 10,
+      "token_acc": 0.751171875,
+      "string_acc": 0.0390625,
+      "digit_errors": [
+        1,
+        11,
+        45,
+        92,
+        145,
+        150,
+        109,
+        56,
+        23,
+        5
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            6,
+            5,
+            7,
+            7,
+            3,
+            3,
+            4,
+            3,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            6,
+            1,
+            1,
+            1,
+            7,
+            1,
+            4,
+            4,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            8,
+            1,
+            6,
+            8,
+            1,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 76,
+        "3": 81,
+        "1": 105,
+        "8": 75,
+        "5": 61,
+        "2": 72,
+        "6": 115,
+        "4": 52
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        6,
+        11,
+        28,
+        45,
+        58,
+        50,
+        26,
+        10,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        8,
+        31,
+        73,
+        110,
+        78,
+        54,
+        29,
+        15,
+        4
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 256,
+      "n": 256,
+      "token_correct": 1704,
+      "string_correct": 2,
+      "token_acc": 0.665625,
+      "string_acc": 0.0078125,
+      "digit_errors": [
+        3,
+        26,
+        71,
+        134,
+        154,
+        160,
+        128,
+        113,
+        56,
+        11
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            4,
+            5,
+            3,
+            3,
+            5,
+            5,
+            6,
+            8,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            5,
+            8,
+            2,
+            3,
+            4,
+            4,
+            5,
+            2,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            1,
+            2,
+            1,
+            2,
+            2,
+            2,
+            2,
+            3,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 76,
+        "5": 72,
+        "3": 88,
+        "6": 151,
+        "8": 133,
+        "1": 117,
+        "2": 100,
+        "7": 119
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        8,
+        37,
+        60,
+        71,
+        72,
+        40,
+        35,
+        35,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        20,
+        26,
+        44,
+        53,
+        64,
+        66,
+        55,
+        20,
+        9
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 512,
+      "n": 256,
+      "token_correct": 1610,
+      "string_correct": 1,
+      "token_acc": 0.62890625,
+      "string_acc": 0.00390625,
+      "digit_errors": [
+        3,
+        24,
+        79,
+        133,
+        173,
+        186,
+        169,
+        118,
+        59,
+        6
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            1,
+            5,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            5,
+            7,
+            1,
+            1,
+            7,
+            7,
+            1,
+            1,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            4,
+            3,
+            1,
+            1,
+            1,
+            3,
+            2,
+            4,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 82,
+        "1": 113,
+        "5": 97,
+        "7": 141,
+        "8": 154,
+        "3": 96,
+        "6": 168,
+        "2": 99
+      },
+      "errors_equal_next_target_by_digit": [
+        2,
+        6,
+        26,
+        49,
+        42,
+        34,
+        56,
+        33,
+        22,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        17,
+        44,
+        79,
+        88,
+        79,
+        67,
+        54,
+        29,
+        4
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 1024,
+      "n": 256,
+      "token_correct": 1345,
+      "string_correct": 0,
+      "token_acc": 0.525390625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        8,
+        54,
+        131,
+        174,
+        181,
+        166,
+        178,
+        161,
+        125,
+        37
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            8,
+            6,
+            4,
+            3,
+            3,
+            3,
+            3,
+            3,
+            7,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            7,
+            3,
+            3,
+            3,
+            3,
+            3,
+            8,
+            5,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            1,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "3": 125,
+        "7": 170,
+        "8": 185,
+        "6": 239,
+        "1": 157,
+        "2": 130,
+        "5": 114,
+        "4": 95
+      },
+      "errors_equal_next_target_by_digit": [
+        6,
+        16,
+        61,
+        76,
+        72,
+        66,
+        58,
+        53,
+        58,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        36,
+        47,
+        37,
+        51,
+        57,
+        61,
+        53,
+        41,
+        19
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 2048,
+      "n": 256,
+      "token_correct": 1147,
+      "string_correct": 0,
+      "token_acc": 0.448046875,
+      "string_acc": 0.0,
+      "digit_errors": [
+        21,
+        85,
+        128,
+        157,
+        187,
+        207,
+        188,
+        164,
+        171,
+        105
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            6,
+            6,
+            5,
+            3,
+            5,
+            3,
+            8,
+            8,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            7,
+            7,
+            3,
+            3,
+            3,
+            4,
+            1,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            2,
+            7,
+            1,
+            1,
+            1,
+            7,
+            7,
+            7,
+            2
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 276,
+        "5": 167,
+        "3": 152,
+        "8": 242,
+        "7": 157,
+        "4": 110,
+        "1": 159,
+        "2": 150
+      },
+      "errors_equal_next_target_by_digit": [
+        4,
+        36,
+        45,
+        57,
+        45,
+        35,
+        68,
+        59,
+        63,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        31,
+        77,
+        76,
+        75,
+        57,
+        57,
+        48,
+        39,
+        15
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 4096,
+      "n": 256,
+      "token_correct": 538,
+      "string_correct": 0,
+      "token_acc": 0.21015625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        215,
+        198,
+        218,
+        204,
+        194,
+        197,
+        219,
+        219,
+        194,
+        164
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            4,
+            2,
+            4,
+            4,
+            5,
+            4,
+            8,
+            4,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            7,
+            1,
+            7,
+            7,
+            6,
+            1,
+            1,
+            3,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            8,
+            6,
+            6,
+            6,
+            6,
+            7,
+            7,
+            6,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "2": 181,
+        "4": 144,
+        "5": 240,
+        "8": 325,
+        "3": 205,
+        "7": 191,
+        "1": 326,
+        "6": 410
+      },
+      "errors_equal_next_target_by_digit": [
+        30,
+        33,
+        37,
+        49,
+        59,
+        34,
+        24,
+        41,
+        84,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        26,
+        33,
+        46,
+        48,
+        42,
+        42,
+        28,
+        34,
+        29
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "best",
+      "evaluation": "standard",
+      "T": 8192,
+      "n": 256,
+      "token_correct": 495,
+      "string_correct": 0,
+      "token_acc": 0.193359375,
+      "string_acc": 0.0,
+      "digit_errors": [
+        211,
+        213,
+        216,
+        227,
+        204,
+        206,
+        200,
+        214,
+        199,
+        175
+      ],
+      "unique_predictions": 255,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            8,
+            3
+          ],
+          "count": 2
+        },
+        {
+          "prediction": [
+            3,
+            2,
+            2,
+            7,
+            7,
+            7,
+            1,
+            7,
+            7,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            8,
+            8,
+            8,
+            8,
+            6,
+            1,
+            7,
+            8,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "3": 185,
+        "2": 216,
+        "7": 219,
+        "1": 263,
+        "8": 409,
+        "5": 223,
+        "4": 86,
+        "6": 464
+      },
+      "errors_equal_next_target_by_digit": [
+        39,
+        36,
+        24,
+        45,
+        41,
+        48,
+        40,
+        42,
+        76,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        28,
+        27,
+        25,
+        17,
+        27,
+        33,
+        48,
+        51,
+        44
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 1,
+      "n": 256,
+      "token_correct": 2560,
+      "string_correct": 256,
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            6,
+            6,
+            2,
+            5,
+            2,
+            7,
+            7,
+            6,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            2,
+            7,
+            2,
+            4,
+            7,
+            2,
+            4,
+            8,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            2,
+            4,
+            6,
+            3,
+            2,
+            3,
+            7,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {},
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 3,
+      "n": 256,
+      "token_correct": 2510,
+      "string_correct": 212,
+      "token_acc": 0.98046875,
+      "string_acc": 0.828125,
+      "digit_errors": [
+        0,
+        0,
+        8,
+        3,
+        13,
+        11,
+        8,
+        7,
+        0,
+        0
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            7,
+            5,
+            1,
+            4,
+            7,
+            3,
+            1,
+            1,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            6,
+            1,
+            8,
+            5,
+            6,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            8,
+            8,
+            6,
+            7,
+            3,
+            7,
+            3,
+            3,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "3": 4,
+        "2": 8,
+        "6": 8,
+        "1": 4,
+        "4": 12,
+        "7": 4,
+        "5": 4,
+        "8": 6
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        0,
+        4,
+        1,
+        5,
+        5,
+        6,
+        5,
+        0,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        7,
+        3,
+        8,
+        7,
+        3,
+        3,
+        0,
+        0
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 16,
+      "n": 256,
+      "token_correct": 2362,
+      "string_correct": 108,
+      "token_acc": 0.92265625,
+      "string_acc": 0.421875,
+      "digit_errors": [
+        0,
+        1,
+        4,
+        22,
+        50,
+        56,
+        48,
+        12,
+        3,
+        2
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            8,
+            2,
+            3,
+            7,
+            6,
+            3,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            6,
+            2,
+            7,
+            3,
+            6,
+            1,
+            4,
+            1,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            1,
+            7,
+            5,
+            3,
+            8,
+            7,
+            7,
+            7,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 43,
+        "5": 17,
+        "8": 24,
+        "3": 23,
+        "6": 25,
+        "4": 24,
+        "1": 18,
+        "2": 24
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        1,
+        3,
+        11,
+        30,
+        28,
+        18,
+        5,
+        1,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        0,
+        0,
+        8,
+        27,
+        32,
+        37,
+        10,
+        3,
+        2
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 64,
+      "n": 256,
+      "token_correct": 2026,
+      "string_correct": 17,
+      "token_acc": 0.79140625,
+      "string_acc": 0.06640625,
+      "digit_errors": [
+        1,
+        2,
+        17,
+        74,
+        106,
+        122,
+        129,
+        68,
+        14,
+        1
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            3,
+            4,
+            7,
+            7,
+            7,
+            7,
+            5,
+            4,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            1,
+            6,
+            4,
+            4,
+            3,
+            8,
+            5,
+            4,
+            5
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            4,
+            3,
+            8,
+            7,
+            7,
+            8,
+            2,
+            5,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 100,
+        "4": 45,
+        "3": 59,
+        "8": 87,
+        "5": 58,
+        "2": 83,
+        "1": 40,
+        "6": 62
+      },
+      "errors_equal_next_target_by_digit": [
+        1,
+        1,
+        9,
+        49,
+        69,
+        44,
+        31,
+        12,
+        10,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        2,
+        8,
+        22,
+        38,
+        77,
+        81,
+        47,
+        4,
+        1
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 128,
+      "n": 256,
+      "token_correct": 1917,
+      "string_correct": 11,
+      "token_acc": 0.748828125,
+      "string_acc": 0.04296875,
+      "digit_errors": [
+        0,
+        13,
+        35,
+        79,
+        133,
+        145,
+        121,
+        85,
+        28,
+        4
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            6,
+            5,
+            7,
+            7,
+            3,
+            3,
+            4,
+            3,
+            1
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            6,
+            1,
+            1,
+            1,
+            7,
+            7,
+            4,
+            4,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            4,
+            8,
+            4,
+            1,
+            1,
+            6,
+            8,
+            1,
+            7
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 105,
+        "3": 83,
+        "1": 58,
+        "4": 56,
+        "5": 78,
+        "2": 82,
+        "6": 98,
+        "8": 83
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        5,
+        10,
+        25,
+        41,
+        47,
+        25,
+        23,
+        7,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        12,
+        26,
+        53,
+        98,
+        77,
+        71,
+        51,
+        20,
+        4
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 256,
+      "n": 256,
+      "token_correct": 1716,
+      "string_correct": 1,
+      "token_acc": 0.6703125,
+      "string_acc": 0.00390625,
+      "digit_errors": [
+        1,
+        27,
+        57,
+        110,
+        150,
+        152,
+        147,
+        150,
+        41,
+        9
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            6,
+            4,
+            5,
+            3,
+            4,
+            5,
+            4,
+            5,
+            8,
+            6
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            3,
+            5,
+            2,
+            4,
+            4,
+            4,
+            5,
+            2,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            4,
+            1,
+            2,
+            2,
+            2,
+            2,
+            2,
+            2,
+            3,
+            8
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 105,
+        "5": 79,
+        "3": 71,
+        "8": 128,
+        "2": 142,
+        "7": 163,
+        "6": 102,
+        "1": 54
+      },
+      "errors_equal_next_target_by_digit": [
+        0,
+        5,
+        31,
+        53,
+        82,
+        62,
+        35,
+        13,
+        10,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        25,
+        18,
+        40,
+        68,
+        70,
+        79,
+        85,
+        29,
+        8
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 512,
+      "n": 256,
+      "token_correct": 1658,
+      "string_correct": 2,
+      "token_acc": 0.64765625,
+      "string_acc": 0.0078125,
+      "digit_errors": [
+        2,
+        21,
+        59,
+        134,
+        165,
+        168,
+        161,
+        137,
+        48,
+        7
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            3,
+            4,
+            4,
+            4,
+            4,
+            4,
+            4,
+            5,
+            4,
+            3
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            5,
+            7,
+            1,
+            1,
+            7,
+            6,
+            6,
+            8,
+            8,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            8,
+            4,
+            3,
+            3,
+            1,
+            3,
+            3,
+            2,
+            4,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "4": 105,
+        "5": 125,
+        "1": 46,
+        "7": 180,
+        "6": 122,
+        "8": 122,
+        "3": 84,
+        "2": 118
+      },
+      "errors_equal_next_target_by_digit": [
+        2,
+        3,
+        20,
+        44,
+        55,
+        50,
+        47,
+        18,
+        3,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        15,
+        40,
+        83,
+        91,
+        72,
+        69,
+        83,
+        33,
+        7
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 1024,
+      "n": 256,
+      "token_correct": 1399,
+      "string_correct": 0,
+      "token_acc": 0.546484375,
+      "string_acc": 0.0,
+      "digit_errors": [
+        6,
+        57,
+        106,
+        176,
+        169,
+        164,
+        170,
+        158,
+        112,
+        43
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            8,
+            6,
+            4,
+            3,
+            7,
+            7,
+            3,
+            3,
+            6,
+            8
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            6,
+            7,
+            3,
+            3,
+            5,
+            8,
+            8,
+            3,
+            5,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            1,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            6,
+            3
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 266,
+        "3": 95,
+        "5": 128,
+        "8": 145,
+        "6": 163,
+        "2": 144,
+        "4": 151,
+        "1": 69
+      },
+      "errors_equal_next_target_by_digit": [
+        5,
+        13,
+        49,
+        78,
+        76,
+        67,
+        58,
+        32,
+        49,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        47,
+        33,
+        36,
+        47,
+        69,
+        68,
+        71,
+        39,
+        20
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 2048,
+      "n": 256,
+      "token_correct": 1147,
+      "string_correct": 0,
+      "token_acc": 0.448046875,
+      "string_acc": 0.0,
+      "digit_errors": [
+        12,
+        86,
+        143,
+        155,
+        198,
+        198,
+        174,
+        161,
+        178,
+        108
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            2,
+            6,
+            6,
+            5,
+            5,
+            6,
+            2,
+            2,
+            4,
+            4
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            3,
+            7,
+            7,
+            4,
+            3,
+            8,
+            4,
+            7,
+            2
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            2,
+            8,
+            7,
+            7,
+            1,
+            8,
+            8,
+            7,
+            2,
+            2
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "6": 218,
+        "5": 198,
+        "2": 162,
+        "4": 157,
+        "7": 289,
+        "3": 121,
+        "8": 186,
+        "1": 82
+      },
+      "errors_equal_next_target_by_digit": [
+        4,
+        27,
+        59,
+        46,
+        46,
+        50,
+        64,
+        63,
+        58,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        43,
+        82,
+        75,
+        86,
+        51,
+        47,
+        52,
+        52,
+        17
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 4096,
+      "n": 256,
+      "token_correct": 514,
+      "string_correct": 0,
+      "token_acc": 0.20078125,
+      "string_acc": 0.0,
+      "digit_errors": [
+        220,
+        201,
+        220,
+        209,
+        192,
+        205,
+        200,
+        217,
+        205,
+        177
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            1,
+            3,
+            4,
+            4,
+            5,
+            4,
+            6,
+            4,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            3,
+            5,
+            7,
+            7,
+            6,
+            6,
+            6,
+            3,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            1,
+            8,
+            7,
+            7,
+            7,
+            6,
+            7,
+            7,
+            6,
+            6
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 393,
+        "1": 210,
+        "3": 171,
+        "4": 307,
+        "5": 250,
+        "6": 328,
+        "8": 206,
+        "2": 181
+      },
+      "errors_equal_next_target_by_digit": [
+        25,
+        32,
+        27,
+        54,
+        58,
+        42,
+        37,
+        41,
+        92,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        32,
+        35,
+        43,
+        47,
+        43,
+        54,
+        30,
+        45,
+        27
+      ]
+    },
+    {
+      "mode": "aligned",
+      "position_mode": "aligned",
+      "checkpoint": "final",
+      "evaluation": "standard",
+      "T": 8192,
+      "n": 256,
+      "token_correct": 458,
+      "string_correct": 0,
+      "token_acc": 0.17890625,
+      "string_acc": 0.0,
+      "digit_errors": [
+        211,
+        215,
+        225,
+        231,
+        215,
+        207,
+        206,
+        213,
+        201,
+        178
+      ],
+      "unique_predictions": 256,
+      "most_common_predictions": [
+        {
+          "prediction": [
+            7,
+            7,
+            2,
+            7,
+            7,
+            2,
+            7,
+            1,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            7,
+            2,
+            5,
+            5,
+            5,
+            6,
+            7,
+            1,
+            7,
+            7
+          ],
+          "count": 1
+        },
+        {
+          "prediction": [
+            3,
+            5,
+            5,
+            5,
+            5,
+            5,
+            7,
+            6,
+            4,
+            4
+          ],
+          "count": 1
+        }
+      ],
+      "wrong_output_value_counts": {
+        "7": 505,
+        "2": 212,
+        "5": 297,
+        "1": 202,
+        "6": 376,
+        "4": 194,
+        "8": 225,
+        "3": 91
+      },
+      "errors_equal_next_target_by_digit": [
+        53,
+        48,
+        21,
+        36,
+        47,
+        36,
+        59,
+        36,
+        93,
+        0
+      ],
+      "errors_equal_previous_target_by_digit": [
+        0,
+        41,
+        22,
+        28,
+        20,
+        26,
+        39,
+        53,
+        44,
+        48
+      ]
+    }
+  ],
+  "matched_mode_exact_outcomes": [
+    {
+      "checkpoint": "best",
+      "T": 1,
+      "both_correct": 255,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 0
+    },
+    {
+      "checkpoint": "best",
+      "T": 2,
+      "both_correct": 250,
+      "only_local_correct": 2,
+      "only_aligned_correct": 4,
+      "both_wrong": 0
+    },
+    {
+      "checkpoint": "best",
+      "T": 3,
+      "both_correct": 193,
+      "only_local_correct": 23,
+      "only_aligned_correct": 37,
+      "both_wrong": 3
+    },
+    {
+      "checkpoint": "best",
+      "T": 4,
+      "both_correct": 142,
+      "only_local_correct": 18,
+      "only_aligned_correct": 80,
+      "both_wrong": 16
+    },
+    {
+      "checkpoint": "best",
+      "T": 5,
+      "both_correct": 96,
+      "only_local_correct": 36,
+      "only_aligned_correct": 82,
+      "both_wrong": 42
+    },
+    {
+      "checkpoint": "best",
+      "T": 6,
+      "both_correct": 69,
+      "only_local_correct": 39,
+      "only_aligned_correct": 71,
+      "both_wrong": 77
+    },
+    {
+      "checkpoint": "best",
+      "T": 7,
+      "both_correct": 61,
+      "only_local_correct": 46,
+      "only_aligned_correct": 61,
+      "both_wrong": 88
+    },
+    {
+      "checkpoint": "best",
+      "T": 8,
+      "both_correct": 85,
+      "only_local_correct": 47,
+      "only_aligned_correct": 69,
+      "both_wrong": 55
+    },
+    {
+      "checkpoint": "best",
+      "T": 9,
+      "both_correct": 94,
+      "only_local_correct": 63,
+      "only_aligned_correct": 46,
+      "both_wrong": 53
+    },
+    {
+      "checkpoint": "best",
+      "T": 10,
+      "both_correct": 114,
+      "only_local_correct": 65,
+      "only_aligned_correct": 34,
+      "both_wrong": 43
+    },
+    {
+      "checkpoint": "best",
+      "T": 11,
+      "both_correct": 42,
+      "only_local_correct": 84,
+      "only_aligned_correct": 42,
+      "both_wrong": 88
+    },
+    {
+      "checkpoint": "best",
+      "T": 12,
+      "both_correct": 59,
+      "only_local_correct": 61,
+      "only_aligned_correct": 41,
+      "both_wrong": 95
+    },
+    {
+      "checkpoint": "best",
+      "T": 13,
+      "both_correct": 67,
+      "only_local_correct": 56,
+      "only_aligned_correct": 43,
+      "both_wrong": 90
+    },
+    {
+      "checkpoint": "best",
+      "T": 14,
+      "both_correct": 75,
+      "only_local_correct": 87,
+      "only_aligned_correct": 27,
+      "both_wrong": 67
+    },
+    {
+      "checkpoint": "best",
+      "T": 16,
+      "both_correct": 38,
+      "only_local_correct": 69,
+      "only_aligned_correct": 41,
+      "both_wrong": 108
+    },
+    {
+      "checkpoint": "best",
+      "T": 24,
+      "both_correct": 27,
+      "only_local_correct": 69,
+      "only_aligned_correct": 37,
+      "both_wrong": 123
+    },
+    {
+      "checkpoint": "best",
+      "T": 32,
+      "both_correct": 16,
+      "only_local_correct": 59,
+      "only_aligned_correct": 25,
+      "both_wrong": 156
+    },
+    {
+      "checkpoint": "best",
+      "T": 48,
+      "both_correct": 2,
+      "only_local_correct": 4,
+      "only_aligned_correct": 33,
+      "both_wrong": 217
+    },
+    {
+      "checkpoint": "best",
+      "T": 64,
+      "both_correct": 4,
+      "only_local_correct": 13,
+      "only_aligned_correct": 21,
+      "both_wrong": 218
+    },
+    {
+      "checkpoint": "best",
+      "T": 96,
+      "both_correct": 1,
+      "only_local_correct": 18,
+      "only_aligned_correct": 21,
+      "both_wrong": 216
+    },
+    {
+      "checkpoint": "best",
+      "T": 128,
+      "both_correct": 0,
+      "only_local_correct": 21,
+      "only_aligned_correct": 10,
+      "both_wrong": 225
+    },
+    {
+      "checkpoint": "best",
+      "T": 192,
+      "both_correct": 0,
+      "only_local_correct": 16,
+      "only_aligned_correct": 9,
+      "both_wrong": 231
+    },
+    {
+      "checkpoint": "best",
+      "T": 256,
+      "both_correct": 0,
+      "only_local_correct": 3,
+      "only_aligned_correct": 2,
+      "both_wrong": 251
+    },
+    {
+      "checkpoint": "best",
+      "T": 384,
+      "both_correct": 0,
+      "only_local_correct": 15,
+      "only_aligned_correct": 2,
+      "both_wrong": 239
+    },
+    {
+      "checkpoint": "best",
+      "T": 512,
+      "both_correct": 0,
+      "only_local_correct": 6,
+      "only_aligned_correct": 1,
+      "both_wrong": 249
+    },
+    {
+      "checkpoint": "best",
+      "T": 768,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "best",
+      "T": 1024,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "best",
+      "T": 1536,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "best",
+      "T": 2048,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "best",
+      "T": 3072,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "best",
+      "T": 4096,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "best",
+      "T": 6144,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "best",
+      "T": 8192,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "final",
+      "T": 1,
+      "both_correct": 255,
+      "only_local_correct": 0,
+      "only_aligned_correct": 1,
+      "both_wrong": 0
+    },
+    {
+      "checkpoint": "final",
+      "T": 2,
+      "both_correct": 248,
+      "only_local_correct": 5,
+      "only_aligned_correct": 2,
+      "both_wrong": 1
+    },
+    {
+      "checkpoint": "final",
+      "T": 3,
+      "both_correct": 193,
+      "only_local_correct": 39,
+      "only_aligned_correct": 19,
+      "both_wrong": 5
+    },
+    {
+      "checkpoint": "final",
+      "T": 4,
+      "both_correct": 175,
+      "only_local_correct": 30,
+      "only_aligned_correct": 38,
+      "both_wrong": 13
+    },
+    {
+      "checkpoint": "final",
+      "T": 5,
+      "both_correct": 154,
+      "only_local_correct": 35,
+      "only_aligned_correct": 46,
+      "both_wrong": 21
+    },
+    {
+      "checkpoint": "final",
+      "T": 6,
+      "both_correct": 78,
+      "only_local_correct": 23,
+      "only_aligned_correct": 93,
+      "both_wrong": 62
+    },
+    {
+      "checkpoint": "final",
+      "T": 7,
+      "both_correct": 65,
+      "only_local_correct": 58,
+      "only_aligned_correct": 58,
+      "both_wrong": 75
+    },
+    {
+      "checkpoint": "final",
+      "T": 8,
+      "both_correct": 84,
+      "only_local_correct": 61,
+      "only_aligned_correct": 53,
+      "both_wrong": 58
+    },
+    {
+      "checkpoint": "final",
+      "T": 9,
+      "both_correct": 98,
+      "only_local_correct": 66,
+      "only_aligned_correct": 45,
+      "both_wrong": 47
+    },
+    {
+      "checkpoint": "final",
+      "T": 10,
+      "both_correct": 133,
+      "only_local_correct": 66,
+      "only_aligned_correct": 28,
+      "both_wrong": 29
+    },
+    {
+      "checkpoint": "final",
+      "T": 11,
+      "both_correct": 49,
+      "only_local_correct": 67,
+      "only_aligned_correct": 46,
+      "both_wrong": 94
+    },
+    {
+      "checkpoint": "final",
+      "T": 12,
+      "both_correct": 76,
+      "only_local_correct": 67,
+      "only_aligned_correct": 45,
+      "both_wrong": 68
+    },
+    {
+      "checkpoint": "final",
+      "T": 13,
+      "both_correct": 81,
+      "only_local_correct": 67,
+      "only_aligned_correct": 47,
+      "both_wrong": 61
+    },
+    {
+      "checkpoint": "final",
+      "T": 14,
+      "both_correct": 74,
+      "only_local_correct": 60,
+      "only_aligned_correct": 60,
+      "both_wrong": 62
+    },
+    {
+      "checkpoint": "final",
+      "T": 16,
+      "both_correct": 45,
+      "only_local_correct": 54,
+      "only_aligned_correct": 63,
+      "both_wrong": 94
+    },
+    {
+      "checkpoint": "final",
+      "T": 24,
+      "both_correct": 37,
+      "only_local_correct": 78,
+      "only_aligned_correct": 40,
+      "both_wrong": 101
+    },
+    {
+      "checkpoint": "final",
+      "T": 32,
+      "both_correct": 20,
+      "only_local_correct": 44,
+      "only_aligned_correct": 24,
+      "both_wrong": 168
+    },
+    {
+      "checkpoint": "final",
+      "T": 48,
+      "both_correct": 4,
+      "only_local_correct": 20,
+      "only_aligned_correct": 32,
+      "both_wrong": 200
+    },
+    {
+      "checkpoint": "final",
+      "T": 64,
+      "both_correct": 1,
+      "only_local_correct": 27,
+      "only_aligned_correct": 16,
+      "both_wrong": 212
+    },
+    {
+      "checkpoint": "final",
+      "T": 96,
+      "both_correct": 3,
+      "only_local_correct": 20,
+      "only_aligned_correct": 18,
+      "both_wrong": 215
+    },
+    {
+      "checkpoint": "final",
+      "T": 128,
+      "both_correct": 0,
+      "only_local_correct": 14,
+      "only_aligned_correct": 11,
+      "both_wrong": 231
+    },
+    {
+      "checkpoint": "final",
+      "T": 192,
+      "both_correct": 1,
+      "only_local_correct": 16,
+      "only_aligned_correct": 7,
+      "both_wrong": 232
+    },
+    {
+      "checkpoint": "final",
+      "T": 256,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 1,
+      "both_wrong": 254
+    },
+    {
+      "checkpoint": "final",
+      "T": 384,
+      "both_correct": 0,
+      "only_local_correct": 9,
+      "only_aligned_correct": 5,
+      "both_wrong": 242
+    },
+    {
+      "checkpoint": "final",
+      "T": 512,
+      "both_correct": 0,
+      "only_local_correct": 3,
+      "only_aligned_correct": 2,
+      "both_wrong": 251
+    },
+    {
+      "checkpoint": "final",
+      "T": 768,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "final",
+      "T": 1024,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "final",
+      "T": 1536,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 1,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "final",
+      "T": 2048,
+      "both_correct": 0,
+      "only_local_correct": 2,
+      "only_aligned_correct": 0,
+      "both_wrong": 254
+    },
+    {
+      "checkpoint": "final",
+      "T": 3072,
+      "both_correct": 0,
+      "only_local_correct": 1,
+      "only_aligned_correct": 0,
+      "both_wrong": 255
+    },
+    {
+      "checkpoint": "final",
+      "T": 4096,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "final",
+      "T": 6144,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    },
+    {
+      "checkpoint": "final",
+      "T": 8192,
+      "both_correct": 0,
+      "only_local_correct": 0,
+      "only_aligned_correct": 0,
+      "both_wrong": 256
+    }
+  ],
+  "limitations": [
+    "Single training seed per mode; 20-step deterministic repeats do not establish full-run or cross-environment repeatability.",
+    "Best is chosen by training intervals; evaluation checkpoints are not chosen by held-out results.",
+    "Memories and scatter positions match across modes/checkpoints at each T, not across T.",
+    "Counts use saved targets, predictions and margins without rerunning inference; sample generation is independently replayed on CPU.",
+    "Neighbor-value error matches can occur by chance when target digits repeat; these are descriptive, not causal diagnoses.",
+    "Zero exact strings in 256 examples does not prove zero success probability or irrecoverable memory loss.",
+    "This campaign evaluates Selective Copying through T8192 only; no extra seeds, 16M evaluation or main merge."
+  ]
+}

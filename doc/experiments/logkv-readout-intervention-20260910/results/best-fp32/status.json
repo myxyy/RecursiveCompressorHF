@@ -1,0 +1,27 @@
+{
+  "state": "complete",
+  "started": "2026-09-10T07:10:29.756145+00:00",
+  "job": {
+    "name": "best-fp32",
+    "checkpoint": "best",
+    "precision": "fp32",
+    "gpu": 2
+  },
+  "weight_sha256": "49c979b3b18e4da53ddbfc441d8525f9ac98b243c5d345967bd2821abc1b8533",
+  "case_groups": 3,
+  "finished": "2026-09-10T07:10:51.686424+00:00",
+  "elapsed_seconds": 21.93031495111063,
+  "checks": [
+    {
+      "T": 49152,
+      "predictions_reproduced": true,
+      "max_logit_difference": 0.0
+    }
+  ],
+  "case_count": 98,
+  "prefix_immutable": true,
+  "payload_KV_equal_across_horizons": true,
+  "observation_and_sham_identity": true,
+  "earlier_answers_unchanged": true,
+  "weight_hash_unchanged": true
+}

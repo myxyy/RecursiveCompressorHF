@@ -1,0 +1,15 @@
+{
+  "evaluation_cells": 82,
+  "comparison_cells": 164,
+  "all_checks_passed": true,
+  "best_step": 39100,
+  "train_elapsed_minutes": 212.9116666666667,
+  "weight_sha256": {
+    "best": "f5255ba19b6b9ced04a7ecf4d777d28b2fd37d17e38d7b358d0d43beed5564e9",
+    "final": "542c2d8ce6ecce140af0c5aed23c9be9eb2b0afa51965395a611c454fb662689"
+  },
+  "diagnostic_cases": 44,
+  "baseline_standard_replay_cases": 2,
+  "baseline_fp32_error_replay_cases": 2,
+  "scope": "Single training seed, fixed ten digits; paired n16 diagnosis; no Selective or 16M"
+}

@@ -1,6 +1,6 @@
 # Compressorの位置減衰による記憶タスク評価
 
-実装commit `77356e6`（2026-09-07）。数式・APIは[位置表現実験の設計 §2.5](logkv-position-design.md#25-compressorの位置減衰)。
+実装commit `77356e6`（2026-09-07）。数式・APIは[logkv.md §2.5](logkv.md#25-compressorの位置減衰)。
 前回の[retrieval側だけの相対位置補正](logkv-relative-position-experiments.md)の6条件を
 すべて評価した後、新規学習を開始した。
 

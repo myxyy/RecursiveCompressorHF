@@ -1,0 +1,33 @@
+{
+  "source_branch": "logkv-aligned-rope",
+  "source_commit": "537e5387fd51bef1c43569e0d892a657859198c4",
+  "main_base_commit": "658f63ede3e1a1266ddf725eb0a425e829515ba1",
+  "scope": [
+    "doc/",
+    "README.md",
+    "README_en.md",
+    "CLAUDE.md"
+  ],
+  "preserved_main_paths_checked": 36,
+  "main_runtime_and_dependencies_unchanged": true,
+  "source_document_paths_imported": 1370,
+  "source_documents_preserved_bitexact": 1369,
+  "intentional_document_adaptations": [
+    "doc/logkv.md: distinguish experimental APIs from main",
+    "doc/logkv-experiments.md: preserve main index and add later experiments",
+    "README.md / README_en.md / CLAUDE.md: main architecture and latest user direction"
+  ],
+  "archived_code_files": 12,
+  "archived_code_bytes_match_source": true,
+  "imported_python_scripts_syntax_checked": 64,
+  "archived_python_scripts_syntax_checked": 12,
+  "lfs_png_files_materialized": 61,
+  "report_links_valid": true,
+  "historical_main_only_documents_retained": [
+    "doc/logkv-experiments.md",
+    "doc/logkv-position-design.md"
+  ],
+  "experiments_started": false,
+  "model_tests_rerun": false,
+  "validation_note": "Main runtime and test sources are unchanged; checked Git blob identity, imported/archived Python syntax, source artifact identity and document links. No GPU use."
+}
