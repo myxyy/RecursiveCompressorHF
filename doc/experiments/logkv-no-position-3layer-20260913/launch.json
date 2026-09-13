@@ -1,0 +1,119 @@
+{
+  "passed": true,
+  "preparation_commit": "3cd0790cfb5e08a4890607ec252a4e885d51df24",
+  "supervisor_pid": 2166116,
+  "launched": "2026-09-13T14:40:44.808680+00:00",
+  "gpus": [
+    2,
+    3
+  ],
+  "checked": "2026-09-13T14:41:38.021468+00:00",
+  "started_jst": "2026-09-13T23:40:44.901451+09:00",
+  "estimated_finish_jst": "2026-09-14T05:55:43.234784+09:00",
+  "hard_stop_jst": "2026-09-14T07:03:24.362310+09:00",
+  "workers": {
+    "copying": 2166117,
+    "selective-copying": 2166118
+  },
+  "tasks": {
+    "copying": {
+      "passed": true,
+      "gpu": 2,
+      "first100_metrics_bitexact": true,
+      "interval": {
+        "step": 100,
+        "loss": 1.064244031906128,
+        "ema_loss": 1.4257012071494262,
+        "token_acc": 0.122578125,
+        "string_acc": 0.0,
+        "lr": 2.9999999999999997e-05,
+        "elapsed_sec": 32.6
+      },
+      "initialization_audit": {
+        "passed": true,
+        "task": "copying",
+        "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-no-position-main-20260913/source/exp/copying/task.py",
+        "task_sha256": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4",
+        "initial_weights_identical": true,
+        "initial_weights_sha256": "f259ab679fa96875a39b3e011aabcdd706c327bb77713f2513071b9fc27c1579",
+        "shared_two_layer_initial_weights_identical": true,
+        "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+        "num_layers": 3,
+        "num_params": 8673792,
+        "deterministic_algorithms": true,
+        "cublas_workspace_config": ":4096:8",
+        "visible_gpu": "2",
+        "torch_version": "2.11.0+cu128",
+        "cuda_version": "12.8",
+        "device_name": "NVIDIA GeForce RTX 3090",
+        "rng_sha256": "6a58f174c990fa93db4341619159a3e5a99633becaac287951df862496754758"
+      },
+      "configuration_differences": {
+        "run_name": [
+          "no-position-fixed10-20260913",
+          "no-position-3layer-fixed10-20260913"
+        ],
+        "num_params": [
+          5786112,
+          8673792
+        ],
+        "num_layers": [
+          2,
+          3
+        ]
+      }
+    },
+    "selective-copying": {
+      "passed": true,
+      "gpu": 3,
+      "first100_metrics_bitexact": true,
+      "interval": {
+        "step": 100,
+        "loss": 0.01652086153626442,
+        "ema_loss": 1.4529660683959844,
+        "token_acc": 0.12575,
+        "string_acc": 0.0,
+        "lr": 2.9999999999999997e-05,
+        "elapsed_sec": 25.1
+      },
+      "initialization_audit": {
+        "passed": true,
+        "task": "selective-copying",
+        "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-no-position-main-20260913/source/exp/selective-copying/task.py",
+        "task_sha256": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528",
+        "initial_weights_identical": true,
+        "initial_weights_sha256": "f259ab679fa96875a39b3e011aabcdd706c327bb77713f2513071b9fc27c1579",
+        "shared_two_layer_initial_weights_identical": true,
+        "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+        "num_layers": 3,
+        "num_params": 8673792,
+        "deterministic_algorithms": true,
+        "cublas_workspace_config": ":4096:8",
+        "visible_gpu": "3",
+        "torch_version": "2.11.0+cu128",
+        "cuda_version": "12.8",
+        "device_name": "NVIDIA GeForce RTX 3090",
+        "rng_sha256": "6a58f174c990fa93db4341619159a3e5a99633becaac287951df862496754758"
+      },
+      "configuration_differences": {
+        "run_name": [
+          "no-position-fixed10-20260913",
+          "no-position-3layer-fixed10-20260913"
+        ],
+        "num_params": [
+          5786112,
+          8673792
+        ],
+        "num_layers": [
+          2,
+          3
+        ]
+      }
+    }
+  },
+  "baseline_supervisor": 2086202,
+  "baseline_continuing": true,
+  "source_and_script_hashes_unchanged": true,
+  "combined_gpu_limit": 4,
+  "gpu_snapshot": "0, 100 %, 16727 MiB, 197.95 W\n1, 94 %, 16727 MiB, 199.05 W\n2, 25 %, 20107 MiB, 192.45 W\n3, 100 %, 20047 MiB, 198.60 W\n4, 0 %, 15 MiB, 32.78 W\n5, 0 %, 15 MiB, 27.43 W\n"
+}

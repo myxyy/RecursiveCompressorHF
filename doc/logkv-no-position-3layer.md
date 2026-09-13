@@ -1,8 +1,13 @@
 # 位置埋め込みなしLogKV：2層から3層への比較
 
 2026-09-13、進行中の[2層の再評価](logkv-no-position-main.md)に対し、ユーザーの指定で
-3層のCopying / Selective Copyingを追加する。**本学習は開始準備中、結果は未確定。**
-追加実験の見積もりは評価込み約6.3時間。事前GPU検証を含む停止期限は
+3層のCopying / Selective Copyingを追加する。
+**2026-09-13 23:40:44 JSTにGPU2/3で本学習を開始した。結果は未確定。**
+両タスクの最初の100 stepsの記録指標は事前benchmarkとbit一致した。
+2層対照とのrun設定の差分も層数・パラメータ数・run名のみと確認した。
+[開始確認](experiments/logkv-no-position-3layer-20260913/launch.json)。準備commit `3cd0790`。
+追加実験の見積もりは評価込み約6.3時間、完了は9月14日06時頃が目安。
+事前GPU検証を含む停止期限は
 2026-09-14 07:03:24 JST。
 
 ## 比較条件
