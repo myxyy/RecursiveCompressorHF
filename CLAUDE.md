@@ -12,6 +12,12 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 - Retain the user's power constraints: continuous work on at most 2 GPUs is authorized; confirm before a proposed experiment/batch expected to take 8 hours or longer. Earlier campaign-specific 3-GPU permissions are not a general increase. Respect meaningful experiment boundaries and keep Copying/Selective as separate training/checkpoint/evaluation tasks.
 - No training is started by this archive integration. Checkpoints and frozen source directories stay under `/mnt/raid0/RecursiveCompressor/experiments/`; archived absolute paths refer to that machine.
 
+## Authorized no-position baseline rerun (2026-09-13)
+- User requested fixed-M10 Copying/Selective evaluation with phase embeddings disabled on main's refined architecture. Historical `none` runs already exist in the 2026-09-07 relative-bias study; record them as prior data, not as an unmeasured condition.
+- This new main-only rerun uses frozen source `0932d8c`; all 27 captured runtime/dependency/task files are identical to `3b0ce51`. Keep gate/self slot/fixed level decay and model size; no RoPE or added positional corrections. Two independent 50k task models, best/final 41 horizons through T131072 x256 (164 cells).
+- GPUs 0/1 only. Deterministic kernels, shared initial weights, 20-step repeat per task bitexact across GPUs. Measured 300-step benchmark predicts 4.11h including 15% margin, one hour evaluation and preflight. Whole batch cap 7.5h from preflight start; stop all on failure, no retries or extra runs/16M.
+- All preparation changes are documentation and experiment scripts under `doc/`; main model/trainer remain unchanged. See `doc/logkv-no-position-main.md` and `doc/experiments/logkv-no-position-main-20260913/`.
+
 ## Architecture
 ### LogKV (main)
 - `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends only to completed sub-units in its current block (c < j); these disjoint intervals partition the entire past. All levels share one softmax (at most C−1 slots per level). See `logkv-refine.drawio.png` and `doc/logkv.md` §6.17. Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.

@@ -1,0 +1,1092 @@
+{
+  "description": "Existing refined-layout no-phase/no-relative-bias data from 2026-09-07; not previously unmeasured. Historical training did not enable deterministic kernels.",
+  "source_commit": "7261652",
+  "tasks": {
+    "copying": {
+      "run_config.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/run_config.json",
+        "sha256": "7aef7adec910d02ec90b349ba4437e5e672fe3f2d9a8b44abca579af3ee7b799",
+        "data": {
+          "run_name": "logkv-d512-logu-none-gated-self-20260907",
+          "arch": "logkv",
+          "phase_emb": false,
+          "relative_position_bias": false,
+          "phase_levels": 2,
+          "learnable_decay": false,
+          "gated_attention": true,
+          "kv_norm": false,
+          "level_amplify": false,
+          "v_norm_only": false,
+          "self_slot": true,
+          "max_t": 2028,
+          "steps": 50000,
+          "batch_size": 64,
+          "grad_accum": 1,
+          "lr": 0.0003,
+          "warmup": 1000,
+          "d_model": 512,
+          "num_heads": 8,
+          "d_ff": 1024,
+          "num_layers": 2,
+          "chunk_size": 4,
+          "compress_size": 1,
+          "retrieve_size": 4,
+          "loss_positions": "all",
+          "t_dist": "loguniform",
+          "seed": 0,
+          "device": "0",
+          "log_interval": 100,
+          "eval_interval": 5000,
+          "save_interval": 10000,
+          "num_params": 5786112,
+          "loss": "position-aligned CE"
+        }
+      },
+      "model_config_best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/model_config_best.json",
+        "sha256": "4386d2a67872796247b2c5c75c5f9dedf34be125094412ff9ad7ce925d273b1a",
+        "data": {
+          "architectures": [
+            "LogKVLM"
+          ],
+          "bos_token_id": null,
+          "chunk_size": 4,
+          "d_ff": 1024,
+          "d_model": 512,
+          "dtype": "float32",
+          "eos_token_id": null,
+          "gated_attention": true,
+          "kv_norm": false,
+          "learnable_decay": false,
+          "level_amplify": false,
+          "model_type": "logkv",
+          "num_heads": 8,
+          "num_layers": 2,
+          "pad_token_id": null,
+          "phase_emb": false,
+          "phase_levels": 2,
+          "relative_position_bias": false,
+          "self_slot": true,
+          "transformers_version": "5.4.0",
+          "v_norm_only": false,
+          "vocab_size": 10
+        }
+      },
+      "model_config_final.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/model_config_final.json",
+        "sha256": "4386d2a67872796247b2c5c75c5f9dedf34be125094412ff9ad7ce925d273b1a",
+        "data": {
+          "architectures": [
+            "LogKVLM"
+          ],
+          "bos_token_id": null,
+          "chunk_size": 4,
+          "d_ff": 1024,
+          "d_model": 512,
+          "dtype": "float32",
+          "eos_token_id": null,
+          "gated_attention": true,
+          "kv_norm": false,
+          "learnable_decay": false,
+          "level_amplify": false,
+          "model_type": "logkv",
+          "num_heads": 8,
+          "num_layers": 2,
+          "pad_token_id": null,
+          "phase_emb": false,
+          "phase_levels": 2,
+          "relative_position_bias": false,
+          "self_slot": true,
+          "transformers_version": "5.4.0",
+          "v_norm_only": false,
+          "vocab_size": 10
+        }
+      },
+      "best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/best.json",
+        "sha256": "3822e053ac7b08aa69accbec734c700799bb7050086b0df74ba2018168faca8e",
+        "data": {
+          "step": 49800,
+          "string_acc": 0.40640625,
+          "token_acc": 0.87165625,
+          "ema_loss": 0.0413420982849729
+        }
+      },
+      "results_best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/results_best.json",
+        "sha256": "36143f50aaf48e87616b0b6a276e00de2091705125771893344b0d2ac717b16c",
+        "data": {
+          "train_max_t": 2028,
+          "samples": 256,
+          "precision": "bf16",
+          "results": {
+            "1": {
+              "token_acc": 0.99921875,
+              "string_acc": 0.9921875,
+              "n": 256
+            },
+            "2": {
+              "token_acc": 0.9984375,
+              "string_acc": 0.984375,
+              "n": 256
+            },
+            "3": {
+              "token_acc": 0.990625,
+              "string_acc": 0.9140625,
+              "n": 256
+            },
+            "4": {
+              "token_acc": 0.971484375,
+              "string_acc": 0.7265625,
+              "n": 256
+            },
+            "5": {
+              "token_acc": 0.957421875,
+              "string_acc": 0.62890625,
+              "n": 256
+            },
+            "6": {
+              "token_acc": 0.9234375,
+              "string_acc": 0.39453125,
+              "n": 256
+            },
+            "7": {
+              "token_acc": 0.853125,
+              "string_acc": 0.16796875,
+              "n": 256
+            },
+            "8": {
+              "token_acc": 0.876953125,
+              "string_acc": 0.06640625,
+              "n": 256
+            },
+            "9": {
+              "token_acc": 0.9765625,
+              "string_acc": 0.796875,
+              "n": 256
+            },
+            "10": {
+              "token_acc": 0.9328125,
+              "string_acc": 0.4765625,
+              "n": 256
+            },
+            "11": {
+              "token_acc": 0.885546875,
+              "string_acc": 0.23046875,
+              "n": 256
+            },
+            "12": {
+              "token_acc": 0.973046875,
+              "string_acc": 0.75390625,
+              "n": 256
+            },
+            "13": {
+              "token_acc": 0.969921875,
+              "string_acc": 0.75,
+              "n": 256
+            },
+            "14": {
+              "token_acc": 0.90390625,
+              "string_acc": 0.3828125,
+              "n": 256
+            },
+            "16": {
+              "token_acc": 0.975390625,
+              "string_acc": 0.80078125,
+              "n": 256
+            },
+            "24": {
+              "token_acc": 0.8796875,
+              "string_acc": 0.08203125,
+              "n": 256
+            },
+            "32": {
+              "token_acc": 0.91875,
+              "string_acc": 0.3984375,
+              "n": 256
+            },
+            "48": {
+              "token_acc": 0.735546875,
+              "string_acc": 0.015625,
+              "n": 256
+            },
+            "64": {
+              "token_acc": 0.83515625,
+              "string_acc": 0.1015625,
+              "n": 256
+            },
+            "96": {
+              "token_acc": 0.817578125,
+              "string_acc": 0.04296875,
+              "n": 256
+            },
+            "128": {
+              "token_acc": 0.854296875,
+              "string_acc": 0.140625,
+              "n": 256
+            },
+            "192": {
+              "token_acc": 0.87421875,
+              "string_acc": 0.20703125,
+              "n": 256
+            },
+            "256": {
+              "token_acc": 0.709375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "384": {
+              "token_acc": 0.717578125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "512": {
+              "token_acc": 0.71015625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "768": {
+              "token_acc": 0.713671875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1024": {
+              "token_acc": 0.705859375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1536": {
+              "token_acc": 0.70625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "2048": {
+              "token_acc": 0.71171875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "3072": {
+              "token_acc": 0.70625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "4096": {
+              "token_acc": 0.691796875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "6144": {
+              "token_acc": 0.683203125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "8192": {
+              "token_acc": 0.694921875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12288": {
+              "token_acc": 0.6953125,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "16384": {
+              "token_acc": 0.676171875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "24576": {
+              "token_acc": 0.673828125,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "32768": {
+              "token_acc": 0.680078125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "49152": {
+              "token_acc": 0.668359375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "65536": {
+              "token_acc": 0.653125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "98304": {
+              "token_acc": 0.662109375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "131072": {
+              "token_acc": 0.655859375,
+              "string_acc": 0.00390625,
+              "n": 256
+            }
+          }
+        }
+      },
+      "results_final.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-copying/results_final.json",
+        "sha256": "b844924e019aaac4b912d060dfdbb3b8218246fc857ab80cb49e7040ffd4a074",
+        "data": {
+          "train_max_t": 2028,
+          "samples": 256,
+          "precision": "bf16",
+          "results": {
+            "1": {
+              "token_acc": 0.996875,
+              "string_acc": 0.96875,
+              "n": 256
+            },
+            "2": {
+              "token_acc": 0.9921875,
+              "string_acc": 0.92578125,
+              "n": 256
+            },
+            "3": {
+              "token_acc": 0.96640625,
+              "string_acc": 0.703125,
+              "n": 256
+            },
+            "4": {
+              "token_acc": 0.913671875,
+              "string_acc": 0.21875,
+              "n": 256
+            },
+            "5": {
+              "token_acc": 0.89609375,
+              "string_acc": 0.1640625,
+              "n": 256
+            },
+            "6": {
+              "token_acc": 0.523828125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "7": {
+              "token_acc": 0.780859375,
+              "string_acc": 0.03515625,
+              "n": 256
+            },
+            "8": {
+              "token_acc": 0.83359375,
+              "string_acc": 0.046875,
+              "n": 256
+            },
+            "9": {
+              "token_acc": 0.973828125,
+              "string_acc": 0.7734375,
+              "n": 256
+            },
+            "10": {
+              "token_acc": 0.736328125,
+              "string_acc": 0.01171875,
+              "n": 256
+            },
+            "11": {
+              "token_acc": 0.83203125,
+              "string_acc": 0.12890625,
+              "n": 256
+            },
+            "12": {
+              "token_acc": 0.953515625,
+              "string_acc": 0.5625,
+              "n": 256
+            },
+            "13": {
+              "token_acc": 0.96640625,
+              "string_acc": 0.69140625,
+              "n": 256
+            },
+            "14": {
+              "token_acc": 0.86015625,
+              "string_acc": 0.1328125,
+              "n": 256
+            },
+            "16": {
+              "token_acc": 0.9578125,
+              "string_acc": 0.609375,
+              "n": 256
+            },
+            "24": {
+              "token_acc": 0.771875,
+              "string_acc": 0.01171875,
+              "n": 256
+            },
+            "32": {
+              "token_acc": 0.96953125,
+              "string_acc": 0.75390625,
+              "n": 256
+            },
+            "48": {
+              "token_acc": 0.73203125,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "64": {
+              "token_acc": 0.84609375,
+              "string_acc": 0.06640625,
+              "n": 256
+            },
+            "96": {
+              "token_acc": 0.872265625,
+              "string_acc": 0.12109375,
+              "n": 256
+            },
+            "128": {
+              "token_acc": 0.85859375,
+              "string_acc": 0.10546875,
+              "n": 256
+            },
+            "192": {
+              "token_acc": 0.853515625,
+              "string_acc": 0.09765625,
+              "n": 256
+            },
+            "256": {
+              "token_acc": 0.743359375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "384": {
+              "token_acc": 0.72265625,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "512": {
+              "token_acc": 0.75390625,
+              "string_acc": 0.01171875,
+              "n": 256
+            },
+            "768": {
+              "token_acc": 0.73125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1024": {
+              "token_acc": 0.737109375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1536": {
+              "token_acc": 0.725390625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "2048": {
+              "token_acc": 0.731640625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "3072": {
+              "token_acc": 0.733984375,
+              "string_acc": 0.01171875,
+              "n": 256
+            },
+            "4096": {
+              "token_acc": 0.7046875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "6144": {
+              "token_acc": 0.704296875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "8192": {
+              "token_acc": 0.70546875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12288": {
+              "token_acc": 0.708984375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "16384": {
+              "token_acc": 0.65234375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "24576": {
+              "token_acc": 0.66875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "32768": {
+              "token_acc": 0.6546875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "49152": {
+              "token_acc": 0.661328125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "65536": {
+              "token_acc": 0.610546875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "98304": {
+              "token_acc": 0.61171875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "131072": {
+              "token_acc": 0.609375,
+              "string_acc": 0.00390625,
+              "n": 256
+            }
+          }
+        }
+      }
+    },
+    "selective-copying": {
+      "run_config.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/run_config.json",
+        "sha256": "7aef7adec910d02ec90b349ba4437e5e672fe3f2d9a8b44abca579af3ee7b799",
+        "data": {
+          "run_name": "logkv-d512-logu-none-gated-self-20260907",
+          "arch": "logkv",
+          "phase_emb": false,
+          "relative_position_bias": false,
+          "phase_levels": 2,
+          "learnable_decay": false,
+          "gated_attention": true,
+          "kv_norm": false,
+          "level_amplify": false,
+          "v_norm_only": false,
+          "self_slot": true,
+          "max_t": 2028,
+          "steps": 50000,
+          "batch_size": 64,
+          "grad_accum": 1,
+          "lr": 0.0003,
+          "warmup": 1000,
+          "d_model": 512,
+          "num_heads": 8,
+          "d_ff": 1024,
+          "num_layers": 2,
+          "chunk_size": 4,
+          "compress_size": 1,
+          "retrieve_size": 4,
+          "loss_positions": "all",
+          "t_dist": "loguniform",
+          "seed": 0,
+          "device": "0",
+          "log_interval": 100,
+          "eval_interval": 5000,
+          "save_interval": 10000,
+          "num_params": 5786112,
+          "loss": "position-aligned CE"
+        }
+      },
+      "model_config_best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/model_config_best.json",
+        "sha256": "4386d2a67872796247b2c5c75c5f9dedf34be125094412ff9ad7ce925d273b1a",
+        "data": {
+          "architectures": [
+            "LogKVLM"
+          ],
+          "bos_token_id": null,
+          "chunk_size": 4,
+          "d_ff": 1024,
+          "d_model": 512,
+          "dtype": "float32",
+          "eos_token_id": null,
+          "gated_attention": true,
+          "kv_norm": false,
+          "learnable_decay": false,
+          "level_amplify": false,
+          "model_type": "logkv",
+          "num_heads": 8,
+          "num_layers": 2,
+          "pad_token_id": null,
+          "phase_emb": false,
+          "phase_levels": 2,
+          "relative_position_bias": false,
+          "self_slot": true,
+          "transformers_version": "5.4.0",
+          "v_norm_only": false,
+          "vocab_size": 10
+        }
+      },
+      "model_config_final.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/model_config_final.json",
+        "sha256": "4386d2a67872796247b2c5c75c5f9dedf34be125094412ff9ad7ce925d273b1a",
+        "data": {
+          "architectures": [
+            "LogKVLM"
+          ],
+          "bos_token_id": null,
+          "chunk_size": 4,
+          "d_ff": 1024,
+          "d_model": 512,
+          "dtype": "float32",
+          "eos_token_id": null,
+          "gated_attention": true,
+          "kv_norm": false,
+          "learnable_decay": false,
+          "level_amplify": false,
+          "model_type": "logkv",
+          "num_heads": 8,
+          "num_layers": 2,
+          "pad_token_id": null,
+          "phase_emb": false,
+          "phase_levels": 2,
+          "relative_position_bias": false,
+          "self_slot": true,
+          "transformers_version": "5.4.0",
+          "v_norm_only": false,
+          "vocab_size": 10
+        }
+      },
+      "best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/best.json",
+        "sha256": "ff2f6e93bcaf99264eab6aa867f94be09b2c5147aa3d95f6f1096f7756e92648",
+        "data": {
+          "step": 49800,
+          "string_acc": 0.194375,
+          "token_acc": 0.679296875,
+          "ema_loss": 0.10152014656580988
+        }
+      },
+      "results_best.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/results_best.json",
+        "sha256": "f5585f70f35229545ba03bf991bf1988316b950a81ae00200e52635c1d2e094a",
+        "data": {
+          "train_max_t": 2028,
+          "samples": 256,
+          "precision": "bf16",
+          "results": {
+            "1": {
+              "token_acc": 0.942578125,
+              "string_acc": 0.43359375,
+              "n": 256
+            },
+            "2": {
+              "token_acc": 0.976171875,
+              "string_acc": 0.80859375,
+              "n": 256
+            },
+            "3": {
+              "token_acc": 0.907421875,
+              "string_acc": 0.38671875,
+              "n": 256
+            },
+            "4": {
+              "token_acc": 0.81328125,
+              "string_acc": 0.06640625,
+              "n": 256
+            },
+            "5": {
+              "token_acc": 0.758203125,
+              "string_acc": 0.01953125,
+              "n": 256
+            },
+            "6": {
+              "token_acc": 0.650390625,
+              "string_acc": 0.0078125,
+              "n": 256
+            },
+            "7": {
+              "token_acc": 0.51484375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "8": {
+              "token_acc": 0.694140625,
+              "string_acc": 0.01953125,
+              "n": 256
+            },
+            "9": {
+              "token_acc": 0.67734375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "10": {
+              "token_acc": 0.626171875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "11": {
+              "token_acc": 0.58046875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12": {
+              "token_acc": 0.736328125,
+              "string_acc": 0.0234375,
+              "n": 256
+            },
+            "13": {
+              "token_acc": 0.702734375,
+              "string_acc": 0.0234375,
+              "n": 256
+            },
+            "14": {
+              "token_acc": 0.693359375,
+              "string_acc": 0.0078125,
+              "n": 256
+            },
+            "16": {
+              "token_acc": 0.756640625,
+              "string_acc": 0.03515625,
+              "n": 256
+            },
+            "24": {
+              "token_acc": 0.643359375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "32": {
+              "token_acc": 0.641796875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "48": {
+              "token_acc": 0.5984375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "64": {
+              "token_acc": 0.587109375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "96": {
+              "token_acc": 0.61796875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "128": {
+              "token_acc": 0.610546875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "192": {
+              "token_acc": 0.575390625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "256": {
+              "token_acc": 0.573046875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "384": {
+              "token_acc": 0.61484375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "512": {
+              "token_acc": 0.583984375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "768": {
+              "token_acc": 0.56171875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1024": {
+              "token_acc": 0.51875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1536": {
+              "token_acc": 0.541796875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "2048": {
+              "token_acc": 0.5375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "3072": {
+              "token_acc": 0.4984375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "4096": {
+              "token_acc": 0.45859375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "6144": {
+              "token_acc": 0.48359375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "8192": {
+              "token_acc": 0.49375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12288": {
+              "token_acc": 0.4625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "16384": {
+              "token_acc": 0.351953125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "24576": {
+              "token_acc": 0.4140625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "32768": {
+              "token_acc": 0.4140625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "49152": {
+              "token_acc": 0.4015625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "65536": {
+              "token_acc": 0.26875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "98304": {
+              "token_acc": 0.357421875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "131072": {
+              "token_acc": 0.342578125,
+              "string_acc": 0.0,
+              "n": 256
+            }
+          }
+        }
+      },
+      "results_final.json": {
+        "path": "doc/experiments/logkv-relative-20260907/runs/none-selective-copying/results_final.json",
+        "sha256": "30b4e3b511c9f1b384b14b0311bc1a2a6228ce11c1657e1cb5be425db0eab3ee",
+        "data": {
+          "train_max_t": 2028,
+          "samples": 256,
+          "precision": "bf16",
+          "results": {
+            "1": {
+              "token_acc": 0.985546875,
+              "string_acc": 0.875,
+              "n": 256
+            },
+            "2": {
+              "token_acc": 0.908203125,
+              "string_acc": 0.31640625,
+              "n": 256
+            },
+            "3": {
+              "token_acc": 0.879296875,
+              "string_acc": 0.30859375,
+              "n": 256
+            },
+            "4": {
+              "token_acc": 0.80390625,
+              "string_acc": 0.05078125,
+              "n": 256
+            },
+            "5": {
+              "token_acc": 0.735546875,
+              "string_acc": 0.015625,
+              "n": 256
+            },
+            "6": {
+              "token_acc": 0.663671875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "7": {
+              "token_acc": 0.601953125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "8": {
+              "token_acc": 0.7328125,
+              "string_acc": 0.03125,
+              "n": 256
+            },
+            "9": {
+              "token_acc": 0.697265625,
+              "string_acc": 0.01953125,
+              "n": 256
+            },
+            "10": {
+              "token_acc": 0.612890625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "11": {
+              "token_acc": 0.5796875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12": {
+              "token_acc": 0.665625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "13": {
+              "token_acc": 0.676953125,
+              "string_acc": 0.0078125,
+              "n": 256
+            },
+            "14": {
+              "token_acc": 0.688671875,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "16": {
+              "token_acc": 0.703125,
+              "string_acc": 0.015625,
+              "n": 256
+            },
+            "24": {
+              "token_acc": 0.644140625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "32": {
+              "token_acc": 0.55859375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "48": {
+              "token_acc": 0.573046875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "64": {
+              "token_acc": 0.591796875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "96": {
+              "token_acc": 0.555859375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "128": {
+              "token_acc": 0.586328125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "192": {
+              "token_acc": 0.56328125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "256": {
+              "token_acc": 0.569921875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "384": {
+              "token_acc": 0.58828125,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "512": {
+              "token_acc": 0.5609375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "768": {
+              "token_acc": 0.534375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "1024": {
+              "token_acc": 0.53984375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "1536": {
+              "token_acc": 0.543359375,
+              "string_acc": 0.00390625,
+              "n": 256
+            },
+            "2048": {
+              "token_acc": 0.5203125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "3072": {
+              "token_acc": 0.495703125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "4096": {
+              "token_acc": 0.475390625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "6144": {
+              "token_acc": 0.48671875,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "8192": {
+              "token_acc": 0.48203125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "12288": {
+              "token_acc": 0.462890625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "16384": {
+              "token_acc": 0.383984375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "24576": {
+              "token_acc": 0.41640625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "32768": {
+              "token_acc": 0.403515625,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "49152": {
+              "token_acc": 0.39375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "65536": {
+              "token_acc": 0.30234375,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "98304": {
+              "token_acc": 0.342578125,
+              "string_acc": 0.0,
+              "n": 256
+            },
+            "131072": {
+              "token_acc": 0.324609375,
+              "string_acc": 0.0,
+              "n": 256
+            }
+          }
+        }
+      }
+    }
+  }
+}

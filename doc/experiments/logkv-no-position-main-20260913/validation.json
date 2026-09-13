@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "source_commit": "0932d8c73ed9e48ac8ada467a06c53206d0a61cc",
+  "all_frozen_files_identical_to_refine": true,
+  "frozen_files_verified": 27,
+  "scripts_syntax_passed": true,
+  "model_code_changed": false
+}

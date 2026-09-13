@@ -51,3 +51,10 @@ PNGはGit LFSの対象。
 `exp/position_study/`などの実験コードは[原コードのアーカイブ](experiments/position-code-archive-20260913/README.md)にも保存した。
 mainの通常の訓練・テストには含めず、元commitの別worktreeで実行する。
 元の実験ブランチ`logkv-aligned-rope`は変更していない。
+
+## mainの位置埋め込みなし再評価（2026-09-13）
+
+[固定10桁の再評価](logkv-no-position-main.md)：ユーザーの指定により、重複なしmainのまま
+phase_emb=FalseのCopying / Selectiveを各50k、best/final T131072まで評価する。
+モデル実装は`3b0ce51`と同一。2026-09-07のnoneに既存データがあることを確認した上での
+再実行であり、今回の結果は開始時点では未確定。最大2GPU・全体見積もり4.11時間。
