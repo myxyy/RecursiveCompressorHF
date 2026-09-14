@@ -1,0 +1,120 @@
+{
+  "passed": true,
+  "preparation_commit": "dab79f2f08d2c926113a8b6e379424fa66dc7276",
+  "supervisor_pid": 2877069,
+  "launched": "2026-09-14T02:04:31.023210+00:00",
+  "gpus": [
+    0,
+    1
+  ],
+  "branch": "logkv-causal-conv",
+  "checked": "2026-09-14T02:05:19.183327+00:00",
+  "started_jst": "2026-09-14T11:04:31.101594+09:00",
+  "hard_stop_jst": "2026-09-14T18:30:42.325856+09:00",
+  "estimated_finish_jst": "2026-09-14T15:21:36.934927+09:00",
+  "workers": {
+    "copying": 2877070,
+    "selective-copying": 2877071
+  },
+  "tasks": {
+    "copying": {
+      "passed": true,
+      "gpu": 0,
+      "first100_metrics_bitexact": true,
+      "interval": {
+        "step": 100,
+        "loss": 0.9348871111869812,
+        "ema_loss": 1.2283992432224817,
+        "token_acc": 0.1226875,
+        "string_acc": 0.0,
+        "lr": 2.9999999999999997e-05,
+        "elapsed_sec": 20.8
+      },
+      "initialization_audit": {
+        "passed": true,
+        "task": "copying",
+        "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/source/exp/copying/task.py",
+        "task_sha256": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4",
+        "initial_weights_identical": true,
+        "initial_weights_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+        "shared_two_layer_initial_weights_identical": true,
+        "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+        "num_layers": 2,
+        "conv_kernel_size": 4,
+        "num_params": 5792256,
+        "deterministic_algorithms": true,
+        "cublas_workspace_config": ":4096:8",
+        "visible_gpu": "0",
+        "torch_version": "2.11.0+cu128",
+        "cuda_version": "12.8",
+        "device_name": "NVIDIA GeForce RTX 3090",
+        "rng_sha256": "706fbb93825ef63dcf04904a8a4712fcded346ee84ab0e6313aef282c4597822"
+      },
+      "configuration_differences": {
+        "num_params": [
+          5786112,
+          5792256
+        ],
+        "conv_kernel_size": [
+          0,
+          4
+        ],
+        "run_name": [
+          "no-position-fixed10-20260913",
+          "causal-conv4-fixed10-20260914"
+        ]
+      }
+    },
+    "selective-copying": {
+      "passed": true,
+      "gpu": 1,
+      "first100_metrics_bitexact": true,
+      "interval": {
+        "step": 100,
+        "loss": 0.016068382188677788,
+        "ema_loss": 1.2560828019640335,
+        "token_acc": 0.12171875,
+        "string_acc": 0.0,
+        "lr": 2.9999999999999997e-05,
+        "elapsed_sec": 17.2
+      },
+      "initialization_audit": {
+        "passed": true,
+        "task": "selective-copying",
+        "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/source/exp/selective-copying/task.py",
+        "task_sha256": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528",
+        "initial_weights_identical": true,
+        "initial_weights_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+        "shared_two_layer_initial_weights_identical": true,
+        "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+        "num_layers": 2,
+        "conv_kernel_size": 4,
+        "num_params": 5792256,
+        "deterministic_algorithms": true,
+        "cublas_workspace_config": ":4096:8",
+        "visible_gpu": "1",
+        "torch_version": "2.11.0+cu128",
+        "cuda_version": "12.8",
+        "device_name": "NVIDIA GeForce RTX 3090",
+        "rng_sha256": "706fbb93825ef63dcf04904a8a4712fcded346ee84ab0e6313aef282c4597822"
+      },
+      "configuration_differences": {
+        "num_params": [
+          5786112,
+          5792256
+        ],
+        "conv_kernel_size": [
+          0,
+          4
+        ],
+        "run_name": [
+          "no-position-fixed10-20260913",
+          "causal-conv4-fixed10-20260914"
+        ]
+      }
+    }
+  },
+  "main_unchanged": "d707675bd2dee14f19a46a5f1d686b3ec9c11326",
+  "source_and_scripts_unchanged": true,
+  "gpu_snapshot": "0, 40 %, 17445 MiB, 191.71 W\n1, 100 %, 17365 MiB, 189.15 W\n2, 0 %, 15 MiB, 33.44 W\n3, 0 %, 15 MiB, 31.18 W\n4, 0 %, 15 MiB, 32.65 W\n5, 0 %, 15 MiB, 27.36 W\n"
+}

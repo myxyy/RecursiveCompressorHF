@@ -1,7 +1,8 @@
 # LogKV実験記録一覧
 
-2026-09-14、新規`logkv-causal-conv`ブランチで[位置埋め込みなし＋CausalConv](logkv-causal-conv.md)を準備中。
-2層・各Blockのattention前に幅4のconvを追加し、固定10桁の既存対照と比較する。結果は未確定。
+2026-09-14、新規`logkv-causal-conv`ブランチで[位置埋め込みなし＋CausalConv](logkv-causal-conv.md)を11:04 JSTから学習中。
+2層・各Blockのattention前に幅4のconvを追加し、固定10桁の既存対照と比較する。
+GPU0/1・各50k steps、best/final T131072まで。評価込み見積もり4.31時間。結果は未確定。
 
 実験の成功・不成功を含めて記録を集約する。mainの標準実装と実験ブランチの実装は区別する。
 各レポートに学習条件、評価条件、再現用commit、全評価値と成果物の場所を記載した。
