@@ -25,3 +25,5 @@ Preflight runs independently and never starts full training automatically:
 Both refuse to overwrite completed stages/runs. No additional campaign is queued.
 `campaign.json` under the RAID root records live status; per-task stdout is `<task>.log`.
 Final raw NPZ observations and weights remain on RAID, with metrics and audit hashes archived here.
+
+Started2026-09-14 14:39:11 JST on GPUs0/1; [launch evidence](launch.json) confirms identical initial weights and first100 training steps versus benchmarks. Estimated finish around19:40 JST; hard deadline22:02:35 JST. Results pending. Preparation `e7c4004`.
