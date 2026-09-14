@@ -3,7 +3,8 @@
 # RecursiveCompressor / LogKV
 
 各方式の比較と再現用commitは[実験記録一覧](doc/logkv-experiments.md)にまとめています。
-標準CausalConvでの[可変桁実験](doc/logkv-variable-memory.md)も同じmainで記録します。
+標準CausalConvでの[可変桁実験](doc/logkv-variable-memory.md)も完了しました。可変桁で学習したCopyingは
+10桁・T=131,072で238/256例が完全一致しましたが、32・64桁は全評価セルで完全一致に届きませんでした。
 
 2026-09-14、各LogKVBlockのattention前に幅4のCausalConvを加え、位置埋め込みを使わない構成を標準に採用しました。
 新規訓練CLIはConv幅4・gate/self slot有効が既定です。`--conv-kernel-size 0`でConvを無効化できます。[実装・比較実験](doc/logkv-causal-conv.md)を参照してください。

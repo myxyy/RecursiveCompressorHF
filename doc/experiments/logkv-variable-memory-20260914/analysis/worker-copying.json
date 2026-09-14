@@ -1,0 +1,64 @@
+{
+  "task": "copying",
+  "state": "complete",
+  "started": "2026-09-14T05:39:11.985237+00:00",
+  "commands": [
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/train.py",
+        "--mode",
+        "causal-conv4",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/copying",
+        "--steps",
+        "50000"
+      ],
+      "started": "2026-09-14T05:39:11.985511+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T09:10:53.855388+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/evaluate.py",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/copying",
+        "--checkpoint",
+        "best",
+        "--samples",
+        "256"
+      ],
+      "started": "2026-09-14T09:10:53.920390+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T09:39:15.726972+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/evaluate.py",
+        "--task",
+        "copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/copying",
+        "--checkpoint",
+        "final",
+        "--samples",
+        "256"
+      ],
+      "started": "2026-09-14T09:39:15.760780+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T10:07:44.614181+00:00"
+    }
+  ],
+  "first_300_steps_match_benchmark": true,
+  "weights": {
+    "model": "ccd3169cddc5d34802bf731e0b1ac6e3988a44f3be6c6551b253aed31ea82390",
+    "model_best": "ccd3169cddc5d34802bf731e0b1ac6e3988a44f3be6c6551b253aed31ea82390"
+  },
+  "finished": "2026-09-14T10:07:44.647380+00:00"
+}

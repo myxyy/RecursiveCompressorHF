@@ -1,0 +1,1442 @@
+[
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 253,
+    "token_acc": 0.9984375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 252,
+    "token_acc": 0.996484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 252,
+    "token_acc": 0.997265625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 253,
+    "token_acc": 0.998046875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 250,
+    "token_acc": 0.995703125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 251,
+    "token_acc": 0.99609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 249,
+    "token_acc": 0.9953125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 238,
+    "token_acc": 0.98984375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 10,
+    "token_acc": 0.86669921875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 19,
+    "token_acc": 0.86962890625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 17,
+    "token_acc": 0.876953125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 21,
+    "token_acc": 0.87548828125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 21,
+    "token_acc": 0.878662109375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 16,
+    "token_acc": 0.87646484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 14,
+    "token_acc": 0.86572265625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 1,
+    "token_acc": 0.7216796875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5484619140625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.546630859375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5364990234375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.535400390625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5302734375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5338134765625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5224609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.4244384765625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35101318359375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3560791015625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35198974609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3507080078125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35284423828125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35626220703125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35272216796875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.30712890625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.261383056640625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25726318359375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2493896484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25067138671875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 253,
+    "token_acc": 0.9984375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 252,
+    "token_acc": 0.996484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 252,
+    "token_acc": 0.997265625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 253,
+    "token_acc": 0.998046875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 250,
+    "token_acc": 0.995703125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 251,
+    "token_acc": 0.99609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 249,
+    "token_acc": 0.9953125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 238,
+    "token_acc": 0.98984375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 10,
+    "token_acc": 0.86669921875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 19,
+    "token_acc": 0.86962890625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 17,
+    "token_acc": 0.876953125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 21,
+    "token_acc": 0.87548828125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 21,
+    "token_acc": 0.878662109375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 16,
+    "token_acc": 0.87646484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 14,
+    "token_acc": 0.86572265625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 1,
+    "token_acc": 0.7216796875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5484619140625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.546630859375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5364990234375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.535400390625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5302734375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5338134765625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5224609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.4244384765625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35101318359375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3560791015625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35198974609375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3507080078125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35284423828125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35626220703125
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35272216796875
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.30712890625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.261383056640625
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25726318359375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2493896484375
+  },
+  {
+    "task": "copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25067138671875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 249,
+    "token_acc": 0.996484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 159,
+    "token_acc": 0.939453125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 43,
+    "token_acc": 0.809765625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 25,
+    "token_acc": 0.770703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 24,
+    "token_acc": 0.7484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 14,
+    "token_acc": 0.730859375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 3,
+    "token_acc": 0.69921875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 10,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.594921875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 8,
+    "token_acc": 0.84521484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.746337890625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.638427734375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.55224609375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.528564453125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.537109375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.512451171875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 16,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.470703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.58935546875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.516845703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.470703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.392333984375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.356689453125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3564453125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3538818359375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 32,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3270263671875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35797119140625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3731689453125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.327880859375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.29595947265625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.254150390625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25506591796875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.25079345703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 64,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.228515625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.24737548828125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.236236572265625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.21563720703125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "best",
+    "memory_len": 128,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.196044921875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 252,
+    "token_acc": 0.998046875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 114,
+    "token_acc": 0.916796875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 37,
+    "token_acc": 0.80625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 10,
+    "token_acc": 0.730078125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 3,
+    "token_acc": 0.7015625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 2,
+    "token_acc": 0.677734375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 2,
+    "token_acc": 0.6484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 10,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.532421875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 6,
+    "token_acc": 0.81396484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.73193359375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.660400390625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.57080078125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.535400390625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.531982421875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.51025390625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 16,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.443115234375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.5509033203125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.501953125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.466552734375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3900146484375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3612060546875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3614501953125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.3680419921875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 32,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.322509765625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 1,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35302734375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.35736083984375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.326416015625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2991943359375
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 1024,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2615966796875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2578125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 8192,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2525634765625
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 64,
+    "T": 131072,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.2410888671875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 16,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.237030029296875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 64,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.23046875
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 256,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.216339111328125
+  },
+  {
+    "task": "selective-copying",
+    "checkpoint": "final",
+    "memory_len": 128,
+    "T": 2048,
+    "prefix": 0,
+    "n": 256,
+    "string_correct": 0,
+    "token_acc": 0.200469970703125
+  }
+]

@@ -1,0 +1,64 @@
+{
+  "task": "selective-copying",
+  "state": "complete",
+  "started": "2026-09-14T05:39:11.991388+00:00",
+  "commands": [
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/train.py",
+        "--mode",
+        "causal-conv4",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/selective-copying",
+        "--steps",
+        "50000"
+      ],
+      "started": "2026-09-14T05:39:11.991662+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T09:14:27.524952+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/evaluate.py",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/selective-copying",
+        "--checkpoint",
+        "best",
+        "--samples",
+        "256"
+      ],
+      "started": "2026-09-14T09:14:27.589076+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T09:43:25.760834+00:00"
+    },
+    {
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/source/exp/variable_memory/evaluate.py",
+        "--task",
+        "selective-copying",
+        "--run-dir",
+        "/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/runs/selective-copying",
+        "--checkpoint",
+        "final",
+        "--samples",
+        "256"
+      ],
+      "started": "2026-09-14T09:43:25.795114+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T10:12:16.543147+00:00"
+    }
+  ],
+  "first_300_steps_match_benchmark": true,
+  "weights": {
+    "model": "d17489ca9f951017eddc1c137f32e0c7363204ab41b938698513e6adcd3de21c",
+    "model_best": "b5f7194f5876e1a052e3b25c318c027fa1f2cc55b2dafedfcbd2b1f802a1b001"
+  },
+  "finished": "2026-09-14T10:12:16.576692+00:00"
+}

@@ -1,0 +1,18 @@
+{
+  "passed": true,
+  "cpu_only": true,
+  "cells_recounted": 880,
+  "campaign_sha256": "ac301ea1555fec96e7f7dad9331fdaeb43ceece69461b452ec1bd22e22f97f9a",
+  "original_review_sha256": "3e82f005e5bd713de93c403c7fbb4907f3b4eb92dbd8293cdf0fbc64e13e4bc2",
+  "copying_best_final_same_weights_and_observations": true,
+  "whole_batch_hours": 4.66824759013123,
+  "execution_hours": 4.5580687375,
+  "script_sha256": "ec31cfd54af360a393dc30fc860c9d54f2c94a88561d5b2d5db3923ce72ddfc1",
+  "files": {
+    "worker-copying.json": "49ab003fe6a2a61f91171ed1221bca27720291be5177ad076c0cbcfff2e610ac",
+    "horizons.png": "301bf15d6e96ef670058da5e66940bbf6e3ce519f4483b80c07045f66e57d81a",
+    "worker-selective-copying.json": "f97e0479d02ff3d46a0d12b8bd9e86edd617bcb32b0a17c47f7407367d2e41cb",
+    "digits.png": "4d996e145d111a73b99e7e4c408306fab30f472c9ee652e24965ad28a1891b25",
+    "selected.json": "d8592c48d61827767aa8d8d7cf26507b2064850750430cd9695d95879cc7cca7"
+  }
+}
