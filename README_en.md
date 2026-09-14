@@ -4,6 +4,9 @@ English | [日本語](README.md)
 
 See the [experiment index](doc/logkv-experiments.md) for comparisons, evaluation artifacts and reproduction commits (in Japanese).
 
+The standard training configuration now uses width4 CausalConv before each block attention, with phase embeddings off and gate/self slot on. These are the new-training CLI defaults; use `--conv-kernel-size 0`, `--no-gated-attention` and `--no-self-slot` for ablations.
+The fixed10 Copying checkpoint achieved 256/256 exact at all 41 tested horizons through T131072 and 8/8 at T16777216. See the [CausalConv report](doc/logkv-causal-conv.md).
+
 A language model implementation of **LogKV**, a custom architecture based on hierarchical kv compression.
 
 ![LogKV kv-cache structure (without overlap)](logkv-refine.drawio.png)
@@ -21,7 +24,7 @@ The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the
 | Component | Description |
 |---|---|
 | Level decay | Logit bias −i·log C for level-i slots. Retains the original coarse-level penalty; its effectiveness after overlap removal needs evaluation |
-| Phase embedding | Learned vectors for the low base-C digits of the position (period 16). Fixes positional degeneracy inside runs of identical tokens |
+| CausalConv | Width4 depthwise causal convolution residual before each block attention; phase embeddings are disabled |
 | Multi-head | Heads folded into the batch dimension |
 | Gated attention | Per-head attention output multiplied by sigmoid(W_g x) |
 | Self slot | One extra slot holding the query token's own k/v (same semantics as a standard causal mask); gives the softmax an "attend to nothing" option and stabilizes gradients |
@@ -50,7 +53,7 @@ cp .env.example .env
 
 ```bash
 uv run torchrun --nproc_per_node=6 train_logkv.py \
-    --run-name myrun --phase-emb --phase-levels 2 --gated-attention --self-slot
+    --run-name myrun --conv-kernel-size 4 --gated-attention --self-slot
 ```
 
 Trains in mixed precision (fp32 master weights + bfloat16 autocast) with a two-optimizer setup: Muon (2D hidden weights) + AdamW. The attention pass uses online softmax + activation checkpointing to reduce VRAM.
@@ -84,7 +87,7 @@ uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV (incl. fp64 machine-pr
 uv run pytest test_lm.py -v                       # legacy architecture
 
 # Copy Memory Problem / Selective Copying (long-range memory benchmarks)
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention --self-slot \
+uv run python exp/copying/train.py --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
 ```
@@ -140,8 +143,12 @@ The data format is Llama-2 style: documents are `<s>text</s>`; conversations are
 | chunk_size | 4 |
 | num_layers | 16 |
 | context_length | 2048 |
-| phase_emb / phase_levels | on / 2 (period 16) |
+| phase_emb | off |
+| conv_kernel_size | 4 |
+| self_slot | on |
 | gated_attention | on |
 | optimizer | Muon (2D hidden) + AdamW (embedding/head/bias/norm/phase emb) |
 | learning rate | 2e-4 (linear warmup 1000) |
 | precision | fp32 master weights + bfloat16 autocast |
+
+For checkpoint compatibility, low-level configuration defaults remain unchanged. When constructing `LogKVConfig` directly, specify `conv_kernel_size=4, gated_attention=True, self_slot=True, phase_emb=False` for the standard model.

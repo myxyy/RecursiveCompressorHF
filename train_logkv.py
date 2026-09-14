@@ -72,7 +72,7 @@ def parse_args():
                         "高い(doc/logkv.md §6.5、Copying/Selective検証はn=2を推奨)")
     p.add_argument("--learnable-decay", action="store_true",
                    help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
-    p.add_argument("--gated-attention", action="store_true",
+    p.add_argument("--gated-attention", action=argparse.BooleanOptionalAction, default=True,
                    help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--kv-norm", action="store_true",
                    help="k/vにhead_dim単位のRMSNormを射影直後と各圧縮後に適用し全レベルを同一スケールにする")
@@ -80,10 +80,10 @@ def parse_args():
                    help="レベルバイアスの符号を反転し +i*log C (増幅) にする (§6.10の希釈補正側)")
     p.add_argument("--v-norm-only", action="store_true",
                    help="vのみRMSNorm(kは非正規化)。kv_normの希釈補正をkeyノルム符号化を保ったまま適用")
-    p.add_argument("--self-slot", action="store_true",
+    p.add_argument("--self-slot", action=argparse.BooleanOptionalAction, default=True,
                    help="クエリ自身のトークンのk/vを1スロット追加 (通常のcausal maskと同じ意味論)")
-    p.add_argument("--conv-kernel-size", type=int, default=0,
-                   help="attention前のcausal depthwise convolution幅（0で無効）")
+    p.add_argument("--conv-kernel-size", type=int, default=4,
+                   help="attention前のcausal depthwise convolution幅（既定4、0で無効）")
     p.add_argument("--batch-size", type=int, default=4, help="per-GPU micro batch")
     p.add_argument("--grad-accum", type=int, default=1)
     p.add_argument("--lr", type=float, default=2e-4)

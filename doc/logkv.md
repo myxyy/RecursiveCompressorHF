@@ -23,6 +23,10 @@ mainの現行APIではない。[実験一覧](logkv-experiments.md)の該当comm
 追加のCopying T16777216でも固定10桁・8/8完全一致を確認した。
 [実装・条件・完了結果](logkv-causal-conv.md)。mainにはモデル変更を取り込んでいない。
 
+**標準構成更新（2026-09-14）**：16M Copying成功後、ユーザー承認によりCausalConvをmainの標準に採用。
+新規訓練CLIは幅4・phaseなし・gate/self slotありを既定とする。旧checkpoint用の低水準config既定値は維持する。
+以下の§6等の位相埋め込みを標準とする記述は過去の選定記録であり、現在の標準は本段落とREADMEを参照。
+
 ## 1. 背景と動機
 
 RecursiveCompressor 系のモデルは自然言語を学習できたが、生成が進むと特定の話題語に
@@ -946,9 +950,9 @@ uv run pytest test_logkv.py test_logkv_lm.py -v
 
 # 標準構成 (§6.8) での訓練
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --self-slot --max-steps 5000
+    --conv-kernel-size 4 --gated-attention --self-slot --max-steps 5000
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --self-slot --resume latest
+    --conv-kernel-size 4 --gated-attention --self-slot --resume latest
 
 # 生成 (config.json から構成を自動判別)
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-5000/model \
@@ -957,13 +961,13 @@ uv run python predict_stream.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/c
     --temperature 0.7 --top-p 0.9
 
 # Copying / Selective (標準構成)
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention \
+uv run python exp/copying/train.py --arch logkv --conv-kernel-size 4 --gated-attention \
     --run-name <name> --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name <name> --max-t-exp 17
 ```
 
 主なチェックポイント（`$DATA_DIR/checkpoints_logkv/`、いずれも 5000 步）:
-`d1024-h8-l16-ph2-gated`（**標準構成**）、`d1024-h8-l16-ph2-gated-kvnorm`（+kv_norm）、`d1024-h8-l16-ld-phase2`（gated なし）、
+`d1024-h8-l16-ph2-gated`（過去の標準構成）、`d1024-h8-l16-ph2-gated-kvnorm`（+kv_norm）、`d1024-h8-l16-ld-phase2`（gated なし）、
 `d1024-h8-l16-ph2-ldecay`（学習可能減衰）、`d1024-h8-l16-leveldecay`（位相なし）。
 シングルヘッド時代の `d1024-l16`（補正なし）と `d1024-l16-leveldecay` はコード 3f7cc40 が必要。
 

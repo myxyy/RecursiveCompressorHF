@@ -3,7 +3,12 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
-## Active causal-convolution branch (2026-09-14)
+## Standard configuration and newly authorized variable-memory study (2026-09-14)
+- User authorized merging CausalConv into main as standard after the successful16M check, then variable-memory Copying/Selective training. This supersedes historical no-merge/no-further-experiments scope below.
+- New-training CLI defaults: conv width4, gate and self slot on, phase off. Low-level config/block defaults stay compatible with old checkpoints. Disable via `--conv-kernel-size 0 --no-gated-attention --no-self-slot`.
+- Variable study: reuse prior M={10,16,32,64}, P0..63, T loguniform1..2028, 50k steps, microbatch32 x2, validation every2000, best/final220 cells each x256. One new standard architecture only, two independent tasks on GPUs0/1, benchmark before launch; confirm >=8h and stop at experiment boundary.
+
+## Historical causal-convolution development and fixed10 campaign (2026-09-14)
 - COMPLETED additional user-authorized 16M Copying evaluation: T=16777216 exact8/8, digits80/80, minimum logit margin10.125. Fixed M10, seed12345, same step50000 checkpoint; no retraining. GPU0 only, 456.83s, completed2026-09-14 14:20:54 JST and released. Preflight T131072/T1048576 also8/8 on the same strings. See `doc/experiments/logkv-causal-conv-20260914/extension-16777216/` and its `review.json` (CPU recount/RNG/source/weight audits passed). This supersedes the earlier no-16M scope for this completed extension only; no Selective16M, further experiments or main merge.
 - User authorized a new branch and implementation/experiments for causal convolution before each LogKVBlock attention. Branch `logkv-causal-conv` starts at main `d707675`; main itself stays unchanged. This new authorization follows the completed positional/no-position studies below.
 - `conv_kernel_size=0` (default) preserves existing model parameters and attention hidden format; 4 enables token-stream RMSNorm -> depthwise causal Conv1d -> SiLU residual before attention. Each block caches only the last k-1 normalized inputs across chunk/step boundaries. No per-compression-level convolution. Keep the refined attention slot layout and fixed level decay.
@@ -67,7 +72,7 @@ uv run pytest test_lm.py -v                            # Legacy tests
 
 # LogKV standard-config training (DDP, 6 GPUs)
 uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
-    --phase-emb --phase-levels 2 --gated-attention --self-slot
+    --conv-kernel-size 4 --gated-attention --self-slot
 
 uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-<step>/model \
     --max-new-tokens 1024 --temperature 0.7 --top-p 0.9
@@ -96,7 +101,7 @@ uv run tensorboard --logdir $DATA_DIR/tensorboard/
 ## Key Design Decisions — LogKV
 Details and evidence live in `doc/logkv.md`; summary:
 - **Refined layout (2026-09-06)** removes overlapping previous-block slots. Matched 50k-step experiments (one seed, phase2 + gated + self slot) preserve perfect Copying through T=131072 (41 horizons, n=256, best/final), with an additional 8/8 at T=16777216, but reduce Selective Copying accuracy (T=64 best string: 30.5% → 17.6%). See `doc/logkv-refine-experiments.md`. LM quality and the LM throughput measurements below still belong to the overlapping layout. Weight shapes/config flags are unchanged, so old checkpoints load with new attention semantics. Restart generation with hidden=None; old runtime hidden states are incompatible.
-- **Standard config**: fixed level decay (−i·log C) + phase embedding (levels=2, period 16) + multi-head + gated attention + self slot (the query's own k/v as one extra slot = standard causal-mask semantics; loss-neutral, gives the softmax an "attend to nothing" option, stabilizes grad_norm ~1.14→0.74). `kv_norm`/`learnable_decay`/`level_amplify`/`v_norm_only` exist as options but are NOT standard (each was tested and rejected for the LM: kv_norm caps the key-norm retrieval margin, learnable decay and amplification worsen temp-0.7 repetition, v_norm alone helps little).
+- **Standard config**: fixed level decay (−i·log C) + width4 token-stream CausalConv (phase off) + multi-head + gated attention + self slot (the query's own k/v as one extra slot = standard causal-mask semantics; loss-neutral, gives the softmax an "attend to nothing" option, stabilizes grad_norm ~1.14→0.74). `kv_norm`/`learnable_decay`/`level_amplify`/`v_norm_only` exist as options but are NOT standard (each was tested and rejected for the LM: kv_norm caps the key-norm retrieval margin, learnable decay and amplification worsen temp-0.7 repetition, v_norm alone helps little).
 - **Level decay** originally corrected cross-level multiplicity and improved topic fixation. It is retained as a coarse-level penalty in the refined layout, where slots no longer overlap; its former multiplicity rationale no longer applies. The original 16.7M-token Copying result is in §6.13; a separate refined-layout probe is recorded in `doc/logkv-refine-experiments.md`. The variable-memory study in `doc/logkv-position-study.md` ablates decay only with the new combined positional scheme. Decay ablations for standard phase2 and LM quality remain untested.
 - **Variable-memory positional study (2026-09-07–08)**: code `24b360c` on `logkv-position-study`; main stores documentation and evaluation data. All 12 runs completed 50k steps and best/final evaluation. Exact Copying remains unsolved; relative K/V improves Selective M10/T64, and combined/no-decay improves very short-horizon M16/M32. One seed, different training conditions from the earlier fixed-M10 studies. See `doc/logkv-position-study.md`.
 - **Phase embedding** (base-C digits of the absolute position, small period) breaks the positional degeneracy inside runs of identical tokens (multi-scale windows coincide there, making "how many so far" uncountable). Longer periods aliased beyond the training range and hurt extrapolation in earlier configurations; period 16 was the robust choice there. The variable-memory study documents its limits for longer payloads and does not establish arbitrary-length exact copying.
@@ -126,7 +131,7 @@ Details and evidence live in `doc/logkv.md`; summary:
 
 ## Current Model Parameters (LogKV standard)
 - d_model=1024, num_heads=8, d_ff=3072, chunk_size=4, num_layers=16 (~310M params)
-- phase_emb=True (phase_levels=2), gated_attention=True, self_slot=True; decay fixed at log C
+- phase_emb=False, conv_kernel_size=4, gated_attention=True, self_slot=True; decay fixed at log C
 - context_length=2048, lr=2e-4 (linear warmup 1000), DDP batch 4/GPU × 6 GPUs
 - mixed precision: fp32 master / bfloat16 autocast
 - (Legacy pipeline model: d_model=2048, num_heads=16, d_ff=6144, num_layers=16, lr=5e-5)

@@ -4,8 +4,8 @@
 
 各方式の比較と再現用commitは[実験記録一覧](doc/logkv-experiments.md)にまとめています。
 
-`logkv-causal-conv`ブランチでは、各LogKVBlockのattention前に任意のcausal depthwise convolutionを追加しています。
-`--conv-kernel-size 4`で有効、既定の0では無効です。[実装・比較実験](doc/logkv-causal-conv.md)を参照してください。
+2026-09-14、各LogKVBlockのattention前に幅4のCausalConvを加え、位置埋め込みを使わない構成を標準に採用しました。
+新規訓練CLIはConv幅4・gate/self slot有効が既定です。`--conv-kernel-size 0`でConvを無効化できます。[実装・比較実験](doc/logkv-causal-conv.md)を参照してください。
 位置埋め込みなし・固定10桁の評価では、CopyingはT=131,072までの全41点で各256/256例が完全一致しました。
 追加のT=16,777,216でも8例中8例が完全一致しました（固定10桁、学習seedは1個）。
 Selective Copyingも改善しましたが、評価した最長距離T=131,072での完全一致は未達です。
@@ -27,7 +27,7 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 | 要素 | 内容 |
 |---|---|
 | レベル減衰 | レベルiのロジットに −i·log C。従来の粗い階層へのペナルティを維持。重複除去後の有効性は再検証予定 |
-| 位相埋め込み | 位置のC進数下位桁（周期16）の学習ベクトル。同一トークン連続区間の位置縮退を解消 |
+| CausalConv | 各Blockのattention前に幅4のdepthwise causal convolution残差を追加。位置埋め込みは使用しない |
 | マルチヘッド | ヘッドをバッチ次元に折り畳んで適用 |
 | Gated attention | sigmoid(W_g x) を各ヘッドのattention出力に乗算 |
 | Self slot | クエリ自身のトークンのk/vを1スロット追加（通常のcausal maskと同じ意味論）。softmaxに「聞かない」逃げ場を与え勾配を安定化 |
@@ -61,7 +61,7 @@ cp .env.example .env
 
 ```bash
 uv run torchrun --nproc_per_node=6 train_logkv.py \
-    --run-name myrun --phase-emb --phase-levels 2 --gated-attention --self-slot
+    --run-name myrun --conv-kernel-size 4 --gated-attention --self-slot
 ```
 
 混合精度（fp32マスター重み + bfloat16 autocast）、Muon（隠れ層の2D重み）+ AdamW の2段オプティマイザで学習します。attention部はonline softmax + activation checkpointingでVRAMを削減しています。
@@ -95,7 +95,7 @@ uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV（fp64機械精度の�
 uv run pytest test_lm.py -v                       # 旧アーキテクチャ
 
 # Copy Memory Problem / Selective Copying（長距離記憶の基礎検証）
-uv run python exp/copying/train.py --arch logkv --phase-emb --phase-levels 2 --gated-attention --self-slot \
+uv run python exp/copying/train.py --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
 uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
 ```
@@ -151,8 +151,12 @@ uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
 | chunk_size | 4 |
 | num_layers | 16 |
 | context_length | 2048 |
-| phase_emb / phase_levels | 有効 / 2（周期16） |
+| phase_emb | 無効 |
+| conv_kernel_size | 4 |
+| self_slot | 有効 |
 | gated_attention | 有効 |
-| optimizer | Muon (2D hidden) + AdamW (embedding/head/bias/norm/位相埋め込み) |
+| optimizer | Muon (2D hidden) + AdamW (embedding/head/bias/norm/Conv) |
 | learning rate | 2e-4（線形warmup 1000） |
 | precision | fp32 master weights + bfloat16 autocast |
+
+旧checkpointの設定読込と低水準APIの既定値は互換性のため維持します。`LogKVConfig`で直接標準モデルを作る場合は`conv_kernel_size=4, gated_attention=True, self_slot=True, phase_emb=False`を指定してください。
