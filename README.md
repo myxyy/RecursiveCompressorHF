@@ -7,7 +7,8 @@
 `logkv-causal-conv`ブランチでは、各LogKVBlockのattention前に任意のcausal depthwise convolutionを追加しています。
 `--conv-kernel-size 4`で有効、既定の0では無効です。[実装・比較実験](doc/logkv-causal-conv.md)を参照してください。
 位置埋め込みなし・固定10桁の評価では、CopyingはT=131,072までの全41点で各256/256例が完全一致しました。
-Selective Copyingも改善しましたが、同じ最長距離での完全一致は未達です。この構成の16M評価は未実施です。
+追加のT=16,777,216でも8例中8例が完全一致しました（固定10桁、学習seedは1個）。
+Selective Copyingも改善しましたが、評価した最長距離T=131,072での完全一致は未達です。
 
 階層的なkv圧縮による独自アーキテクチャ **LogKV** の言語モデル実装です。
 

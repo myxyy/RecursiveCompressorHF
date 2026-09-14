@@ -32,4 +32,19 @@ CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python \
   doc/experiments/logkv-causal-conv-20260914/extension-16777216/evaluate.py full
 ```
 
-Results pending.
+Completed 2026-09-14 14:20:54 JST: **T=16,777,216 exact8/8, digits80/80**.
+Minimum correct-minus-best-wrong logit margin10.125. Full evaluation456.83s;
+GPU0 released. Preflight T131072/T1048576 also8/8, on the same eight strings.
+Preparation commit `109f7d9`.
+
+[full.json](full.json) preserves all memories, predictions, answer logits and margins.
+[review.json](review.json) records independent CPU recounts, RNG replay and provenance checks.
+To repeat the completed audit without GPU inference:
+
+```bash
+CUDA_VISIBLE_DEVICES='' .venv/bin/python \
+  doc/experiments/logkv-causal-conv-20260914/extension-16777216/review.py
+```
+
+This is one training seed and eight memory strings, not256 samples at16M or all intermediate horizons.
+Main was not merged; no further experiments are queued.

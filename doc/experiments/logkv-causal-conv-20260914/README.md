@@ -35,3 +35,5 @@ It writes `analysis/{review,counts,training}.json` and two plots. Reproduce from
 ```
 
 The original RAID checkpoints and baseline archives are required for the full audit.
+
+User-authorized follow-up: [16M Copying extension](extension-16777216/README.md) completed with8/8 exact,80/80 digits, no retraining. The initial no-16M statements above describe the original campaign scope. GPU0 was released after456.83s of full evaluation.

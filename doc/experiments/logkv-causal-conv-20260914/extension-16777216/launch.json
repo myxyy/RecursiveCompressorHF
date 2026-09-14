@@ -1,0 +1,21 @@
+{
+  "started": "2026-09-14T05:13:12.963969+00:00",
+  "pid": 3090637,
+  "command": [
+    "timeout",
+    "--signal=TERM",
+    "--kill-after=30s",
+    "20m",
+    ".venv/bin/python",
+    "-u",
+    "doc/experiments/logkv-causal-conv-20260914/extension-16777216/evaluate.py",
+    "full"
+  ],
+  "gpus": [
+    0
+  ],
+  "timeout_seconds": 1200,
+  "preparation_commit": "109f7d9b464f153ba3bec15f7f42f819718d7eb9",
+  "preflight_sha256": "cf9abe602a1759e00cb1e05f532d922234d04448799551ff97b2d2ce43049dfc",
+  "projected_full_seconds_with_margin": 616.8027933351696
+}

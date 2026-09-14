@@ -1,0 +1,4 @@
+Loading weights:   0%|          | 0/33 [00:00<?, ?it/s]Loading weights: 100%|██████████| 33/33 [00:00<00:00, 5515.30it/s]
+T=131072: exact=8/8 digits=80/80 seconds=3.06
+T=1048576: exact=8/8 digits=80/80 seconds=23.20
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/extension-16777216/preflight.json

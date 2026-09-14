@@ -20,7 +20,8 @@ mainの現行APIではない。[実験一覧](logkv-experiments.md)の該当comm
 トークン列上の残差付きdepthwise causal convolutionを追加した（`conv_kernel_size=4`で有効、既定0は無効）。
 圧縮階層ごとのconvではなく、圧縮自体と参照スロット規則は維持する。
 位置埋め込みなし・固定10桁CopyingはT131072まで全41評価点で各256/256完全一致、Selectiveも対照から改善した。
-この構成の16M評価は未実施。[実装・条件・完了結果](logkv-causal-conv.md)。mainにはモデル変更を取り込んでいない。
+追加のCopying T16777216でも固定10桁・8/8完全一致を確認した。
+[実装・条件・完了結果](logkv-causal-conv.md)。mainにはモデル変更を取り込んでいない。
 
 ## 1. 背景と動機
 

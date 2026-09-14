@@ -1,0 +1,82 @@
+{
+  "passed": true,
+  "cpu_only": true,
+  "main_unchanged": "d707675bd2dee14f19a46a5f1d686b3ec9c11326",
+  "rows": [
+    {
+      "T": 131072,
+      "n": 8,
+      "string_correct": 8,
+      "token_correct": 80,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "minimum_margin": 10.15625,
+      "median_margin": 14.43701171875,
+      "seconds": 3.058438560925424
+    },
+    {
+      "T": 1048576,
+      "n": 8,
+      "string_correct": 8,
+      "token_correct": 80,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "minimum_margin": 10.125,
+      "median_margin": 14.43701171875,
+      "seconds": 23.200116388965398
+    },
+    {
+      "T": 16777216,
+      "n": 8,
+      "string_correct": 8,
+      "token_correct": 80,
+      "digit_errors": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "minimum_margin": 10.125,
+      "median_margin": 14.43701171875,
+      "seconds": 456.8296297052875
+    }
+  ],
+  "checkpoint_and_frozen_source_hashes_verified": true,
+  "seed_replay_verified": true,
+  "saved_logits_recounted": true,
+  "script_sha256": "517efe399771fb27ec9aae52aaad375b3960658efc83508af7e0b317302f2113",
+  "files": {
+    "preflight.json": "cf9abe602a1759e00cb1e05f532d922234d04448799551ff97b2d2ce43049dfc",
+    "full.json": "3cdc475969559632064eb5eb0d4a55dbad79a022b20c73a9dc50363c688ef1db",
+    "launch.json": "b264b49a1c4efdad4951f976dc7673b7c382d3b212f2a4131d5343412a6f10e6",
+    "preflight.log": "2b181b67d4dec914fa22bacb1f6bf331fae47df6f49f92779595553b1cf32b06",
+    "full.log": "c62eb9c68b37cb99c3c1a883903a8fd36fe597ed63c90c224823fcadf674cb90"
+  },
+  "limitations": "One trained checkpoint, eight fixed random strings shared across the three horizons; not 256 examples, not all intermediate T, variable memory length, or Selective Copying."
+}
