@@ -1,8 +1,11 @@
 # LogKV：位置埋め込みなし＋CausalConvの比較
 
 2026-09-14、ユーザーの依頼によりmain `d707675`から`logkv-causal-conv`ブランチを作成した。
-**実装とCPU検証が完了し、GPU事前検証を準備中。本学習・評価の結果は未確定。**
+**実装とCPU/GPU事前検証が完了し、本学習の開始準備中。結果は未確定。**
 mainへのモデル変更のマージは行っていない。
+実装commit `4bfee1f`の28ファイルを実験専用ディレクトリへ凍結した。
+モデル・通常訓練CLI等の変更は同commitで追跡し、タスク生成・評価器は既存対照と同一。
+[ソース記録](experiments/logkv-causal-conv-20260914/source_manifest.json)。
 
 ## 実装
 
@@ -24,6 +27,10 @@ x ← x + FFNSwiGLU(RMSNorm(x))
 - `conv_kernel_size=0`は既定・無効。旧checkpointのパラメータ構成とhidden形式を維持する。
   有効時のBlock hiddenは`(conv_cache, attention_hidden)`。実行中に設定を切り替えず、別設定ではhidden=Noneから開始する。
 - Copying/Selectiveと通常LM訓練のCLIは`--conv-kernel-size 4`。LM用Muonへ3次元のconv重みを渡さずAdamWへ割り当てる。
+
+300 stepsの実checkpointで両タスクbest/finalをT3/16/65・各256例で評価し、
+記憶列・実配置・正答数の独立照合を通過した。対照との同一例比較の集計も検証した。
+[評価器確認](experiments/logkv-causal-conv-20260914/evaluation_smoke.json)。
 
 ## 比較条件
 
@@ -59,6 +66,19 @@ CPUテスト159件を通過。独立した過去tap演算＋既存の独立atten
 bf16重み推論、conv無効の旧config読込、Muon/AdamW振分けを確認した。
 保存読込は全重みの完全一致とfp64出力誤差1e−12以内を検査する。
 [テスト記録](experiments/logkv-causal-conv-20260914/tests.json)。
+
+GPU事前検証は2026-09-14 11:00:42 JST開始。最大T2028・batch64で2回のoptimizer更新を通過し、
+ピークallocated 15.85 GiB、reserved 16.49 GiB。GPUのfp64分割推論最大差は5.6e−17、
+確認した小型モデルでfp32＋bf16 autocast・bf16重みの分割推論は最大差0だった。
+conv無効モデルの初期重みとfp64出力も、凍結した2層対照とbit一致した。
+[最大サイズ・GPU逐次推論確認](experiments/logkv-causal-conv-20260914/fullsize_smoke.json)、
+[ソース・初期化・互換性確認](experiments/logkv-causal-conv-20260914/validation.json)。
+
+20 stepsのGPU0/1反復は両タスクで重み・記録指標がbit一致。
+300 stepsの同時実測はCopying 61.7秒、Selective 57.7秒で、50kへの単純外挿は2.86 / 2.67時間。
+15%の学習時間余裕・評価1時間・GPU事前検証を含め、全体見積もりは**4.31時間**。
+事前GPU検証を含む停止期限は**2026-09-14 18:30:42 JST**。
+[再現性・時間計測](experiments/logkv-causal-conv-20260914/preflight.json)。
 
 GPU0=Copying、GPU1=Selectiveで最大2GPU。まずGPUでの分割推論・最大T/batchの更新を確認し、
 20-step反復と300-step同時benchmarkで再現性・所要時間を確認する。

@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "source_commit": "4bfee1fc15af6e4decef26c6bfecd8bd3336cd9d",
+  "frozen_files_verified": 28,
+  "source_hashes_match_checkout": true,
+  "scripts_syntax_passed": true,
+  "num_layers": 2,
+  "conv_kernel_size": 4,
+  "num_params": 5792256,
+  "shared_initial_weights_identical": true,
+  "extra_parameters_only_in_convolution": true,
+  "disabled_initial_weights_identical_to_baseline": true,
+  "disabled_fp64_outputs_bitexact_to_frozen_baseline": true,
+  "tests": {
+    "passed": true,
+    "tests_passed": 159,
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py -q",
+    "gpu_used": false,
+    "checks": [
+      "independent convolution and attention oracle",
+      "fp64 streaming/predict equivalence",
+      "causality",
+      "split backward equivalence",
+      "bounded cache storage",
+      "HF save/load and generate",
+      "bf16 weight inference",
+      "old config compatibility",
+      "Muon partition"
+    ]
+  },
+  "tests_log_sha256": "79e45cfddf408914c32f57811d9e8b08eb10115492816e3a4d9f51ead4295304",
+  "script_hashes": {
+    "evaluation_smoke.py": "fff948809cd570f2d7fa2b573a31fc65cbc9d9c58d8a706997170b1584175be1",
+    "summarize.py": "8c6a2a6d92b5b839912047cde26654501609caf618b9ecab525d0ec35dd6a0cb",
+    "train_entry.py": "75f30f8d6be2380f7c58e910aef84a19f0efe7109b0ba2fa4e21b004df44d485",
+    "evaluate.py": "80491472421d805c3510b565ea4a417e1f880eaf1be011e85c318bc72f172a73",
+    "compare_baseline.py": "3d287dcd14670e0d1bac8640753dfa2d0cb1d4dc97ca3c48b672c420b2f790bc",
+    "run.py": "4d54ba744c74c4cac2fb6412e8d7d5f5197c74ae104f41ffdecc9b6bacd58ce9",
+    "worker.py": "f25bd1ace787d24586df89f158f859c682bfc329debb59229e2fb727e381ed49",
+    "fullsize_smoke.py": "f1abada1534dcfe0f6f32c48c843693b31051ab7cf156e9ae75fb2085adaa5e1",
+    "common.py": "ebf8d994328f043b1f61685e14ab956f6e1707a79499d24e64a440b723f2c09e",
+    "preflight.py": "c5925a95cc07aebb78de5a202ace4cbca2b5bd0395613034647f8dfa772da7a9"
+  },
+  "evaluation_smoke_passed": true,
+  "paired_baseline_smoke_cells": 12,
+  "paired_counts_passed": true,
+  "data_mismatch_rejected": true,
+  "baseline_result_hashes_verified": true
+}

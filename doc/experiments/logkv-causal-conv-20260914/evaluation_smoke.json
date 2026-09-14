@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "tasks": [
+    "copying",
+    "selective-copying"
+  ],
+  "checkpoints": [
+    "best",
+    "final"
+  ],
+  "horizons": [
+    3,
+    16,
+    65
+  ],
+  "samples": 256,
+  "checkpoint_training_steps": 300,
+  "targets_and_positions_replayed": true
+}

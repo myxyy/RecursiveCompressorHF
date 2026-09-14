@@ -1,0 +1,44 @@
+{
+  "passed": true,
+  "physical_gpu": "0",
+  "num_layers": 2,
+  "conv_kernel_size": 4,
+  "batch_size": 64,
+  "T": 2028,
+  "sequence_length": 2048,
+  "updates": 2,
+  "losses": [
+    2.2420849800109863,
+    0.04614192247390747
+  ],
+  "peak_allocated_bytes": 17023790592,
+  "streaming_checks": [
+    {
+      "dtype": "torch.float64",
+      "autocast": false,
+      "max_abs_error": 5.551115123125783e-17,
+      "tolerance": 1e-12
+    },
+    {
+      "dtype": "torch.float32",
+      "autocast": true,
+      "max_abs_error": 0.0,
+      "tolerance": 0.005
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "autocast": false,
+      "max_abs_error": 0.0,
+      "tolerance": 0.005
+    },
+    {
+      "dtype": "torch.bfloat16",
+      "autocast": true,
+      "max_abs_error": 0.0,
+      "tolerance": 0.005
+    }
+  ],
+  "peak_reserved_bytes": 17708351488,
+  "initial_weights_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+  "base_initial_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862"
+}
