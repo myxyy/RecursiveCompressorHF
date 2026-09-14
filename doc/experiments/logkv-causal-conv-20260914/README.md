@@ -19,3 +19,19 @@ Frozen runtime lives in its `source/`; weights in `exp/<task>/causal-conv4-fixed
 Status: `campaign.json`, `AGENT_STATUS.json`; task stdout `copying.log`, `selective-copying.log`.
 Baseline is read-only `/mnt/raid0/RecursiveCompressor/experiments/logkv-no-position-main-20260913/`.
 No additional widths/seeds, per-compression-level convolution, three-layer training or 16M extension are queued.
+
+Completed 2026-09-14 13:55:28 JST; both workers and all evaluation/audit commands succeeded.
+Runtime 2.85h (2.91h including preflight). GPUs released. Original hash-indexed
+`results/` files preserve the automatic audit snapshot; the report above contains the completed interpretation.
+Copying: 256/256 exact at all 41 horizons through T131072; best step50000 is identical to final.
+Selective: T64 exact94/112 (best/final, each256), T131072 exact0/0. No 16M evaluation.
+
+`analyze_completed.py` checks completion, frozen/source/result/checkpoint hashes,
+training selection, and recounts saved per-digit and paired baseline outcomes on CPU.
+It writes `analysis/{review,counts,training}.json` and two plots. Reproduce from the repository root:
+
+```bash
+.venv/bin/python doc/experiments/logkv-causal-conv-20260914/analyze_completed.py
+```
+
+The original RAID checkpoints and baseline archives are required for the full audit.

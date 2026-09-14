@@ -1,0 +1,46 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/33 [00:00<?, ?it/s]Loading weights: 100%|██████████| 33/33 [00:00<00:00, 7822.10it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/exp/selective-copying/causal-conv4-fixed10-20260914/model_best on 41 horizons (T=1..131072), 256 samples each, device=cuda:0
+T=      1 | token 1.0000 | string 1.0000 | 0.6s <= train horizon
+T=      2 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      3 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      4 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=      5 | token 0.9988 | string 0.9883 | 0.0s <= train horizon
+T=      6 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=      7 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=      8 | token 0.9973 | string 0.9727 | 0.0s <= train horizon
+T=      9 | token 0.9961 | string 0.9609 | 0.0s <= train horizon
+T=     10 | token 0.9984 | string 0.9883 | 0.0s <= train horizon
+T=     11 | token 0.9969 | string 0.9727 | 0.0s <= train horizon
+T=     12 | token 0.9961 | string 0.9727 | 0.0s <= train horizon
+T=     13 | token 0.9984 | string 0.9844 | 0.0s <= train horizon
+T=     14 | token 0.9969 | string 0.9688 | 0.0s <= train horizon
+T=     16 | token 0.9906 | string 0.9180 | 0.0s <= train horizon
+T=     24 | token 0.9859 | string 0.8945 | 0.0s <= train horizon
+T=     32 | token 0.9645 | string 0.7266 | 0.0s <= train horizon
+T=     48 | token 0.9273 | string 0.5312 | 0.0s <= train horizon
+T=     64 | token 0.9039 | string 0.3672 | 0.0s <= train horizon
+T=     96 | token 0.9160 | string 0.4609 | 0.0s <= train horizon
+T=    128 | token 0.8922 | string 0.3281 | 0.1s <= train horizon
+T=    192 | token 0.8629 | string 0.2539 | 0.1s <= train horizon
+T=    256 | token 0.8125 | string 0.1133 | 0.1s <= train horizon
+T=    384 | token 0.8570 | string 0.1953 | 0.2s <= train horizon
+T=    512 | token 0.8262 | string 0.1055 | 0.3s <= train horizon
+T=    768 | token 0.8094 | string 0.1289 | 0.4s <= train horizon
+T=   1024 | token 0.7715 | string 0.0391 | 0.6s <= train horizon
+T=   1536 | token 0.8086 | string 0.1445 | 0.9s <= train horizon
+T=   2048 | token 0.7750 | string 0.0547 | 1.2s
+T=   3072 | token 0.7488 | string 0.0391 | 1.8s
+T=   4096 | token 0.7176 | string 0.0156 | 2.6s
+T=   6144 | token 0.7449 | string 0.0430 | 4.1s
+T=   8192 | token 0.6840 | string 0.0117 | 5.2s
+T=  12288 | token 0.6078 | string 0.0000 | 7.8s
+T=  16384 | token 0.5777 | string 0.0000 | 10.9s
+T=  24576 | token 0.5898 | string 0.0078 | 16.5s
+T=  32768 | token 0.5156 | string 0.0039 | 22.2s
+T=  49152 | token 0.4926 | string 0.0039 | 33.5s
+T=  65536 | token 0.4121 | string 0.0000 | 45.2s
+T=  98304 | token 0.4453 | string 0.0000 | 69.8s
+T= 131072 | token 0.4105 | string 0.0000 | 94.3s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/exp/selective-copying/causal-conv4-fixed10-20260914/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/exp/selective-copying/causal-conv4-fixed10-20260914/plot.png

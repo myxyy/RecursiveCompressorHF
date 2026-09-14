@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "cpu_only": true,
+  "cells_recounted": 328,
+  "frozen_source_script_prerequisite_hashes_verified": true,
+  "result_review_hashes": {
+    "baseline": "7c13febba3e746774a3f0e971951ae3ca97e0821f6b4d5eb9d3d78351682f82b",
+    "conv": "fee680705cc9d2cfd283107c4045449beff3eca6578b64259f5f0464bdf49728"
+  },
+  "checkpoint_hashes_verified": true,
+  "paired_samples_verified": true,
+  "main_unchanged": "d707675bd2dee14f19a46a5f1d686b3ec9c11326",
+  "copying_best_final_same_weights": true,
+  "copying_samples_per_checkpoint": 10496,
+  "copying_min_margin": 4.4375,
+  "script_sha256": "1e4079dc7e17eda0450217ad6c5b6f95804e2d02c854386d559508d36e0d78b5",
+  "files": {
+    "comparison.png": "daf27bb43b1d868e0158994aab2e7cc3b5bceac210e41cfa00d6ccb47952543d",
+    "counts.json": "3e146aba393ccf0844dcc4e225a3d64f8632a112cb02321ecd854d9ed8ba134a",
+    "training.json": "2cc132d8511a40979f2c8ed708eb61574e5d4cc7aef4e8545eb3f0500ef854d3",
+    "training.png": "271df8fc54545b603e94c37d5e7070fdab893ebb27c878929fb49586bf4b307a"
+  },
+  "limitation": "One seed; best/final Copying are the same checkpoint and same evaluation data. Only the sampled 41 horizons through T131072 were evaluated; no 16M extension or new inference in this review."
+}

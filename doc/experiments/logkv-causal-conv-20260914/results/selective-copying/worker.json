@@ -1,0 +1,91 @@
+{
+  "task": "selective-copying",
+  "mode": "selective-copying",
+  "state": "complete",
+  "started": "2026-09-14T02:04:31.187717+00:00",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-causal-conv-20260914/train_entry.py",
+        "--run-name",
+        "causal-conv4-fixed10-20260914",
+        "--arch",
+        "logkv",
+        "--gated-attention",
+        "--self-slot",
+        "--phase-levels",
+        "2",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--conv-kernel-size",
+        "4",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-14T02:04:31.187755+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T04:44:31.531130+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-causal-conv-20260914/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-14T04:44:31.610657+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T04:49:56.341107+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-causal-conv-20260914/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-14T04:49:56.341823+00:00",
+      "returncode": 0,
+      "finished": "2026-09-14T04:55:18.209237+00:00"
+    }
+  ],
+  "weights": {
+    "best": "88a4d9102a369a692f738816d4be33ecd58f61d984e96e3ea842d1aee7469ee5",
+    "final": "a4d51f01fe40aebf5d82b276253ced29f4d721487c8bf7a28478a68b7141a91d"
+  },
+  "finished": "2026-09-14T04:55:18.261261+00:00"
+}
