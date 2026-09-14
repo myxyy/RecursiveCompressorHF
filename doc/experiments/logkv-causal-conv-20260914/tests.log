@@ -1,0 +1,13 @@
+........................................................................ [ 45%]
+........................................................................ [ 90%]
+...............                                                          [100%]
+=============================== warnings summary ===============================
+test_logkv_conv.py::test_conv_weights_use_adamw_not_muon
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+test_logkv_conv.py::test_conv_weights_use_adamw_not_muon
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+159 passed, 2 warnings in 7.58s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

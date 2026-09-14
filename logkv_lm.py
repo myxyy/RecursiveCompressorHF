@@ -20,7 +20,7 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
             LogKVBlock(config.d_model, config.chunk_size, config.d_ff, config.num_heads,
                        config.phase_emb, config.phase_levels, config.learnable_decay,
                        config.gated_attention, config.kv_norm, config.level_amplify,
-                       config.v_norm_only, config.self_slot)
+                       config.v_norm_only, config.self_slot, config.conv_kernel_size)
             for _ in range(config.num_layers)
         ])
         self.norm = nn.RMSNorm(config.d_model)
@@ -30,8 +30,9 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
     def step(self, input_ids, hidden=None):
         """Chunked sequential forward over all layers.
 
-        hidden: list of per-layer LogKV hidden states ((levels, offset)
-        tuples), or None to start. Concatenating step() logits over any split
+        hidden: list of per-block opaque states, or None to start. With causal
+        convolution enabled a block wraps its attention state with conv history.
+        Concatenating step() logits over any split
         of the input reproduces forward(). Returns (logits, hidden)."""
         x = self.embedding(input_ids)
         if hidden is None:

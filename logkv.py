@@ -377,30 +377,82 @@ class FFNSwiGLU(nn.Module):
         return output
 
 
+class CausalConvBlock(nn.Module):
+    """Token-stream depthwise causal convolution with pre-norm/SiLU residual.
+
+    History spans attention chunks and step calls; zero padding is used only at
+    the true sequence start. Each block retains k-1 normalized input vectors.
+    Convolution is not applied again at the recursive compression levels.
+    """
+
+    def __init__(self, dim, kernel_size):
+        super().__init__()
+        if not isinstance(kernel_size, int) or kernel_size < 1:
+            raise ValueError("kernel_size must be a positive integer")
+        self.kernel_size = kernel_size
+        self.norm = nn.RMSNorm(dim)
+        self.conv = nn.Conv1d(dim, dim, kernel_size, groups=dim)
+
+    def forward(self, x):
+        return self.step(x)[0]
+
+    def step(self, x, cache=None):
+        h = self.norm(x)
+        history_size = self.kernel_size - 1
+        if cache is None:
+            cache = h.new_zeros(h.size(0), history_size, h.size(2))
+        if cache.shape != (h.size(0), history_size, h.size(2)):
+            raise ValueError("Invalid causal convolution history shape")
+        if h.size(1) == 0:
+            return x, cache
+        history = torch.cat([cache, h], dim=1)
+        y = self.conv(history.transpose(1, 2)).transpose(1, 2)
+        # Clone prevents a tiny inference cache from pinning the full segment.
+        # Keep autograd connections so split training has the same gradients.
+        new_cache = history[:, -history_size:].clone() if history_size else history[:, :0].clone()
+        return x + torch.nn.functional.silu(y), new_cache
+
+
 class LogKVBlock(nn.Module):
     """Standard pre-norm transformer block with LogKV attention:
-    x = x + LogKV(RMSNorm(x)); x = x + FFNSwiGLU(RMSNorm(x))."""
+    Optional causal-conv residual, then attention residual, then FFN residual.
+    Hidden is the original attention state when convolution is disabled;
+    otherwise it is (conv_cache, attention_state).
+    """
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False, level_amplify=False,
-                 v_norm_only=False, self_slot=False):
+                 v_norm_only=False, self_slot=False, conv_kernel_size=0):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
                                gated_attention, kv_norm, level_amplify, v_norm_only, self_slot)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
+        if not isinstance(conv_kernel_size, int) or conv_kernel_size < 0:
+            raise ValueError("conv_kernel_size must be a nonnegative integer")
+        self.causal_conv = CausalConvBlock(dim, conv_kernel_size) if conv_kernel_size else None
 
     def forward(self, x):
+        if self.causal_conv is not None:
+            x = self.causal_conv(x)
         x = x + self.attention(self.attention_norm(x))
         return x + self.ffn(self.ffn_norm(x))
 
     def step(self, x, hidden=None):
+        if self.causal_conv is not None:
+            conv_cache, hidden = hidden if hidden is not None else (None, None)
+            x, conv_cache = self.causal_conv.step(x, conv_cache)
         y, hidden = self.attention.step(self.attention_norm(x), hidden)
         x = x + y
+        if self.causal_conv is not None:
+            hidden = (conv_cache, hidden)
         return x + self.ffn(self.ffn_norm(x)), hidden
 
     def predict(self, x, hidden=None):
+        if self.causal_conv is not None:
+            y, hidden = self.step(x.unsqueeze(1), hidden)
+            return y.squeeze(1), hidden
         y, hidden = self.attention.predict(self.attention_norm(x), hidden)
         x = x + y
         return x + self.ffn(self.ffn_norm(x)), hidden

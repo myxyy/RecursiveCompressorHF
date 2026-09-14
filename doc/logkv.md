@@ -16,6 +16,11 @@ mainのモデル・設定・訓練CLIは`658f63e`の実装を維持している�
 §2.4/2.5の位置logit補正、子位置変換・相対K/V、RoPE関連の追加APIは実験ブランチの機能で、
 mainの現行APIではない。[実験一覧](logkv-experiments.md)の該当commitを参照すること。
 
+**CausalConv実験ブランチ（2026-09-14）**：`logkv-causal-conv`ではBlockのattention前に
+トークン列上の残差付きdepthwise causal convolutionを追加した（`conv_kernel_size=4`で有効、既定0は無効）。
+圧縮階層ごとのconvではなく、圧縮自体と参照スロット規則は維持する。
+[実装と比較条件](logkv-causal-conv.md)。mainにはモデル変更を取り込んでいない。
+
 ## 1. 背景と動機
 
 RecursiveCompressor 系のモデルは自然言語を学習できたが、生成が進むと特定の話題語に

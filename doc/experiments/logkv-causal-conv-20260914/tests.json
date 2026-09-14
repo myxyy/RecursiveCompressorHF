@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "tests_passed": 159,
+  "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py -q",
+  "gpu_used": false,
+  "checks": [
+    "independent convolution and attention oracle",
+    "fp64 streaming/predict equivalence",
+    "causality",
+    "split backward equivalence",
+    "bounded cache storage",
+    "HF save/load and generate",
+    "bf16 weight inference",
+    "old config compatibility",
+    "Muon partition"
+  ]
+}

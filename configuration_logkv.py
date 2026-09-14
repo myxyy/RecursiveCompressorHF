@@ -27,6 +27,7 @@ class LogKVConfig(PretrainedConfig):
         level_amplify=False,
         v_norm_only=False,
         self_slot=False,
+        conv_kernel_size=0,
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
@@ -45,6 +46,9 @@ class LogKVConfig(PretrainedConfig):
         self.level_amplify = level_amplify
         self.v_norm_only = v_norm_only
         self.self_slot = self_slot
+        if not isinstance(conv_kernel_size, int) or conv_kernel_size < 0:
+            raise ValueError("conv_kernel_size must be a nonnegative integer (0 disables convolution)")
+        self.conv_kernel_size = conv_kernel_size
         super().__init__(
             vocab_size=vocab_size,
             pad_token_id=pad_token_id,

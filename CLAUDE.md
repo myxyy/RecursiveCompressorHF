@@ -3,6 +3,14 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Active causal-convolution branch (2026-09-14)
+- User authorized a new branch and implementation/experiments for causal convolution before each LogKVBlock attention. Branch `logkv-causal-conv` starts at main `d707675`; main itself stays unchanged. This new authorization follows the completed positional/no-position studies below.
+- `conv_kernel_size=0` (default) preserves existing model parameters and attention hidden format; 4 enables token-stream RMSNorm -> depthwise causal Conv1d -> SiLU residual before attention. Each block caches only the last k-1 normalized inputs across chunk/step boundaries. No per-compression-level convolution. Keep the refined attention slot layout and fixed level decay.
+- Only new experiments authorized: two-layer, no phase embeddings, conv width4, fixed M10 Copying and Selective, independently trained 50k, best/final 41 horizons through T131072 x256. Shared initial parameters match the completed two-layer no-position baseline's untrained weights; new conv parameters only. Baseline results already exist; do not retrain it or restart archived runs.
+- Maximum two GPUs (0/1); benchmark first, confirm if a proposed batch is expected to take >=8h, whole new batch capped at 7.5h including GPU preflight. No additional seeds, widths, per-level variants, three-layer models or 16M extension are queued.
+- Core tests: `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py -q` (159 passed). Convolution's 3D weights must use AdamW, not Muon; LM optimizer now requires ndim==2 for Muon.
+- See `doc/logkv-causal-conv.md` and `doc/experiments/logkv-causal-conv-20260914/`. Results pending during preparation; update launch/status after GPU preflight. All large artifacts live under `/mnt/raid0/RecursiveCompressor/experiments/logkv-causal-conv-20260914/`.
+
 ## Current direction and experiment archive (2026-09-13)
 - User explicitly paused positional-encoding tuning and requested documentation/experiment-code-only cherry-picks into main. This authorizes the archive integration even though replacement encodings did not pass the 16M Copying gate; it does not authorize merging their model implementation.
 - Main's model, configuration, training entry points, baseline task suites, dependency files and normal tests remain exactly as at `658f63e`. Use that existing architecture for subsequent training.

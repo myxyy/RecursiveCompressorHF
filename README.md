@@ -4,6 +4,9 @@
 
 各方式の比較と再現用commitは[実験記録一覧](doc/logkv-experiments.md)にまとめています。
 
+`logkv-causal-conv`ブランチでは、各LogKVBlockのattention前に任意のcausal depthwise convolutionを追加しています。
+`--conv-kernel-size 4`で有効、既定の0では無効です。[実装・比較実験](doc/logkv-causal-conv.md)を参照してください。
+
 階層的なkv圧縮による独自アーキテクチャ **LogKV** の言語モデル実装です。
 
 ![LogKVのKVキャッシュ構造（重複なし）](logkv-refine.drawio.png)
