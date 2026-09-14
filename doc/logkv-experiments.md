@@ -1,5 +1,9 @@
 # LogKV実験記録一覧
 
+2026-09-14、CausalConvを標準としてmainへマージした（`654f311`）。
+[可変桁M10/16/32/64の追加実験](logkv-variable-memory.md)はGPU0/1・別タスク各50kの準備を完了。
+事前確認込み見積もり約5.08時間、最終結果は未確定。
+
 2026-09-14 13:55 JST、`logkv-causal-conv`ブランチの[位置埋め込みなし＋CausalConv](logkv-causal-conv.md)が完了。
 2層・各Blockのattention前に幅4のconvを追加し、固定10桁の既存対照と比較した。
 両タスク各50k steps、best/final T131072までの監査を通過。Copyingは全41点で各256/256完全一致

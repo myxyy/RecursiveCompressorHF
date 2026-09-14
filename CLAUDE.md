@@ -4,6 +4,8 @@
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
 ## Standard configuration and newly authorized variable-memory study (2026-09-14)
+- MERGED locally into main at `654f311`; variable task code `90f13b1`. 159 model tests and14 variable-task tests passed, plus CLI default/opt-out checks.
+- Variable campaign prepared: 300-step benchmarks and440 evaluation cells with CPU RNG/position replay passed. Estimated5.08h including preflight; GPU0/1 only, maximum allocated8.98 GiB each. Deadline2026-09-14 22:02:35 JST. See `doc/logkv-variable-memory.md`; raw/source/checkpoints under `/mnt/raid0/RecursiveCompressor/experiments/logkv-variable-memory-20260914/`. Preserve frozen source and running scripts; never restart a campaign from historical launch examples.
 - User authorized merging CausalConv into main as standard after the successful16M check, then variable-memory Copying/Selective training. This supersedes historical no-merge/no-further-experiments scope below.
 - New-training CLI defaults: conv width4, gate and self slot on, phase off. Low-level config/block defaults stay compatible with old checkpoints. Disable via `--conv-kernel-size 0 --no-gated-attention --no-self-slot`.
 - Variable study: reuse prior M={10,16,32,64}, P0..63, T loguniform1..2028, 50k steps, microbatch32 x2, validation every2000, best/final220 cells each x256. One new standard architecture only, two independent tasks on GPUs0/1, benchmark before launch; confirm >=8h and stop at experiment boundary.
