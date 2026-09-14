@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "gpu_used": false,
+  "cells": 328,
+  "campaigns": [
+    {
+      "depth": 2,
+      "passed": true,
+      "archived_files": 40,
+      "campaign_sha256": "2dcd1a720f49f66bfc35c96508bd57b2bf64a3f9d6e7b7083a139b92983af9a5",
+      "review_sha256": "7c13febba3e746774a3f0e971951ae3ca97e0821f6b4d5eb9d3d78351682f82b",
+      "finished": "2026-09-13T16:02:04.970648+00:00",
+      "elapsed_hours": 2.7199516172870064,
+      "whole_gpu_batch_hours": 2.803289012114207
+    },
+    {
+      "depth": 3,
+      "passed": true,
+      "archived_files": 41,
+      "campaign_sha256": "1cc46c7a7d108d80650b4eea438991d5e14232f413b7e74156f6f99c890ab0de",
+      "review_sha256": "fa3d33f5e9f223a27df56def485fc5647e58a7cf4084948bacfecedcac31c692",
+      "finished": "2026-09-13T19:14:42.945500+00:00",
+      "elapsed_hours": 4.566101898314794,
+      "whole_gpu_batch_hours": 4.6884953369034665
+    }
+  ],
+  "all_archived_hashes_verified": true,
+  "current_main_runtime_unchanged": true,
+  "saved_predictions_recounted": true,
+  "paired_samples_and_counts_verified": true,
+  "script_sha256": "d847d650a20e716896509873474b7ba9e84a7c8d5b41095ba83a4e1e11d20c9e",
+  "outputs": {
+    "aggregates.json": "0b5033e80fef66d7c70ff099fdbb53ad38c9dceb3be7e362aecd82fa84685a18",
+    "counts.json": "637f4c774ac0a74b6db684e33600d88447036e9af3825dfa98a0983ced4f427d",
+    "training.json": "406edb61737af5d6ee3efee63a02f5b17bc481a39a47867a6bf9b3b2497fd9a0",
+    "digit_errors.png": "21308476029b8f0b4baef8864bcd0ade4641d3a55e10d26db7f7eb01101ea536",
+    "depth_accuracy.png": "d17d0f9495f2aa369473ede67dfcb07ab0895ad894d8806e9467a7b4c5864097",
+    "training.png": "991ab18f57b5ce52a2ba4564aa4fa19b5564e955f00a9fa00507a2d2389c319f"
+  },
+  "limitations": "One seed; depth also increases parameter count. No new forward passes or hidden-state diagnosis. Aggregates weight the specified horizon grid equally, not the training distribution."
+}

@@ -1,0 +1,215 @@
+{
+  "train_max_t": 2028,
+  "samples": 256,
+  "precision": "bf16",
+  "results": {
+    "1": {
+      "token_acc": 0.998828125,
+      "string_acc": 0.98828125,
+      "n": 256
+    },
+    "2": {
+      "token_acc": 0.99921875,
+      "string_acc": 0.9921875,
+      "n": 256
+    },
+    "3": {
+      "token_acc": 0.98828125,
+      "string_acc": 0.8828125,
+      "n": 256
+    },
+    "4": {
+      "token_acc": 0.963671875,
+      "string_acc": 0.640625,
+      "n": 256
+    },
+    "5": {
+      "token_acc": 0.94140625,
+      "string_acc": 0.51171875,
+      "n": 256
+    },
+    "6": {
+      "token_acc": 0.91171875,
+      "string_acc": 0.35546875,
+      "n": 256
+    },
+    "7": {
+      "token_acc": 0.94140625,
+      "string_acc": 0.52734375,
+      "n": 256
+    },
+    "8": {
+      "token_acc": 0.9546875,
+      "string_acc": 0.546875,
+      "n": 256
+    },
+    "9": {
+      "token_acc": 0.97890625,
+      "string_acc": 0.8125,
+      "n": 256
+    },
+    "10": {
+      "token_acc": 0.958984375,
+      "string_acc": 0.62109375,
+      "n": 256
+    },
+    "11": {
+      "token_acc": 0.922265625,
+      "string_acc": 0.41796875,
+      "n": 256
+    },
+    "12": {
+      "token_acc": 0.936328125,
+      "string_acc": 0.3828125,
+      "n": 256
+    },
+    "13": {
+      "token_acc": 0.928515625,
+      "string_acc": 0.29296875,
+      "n": 256
+    },
+    "14": {
+      "token_acc": 0.93671875,
+      "string_acc": 0.40625,
+      "n": 256
+    },
+    "16": {
+      "token_acc": 0.937890625,
+      "string_acc": 0.4453125,
+      "n": 256
+    },
+    "24": {
+      "token_acc": 0.935546875,
+      "string_acc": 0.3671875,
+      "n": 256
+    },
+    "32": {
+      "token_acc": 0.84296875,
+      "string_acc": 0.1484375,
+      "n": 256
+    },
+    "48": {
+      "token_acc": 0.74296875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "64": {
+      "token_acc": 0.861328125,
+      "string_acc": 0.12109375,
+      "n": 256
+    },
+    "96": {
+      "token_acc": 0.778515625,
+      "string_acc": 0.01171875,
+      "n": 256
+    },
+    "128": {
+      "token_acc": 0.89375,
+      "string_acc": 0.27734375,
+      "n": 256
+    },
+    "192": {
+      "token_acc": 0.8921875,
+      "string_acc": 0.23046875,
+      "n": 256
+    },
+    "256": {
+      "token_acc": 0.75,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "384": {
+      "token_acc": 0.779296875,
+      "string_acc": 0.0078125,
+      "n": 256
+    },
+    "512": {
+      "token_acc": 0.758984375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "768": {
+      "token_acc": 0.762109375,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "1024": {
+      "token_acc": 0.73515625,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "1536": {
+      "token_acc": 0.733203125,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "2048": {
+      "token_acc": 0.728515625,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "3072": {
+      "token_acc": 0.7234375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "4096": {
+      "token_acc": 0.721484375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "6144": {
+      "token_acc": 0.71875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "8192": {
+      "token_acc": 0.721875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "12288": {
+      "token_acc": 0.7296875,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "16384": {
+      "token_acc": 0.71875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "24576": {
+      "token_acc": 0.723828125,
+      "string_acc": 0.00390625,
+      "n": 256
+    },
+    "32768": {
+      "token_acc": 0.728125,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "49152": {
+      "token_acc": 0.71484375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "65536": {
+      "token_acc": 0.717578125,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "98304": {
+      "token_acc": 0.716015625,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "131072": {
+      "token_acc": 0.719140625,
+      "string_acc": 0.00390625,
+      "n": 256
+    }
+  },
+  "task": "copying",
+  "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-no-position-main-20260913/source/exp/copying/task.py",
+  "task_sha256": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4"
+}

@@ -2,6 +2,13 @@
 
 Protocol: [../../logkv-no-position-3layer.md](../../logkv-no-position-3layer.md).
 
+Completed 2026-09-14 04:14:42 JST; both 50k runs and 164 evaluation cells passed audits.
+GPU 2/3 released. `analysis/` contains the CPU review of all 328 two/three-layer cells,
+paired output-position counts and comparison plots. Reproduce it with
+`OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python doc/experiments/logkv-no-position-3layer-20260913/analyze_completed.py`
+from the repository root; recorded checkpoint/source paths must remain available.
+Original campaign scripts and `results/review.json` inputs remain unchanged.
+
 Adds one stacked LogKVBlock to the ongoing two-layer no-position control. All shared
 parameters are copied from its **untrained initial** state; only layer 2 is newly
 initialized. Both tasks load the same three-layer initial weights. No model source changes.

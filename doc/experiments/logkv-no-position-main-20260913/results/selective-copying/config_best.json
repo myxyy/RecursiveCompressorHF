@@ -1,0 +1,25 @@
+{
+  "architectures": [
+    "LogKVLM"
+  ],
+  "bos_token_id": null,
+  "chunk_size": 4,
+  "d_ff": 1024,
+  "d_model": 512,
+  "dtype": "float32",
+  "eos_token_id": null,
+  "gated_attention": true,
+  "kv_norm": false,
+  "learnable_decay": false,
+  "level_amplify": false,
+  "model_type": "logkv",
+  "num_heads": 8,
+  "num_layers": 2,
+  "pad_token_id": null,
+  "phase_emb": false,
+  "phase_levels": 2,
+  "self_slot": true,
+  "transformers_version": "5.4.0",
+  "v_norm_only": false,
+  "vocab_size": 10
+}

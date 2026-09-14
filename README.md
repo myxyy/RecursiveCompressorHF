@@ -36,6 +36,11 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 [全実験の一覧と再現方法](doc/logkv-experiments.md)を参照してください。
 位置表現の実験専用フラグはmainでは利用できません。
 
+2026-09-14、位置埋め込みを無効にした[2層の再評価](doc/logkv-no-position-main.md)と
+[3層との比較](doc/logkv-no-position-3layer.md)が完了しました。3層化で短～中距離Copyingと
+Selective Copyingの桁精度は改善しましたが、Copyingの長距離完全一致は回復せず、
+長距離の桁精度は低下しました（固定10桁、各50k steps、各構成1 seed）。
+
 ## セットアップ
 
 ```bash

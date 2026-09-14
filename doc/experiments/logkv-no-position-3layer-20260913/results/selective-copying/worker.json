@@ -1,0 +1,89 @@
+{
+  "task": "selective-copying",
+  "mode": "selective-copying",
+  "state": "complete",
+  "started": "2026-09-13T14:40:45.017874+00:00",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-position-3layer-20260913/train_entry.py",
+        "--run-name",
+        "no-position-3layer-fixed10-20260913",
+        "--arch",
+        "logkv",
+        "--gated-attention",
+        "--self-slot",
+        "--phase-levels",
+        "2",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "3",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-13T14:40:45.017912+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T18:30:50.029757+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-position-3layer-20260913/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-13T18:30:50.126125+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T18:38:30.598649+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-position-3layer-20260913/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-13T18:38:30.599374+00:00",
+      "returncode": 0,
+      "finished": "2026-09-13T18:46:15.182127+00:00"
+    }
+  ],
+  "weights": {
+    "best": "3bfd4a034a5e57e426e08491e9fe737f10131d9eb7917d74aa5669c74f2fa016",
+    "final": "c256cd3ee287eb272071f685c59f6e46fe0292f49fb8ba77ee4e5da6403a4f20"
+  },
+  "finished": "2026-09-13T18:46:15.294585+00:00"
+}

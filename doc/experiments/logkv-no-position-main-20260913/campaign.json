@@ -1,0 +1,77 @@
+{
+  "tasks": [
+    "copying",
+    "selective-copying"
+  ],
+  "state": "complete-awaiting-review",
+  "started": "2026-09-13T13:18:53.117146+00:00",
+  "pid": 2086202,
+  "gpu_limit": 2,
+  "gpus": [
+    0,
+    1
+  ],
+  "estimated_hours": 4.105122704969512,
+  "time_limit_hours": 7.5,
+  "source_manifest": {
+    "source_commit": "0932d8c73ed9e48ac8ada467a06c53206d0a61cc",
+    "architecture_commit": "3b0ce51",
+    "all_frozen_files_identical_to_refine": true,
+    "files": {
+      "chat_server.py": "5cadce8734e27b30b1a6ff3ef33b3bb9ac986b128d9d5c6948ec98f574ebc56a",
+      "configuration_logkv.py": "169f326f0eb9f88cf47fdfff71d2cac04e997668bea4d8311e76888e100cf536",
+      "configuration_recursive_compressor.py": "e74eae2220420d2f6da1c014921df1a2ed3d014a876e8eeab2c21d7d45fe1611",
+      "dataset.py": "2909f9944a04f5894f759d0ffa1b4404a8c00197589c967f1da504b8ec0694bf",
+      "exp/copying/evaluate.py": "45dcfa5804c0da20ac6b4047981317d52d03c3974efd33b3effd365e44c0bd7f",
+      "exp/copying/task.py": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4",
+      "exp/copying/test_task.py": "eef7af5c2491c8da679cd8dfb3449000be23a0d8657a77cea2b476f9480de881",
+      "exp/copying/train.py": "b4a40cd880e8ac1d08a8639b611ae76eae271ce35ca92f3cdf7c17269b761336",
+      "exp/selective-copying/evaluate.py": "a16ab1c07e6beb20a8693f68124a77c8906d09ed189c139b3f785e611ccb532c",
+      "exp/selective-copying/task.py": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528",
+      "exp/selective-copying/test_selective_task.py": "ac860adea415902d48f1aed5864d35de91adec549d58f408acb9e1a20fe8ad9a",
+      "exp/selective-copying/train.py": "b531d192cef01379523b5b24ae44bf6ad6c0cacb1c683340722b2ac8375112a2",
+      "logkv.py": "4907ad69c94c637bf99737a094c4e492fd31aa62a78ba5d7583cb3235aecffa0",
+      "logkv_lm.py": "bc686d5de9ad615f5f9ded57e66299e133c3eb3aa13bb801705419064495ed81",
+      "predict.py": "7553fa38c36776e3bd80d743732b2e7b5f4a8e7741543275f86a0829de5f0cc7",
+      "predict_logkv.py": "c5dc85c0b9cc9946b4f01aaefa484e658165606e30ce8c38ec619bdb0ec7c359",
+      "predict_stream.py": "0a57807e7f86409e91826bf6b004a9b70e687d0ba0b2b92284574da900cce80d",
+      "pyproject.toml": "2c1ca2a6ac564dec52bb33bcdee8fcf122669ef35ac1dc1c671d691aa60c4497",
+      "recursive_compressor.py": "848369c347e223afc3f4cab4ce39d2583c3efbf897b9a88a036cbf507007c74c",
+      "recursive_compressor_lm.py": "b2aa93e98c853a65b97b2822087a6b39268c0fd16f540e1d05852fc279eff5ce",
+      "recursive_compressor_lm_pipeline.py": "e8c15bd2e88f9fad928c300ea9c4d05c0f7b440e06089efc10c109d10cf6621c",
+      "test_lm.py": "db62261d8516470b897eac913aaa5e4d2d93252c81ab182e638e98ac9ed38cac",
+      "test_logkv.py": "6c78cb408f2539a0df35345108d7f949f9cf7fd183b3fc7c7a4f12d756686f8e",
+      "test_logkv_lm.py": "9136b24d8b83737e9bed22c93f46925c89b6ff83ff042aea1cddaa4753124632",
+      "train_logkv.py": "2ec93b38a2eb874f89deee5772ac354b7dc9bc2ecaa985156bcef43bba1fd5af",
+      "train_pipeline.py": "5ef5ccea611d4cf18bc9d70c9094407d512ddcfe228c05a57f6c7f564b3f1b68",
+      "uv.lock": "22034c2ee77bce6831db6528f45fa5a3b21c4053ee1d0b53aca5d328f777531c"
+    }
+  },
+  "source_root": "/mnt/raid0/RecursiveCompressor/experiments/logkv-no-position-main-20260913/source",
+  "scripts": {
+    "evaluation_smoke.py": "1e7d03b58161039caa79581d01b55584509e9d156bccb5b42f6416f8fdc3a12b",
+    "summarize.py": "9cc73d8159093ad616ffc3b4dcdc73ef8d56b6594a865e2803d89fb3aac1f880",
+    "train_entry.py": "b268dfa45017580ca0d3d805aafdd761018fa53eb169528f0c981ee18c93d4cf",
+    "evaluate.py": "46b0401fc98a22cd4b8b9c13bdc54f3ef7aceef85d661b8ea8986c727254f946",
+    "run.py": "7ee4f7c90dcbd07695bc6c3e354324d7e6ba86690abe79a806992c6967c2c32c",
+    "worker.py": "c1adf193163899ebdbee697e322dcb0242e52dee06259de81ac0dbbb645981db",
+    "common.py": "b4334a5aa8e5f83ba44b574ef21cdf4c5af619f4ab8d6ccf17d662abfd77f7b1",
+    "preflight.py": "ee988dbc4c4e0ef0538f3d2ad68878023178de01867ea2260fdb5132057bc970"
+  },
+  "prerequisite_hashes": {
+    "preflight.json": "6189822bd78e426c44a80a4ba57e8d9dc7e1894aadcbdb46eae83277b96178b6",
+    "validation.json": "5d25479e3ba4bd590ab21740109c1d51fdd12eae43dbb7df6de57982e5149a63",
+    "evaluation_smoke.json": "dedac965acc3f83d11ae628cbc9c337d6a12b6d54414e1437b65287043a2edd2"
+  },
+  "initial_weights_sha256": "9aee1b7f31d7122f510dbc7ebcc551c77737f380ecfc24f6ec52a44657106862",
+  "next_stage_queued": false,
+  "gpu_batch_started": "2026-09-13T13:13:53.130239+00:00",
+  "remaining_hours_at_launch": 7.41666260447767,
+  "workers": {
+    "copying": 2086213,
+    "selective-copying": 2086214
+  },
+  "finished": "2026-09-13T16:02:04.970648+00:00",
+  "elapsed_hours": 2.7199516172870064,
+  "whole_gpu_batch_hours": 2.803289012114207
+}

@@ -2,6 +2,11 @@
 
 Protocol: [../../logkv-no-position-main.md](../../logkv-no-position-main.md).
 
+Completed 2026-09-14 01:02:04 JST; both 50k runs and all 164 cells passed audits.
+GPU 0/1 released. Results are in `results/`; interpretation is in the protocol report
+and [the depth comparison](../../logkv-no-position-3layer.md). Original campaign
+scripts and hash-indexed result artifacts are preserved unchanged.
+
 One architecture, two independently trained tasks: fixed-M10 Copying and Selective Copying.
 The frozen main runtime at `0932d8c` is identical to `3b0ce51` for all 27 captured files.
 No model implementation changes. Earlier no-position results exist in the 2026-09-07 `none` runs;
