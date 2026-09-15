@@ -16,3 +16,7 @@ whole campaign cap7.5h including GPU preflight; no further training queued.
 Large files live at `/mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/`.
 Once launched, preserve the source/scripts and launch hashes; never restart a completed campaign.
 The normal CLI does not add experimental beta telemetry or isolate periodic sample RNG.
+
+Started2026-09-15 23:02:55 JST, supervisor655438,training launcher655440. Preparation `5207743`.
+Estimated completionSep16 04:30 JST; hard deadline06:26:50 JST.
+See [campaign.json](campaign.json). Results pending.

@@ -2,7 +2,9 @@
 
 2026-09-15、固定10桁の[学習可能減衰実験](logkv-learnable-decay.md)に続き、
 `train_logkv.py --learnable-decay --max-steps 5000`による新規事前学習とヘッド・生成傾向の解析を行う。
-**準備完了。本学習の結果は未確定。** 実験ブランチは`adjust-attenuation`。
+**2026-09-15 23:02:55 JSTに6GPUで本学習を開始した。結果は未確定。**
+準備commit `5207743`。完了目安は9月16日4:30 JST頃、停止上限は同6:26:50 JST。
+[開始・監視記録](experiments/logkv-lm-learnable-decay-20260915/campaign.json)。 実験ブランチは`adjust-attenuation`。
 ユーザーは今回のLLM訓練に限り最大6GPUの使用を許可した。8時間以上の見込みなら事前確認する。
 標準16層を使い、ユーザーの別run（32層）の再開や上書きは行わない。
 

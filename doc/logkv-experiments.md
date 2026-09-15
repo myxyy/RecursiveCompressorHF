@@ -1,7 +1,7 @@
 # LogKV実験記録一覧
 
-2026-09-15、[標準LLM＋学習可能減衰の5,000-step訓練](logkv-lm-learnable-decay.md)を準備。
-ユーザー指定で6GPUを許可、事前実測・評価器確認通過。結果は未確定。
+2026-09-15、[標準LLM＋学習可能減衰の5,000-step訓練](logkv-lm-learnable-decay.md)を23:02 JSTに開始。
+ユーザー指定で6GPU、事前実測・評価器確認通過、全体見積もり5.42時間。結果は未確定。
 
 2026-09-15、標準CausalConv＋既存`--learnable-decay`による[固定10桁の比較](logkv-learnable-decay.md)を19:33 JSTに完了。
 各50k steps・164セル、事前確認込み2.93時間、GPU解放済み。Copying bestはT131072まで全41点で256/256、
