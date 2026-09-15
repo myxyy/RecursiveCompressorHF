@@ -1,0 +1,382 @@
+{
+  "rows": [
+    {
+      "case": 0,
+      "prompt": "日本の首都は",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 377,
+      "eos": true,
+      "quartile_distinct": [
+        0.875,
+        0.7333333333333333,
+        0.6634615384615384,
+        0.580952380952381
+      ],
+      "token_4gram_repeat_fraction": 0.17914438502673802,
+      "max_same_token": 2
+    },
+    {
+      "case": 1,
+      "prompt": "昔々あるところに",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.65,
+        0.5033333333333333,
+        0.28,
+        0.046511627906976744
+      ],
+      "token_4gram_repeat_fraction": 0.5778648383937317,
+      "max_same_token": 2
+    },
+    {
+      "case": 2,
+      "prompt": "人工知能とは",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 18,
+      "eos": true,
+      "quartile_distinct": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 1
+    },
+    {
+      "case": 3,
+      "prompt": "日本の首都は",
+      "seed": 1,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 404,
+      "eos": true,
+      "quartile_distinct": [
+        0.8558558558558559,
+        0.6875,
+        0.6846846846846847,
+        0.5
+      ],
+      "token_4gram_repeat_fraction": 0.20448877805486287,
+      "max_same_token": 3
+    },
+    {
+      "case": 4,
+      "prompt": "昔々あるところに",
+      "seed": 1,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.6763636363636364,
+        0.22181818181818183,
+        0.06545454545454546,
+        0.06909090909090909
+      ],
+      "token_4gram_repeat_fraction": 0.6258570029382957,
+      "max_same_token": 3
+    },
+    {
+      "case": 5,
+      "prompt": "人工知能とは",
+      "seed": 1,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.4072727272727273,
+        0.35144927536231885,
+        0.4166666666666667,
+        0.1956521739130435
+      ],
+      "token_4gram_repeat_fraction": 0.5592556317335945,
+      "max_same_token": 2
+    },
+    {
+      "case": 6,
+      "prompt": "日本の首都は",
+      "seed": 2,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.5789473684210527,
+        0.6983606557377049,
+        0.5114754098360655,
+        0.25573770491803277
+      ],
+      "token_4gram_repeat_fraction": 0.3330068560235063,
+      "max_same_token": 2
+    },
+    {
+      "case": 7,
+      "prompt": "昔々あるところに",
+      "seed": 2,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 149,
+      "eos": true,
+      "quartile_distinct": [
+        0.9,
+        0.9166666666666666,
+        0.9166666666666666,
+        0.95
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 1
+    },
+    {
+      "case": 8,
+      "prompt": "人工知能とは",
+      "seed": 2,
+      "temperature": 0.7,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.5362318840579711,
+        0.4479768786127168,
+        0.5780346820809249,
+        0.5491329479768786
+      ],
+      "token_4gram_repeat_fraction": 0.2918707149853085,
+      "max_same_token": 1
+    },
+    {
+      "case": 9,
+      "prompt": "日本の首都は",
+      "seed": 0,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 85,
+      "eos": true,
+      "quartile_distinct": [
+        0.9615384615384616,
+        1.0,
+        0.9615384615384616,
+        0.9230769230769231
+      ],
+      "token_4gram_repeat_fraction": 0.024390243902439046,
+      "max_same_token": 2
+    },
+    {
+      "case": 10,
+      "prompt": "昔々あるところに",
+      "seed": 0,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.7110609480812641,
+        0.6568848758465011,
+        0.6862302483069977,
+        0.654627539503386
+      ],
+      "token_4gram_repeat_fraction": 0.015670910871694366,
+      "max_same_token": 2
+    },
+    {
+      "case": 11,
+      "prompt": "人工知能とは",
+      "seed": 0,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 36,
+      "eos": true,
+      "quartile_distinct": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 1
+    },
+    {
+      "case": 12,
+      "prompt": "日本の首都は",
+      "seed": 1,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 143,
+      "eos": true,
+      "quartile_distinct": [
+        0.9615384615384616,
+        0.9038461538461539,
+        0.9807692307692307,
+        0.9433962264150944
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 2
+    },
+    {
+      "case": 13,
+      "prompt": "昔々あるところに",
+      "seed": 1,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 26,
+      "eos": true,
+      "quartile_distinct": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 1
+    },
+    {
+      "case": 14,
+      "prompt": "人工知能とは",
+      "seed": 1,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 567,
+      "eos": true,
+      "quartile_distinct": [
+        0.7839195979899497,
+        0.8341708542713567,
+        0.8291457286432161,
+        0.8492462311557789
+      ],
+      "token_4gram_repeat_fraction": 0.007092198581560294,
+      "max_same_token": 2
+    },
+    {
+      "case": 15,
+      "prompt": "日本の首都は",
+      "seed": 2,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.8044692737430168,
+        0.7298050139275766,
+        0.7938718662952646,
+        0.7855153203342619
+      ],
+      "token_4gram_repeat_fraction": 0.021547502448579836,
+      "max_same_token": 2
+    },
+    {
+      "case": 16,
+      "prompt": "昔々あるところに",
+      "seed": 2,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 473,
+      "eos": true,
+      "quartile_distinct": [
+        0.8397790055248618,
+        0.7569060773480663,
+        0.8011049723756906,
+        0.850828729281768
+      ],
+      "token_4gram_repeat_fraction": 0.010638297872340385,
+      "max_same_token": 1
+    },
+    {
+      "case": 17,
+      "prompt": "人工知能とは",
+      "seed": 2,
+      "temperature": 1.0,
+      "limit": 1024,
+      "length": 1024,
+      "eos": false,
+      "quartile_distinct": [
+        0.6855670103092784,
+        0.6417525773195877,
+        0.6134020618556701,
+        0.6572164948453608
+      ],
+      "token_4gram_repeat_fraction": 0.050930460333006855,
+      "max_same_token": 2
+    },
+    {
+      "case": 18,
+      "prompt": "日本の首都は",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 4096,
+      "length": 377,
+      "eos": true,
+      "quartile_distinct": [
+        0.875,
+        0.7333333333333333,
+        0.6634615384615384,
+        0.580952380952381
+      ],
+      "token_4gram_repeat_fraction": 0.17914438502673802,
+      "max_same_token": 2
+    },
+    {
+      "case": 19,
+      "prompt": "昔々あるところに",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 4096,
+      "length": 4068,
+      "eos": true,
+      "quartile_distinct": [
+        0.3211951447245565,
+        0.06816059757236227,
+        0.047619047619047616,
+        0.05970149253731343
+      ],
+      "token_4gram_repeat_fraction": 0.8558425584255842,
+      "max_same_token": 2
+    },
+    {
+      "case": 20,
+      "prompt": "人工知能とは",
+      "seed": 0,
+      "temperature": 0.7,
+      "limit": 4096,
+      "length": 18,
+      "eos": true,
+      "quartile_distinct": [
+        1.0,
+        1.0,
+        1.0,
+        1.0
+      ],
+      "token_4gram_repeat_fraction": 0.0,
+      "max_same_token": 1
+    }
+  ],
+  "extension_prefixes": [
+    {
+      "prompt": "日本の首都は",
+      "short_length": 377,
+      "extended_length": 377,
+      "prefix_exact": true
+    },
+    {
+      "prompt": "昔々あるところに",
+      "short_length": 1024,
+      "extended_length": 4068,
+      "prefix_exact": true
+    },
+    {
+      "prompt": "人工知能とは",
+      "short_length": 18,
+      "extended_length": 18,
+      "prefix_exact": true
+    }
+  ],
+  "note": "4096-limit rows extend/repeat the same seed0 trajectories; not three independent extra samples. EOS does not imply coherent output."
+}

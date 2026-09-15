@@ -1,0 +1,29 @@
+[
+  {
+    "limit": 1024,
+    "temperature": 0.7,
+    "n": 9,
+    "eos": 4,
+    "mean_length": 674.2222222222222,
+    "mean_q4_distinct": 0.46078641608424686,
+    "q4_below_half": 4
+  },
+  {
+    "limit": 1024,
+    "temperature": 1.0,
+    "n": 9,
+    "eos": 6,
+    "mean_length": 489.1111111111111,
+    "mean_q4_distinct": 0.8515452738458414,
+    "q4_below_half": 0
+  },
+  {
+    "limit": 4096,
+    "temperature": 0.7,
+    "n": 3,
+    "eos": 3,
+    "mean_length": 1487.6666666666667,
+    "mean_q4_distinct": 0.5468846244965647,
+    "q4_below_half": 1
+  }
+]

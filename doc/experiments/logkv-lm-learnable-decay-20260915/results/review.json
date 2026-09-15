@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "step": 5000,
+  "elapsed_seconds": 1145.8817691849545,
+  "weights_sha256": "dbd7a3f88a186edf9c9758c94eda27c096af6567758f6d24c00c28adb25384e3",
+  "observer_bitexact": true,
+  "heldout_disjoint": true,
+  "generation_count": 21,
+  "precision": "fp32 weights + bf16 autocast; beta remains fp32",
+  "caveat": "Resetting beta at inference is an intervention on one trained model, not a fixed-decay training control.",
+  "hashes": {
+    "generations.json": "9b65499692e3cf7325b854a527b912518469767438989b5fe91e62ad26cec90d",
+    "coefficients.json": "486d7e4dd0ee12803c28c7e52f23d4f85cf2fad15cf219bc6033792b185ef584",
+    "heldout_manifest.json": "45136d376e05b777db64090065dad83452135a7b9b835049aee2598582eeaa0f",
+    "heldout_loss.json": "87c122d66f96af83ef1e6811298cd8b3421d261489adaeb6cb6fc4e1b6123227",
+    "generation_summary.json": "1ea30379ff14ded06d0cfe07213ffa4aeb31234bf71e5900fae28a6cdaae400d",
+    "attention_mass.json": "c5265a0c1709ece22ab04658ae8361a881744615d8f5745bc6f90042e4f88984"
+  }
+}

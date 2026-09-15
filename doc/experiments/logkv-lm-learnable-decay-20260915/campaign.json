@@ -1,5 +1,5 @@
 {
-  "state": "running",
+  "state": "complete-awaiting-review",
   "started": "2026-09-15T14:02:55.438696+00:00",
   "pid": 655438,
   "gpu_limit": 6,
@@ -134,7 +134,33 @@
         "--no-prefault"
       ],
       "started": "2026-09-15T14:02:55.439861+00:00",
-      "pid": 655440
+      "pid": 655440,
+      "returncode": 0,
+      "finished": "2026-09-15T18:14:02.072958+00:00"
+    },
+    {
+      "stage": "evaluate",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-lm-learnable-decay-20260915/evaluate.py"
+      ],
+      "started": "2026-09-15T18:14:02.074380+00:00",
+      "pid": 852211,
+      "returncode": 0,
+      "finished": "2026-09-15T18:33:13.516071+00:00"
+    },
+    {
+      "stage": "summarize",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-lm-learnable-decay-20260915/summarize.py"
+      ],
+      "started": "2026-09-15T18:33:13.517572+00:00",
+      "pid": 867165,
+      "returncode": 0,
+      "finished": "2026-09-15T18:33:21.351121+00:00"
     }
-  ]
+  ],
+  "finished": "2026-09-15T18:33:21.355182+00:00",
+  "elapsed_hours": 4.5071990495920184
 }

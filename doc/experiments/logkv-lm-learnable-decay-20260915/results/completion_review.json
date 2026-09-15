@@ -1,0 +1,49 @@
+{
+  "passed": true,
+  "steps": 5000,
+  "beta_snapshots": 501,
+  "benchmark_beta_prefix_bitexact": true,
+  "checkpoint_sha256": {
+    "1000": "87d34084a6bb6e3ea037d8cc3c07f28cafa129b4b126884ba833da862dcbabb8",
+    "2000": "e63e1c5822424ce98fc50604d55959a71ef98f43c76bc6fe1f6f8807b8fb7a37",
+    "3000": "16b9ee6a8c0858b80c1851599495ea17737ebce6b215f5bd65721dbc3518c419",
+    "4000": "07b1ed27769b06788373ecc24976b5c20b683670d11a4dc88b033861721f3ebb",
+    "5000": "dbd7a3f88a186edf9c9758c94eda27c096af6567758f6d24c00c28adb25384e3"
+  },
+  "final_rank0_loss": 3.373208522796631,
+  "final_rank0_ema": 3.521787108546143,
+  "source_manifest": {
+    "commit": "ce360e3389ced877b7ac07738195a0cab4c24253",
+    "files": {
+      "train_logkv.py": "b913fdfedc53b7e85b3cbbd296f3838d5b3ab4d856bfda96816f4e79e179bd95",
+      "dataset.py": "2909f9944a04f5894f759d0ffa1b4404a8c00197589c967f1da504b8ec0694bf",
+      "logkv.py": "e2eacad568854c6ea702fa6c050f92e9936bc53f7cbacc56796d5ab2d7d6ad19",
+      "logkv_lm.py": "ecb604597e6a3c30e926f4631102f140575ce5030cb049d208680be3e3c55db4",
+      "configuration_logkv.py": "40a36e3296bf2c5a16534282995478142b4c5fcca86b668a3bae95110c665c61",
+      "pyproject.toml": "2c1ca2a6ac564dec52bb33bcdee8fcf122669ef35ac1dc1c671d691aa60c4497",
+      "uv.lock": "22034c2ee77bce6831db6528f45fa5a3b21c4053ee1d0b53aca5d328f777531c"
+    }
+  },
+  "output_hashes": {
+    "heldout_loss.json": "87c122d66f96af83ef1e6811298cd8b3421d261489adaeb6cb6fc4e1b6123227",
+    "run_config.json": "6fad97b3f5e8ba30f5685542ce925f939d190dc10c882d9723362bf6b38ff024",
+    "beta_log.jsonl": "a7a9711c079bbbf957bec12aa2cd6da276996a2220d34edd5e8ca288047d2f8b",
+    "training_metrics.json": "3fb1ee82d39568d70ed2f5d534b4d6415d36747cadfa4b17b683e6f796335d8f",
+    "coefficients.json": "486d7e4dd0ee12803c28c7e52f23d4f85cf2fad15cf219bc6033792b185ef584",
+    "heldout_manifest.json": "45136d376e05b777db64090065dad83452135a7b9b835049aee2598582eeaa0f",
+    "attention_mass.json": "c5265a0c1709ece22ab04658ae8361a881744615d8f5745bc6f90042e4f88984",
+    "config-5000.json": "adeb55ade177bcfe3e35b0eb4a5ab86cbb245796437b4ede387f2d2026dda6f7",
+    "config-3000.json": "adeb55ade177bcfe3e35b0eb4a5ab86cbb245796437b4ede387f2d2026dda6f7",
+    "config-1000.json": "adeb55ade177bcfe3e35b0eb4a5ab86cbb245796437b4ede387f2d2026dda6f7",
+    "config-4000.json": "adeb55ade177bcfe3e35b0eb4a5ab86cbb245796437b4ede387f2d2026dda6f7",
+    "config-2000.json": "adeb55ade177bcfe3e35b0eb4a5ab86cbb245796437b4ede387f2d2026dda6f7",
+    "samples.log": "65f781d7464c5ce30e942acd2edd1c98f97a8bff1c3d0c1062acfbc5191586f0",
+    "training.png": "9dda71d66ce7268adf89f4f94f589a0dd315cd0fd9f83f09c0d15c633d0059a4",
+    "review.json": "7b65f1088e5c324673ca3ae3c84bb93450533e9d013c88532e27e84185cf2e65",
+    "generations.json": "9b65499692e3cf7325b854a527b912518469767438989b5fe91e62ad26cec90d",
+    "beta_final.png": "541d23996176b607b61d57c3f1c5522cebd8d4adb490564aaf886e6977a405ca",
+    "generation_summary.json": "1ea30379ff14ded06d0cfe07213ffa4aeb31234bf71e5900fae28a6cdaae400d",
+    "train.log": "bd1846a8a3660b85e7c57efec833cba53c1b19e11217a794edb4e3526bb3fafc"
+  },
+  "limitations": "One newly trained model. Inference beta resets are not retraining controls. Heldout packed rows can share documents with training; rank0 training loss is not a six-rank average."
+}

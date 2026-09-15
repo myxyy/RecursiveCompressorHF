@@ -18,5 +18,22 @@ Once launched, preserve the source/scripts and launch hashes; never restart a co
 The normal CLI does not add experimental beta telemetry or isolate periodic sample RNG.
 
 Started2026-09-15 23:02:55 JST, supervisor655438,training launcher655440. Preparation `5207743`.
-Estimated completionSep16 04:30 JST; hard deadline06:26:50 JST.
-See [campaign.json](campaign.json). Results pending.
+CompletedSep16 03:33:21 JST,4.51h execution/4.61h preflight-inclusive.
+See [campaign.json](campaign.json). All stages exit0; GPUs released.
+
+
+Post-review correction: original `results/attention_mass.json` includes PAD queries in its
+absolute trailing512 window. Do not use it to infer head roles. All other original metrics
+remain valid. `attention_valid.py` profiled the same128 unseen rows onGPU0 in24.7s using
+only real input/target positions; results and plots are in `analysis/`. No retraining.
+`analyze_completed.py` verifies original hashes, five checkpoint coefficients, all generation
+metrics and extended-prefix identity, then summarizes corrected attention.
+
+CPU audit reproduction (RAID checkpoints/tokenizer required):
+
+```bash
+CUDA_VISIBLE_DEVICES='' OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python doc/experiments/logkv-lm-learnable-decay-20260915/analyze_completed.py
+```
+
+Preserve original scripts and hash-indexed results; the two post-review analysis scripts
+are separate from the completed campaign's frozen scripts.

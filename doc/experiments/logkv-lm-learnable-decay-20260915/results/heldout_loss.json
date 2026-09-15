@@ -1,0 +1,86 @@
+[
+  {
+    "mode": "learned",
+    "source": "wiki_ja",
+    "tokens": 52389,
+    "loss": 3.25097204707356,
+    "perplexity": 25.815421529914897
+  },
+  {
+    "mode": "learned",
+    "source": "wiki_en",
+    "tokens": 52669,
+    "loss": 3.401952663746578,
+    "perplexity": 30.022667021452744
+  },
+  {
+    "mode": "learned",
+    "source": "cc100_ja",
+    "tokens": 53766,
+    "loss": 3.467781865042031,
+    "perplexity": 32.065537812837434
+  },
+  {
+    "mode": "learned",
+    "source": "minipile",
+    "tokens": 54119,
+    "loss": 4.332635062221819,
+    "perplexity": 76.14466838301574
+  },
+  {
+    "mode": "reset_logC",
+    "source": "wiki_ja",
+    "tokens": 52389,
+    "loss": 3.270519273589514,
+    "perplexity": 26.325005674867032
+  },
+  {
+    "mode": "reset_logC",
+    "source": "wiki_en",
+    "tokens": 52669,
+    "loss": 3.4108027381897337,
+    "perplexity": 30.289549080687696
+  },
+  {
+    "mode": "reset_logC",
+    "source": "cc100_ja",
+    "tokens": 53766,
+    "loss": 3.48099563687001,
+    "perplexity": 32.492056265837604
+  },
+  {
+    "mode": "reset_logC",
+    "source": "minipile",
+    "tokens": 54119,
+    "loss": 4.3463726062027845,
+    "perplexity": 77.19792714391164
+  },
+  {
+    "mode": "zero",
+    "source": "wiki_ja",
+    "tokens": 52389,
+    "loss": 3.4386077400936688,
+    "perplexity": 31.143568029035826
+  },
+  {
+    "mode": "zero",
+    "source": "wiki_en",
+    "tokens": 52669,
+    "loss": 3.6028969735181584,
+    "perplexity": 36.70441228260875
+  },
+  {
+    "mode": "zero",
+    "source": "cc100_ja",
+    "tokens": 53766,
+    "loss": 3.6780338785112052,
+    "perplexity": 39.56852102425585
+  },
+  {
+    "mode": "zero",
+    "source": "minipile",
+    "tokens": 54119,
+    "loss": 4.445211294518137,
+    "perplexity": 85.21788200647964
+  }
+]

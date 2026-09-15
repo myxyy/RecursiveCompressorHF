@@ -1,0 +1,651 @@
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W915 23:03:04.681999182 ProcessGroupNCCL.cpp:5188] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+LogKVLM: 327,392,384 params | d_model=1024 heads=8 d_ff=3072 layers=16 chunk=4 ctx=2048
+world=6 batch/GPU=4 accum=1 -> effective batch 24
+epoch 0 step 10 | loss 10.9253 | ema 10.9109 | lr 2.00e-06 | grad_norm 1.58 | 15,657 tok/s
+epoch 0 step 20 | loss 10.9158 | ema 10.9114 | lr 4.00e-06 | grad_norm 1.55 | 17,682 tok/s
+epoch 0 step 30 | loss 10.8884 | ema 10.9109 | lr 6.00e-06 | grad_norm 1.62 | 17,765 tok/s
+epoch 0 step 40 | loss 10.8625 | ema 10.9083 | lr 8.00e-06 | grad_norm 1.70 | 17,537 tok/s
+epoch 0 step 50 | loss 10.8227 | ema 10.9036 | lr 1.00e-05 | grad_norm 1.65 | 17,360 tok/s
+epoch 0 step 60 | loss 10.7811 | ema 10.8954 | lr 1.20e-05 | grad_norm 1.61 | 17,192 tok/s
+epoch 0 step 70 | loss 10.7521 | ema 10.8838 | lr 1.40e-05 | grad_norm 1.74 | 17,058 tok/s
+epoch 0 step 80 | loss 10.6616 | ema 10.8664 | lr 1.60e-05 | grad_norm 1.77 | 16,934 tok/s
+epoch 0 step 90 | loss 10.5641 | ema 10.8413 | lr 1.80e-05 | grad_norm 1.87 | 16,885 tok/s
+epoch 0 step 100 | loss 10.4519 | ema 10.8076 | lr 2.00e-05 | grad_norm 2.06 | 16,712 tok/s
+epoch 0 step 110 | loss 10.1789 | ema 10.7577 | lr 2.20e-05 | grad_norm 2.36 | 16,611 tok/s
+epoch 0 step 120 | loss 9.8905 | ema 10.6914 | lr 2.40e-05 | grad_norm 2.47 | 16,543 tok/s
+epoch 0 step 130 | loss 9.5396 | ema 10.5999 | lr 2.60e-05 | grad_norm 2.72 | 16,521 tok/s
+epoch 0 step 140 | loss 9.1549 | ema 10.4817 | lr 2.80e-05 | grad_norm 2.90 | 16,541 tok/s
+epoch 0 step 150 | loss 9.1574 | ema 10.3431 | lr 3.00e-05 | grad_norm 2.57 | 16,349 tok/s
+epoch 0 step 160 | loss 8.4470 | ema 10.1749 | lr 3.20e-05 | grad_norm 2.19 | 16,488 tok/s
+epoch 0 step 170 | loss 8.5351 | ema 9.9909 | lr 3.40e-05 | grad_norm 1.80 | 16,360 tok/s
+epoch 0 step 180 | loss 7.8259 | ema 9.7945 | lr 3.60e-05 | grad_norm 1.23 | 16,444 tok/s
+epoch 0 step 190 | loss 7.4611 | ema 9.5878 | lr 3.80e-05 | grad_norm 0.92 | 16,256 tok/s
+epoch 0 step 200 | loss 7.3958 | ema 9.4007 | lr 4.00e-05 | grad_norm 0.90 | 16,325 tok/s
+epoch 0 step 210 | loss 7.6747 | ema 9.2322 | lr 4.20e-05 | grad_norm 0.84 | 16,326 tok/s
+epoch 0 step 220 | loss 8.3396 | ema 9.0612 | lr 4.40e-05 | grad_norm 0.95 | 16,378 tok/s
+epoch 0 step 230 | loss 7.1908 | ema 8.9054 | lr 4.60e-05 | grad_norm 1.47 | 16,417 tok/s
+epoch 0 step 240 | loss 8.1682 | ema 8.7628 | lr 4.80e-05 | grad_norm 0.85 | 16,345 tok/s
+epoch 0 step 250 | loss 7.3480 | ema 8.6115 | lr 5.00e-05 | grad_norm 0.94 | 16,320 tok/s
+epoch 0 step 260 | loss 7.1599 | ema 8.4714 | lr 5.20e-05 | grad_norm 0.91 | 16,258 tok/s
+epoch 0 step 270 | loss 6.8759 | ema 8.3308 | lr 5.40e-05 | grad_norm 0.98 | 16,379 tok/s
+epoch 0 step 280 | loss 6.8288 | ema 8.1903 | lr 5.60e-05 | grad_norm 0.84 | 16,301 tok/s
+epoch 0 step 290 | loss 6.8401 | ema 8.0620 | lr 5.80e-05 | grad_norm 0.67 | 16,310 tok/s
+epoch 0 step 300 | loss 6.8704 | ema 7.9327 | lr 6.00e-05 | grad_norm 0.84 | 16,296 tok/s
+epoch 0 step 310 | loss 6.7033 | ema 7.8191 | lr 6.20e-05 | grad_norm 0.79 | 16,273 tok/s
+epoch 0 step 320 | loss 6.5445 | ema 7.7137 | lr 6.40e-05 | grad_norm 0.85 | 16,340 tok/s
+epoch 0 step 330 | loss 6.3003 | ema 7.6065 | lr 6.60e-05 | grad_norm 0.86 | 16,240 tok/s
+epoch 0 step 340 | loss 6.3428 | ema 7.4894 | lr 6.80e-05 | grad_norm 1.16 | 16,256 tok/s
+epoch 0 step 350 | loss 6.3791 | ema 7.3860 | lr 7.00e-05 | grad_norm 0.84 | 16,232 tok/s
+epoch 0 step 360 | loss 6.1618 | ema 7.2841 | lr 7.20e-05 | grad_norm 0.87 | 16,344 tok/s
+epoch 0 step 370 | loss 6.3274 | ema 7.1883 | lr 7.40e-05 | grad_norm 1.05 | 16,320 tok/s
+epoch 0 step 380 | loss 5.9844 | ema 7.0845 | lr 7.60e-05 | grad_norm 0.94 | 16,280 tok/s
+epoch 0 step 390 | loss 6.4114 | ema 6.9778 | lr 7.80e-05 | grad_norm 0.79 | 16,275 tok/s
+epoch 0 step 400 | loss 5.7685 | ema 6.8770 | lr 8.00e-05 | grad_norm 0.91 | 16,265 tok/s
+epoch 0 step 410 | loss 5.7785 | ema 6.7878 | lr 8.20e-05 | grad_norm 0.87 | 16,231 tok/s
+epoch 0 step 420 | loss 5.9237 | ema 6.6771 | lr 8.40e-05 | grad_norm 0.84 | 16,323 tok/s
+epoch 0 step 430 | loss 5.9974 | ema 6.5998 | lr 8.60e-05 | grad_norm 0.86 | 16,312 tok/s
+epoch 0 step 440 | loss 5.4141 | ema 6.4990 | lr 8.80e-05 | grad_norm 0.89 | 16,257 tok/s
+epoch 0 step 450 | loss 5.5331 | ema 6.4169 | lr 9.00e-05 | grad_norm 0.84 | 16,262 tok/s
+epoch 0 step 460 | loss 5.7724 | ema 6.3424 | lr 9.20e-05 | grad_norm 1.07 | 16,291 tok/s
+epoch 0 step 470 | loss 5.1733 | ema 6.2539 | lr 9.40e-05 | grad_norm 0.97 | 16,376 tok/s
+epoch 0 step 480 | loss 5.7351 | ema 6.1695 | lr 9.60e-05 | grad_norm 0.81 | 16,326 tok/s
+epoch 0 step 490 | loss 5.9845 | ema 6.1020 | lr 9.80e-05 | grad_norm 0.90 | 16,295 tok/s
+epoch 0 step 500 | loss 5.1162 | ema 6.0458 | lr 1.00e-04 | grad_norm 1.01 | 16,329 tok/s
+epoch 0 step 510 | loss 5.1376 | ema 5.9805 | lr 1.02e-04 | grad_norm 0.92 | 16,217 tok/s
+epoch 0 step 520 | loss 5.1687 | ema 5.9279 | lr 1.04e-04 | grad_norm 1.00 | 16,359 tok/s
+epoch 0 step 530 | loss 4.8280 | ema 5.8617 | lr 1.06e-04 | grad_norm 0.98 | 16,324 tok/s
+epoch 0 step 540 | loss 5.0112 | ema 5.7991 | lr 1.08e-04 | grad_norm 1.46 | 16,301 tok/s
+epoch 0 step 550 | loss 4.8928 | ema 5.7355 | lr 1.10e-04 | grad_norm 1.15 | 16,311 tok/s
+epoch 0 step 560 | loss 4.5858 | ema 5.6753 | lr 1.12e-04 | grad_norm 0.91 | 16,227 tok/s
+epoch 0 step 570 | loss 5.3358 | ema 5.6257 | lr 1.14e-04 | grad_norm 1.69 | 16,274 tok/s
+epoch 0 step 580 | loss 5.1859 | ema 5.5731 | lr 1.16e-04 | grad_norm 1.61 | 16,322 tok/s
+epoch 0 step 590 | loss 4.9469 | ema 5.5310 | lr 1.18e-04 | grad_norm 1.07 | 16,251 tok/s
+epoch 0 step 600 | loss 5.1676 | ema 5.4731 | lr 1.20e-04 | grad_norm 1.06 | 16,345 tok/s
+epoch 0 step 610 | loss 5.4169 | ema 5.4454 | lr 1.22e-04 | grad_norm 0.97 | 16,181 tok/s
+epoch 0 step 620 | loss 4.8251 | ema 5.4019 | lr 1.24e-04 | grad_norm 0.99 | 16,371 tok/s
+epoch 0 step 630 | loss 5.6213 | ema 5.3744 | lr 1.26e-04 | grad_norm 1.02 | 16,300 tok/s
+epoch 0 step 640 | loss 4.7804 | ema 5.3380 | lr 1.28e-04 | grad_norm 0.93 | 16,356 tok/s
+epoch 0 step 650 | loss 4.8133 | ema 5.3056 | lr 1.30e-04 | grad_norm 1.11 | 16,315 tok/s
+epoch 0 step 660 | loss 5.2631 | ema 5.2778 | lr 1.32e-04 | grad_norm 1.00 | 16,418 tok/s
+epoch 0 step 670 | loss 5.1019 | ema 5.2415 | lr 1.34e-04 | grad_norm 0.98 | 16,298 tok/s
+epoch 0 step 680 | loss 5.2629 | ema 5.2276 | lr 1.36e-04 | grad_norm 0.98 | 16,333 tok/s
+epoch 0 step 690 | loss 4.6814 | ema 5.2123 | lr 1.38e-04 | grad_norm 0.99 | 16,291 tok/s
+epoch 0 step 700 | loss 5.3499 | ema 5.1810 | lr 1.40e-04 | grad_norm 0.92 | 16,237 tok/s
+epoch 0 step 710 | loss 4.9583 | ema 5.1612 | lr 1.42e-04 | grad_norm 0.92 | 16,290 tok/s
+epoch 0 step 720 | loss 4.8613 | ema 5.1291 | lr 1.44e-04 | grad_norm 1.00 | 16,336 tok/s
+epoch 0 step 730 | loss 4.6831 | ema 5.1009 | lr 1.46e-04 | grad_norm 0.98 | 16,314 tok/s
+epoch 0 step 740 | loss 5.2745 | ema 5.0712 | lr 1.48e-04 | grad_norm 1.09 | 16,301 tok/s
+epoch 0 step 750 | loss 4.6853 | ema 5.0352 | lr 1.50e-04 | grad_norm 1.18 | 16,314 tok/s
+epoch 0 step 760 | loss 4.5751 | ema 5.0148 | lr 1.52e-04 | grad_norm 0.93 | 16,418 tok/s
+epoch 0 step 770 | loss 4.9708 | ema 5.0109 | lr 1.54e-04 | grad_norm 0.98 | 16,380 tok/s
+epoch 0 step 780 | loss 4.8691 | ema 4.9991 | lr 1.56e-04 | grad_norm 1.08 | 16,335 tok/s
+epoch 0 step 790 | loss 5.0645 | ema 4.9767 | lr 1.58e-04 | grad_norm 0.92 | 16,335 tok/s
+epoch 0 step 800 | loss 4.8813 | ema 4.9553 | lr 1.60e-04 | grad_norm 1.09 | 16,345 tok/s
+epoch 0 step 810 | loss 4.9272 | ema 4.9406 | lr 1.62e-04 | grad_norm 1.08 | 16,390 tok/s
+epoch 0 step 820 | loss 4.8337 | ema 4.9095 | lr 1.64e-04 | grad_norm 0.94 | 16,422 tok/s
+epoch 0 step 830 | loss 4.5399 | ema 4.8729 | lr 1.66e-04 | grad_norm 1.31 | 16,409 tok/s
+epoch 0 step 840 | loss 6.0496 | ema 4.8682 | lr 1.68e-04 | grad_norm 0.98 | 16,369 tok/s
+epoch 0 step 850 | loss 4.4389 | ema 4.8487 | lr 1.70e-04 | grad_norm 0.98 | 16,357 tok/s
+epoch 0 step 860 | loss 5.0804 | ema 4.8346 | lr 1.72e-04 | grad_norm 0.89 | 16,401 tok/s
+epoch 0 step 870 | loss 4.5082 | ema 4.8173 | lr 1.74e-04 | grad_norm 1.07 | 16,421 tok/s
+epoch 0 step 880 | loss 4.4400 | ema 4.7923 | lr 1.76e-04 | grad_norm 0.88 | 16,388 tok/s
+epoch 0 step 890 | loss 4.7480 | ema 4.7754 | lr 1.78e-04 | grad_norm 1.19 | 16,410 tok/s
+epoch 0 step 900 | loss 4.7452 | ema 4.7573 | lr 1.80e-04 | grad_norm 1.05 | 16,348 tok/s
+epoch 0 step 910 | loss 4.5723 | ema 4.7402 | lr 1.82e-04 | grad_norm 0.92 | 16,417 tok/s
+epoch 0 step 920 | loss 4.8866 | ema 4.7393 | lr 1.84e-04 | grad_norm 1.00 | 16,404 tok/s
+epoch 0 step 930 | loss 4.6930 | ema 4.7219 | lr 1.86e-04 | grad_norm 0.88 | 16,399 tok/s
+epoch 0 step 940 | loss 4.7780 | ema 4.7116 | lr 1.88e-04 | grad_norm 0.96 | 16,425 tok/s
+epoch 0 step 950 | loss 4.2934 | ema 4.6835 | lr 1.90e-04 | grad_norm 1.03 | 16,421 tok/s
+epoch 0 step 960 | loss 4.6501 | ema 4.6797 | lr 1.92e-04 | grad_norm 0.92 | 16,466 tok/s
+epoch 0 step 970 | loss 4.3271 | ema 4.6664 | lr 1.94e-04 | grad_norm 0.89 | 16,357 tok/s
+epoch 0 step 980 | loss 4.3476 | ema 4.6402 | lr 1.96e-04 | grad_norm 0.90 | 16,401 tok/s
+epoch 0 step 990 | loss 4.2218 | ema 4.6195 | lr 1.98e-04 | grad_norm 0.97 | 16,334 tok/s
+epoch 0 step 1000 | loss 4.3053 | ema 4.6088 | lr 2.00e-04 | grad_norm 0.86 | 16,511 tok/s
+===== step 1000 =====
+[日本の首都は] 日本の首都は100万ドルで最も広がり、現在に至ります。
+
+[昔々あるところに] 昔々あるところに、あたしは自分の力でやっていることがわかりますよ。
+あんこで食べ物に食べている。
+「カオ」は、そういった意味で、12年はもう少し離れた場所にいるのがちょっと待っていたのですが、あんまり書いてみることもできない
+だから、自分もまた自分自身が集まるようになる。と書かれ
+[人工知能とは] 人工知能とは知っているのは、本物だからと知っているので、おはぎにくいしつけをしました。
+ちなみに、最近では、フロアでの販売のメリットとデメリットとデュアルレが数値だったため、マネジメントと違う場所です。
+ただ、自分の好きな人は、あまり使わないようにしてください。
+これって、今、こんなことない
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.09s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.09s/it]
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-1000
+epoch 0 step 1010 | loss 4.1992 | ema 4.5932 | lr 2.00e-04 | grad_norm 0.83 | 11,009 tok/s
+epoch 0 step 1020 | loss 4.6922 | ema 4.5894 | lr 2.00e-04 | grad_norm 0.81 | 16,430 tok/s
+epoch 0 step 1030 | loss 4.1816 | ema 4.5737 | lr 2.00e-04 | grad_norm 0.91 | 16,390 tok/s
+epoch 0 step 1040 | loss 4.2528 | ema 4.5724 | lr 2.00e-04 | grad_norm 0.94 | 16,509 tok/s
+epoch 0 step 1050 | loss 4.2877 | ema 4.5551 | lr 2.00e-04 | grad_norm 0.95 | 16,458 tok/s
+epoch 0 step 1060 | loss 4.2106 | ema 4.5378 | lr 2.00e-04 | grad_norm 0.81 | 16,418 tok/s
+epoch 0 step 1070 | loss 4.4208 | ema 4.5190 | lr 2.00e-04 | grad_norm 0.89 | 16,392 tok/s
+epoch 0 step 1080 | loss 4.1396 | ema 4.5120 | lr 2.00e-04 | grad_norm 0.88 | 16,403 tok/s
+epoch 0 step 1090 | loss 4.5158 | ema 4.5136 | lr 2.00e-04 | grad_norm 0.89 | 16,410 tok/s
+epoch 0 step 1100 | loss 4.7411 | ema 4.5039 | lr 2.00e-04 | grad_norm 1.02 | 16,463 tok/s
+epoch 0 step 1110 | loss 4.3268 | ema 4.4832 | lr 2.00e-04 | grad_norm 1.00 | 16,414 tok/s
+epoch 0 step 1120 | loss 4.2877 | ema 4.4628 | lr 2.00e-04 | grad_norm 1.00 | 16,389 tok/s
+epoch 0 step 1130 | loss 4.2390 | ema 4.4497 | lr 2.00e-04 | grad_norm 0.86 | 16,400 tok/s
+epoch 0 step 1140 | loss 4.3013 | ema 4.4336 | lr 2.00e-04 | grad_norm 0.95 | 16,411 tok/s
+epoch 0 step 1150 | loss 4.6700 | ema 4.4439 | lr 2.00e-04 | grad_norm 0.82 | 16,473 tok/s
+epoch 0 step 1160 | loss 4.7776 | ema 4.4540 | lr 2.00e-04 | grad_norm 0.94 | 16,350 tok/s
+epoch 0 step 1170 | loss 4.6319 | ema 4.4431 | lr 2.00e-04 | grad_norm 1.07 | 16,420 tok/s
+epoch 0 step 1180 | loss 4.6132 | ema 4.4367 | lr 2.00e-04 | grad_norm 0.89 | 16,440 tok/s
+epoch 0 step 1190 | loss 4.6318 | ema 4.4391 | lr 2.00e-04 | grad_norm 3.45 | 16,330 tok/s
+epoch 0 step 1200 | loss 4.2922 | ema 4.4185 | lr 2.00e-04 | grad_norm 0.85 | 16,506 tok/s
+epoch 0 step 1210 | loss 4.2525 | ema 4.3990 | lr 2.00e-04 | grad_norm 0.84 | 16,318 tok/s
+epoch 0 step 1220 | loss 4.1570 | ema 4.3894 | lr 2.00e-04 | grad_norm 1.13 | 16,409 tok/s
+epoch 0 step 1230 | loss 4.4454 | ema 4.3871 | lr 2.00e-04 | grad_norm 0.84 | 16,432 tok/s
+epoch 0 step 1240 | loss 4.2980 | ema 4.3767 | lr 2.00e-04 | grad_norm 1.15 | 16,425 tok/s
+epoch 0 step 1250 | loss 4.1584 | ema 4.3805 | lr 2.00e-04 | grad_norm 0.80 | 16,407 tok/s
+epoch 0 step 1260 | loss 4.4650 | ema 4.3908 | lr 2.00e-04 | grad_norm 0.82 | 16,410 tok/s
+epoch 0 step 1270 | loss 3.9348 | ema 4.3728 | lr 2.00e-04 | grad_norm 0.89 | 16,416 tok/s
+epoch 0 step 1280 | loss 4.1148 | ema 4.3609 | lr 2.00e-04 | grad_norm 1.17 | 16,355 tok/s
+epoch 0 step 1290 | loss 4.2746 | ema 4.3458 | lr 2.00e-04 | grad_norm 0.88 | 16,486 tok/s
+epoch 0 step 1300 | loss 3.8012 | ema 4.3371 | lr 2.00e-04 | grad_norm 0.79 | 16,423 tok/s
+epoch 0 step 1310 | loss 4.7183 | ema 4.3240 | lr 2.00e-04 | grad_norm 0.84 | 16,410 tok/s
+epoch 0 step 1320 | loss 4.1153 | ema 4.3070 | lr 2.00e-04 | grad_norm 0.83 | 16,440 tok/s
+epoch 0 step 1330 | loss 4.6059 | ema 4.3128 | lr 2.00e-04 | grad_norm 0.82 | 16,348 tok/s
+epoch 0 step 1340 | loss 4.5392 | ema 4.3230 | lr 2.00e-04 | grad_norm 1.06 | 16,425 tok/s
+epoch 0 step 1350 | loss 4.2090 | ema 4.3255 | lr 2.00e-04 | grad_norm 0.81 | 16,432 tok/s
+epoch 0 step 1360 | loss 4.0668 | ema 4.3101 | lr 2.00e-04 | grad_norm 0.97 | 16,380 tok/s
+epoch 0 step 1370 | loss 4.5400 | ema 4.2981 | lr 2.00e-04 | grad_norm 1.09 | 16,444 tok/s
+epoch 0 step 1380 | loss 4.1876 | ema 4.2957 | lr 2.00e-04 | grad_norm 0.94 | 16,335 tok/s
+epoch 0 step 1390 | loss 4.0614 | ema 4.2895 | lr 2.00e-04 | grad_norm 0.79 | 16,418 tok/s
+epoch 0 step 1400 | loss 4.0509 | ema 4.2741 | lr 2.00e-04 | grad_norm 0.83 | 16,409 tok/s
+epoch 0 step 1410 | loss 3.9060 | ema 4.2600 | lr 2.00e-04 | grad_norm 0.86 | 16,428 tok/s
+epoch 0 step 1420 | loss 4.7057 | ema 4.2543 | lr 2.00e-04 | grad_norm 0.89 | 16,331 tok/s
+epoch 0 step 1430 | loss 3.9818 | ema 4.2455 | lr 2.00e-04 | grad_norm 0.82 | 16,409 tok/s
+epoch 0 step 1440 | loss 3.8111 | ema 4.2355 | lr 2.00e-04 | grad_norm 0.79 | 16,454 tok/s
+epoch 0 step 1450 | loss 4.3699 | ema 4.2437 | lr 2.00e-04 | grad_norm 0.75 | 16,373 tok/s
+epoch 0 step 1460 | loss 4.0735 | ema 4.2307 | lr 2.00e-04 | grad_norm 0.74 | 16,387 tok/s
+epoch 0 step 1470 | loss 4.0855 | ema 4.2249 | lr 2.00e-04 | grad_norm 0.83 | 16,386 tok/s
+epoch 0 step 1480 | loss 3.9876 | ema 4.2134 | lr 2.00e-04 | grad_norm 0.92 | 16,458 tok/s
+epoch 0 step 1490 | loss 3.9512 | ema 4.2081 | lr 2.00e-04 | grad_norm 1.04 | 16,377 tok/s
+epoch 0 step 1500 | loss 3.8490 | ema 4.1994 | lr 2.00e-04 | grad_norm 0.82 | 16,430 tok/s
+epoch 0 step 1510 | loss 4.2421 | ema 4.2090 | lr 2.00e-04 | grad_norm 0.91 | 16,403 tok/s
+epoch 0 step 1520 | loss 4.6143 | ema 4.2171 | lr 2.00e-04 | grad_norm 1.02 | 16,445 tok/s
+epoch 0 step 1530 | loss 4.6751 | ema 4.2144 | lr 2.00e-04 | grad_norm 0.92 | 16,410 tok/s
+epoch 0 step 1540 | loss 4.4394 | ema 4.2099 | lr 2.00e-04 | grad_norm 0.76 | 16,358 tok/s
+epoch 0 step 1550 | loss 4.1994 | ema 4.2022 | lr 2.00e-04 | grad_norm 0.81 | 16,543 tok/s
+epoch 0 step 1560 | loss 3.8912 | ema 4.1861 | lr 2.00e-04 | grad_norm 0.87 | 16,423 tok/s
+epoch 0 step 1570 | loss 4.2823 | ema 4.1946 | lr 2.00e-04 | grad_norm 0.79 | 16,440 tok/s
+epoch 0 step 1580 | loss 3.8053 | ema 4.1789 | lr 2.00e-04 | grad_norm 0.85 | 16,456 tok/s
+epoch 0 step 1590 | loss 3.7720 | ema 4.1699 | lr 2.00e-04 | grad_norm 0.82 | 16,466 tok/s
+epoch 0 step 1600 | loss 4.8110 | ema 4.1707 | lr 2.00e-04 | grad_norm 0.84 | 16,368 tok/s
+epoch 0 step 1610 | loss 4.3150 | ema 4.1680 | lr 2.00e-04 | grad_norm 0.75 | 16,412 tok/s
+epoch 0 step 1620 | loss 4.2026 | ema 4.1567 | lr 2.00e-04 | grad_norm 0.76 | 16,379 tok/s
+epoch 0 step 1630 | loss 4.0565 | ema 4.1511 | lr 2.00e-04 | grad_norm 0.81 | 16,379 tok/s
+epoch 0 step 1640 | loss 3.8607 | ema 4.1526 | lr 2.00e-04 | grad_norm 0.93 | 16,452 tok/s
+epoch 0 step 1650 | loss 4.4649 | ema 4.1470 | lr 2.00e-04 | grad_norm 0.69 | 16,399 tok/s
+epoch 0 step 1660 | loss 3.9457 | ema 4.1426 | lr 2.00e-04 | grad_norm 0.82 | 16,426 tok/s
+epoch 0 step 1670 | loss 4.3671 | ema 4.1400 | lr 2.00e-04 | grad_norm 0.87 | 16,344 tok/s
+epoch 0 step 1680 | loss 3.8569 | ema 4.1311 | lr 2.00e-04 | grad_norm 0.88 | 16,399 tok/s
+epoch 0 step 1690 | loss 4.0450 | ema 4.1217 | lr 2.00e-04 | grad_norm 0.95 | 16,487 tok/s
+epoch 0 step 1700 | loss 3.9215 | ema 4.1301 | lr 2.00e-04 | grad_norm 0.78 | 16,434 tok/s
+epoch 0 step 1710 | loss 3.8544 | ema 4.1274 | lr 2.00e-04 | grad_norm 0.78 | 16,468 tok/s
+epoch 0 step 1720 | loss 3.7507 | ema 4.1132 | lr 2.00e-04 | grad_norm 0.73 | 16,408 tok/s
+epoch 0 step 1730 | loss 4.3382 | ema 4.1070 | lr 2.00e-04 | grad_norm 0.80 | 16,520 tok/s
+epoch 0 step 1740 | loss 4.1374 | ema 4.1115 | lr 2.00e-04 | grad_norm 0.74 | 16,404 tok/s
+epoch 0 step 1750 | loss 3.6604 | ema 4.1041 | lr 2.00e-04 | grad_norm 0.72 | 16,432 tok/s
+epoch 0 step 1760 | loss 3.8279 | ema 4.0856 | lr 2.00e-04 | grad_norm 0.91 | 16,403 tok/s
+epoch 0 step 1770 | loss 4.2552 | ema 4.0838 | lr 2.00e-04 | grad_norm 0.90 | 16,472 tok/s
+epoch 0 step 1780 | loss 4.1942 | ema 4.0808 | lr 2.00e-04 | grad_norm 0.83 | 16,526 tok/s
+epoch 0 step 1790 | loss 3.7742 | ema 4.0698 | lr 2.00e-04 | grad_norm 0.75 | 16,441 tok/s
+epoch 0 step 1800 | loss 3.9292 | ema 4.0788 | lr 2.00e-04 | grad_norm 0.76 | 16,455 tok/s
+epoch 0 step 1810 | loss 4.1215 | ema 4.0833 | lr 2.00e-04 | grad_norm 0.98 | 16,480 tok/s
+epoch 0 step 1820 | loss 3.8914 | ema 4.0629 | lr 2.00e-04 | grad_norm 0.77 | 16,422 tok/s
+epoch 0 step 1830 | loss 3.8433 | ema 4.0562 | lr 2.00e-04 | grad_norm 0.80 | 16,481 tok/s
+epoch 0 step 1840 | loss 3.8151 | ema 4.0456 | lr 2.00e-04 | grad_norm 1.03 | 16,417 tok/s
+epoch 0 step 1850 | loss 3.8682 | ema 4.0446 | lr 2.00e-04 | grad_norm 0.70 | 16,386 tok/s
+epoch 0 step 1860 | loss 3.8919 | ema 4.0420 | lr 2.00e-04 | grad_norm 1.05 | 16,313 tok/s
+epoch 0 step 1870 | loss 4.1173 | ema 4.0299 | lr 2.00e-04 | grad_norm 0.77 | 16,389 tok/s
+epoch 0 step 1880 | loss 4.2247 | ema 4.0193 | lr 2.00e-04 | grad_norm 0.75 | 16,469 tok/s
+epoch 0 step 1890 | loss 4.4200 | ema 4.0176 | lr 2.00e-04 | grad_norm 0.81 | 16,413 tok/s
+epoch 0 step 1900 | loss 4.2152 | ema 4.0110 | lr 2.00e-04 | grad_norm 2.23 | 16,365 tok/s
+epoch 0 step 1910 | loss 3.9024 | ema 4.0164 | lr 2.00e-04 | grad_norm 0.90 | 16,337 tok/s
+epoch 0 step 1920 | loss 3.8212 | ema 4.0229 | lr 2.00e-04 | grad_norm 0.79 | 16,430 tok/s
+epoch 0 step 1930 | loss 3.7788 | ema 4.0151 | lr 2.00e-04 | grad_norm 0.86 | 16,479 tok/s
+epoch 0 step 1940 | loss 3.9482 | ema 4.0036 | lr 2.00e-04 | grad_norm 0.91 | 16,445 tok/s
+epoch 0 step 1950 | loss 3.8696 | ema 4.0012 | lr 2.00e-04 | grad_norm 1.09 | 16,401 tok/s
+epoch 0 step 1960 | loss 3.7427 | ema 3.9931 | lr 2.00e-04 | grad_norm 0.95 | 16,422 tok/s
+epoch 0 step 1970 | loss 4.1044 | ema 3.9906 | lr 2.00e-04 | grad_norm 0.84 | 16,434 tok/s
+epoch 0 step 1980 | loss 3.6626 | ema 3.9842 | lr 2.00e-04 | grad_norm 0.74 | 16,454 tok/s
+epoch 0 step 1990 | loss 3.8063 | ema 3.9821 | lr 2.00e-04 | grad_norm 0.92 | 16,442 tok/s
+epoch 0 step 2000 | loss 4.4584 | ema 3.9874 | lr 2.00e-04 | grad_norm 0.75 | 16,423 tok/s
+===== step 2000 =====
+[日本の首都は] 日本の首都は、日韓に相対的に影響を与えている可能性が強い。
+しかし、大正期（1990年）に近畿地方で中国と大州方との戦いは起こった。
+
+[昔々あるところに] 昔々あるところに位置し、近況が違いますね。おまけに、本日(18日)の9時間10時(夕食)の時間帯は午前10時から20時まで。
+昨日14時ごろに撮影した、4月20日（日）は8月28日（月）より予約が取りやす
+[人工知能とは] 人工知能とは、特定の分野を支援する専門家を創造的に支援するプロセスです。
+その多くは、アジア、アジア系の医療機器、食品業界、工場を対象としたインディスカバアジア系系、日本、中国、大都市を拠点とする国、インドで生命の健康に生まれつつ、多くの
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-2000
+epoch 0 step 2010 | loss 3.8161 | ema 3.9810 | lr 2.00e-04 | grad_norm 1.07 | 10,620 tok/s
+epoch 0 step 2020 | loss 4.0398 | ema 3.9746 | lr 2.00e-04 | grad_norm 0.80 | 16,407 tok/s
+epoch 0 step 2030 | loss 4.0071 | ema 3.9733 | lr 2.00e-04 | grad_norm 0.77 | 16,537 tok/s
+epoch 0 step 2040 | loss 3.7563 | ema 3.9708 | lr 2.00e-04 | grad_norm 0.86 | 16,430 tok/s
+epoch 0 step 2050 | loss 3.7557 | ema 3.9674 | lr 2.00e-04 | grad_norm 0.75 | 16,479 tok/s
+epoch 0 step 2060 | loss 4.0511 | ema 3.9589 | lr 2.00e-04 | grad_norm 0.73 | 16,455 tok/s
+epoch 0 step 2070 | loss 3.8064 | ema 3.9510 | lr 2.00e-04 | grad_norm 0.76 | 16,440 tok/s
+epoch 0 step 2080 | loss 4.0854 | ema 3.9457 | lr 2.00e-04 | grad_norm 0.75 | 16,436 tok/s
+epoch 0 step 2090 | loss 3.6907 | ema 3.9374 | lr 2.00e-04 | grad_norm 0.84 | 16,364 tok/s
+epoch 0 step 2100 | loss 4.0027 | ema 3.9290 | lr 2.00e-04 | grad_norm 0.74 | 16,469 tok/s
+epoch 0 step 2110 | loss 3.8486 | ema 3.9337 | lr 2.00e-04 | grad_norm 0.69 | 16,446 tok/s
+epoch 0 step 2120 | loss 3.9723 | ema 3.9266 | lr 2.00e-04 | grad_norm 0.83 | 16,366 tok/s
+epoch 0 step 2130 | loss 3.7682 | ema 3.9244 | lr 2.00e-04 | grad_norm 0.76 | 16,466 tok/s
+epoch 0 step 2140 | loss 3.5426 | ema 3.9427 | lr 2.00e-04 | grad_norm 0.78 | 16,400 tok/s
+epoch 0 step 2150 | loss 4.3615 | ema 3.9598 | lr 2.00e-04 | grad_norm 0.88 | 16,336 tok/s
+epoch 0 step 2160 | loss 4.1327 | ema 3.9564 | lr 2.00e-04 | grad_norm 0.80 | 16,346 tok/s
+epoch 0 step 2170 | loss 3.8931 | ema 3.9536 | lr 2.00e-04 | grad_norm 0.69 | 16,401 tok/s
+epoch 0 step 2180 | loss 4.2717 | ema 3.9476 | lr 2.00e-04 | grad_norm 0.76 | 16,519 tok/s
+epoch 0 step 2190 | loss 3.7862 | ema 3.9491 | lr 2.00e-04 | grad_norm 0.78 | 16,357 tok/s
+epoch 0 step 2200 | loss 4.2727 | ema 3.9387 | lr 2.00e-04 | grad_norm 0.78 | 16,436 tok/s
+epoch 0 step 2210 | loss 3.5471 | ema 3.9251 | lr 2.00e-04 | grad_norm 0.75 | 16,369 tok/s
+epoch 0 step 2220 | loss 3.9516 | ema 3.9166 | lr 2.00e-04 | grad_norm 0.72 | 16,422 tok/s
+epoch 0 step 2230 | loss 3.9449 | ema 3.8973 | lr 2.00e-04 | grad_norm 0.71 | 16,475 tok/s
+epoch 0 step 2240 | loss 3.6619 | ema 3.8856 | lr 2.00e-04 | grad_norm 0.73 | 16,444 tok/s
+epoch 0 step 2250 | loss 3.9379 | ema 3.8978 | lr 2.00e-04 | grad_norm 0.74 | 16,473 tok/s
+epoch 0 step 2260 | loss 4.0841 | ema 3.9110 | lr 2.00e-04 | grad_norm 0.70 | 16,470 tok/s
+epoch 0 step 2270 | loss 3.7598 | ema 3.9134 | lr 2.00e-04 | grad_norm 0.84 | 16,488 tok/s
+epoch 0 step 2280 | loss 3.6432 | ema 3.9084 | lr 2.00e-04 | grad_norm 0.74 | 16,453 tok/s
+epoch 0 step 2290 | loss 3.9928 | ema 3.9010 | lr 2.00e-04 | grad_norm 0.83 | 16,468 tok/s
+epoch 0 step 2300 | loss 3.8574 | ema 3.9016 | lr 2.00e-04 | grad_norm 0.75 | 16,432 tok/s
+epoch 0 step 2310 | loss 4.0543 | ema 3.9098 | lr 2.00e-04 | grad_norm 0.82 | 16,445 tok/s
+epoch 0 step 2320 | loss 4.2916 | ema 3.9117 | lr 2.00e-04 | grad_norm 1.03 | 16,402 tok/s
+epoch 0 step 2330 | loss 3.6585 | ema 3.9061 | lr 2.00e-04 | grad_norm 0.69 | 16,452 tok/s
+epoch 0 step 2340 | loss 3.7393 | ema 3.9153 | lr 2.00e-04 | grad_norm 0.71 | 16,372 tok/s
+epoch 0 step 2350 | loss 3.4901 | ema 3.9198 | lr 2.00e-04 | grad_norm 0.74 | 16,376 tok/s
+epoch 0 step 2360 | loss 3.7571 | ema 3.9188 | lr 2.00e-04 | grad_norm 1.06 | 16,432 tok/s
+epoch 0 step 2370 | loss 4.1001 | ema 3.9116 | lr 2.00e-04 | grad_norm 0.84 | 16,345 tok/s
+epoch 0 step 2380 | loss 3.1494 | ema 3.9085 | lr 2.00e-04 | grad_norm 0.77 | 16,488 tok/s
+epoch 0 step 2390 | loss 3.7137 | ema 3.8961 | lr 2.00e-04 | grad_norm 0.74 | 16,479 tok/s
+epoch 0 step 2400 | loss 3.7596 | ema 3.8949 | lr 2.00e-04 | grad_norm 0.81 | 16,420 tok/s
+epoch 0 step 2410 | loss 3.8179 | ema 3.8982 | lr 2.00e-04 | grad_norm 0.84 | 16,434 tok/s
+epoch 0 step 2420 | loss 3.6510 | ema 3.8915 | lr 2.00e-04 | grad_norm 0.70 | 16,511 tok/s
+epoch 0 step 2430 | loss 3.9192 | ema 3.8909 | lr 2.00e-04 | grad_norm 0.75 | 16,342 tok/s
+epoch 0 step 2440 | loss 4.1595 | ema 3.8811 | lr 2.00e-04 | grad_norm 0.80 | 16,393 tok/s
+epoch 0 step 2450 | loss 4.0750 | ema 3.8819 | lr 2.00e-04 | grad_norm 0.76 | 16,356 tok/s
+epoch 0 step 2460 | loss 3.7342 | ema 3.8771 | lr 2.00e-04 | grad_norm 0.75 | 16,433 tok/s
+epoch 0 step 2470 | loss 3.4715 | ema 3.8622 | lr 2.00e-04 | grad_norm 0.95 | 16,488 tok/s
+epoch 0 step 2480 | loss 3.7675 | ema 3.8633 | lr 2.00e-04 | grad_norm 0.72 | 16,462 tok/s
+epoch 0 step 2490 | loss 4.0747 | ema 3.8665 | lr 2.00e-04 | grad_norm 0.82 | 16,303 tok/s
+epoch 0 step 2500 | loss 3.5008 | ema 3.8686 | lr 2.00e-04 | grad_norm 0.70 | 16,402 tok/s
+epoch 0 step 2510 | loss 3.7304 | ema 3.8691 | lr 2.00e-04 | grad_norm 0.71 | 16,470 tok/s
+epoch 0 step 2520 | loss 3.9564 | ema 3.8757 | lr 2.00e-04 | grad_norm 0.74 | 16,354 tok/s
+epoch 0 step 2530 | loss 3.4514 | ema 3.8625 | lr 2.00e-04 | grad_norm 0.72 | 16,453 tok/s
+epoch 0 step 2540 | loss 4.0341 | ema 3.8509 | lr 2.00e-04 | grad_norm 0.69 | 16,425 tok/s
+epoch 0 step 2550 | loss 3.6911 | ema 3.8569 | lr 2.00e-04 | grad_norm 0.73 | 16,333 tok/s
+epoch 0 step 2560 | loss 3.8741 | ema 3.8490 | lr 2.00e-04 | grad_norm 0.71 | 16,502 tok/s
+epoch 0 step 2570 | loss 3.7672 | ema 3.8415 | lr 2.00e-04 | grad_norm 0.73 | 16,432 tok/s
+epoch 0 step 2580 | loss 3.5570 | ema 3.8446 | lr 2.00e-04 | grad_norm 1.25 | 16,408 tok/s
+epoch 0 step 2590 | loss 3.9381 | ema 3.8329 | lr 2.00e-04 | grad_norm 0.73 | 16,455 tok/s
+epoch 0 step 2600 | loss 3.8930 | ema 3.8377 | lr 2.00e-04 | grad_norm 0.79 | 16,413 tok/s
+epoch 0 step 2610 | loss 3.6465 | ema 3.8325 | lr 2.00e-04 | grad_norm 0.81 | 16,489 tok/s
+epoch 0 step 2620 | loss 3.8502 | ema 3.8254 | lr 2.00e-04 | grad_norm 0.99 | 16,431 tok/s
+epoch 0 step 2630 | loss 3.9762 | ema 3.8261 | lr 2.00e-04 | grad_norm 0.72 | 16,379 tok/s
+epoch 0 step 2640 | loss 4.1123 | ema 3.8319 | lr 2.00e-04 | grad_norm 0.89 | 16,423 tok/s
+epoch 0 step 2650 | loss 3.7996 | ema 3.8259 | lr 2.00e-04 | grad_norm 0.66 | 16,419 tok/s
+epoch 0 step 2660 | loss 3.8956 | ema 3.8214 | lr 2.00e-04 | grad_norm 0.75 | 16,487 tok/s
+epoch 0 step 2670 | loss 3.9054 | ema 3.8297 | lr 2.00e-04 | grad_norm 0.77 | 16,434 tok/s
+epoch 0 step 2680 | loss 3.7241 | ema 3.8169 | lr 2.00e-04 | grad_norm 0.69 | 16,393 tok/s
+epoch 0 step 2690 | loss 3.6328 | ema 3.8142 | lr 2.00e-04 | grad_norm 0.73 | 16,455 tok/s
+epoch 0 step 2700 | loss 3.8997 | ema 3.8233 | lr 2.00e-04 | grad_norm 0.66 | 16,396 tok/s
+epoch 0 step 2710 | loss 3.3132 | ema 3.8065 | lr 2.00e-04 | grad_norm 0.82 | 16,469 tok/s
+epoch 0 step 2720 | loss 3.6408 | ema 3.7988 | lr 2.00e-04 | grad_norm 0.80 | 16,456 tok/s
+epoch 0 step 2730 | loss 3.7177 | ema 3.7995 | lr 2.00e-04 | grad_norm 0.69 | 16,423 tok/s
+epoch 0 step 2740 | loss 3.4416 | ema 3.7798 | lr 2.00e-04 | grad_norm 0.67 | 16,400 tok/s
+epoch 0 step 2750 | loss 3.8605 | ema 3.7847 | lr 2.00e-04 | grad_norm 0.73 | 16,322 tok/s
+epoch 0 step 2760 | loss 3.5700 | ema 3.7848 | lr 2.00e-04 | grad_norm 0.98 | 16,503 tok/s
+epoch 0 step 2770 | loss 3.3917 | ema 3.7926 | lr 2.00e-04 | grad_norm 0.68 | 16,442 tok/s
+epoch 0 step 2780 | loss 3.9510 | ema 3.7740 | lr 2.00e-04 | grad_norm 0.75 | 16,440 tok/s
+epoch 0 step 2790 | loss 4.5270 | ema 3.7930 | lr 2.00e-04 | grad_norm 0.92 | 16,365 tok/s
+epoch 0 step 2800 | loss 4.1243 | ema 3.8016 | lr 2.00e-04 | grad_norm 0.79 | 16,396 tok/s
+epoch 0 step 2810 | loss 3.5145 | ema 3.7970 | lr 2.00e-04 | grad_norm 0.76 | 16,477 tok/s
+epoch 0 step 2820 | loss 3.8297 | ema 3.7951 | lr 2.00e-04 | grad_norm 0.71 | 16,400 tok/s
+epoch 0 step 2830 | loss 3.7709 | ema 3.7950 | lr 2.00e-04 | grad_norm 0.85 | 16,355 tok/s
+epoch 0 step 2840 | loss 3.8227 | ema 3.7860 | lr 2.00e-04 | grad_norm 0.79 | 16,469 tok/s
+epoch 0 step 2850 | loss 3.9125 | ema 3.7924 | lr 2.00e-04 | grad_norm 0.73 | 16,323 tok/s
+epoch 0 step 2860 | loss 3.3096 | ema 3.7866 | lr 2.00e-04 | grad_norm 0.72 | 16,478 tok/s
+epoch 0 step 2870 | loss 3.5073 | ema 3.7772 | lr 2.00e-04 | grad_norm 0.75 | 16,429 tok/s
+epoch 0 step 2880 | loss 4.4059 | ema 3.7696 | lr 2.00e-04 | grad_norm 0.70 | 16,437 tok/s
+epoch 0 step 2890 | loss 3.9425 | ema 3.7785 | lr 2.00e-04 | grad_norm 0.79 | 16,376 tok/s
+epoch 0 step 2900 | loss 3.6989 | ema 3.7830 | lr 2.00e-04 | grad_norm 0.68 | 16,511 tok/s
+epoch 0 step 2910 | loss 3.8008 | ema 3.7898 | lr 2.00e-04 | grad_norm 0.79 | 16,464 tok/s
+epoch 0 step 2920 | loss 3.7011 | ema 3.7934 | lr 2.00e-04 | grad_norm 0.75 | 16,458 tok/s
+epoch 0 step 2930 | loss 4.0768 | ema 3.7876 | lr 2.00e-04 | grad_norm 0.70 | 16,387 tok/s
+epoch 0 step 2940 | loss 3.7590 | ema 3.7893 | lr 2.00e-04 | grad_norm 0.89 | 16,337 tok/s
+epoch 0 step 2950 | loss 3.9972 | ema 3.7765 | lr 2.00e-04 | grad_norm 0.64 | 16,447 tok/s
+epoch 0 step 2960 | loss 3.9261 | ema 3.7822 | lr 2.00e-04 | grad_norm 0.76 | 16,475 tok/s
+epoch 0 step 2970 | loss 3.8134 | ema 3.7993 | lr 2.00e-04 | grad_norm 0.95 | 16,401 tok/s
+epoch 0 step 2980 | loss 4.4130 | ema 3.8174 | lr 2.00e-04 | grad_norm 0.74 | 16,487 tok/s
+epoch 0 step 2990 | loss 4.1513 | ema 3.8026 | lr 2.00e-04 | grad_norm 0.78 | 16,354 tok/s
+epoch 0 step 3000 | loss 3.7196 | ema 3.8068 | lr 2.00e-04 | grad_norm 0.71 | 16,403 tok/s
+===== step 3000 =====
+[日本の首都は] 日本の首都は、東京や渋谷など東北、西日本の各地で、それぞれ都市の1つが日本一、世界一となっている。
+
+歴史 
+ 1968年（昭和17年）3月 - 韓国に編入され、中国・米国が開かれる。
+
+国際的な主要な地方 
+日本の地方の地域
+[昔々あるところに] 昔々あるところに泊められた写真のうちにも関わらず、私の住んでいたマンションにいたからもう一台買って帰ってきたという事だった。
+こんなにも多くの写真で、本当に親切に撮ってみたいと思います。
+
+[人工知能とは] 人工知能とは、生命活動を体験する仕組みであり、企業の技術力を高めるためには、社会的要求事項を根源的なものにすることである。
+それ以外に、人間の本質、人によって得られるものを、他人の言葉で伝えることは、社会が役割とその実現の基礎になります。
+人々は、その価値を価値とは
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-3000
+epoch 0 step 3010 | loss 3.4519 | ema 3.7962 | lr 2.00e-04 | grad_norm 0.90 | 10,556 tok/s
+epoch 0 step 3020 | loss 3.6113 | ema 3.7879 | lr 2.00e-04 | grad_norm 0.68 | 16,444 tok/s
+epoch 0 step 3030 | loss 3.6967 | ema 3.7902 | lr 2.00e-04 | grad_norm 0.73 | 16,385 tok/s
+epoch 0 step 3040 | loss 3.6381 | ema 3.7856 | lr 2.00e-04 | grad_norm 0.96 | 16,496 tok/s
+epoch 0 step 3050 | loss 3.8859 | ema 3.7794 | lr 2.00e-04 | grad_norm 0.78 | 16,497 tok/s
+epoch 0 step 3060 | loss 3.5033 | ema 3.7703 | lr 2.00e-04 | grad_norm 0.67 | 16,488 tok/s
+epoch 0 step 3070 | loss 3.6761 | ema 3.7666 | lr 2.00e-04 | grad_norm 0.79 | 16,432 tok/s
+epoch 0 step 3080 | loss 3.4829 | ema 3.7634 | lr 2.00e-04 | grad_norm 0.76 | 16,454 tok/s
+epoch 0 step 3090 | loss 3.8175 | ema 3.7559 | lr 2.00e-04 | grad_norm 0.70 | 16,391 tok/s
+epoch 0 step 3100 | loss 3.7934 | ema 3.7496 | lr 2.00e-04 | grad_norm 0.95 | 16,376 tok/s
+epoch 0 step 3110 | loss 3.8824 | ema 3.7583 | lr 2.00e-04 | grad_norm 0.70 | 16,567 tok/s
+epoch 0 step 3120 | loss 3.5560 | ema 3.7584 | lr 2.00e-04 | grad_norm 0.73 | 16,432 tok/s
+epoch 0 step 3130 | loss 3.7698 | ema 3.7614 | lr 2.00e-04 | grad_norm 0.72 | 16,457 tok/s
+epoch 0 step 3140 | loss 3.9385 | ema 3.7635 | lr 2.00e-04 | grad_norm 0.67 | 16,367 tok/s
+epoch 0 step 3150 | loss 3.7185 | ema 3.7571 | lr 2.00e-04 | grad_norm 0.70 | 16,496 tok/s
+epoch 0 step 3160 | loss 3.4659 | ema 3.7570 | lr 2.00e-04 | grad_norm 0.71 | 16,479 tok/s
+epoch 0 step 3170 | loss 3.6847 | ema 3.7576 | lr 2.00e-04 | grad_norm 0.73 | 16,379 tok/s
+epoch 0 step 3180 | loss 3.5683 | ema 3.7496 | lr 2.00e-04 | grad_norm 0.72 | 16,451 tok/s
+epoch 0 step 3190 | loss 3.8015 | ema 3.7540 | lr 2.00e-04 | grad_norm 0.65 | 16,394 tok/s
+epoch 0 step 3200 | loss 3.7564 | ema 3.7638 | lr 2.00e-04 | grad_norm 0.70 | 16,554 tok/s
+epoch 0 step 3210 | loss 3.7940 | ema 3.7643 | lr 2.00e-04 | grad_norm 0.82 | 16,366 tok/s
+epoch 0 step 3220 | loss 3.5043 | ema 3.7478 | lr 2.00e-04 | grad_norm 0.69 | 16,348 tok/s
+epoch 0 step 3230 | loss 3.8076 | ema 3.7345 | lr 2.00e-04 | grad_norm 0.71 | 16,433 tok/s
+epoch 0 step 3240 | loss 3.5163 | ema 3.7240 | lr 2.00e-04 | grad_norm 0.70 | 16,478 tok/s
+epoch 0 step 3250 | loss 3.6518 | ema 3.7296 | lr 2.00e-04 | grad_norm 0.80 | 16,477 tok/s
+epoch 0 step 3260 | loss 3.8470 | ema 3.7200 | lr 2.00e-04 | grad_norm 0.78 | 16,411 tok/s
+epoch 0 step 3270 | loss 3.6507 | ema 3.7053 | lr 2.00e-04 | grad_norm 1.32 | 16,379 tok/s
+epoch 0 step 3280 | loss 3.3359 | ema 3.7187 | lr 2.00e-04 | grad_norm 0.69 | 16,416 tok/s
+epoch 0 step 3290 | loss 3.7634 | ema 3.7169 | lr 2.00e-04 | grad_norm 0.81 | 16,438 tok/s
+epoch 0 step 3300 | loss 3.3897 | ema 3.7144 | lr 2.00e-04 | grad_norm 0.72 | 16,496 tok/s
+epoch 0 step 3310 | loss 4.0214 | ema 3.7273 | lr 2.00e-04 | grad_norm 0.85 | 16,394 tok/s
+epoch 0 step 3320 | loss 3.4788 | ema 3.7166 | lr 2.00e-04 | grad_norm 1.17 | 16,356 tok/s
+epoch 0 step 3330 | loss 4.3749 | ema 3.7234 | lr 2.00e-04 | grad_norm 0.74 | 16,418 tok/s
+epoch 0 step 3340 | loss 4.2542 | ema 3.7351 | lr 2.00e-04 | grad_norm 0.71 | 16,468 tok/s
+epoch 0 step 3350 | loss 3.7417 | ema 3.7320 | lr 2.00e-04 | grad_norm 0.90 | 16,445 tok/s
+epoch 0 step 3360 | loss 4.1711 | ema 3.7394 | lr 2.00e-04 | grad_norm 0.78 | 16,483 tok/s
+epoch 0 step 3370 | loss 3.1558 | ema 3.7380 | lr 2.00e-04 | grad_norm 0.66 | 16,370 tok/s
+epoch 0 step 3380 | loss 3.5838 | ema 3.7268 | lr 2.00e-04 | grad_norm 0.67 | 16,422 tok/s
+epoch 0 step 3390 | loss 3.4269 | ema 3.7211 | lr 2.00e-04 | grad_norm 0.73 | 16,388 tok/s
+epoch 0 step 3400 | loss 3.4023 | ema 3.7190 | lr 2.00e-04 | grad_norm 0.66 | 16,444 tok/s
+epoch 0 step 3410 | loss 3.8135 | ema 3.7195 | lr 2.00e-04 | grad_norm 0.88 | 16,395 tok/s
+epoch 0 step 3420 | loss 3.7651 | ema 3.7103 | lr 2.00e-04 | grad_norm 0.82 | 16,436 tok/s
+epoch 0 step 3430 | loss 4.1361 | ema 3.7059 | lr 2.00e-04 | grad_norm 0.79 | 16,412 tok/s
+epoch 0 step 3440 | loss 3.5050 | ema 3.6969 | lr 2.00e-04 | grad_norm 0.67 | 16,433 tok/s
+epoch 0 step 3450 | loss 3.8309 | ema 3.6903 | lr 2.00e-04 | grad_norm 1.04 | 16,421 tok/s
+epoch 0 step 3460 | loss 3.0390 | ema 3.6792 | lr 2.00e-04 | grad_norm 0.78 | 16,376 tok/s
+epoch 0 step 3470 | loss 4.2719 | ema 3.6781 | lr 2.00e-04 | grad_norm 0.73 | 16,424 tok/s
+epoch 0 step 3480 | loss 3.6239 | ema 3.6879 | lr 2.00e-04 | grad_norm 0.68 | 16,542 tok/s
+epoch 0 step 3490 | loss 3.6356 | ema 3.6877 | lr 2.00e-04 | grad_norm 0.68 | 16,510 tok/s
+epoch 0 step 3500 | loss 3.3882 | ema 3.6719 | lr 2.00e-04 | grad_norm 0.69 | 16,441 tok/s
+epoch 0 step 3510 | loss 3.8246 | ema 3.6719 | lr 2.00e-04 | grad_norm 0.67 | 16,413 tok/s
+epoch 0 step 3520 | loss 3.7957 | ema 3.6768 | lr 2.00e-04 | grad_norm 0.74 | 16,488 tok/s
+epoch 0 step 3530 | loss 4.0423 | ema 3.6807 | lr 2.00e-04 | grad_norm 0.74 | 16,448 tok/s
+epoch 0 step 3540 | loss 3.5566 | ema 3.6672 | lr 2.00e-04 | grad_norm 0.77 | 16,506 tok/s
+epoch 0 step 3550 | loss 3.5767 | ema 3.6598 | lr 2.00e-04 | grad_norm 0.73 | 16,433 tok/s
+epoch 0 step 3560 | loss 3.4226 | ema 3.6487 | lr 2.00e-04 | grad_norm 0.71 | 16,403 tok/s
+epoch 0 step 3570 | loss 4.0539 | ema 3.6466 | lr 2.00e-04 | grad_norm 0.71 | 16,423 tok/s
+epoch 0 step 3580 | loss 3.9738 | ema 3.6531 | lr 2.00e-04 | grad_norm 0.68 | 16,408 tok/s
+epoch 0 step 3590 | loss 3.9046 | ema 3.6543 | lr 2.00e-04 | grad_norm 0.68 | 16,494 tok/s
+epoch 0 step 3600 | loss 3.4837 | ema 3.6579 | lr 2.00e-04 | grad_norm 0.69 | 16,417 tok/s
+epoch 0 step 3610 | loss 3.9679 | ema 3.6694 | lr 2.00e-04 | grad_norm 0.76 | 16,387 tok/s
+epoch 0 step 3620 | loss 3.5847 | ema 3.6647 | lr 2.00e-04 | grad_norm 0.78 | 16,367 tok/s
+epoch 0 step 3630 | loss 3.6733 | ema 3.6652 | lr 2.00e-04 | grad_norm 0.68 | 16,445 tok/s
+epoch 0 step 3640 | loss 3.5850 | ema 3.6697 | lr 2.00e-04 | grad_norm 0.65 | 16,490 tok/s
+epoch 0 step 3650 | loss 3.2997 | ema 3.6494 | lr 2.00e-04 | grad_norm 0.79 | 16,373 tok/s
+epoch 0 step 3660 | loss 3.7525 | ema 3.6461 | lr 2.00e-04 | grad_norm 0.65 | 16,373 tok/s
+epoch 0 step 3670 | loss 3.4638 | ema 3.6469 | lr 2.00e-04 | grad_norm 0.67 | 16,385 tok/s
+epoch 0 step 3680 | loss 3.4664 | ema 3.6405 | lr 2.00e-04 | grad_norm 0.73 | 16,415 tok/s
+epoch 0 step 3690 | loss 3.8250 | ema 3.6391 | lr 2.00e-04 | grad_norm 0.64 | 16,485 tok/s
+epoch 0 step 3700 | loss 3.4150 | ema 3.6318 | lr 2.00e-04 | grad_norm 0.87 | 16,410 tok/s
+epoch 0 step 3710 | loss 3.3673 | ema 3.6230 | lr 2.00e-04 | grad_norm 0.65 | 16,371 tok/s
+epoch 0 step 3720 | loss 3.6785 | ema 3.6205 | lr 2.00e-04 | grad_norm 0.69 | 16,433 tok/s
+epoch 0 step 3730 | loss 3.9163 | ema 3.6248 | lr 2.00e-04 | grad_norm 0.88 | 16,407 tok/s
+epoch 0 step 3740 | loss 3.6461 | ema 3.6256 | lr 2.00e-04 | grad_norm 0.71 | 16,511 tok/s
+epoch 0 step 3750 | loss 3.2483 | ema 3.6281 | lr 2.00e-04 | grad_norm 0.66 | 16,475 tok/s
+epoch 0 step 3760 | loss 3.4080 | ema 3.6380 | lr 2.00e-04 | grad_norm 0.66 | 16,502 tok/s
+epoch 0 step 3770 | loss 3.6861 | ema 3.6513 | lr 2.00e-04 | grad_norm 0.64 | 16,466 tok/s
+epoch 0 step 3780 | loss 3.3830 | ema 3.6517 | lr 2.00e-04 | grad_norm 0.69 | 16,435 tok/s
+epoch 0 step 3790 | loss 3.8816 | ema 3.6462 | lr 2.00e-04 | grad_norm 0.75 | 16,493 tok/s
+epoch 0 step 3800 | loss 2.9419 | ema 3.6311 | lr 2.00e-04 | grad_norm 0.66 | 16,392 tok/s
+epoch 0 step 3810 | loss 3.5563 | ema 3.6234 | lr 2.00e-04 | grad_norm 0.72 | 16,431 tok/s
+epoch 0 step 3820 | loss 3.3898 | ema 3.6147 | lr 2.00e-04 | grad_norm 0.76 | 16,427 tok/s
+epoch 0 step 3830 | loss 3.5996 | ema 3.6191 | lr 2.00e-04 | grad_norm 0.70 | 16,498 tok/s
+epoch 0 step 3840 | loss 3.2637 | ema 3.6129 | lr 2.00e-04 | grad_norm 0.72 | 16,388 tok/s
+epoch 0 step 3850 | loss 3.6997 | ema 3.6249 | lr 2.00e-04 | grad_norm 0.79 | 16,388 tok/s
+epoch 0 step 3860 | loss 3.4589 | ema 3.6267 | lr 2.00e-04 | grad_norm 0.64 | 16,435 tok/s
+epoch 0 step 3870 | loss 3.6780 | ema 3.6173 | lr 2.00e-04 | grad_norm 0.90 | 16,442 tok/s
+epoch 0 step 3880 | loss 3.2627 | ema 3.6183 | lr 2.00e-04 | grad_norm 0.73 | 16,380 tok/s
+epoch 0 step 3890 | loss 3.6139 | ema 3.6258 | lr 2.00e-04 | grad_norm 0.75 | 16,487 tok/s
+epoch 0 step 3900 | loss 3.7360 | ema 3.6339 | lr 2.00e-04 | grad_norm 0.64 | 16,399 tok/s
+epoch 0 step 3910 | loss 3.6934 | ema 3.6273 | lr 2.00e-04 | grad_norm 0.73 | 16,367 tok/s
+epoch 0 step 3920 | loss 3.4852 | ema 3.6119 | lr 2.00e-04 | grad_norm 0.68 | 16,455 tok/s
+epoch 0 step 3930 | loss 3.2320 | ema 3.6034 | lr 2.00e-04 | grad_norm 0.65 | 16,491 tok/s
+epoch 0 step 3940 | loss 3.5908 | ema 3.6143 | lr 2.00e-04 | grad_norm 0.66 | 16,462 tok/s
+epoch 0 step 3950 | loss 4.0074 | ema 3.6108 | lr 2.00e-04 | grad_norm 0.73 | 16,401 tok/s
+epoch 0 step 3960 | loss 3.7348 | ema 3.6282 | lr 2.00e-04 | grad_norm 0.68 | 16,443 tok/s
+epoch 0 step 3970 | loss 3.4561 | ema 3.6196 | lr 2.00e-04 | grad_norm 0.70 | 16,412 tok/s
+epoch 0 step 3980 | loss 3.9989 | ema 3.6233 | lr 2.00e-04 | grad_norm 0.68 | 16,394 tok/s
+epoch 0 step 3990 | loss 3.0573 | ema 3.6132 | lr 2.00e-04 | grad_norm 0.79 | 16,476 tok/s
+epoch 0 step 4000 | loss 3.8178 | ema 3.6286 | lr 2.00e-04 | grad_norm 0.65 | 16,467 tok/s
+===== step 4000 =====
+[日本の首都は] 日本の首都は、その土地があまりに美しく、そして国内では有名な話、歴史に残る「国立博物館」は、日本の芸術には、日本国内においての特集をはじめとする、科学技術の発達、発展に伴って、世界の文明が発展してきている。日本で「大西洋美術館の再
+[昔々あるところに] 昔々あるところに「白雪姫」という街があったりします。
+「かぐや姫」で有名な八王子の「あやがれ」は、まさか宇津姫が一番知るような、真っ向から見えてこないと、本当にその通りなのです。
+ただ、この「金子家」という言葉も、その世の中には「大野君
+[人工知能とは] 人工知能とは、社会を構築して人々の役割分担を高速にすることを意味する。特に、人口の増加に伴って、人間性や環境はどんどん大きく成長を遂げている。
+
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.08s/it]
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-4000
+epoch 0 step 4010 | loss 3.3767 | ema 3.6253 | lr 2.00e-04 | grad_norm 0.62 | 10,610 tok/s
+epoch 0 step 4020 | loss 3.4588 | ema 3.6174 | lr 2.00e-04 | grad_norm 0.63 | 16,499 tok/s
+epoch 0 step 4030 | loss 3.3347 | ema 3.5880 | lr 2.00e-04 | grad_norm 1.08 | 16,544 tok/s
+epoch 0 step 4040 | loss 3.5079 | ema 3.5781 | lr 2.00e-04 | grad_norm 0.65 | 16,519 tok/s
+epoch 0 step 4050 | loss 3.6954 | ema 3.5815 | lr 2.00e-04 | grad_norm 0.66 | 16,423 tok/s
+epoch 0 step 4060 | loss 3.2653 | ema 3.5741 | lr 2.00e-04 | grad_norm 0.64 | 16,435 tok/s
+epoch 0 step 4070 | loss 3.8209 | ema 3.5804 | lr 2.00e-04 | grad_norm 0.63 | 16,444 tok/s
+epoch 0 step 4080 | loss 3.5938 | ema 3.5871 | lr 2.00e-04 | grad_norm 0.63 | 16,545 tok/s
+epoch 0 step 4090 | loss 3.5980 | ema 3.5959 | lr 2.00e-04 | grad_norm 0.73 | 16,488 tok/s
+epoch 0 step 4100 | loss 4.0358 | ema 3.5971 | lr 2.00e-04 | grad_norm 0.76 | 16,372 tok/s
+epoch 0 step 4110 | loss 3.3363 | ema 3.5977 | lr 2.00e-04 | grad_norm 0.64 | 16,406 tok/s
+epoch 0 step 4120 | loss 3.4015 | ema 3.6007 | lr 2.00e-04 | grad_norm 0.67 | 16,410 tok/s
+epoch 0 step 4130 | loss 3.7552 | ema 3.6039 | lr 2.00e-04 | grad_norm 0.98 | 16,472 tok/s
+epoch 0 step 4140 | loss 3.6794 | ema 3.5986 | lr 2.00e-04 | grad_norm 0.65 | 16,366 tok/s
+epoch 0 step 4150 | loss 3.5723 | ema 3.5953 | lr 2.00e-04 | grad_norm 0.71 | 16,387 tok/s
+epoch 0 step 4160 | loss 3.3171 | ema 3.5880 | lr 2.00e-04 | grad_norm 0.73 | 16,508 tok/s
+epoch 0 step 4170 | loss 3.6225 | ema 3.5828 | lr 2.00e-04 | grad_norm 0.77 | 16,445 tok/s
+epoch 0 step 4180 | loss 3.9568 | ema 3.5829 | lr 2.00e-04 | grad_norm 0.65 | 16,474 tok/s
+epoch 0 step 4190 | loss 3.5531 | ema 3.5749 | lr 2.00e-04 | grad_norm 0.87 | 16,513 tok/s
+epoch 0 step 4200 | loss 3.9507 | ema 3.5738 | lr 2.00e-04 | grad_norm 0.72 | 16,466 tok/s
+epoch 0 step 4210 | loss 3.3704 | ema 3.5808 | lr 2.00e-04 | grad_norm 0.64 | 16,468 tok/s
+epoch 0 step 4220 | loss 3.4284 | ema 3.5834 | lr 2.00e-04 | grad_norm 0.69 | 16,476 tok/s
+epoch 0 step 4230 | loss 3.7771 | ema 3.5822 | lr 2.00e-04 | grad_norm 0.66 | 16,517 tok/s
+epoch 0 step 4240 | loss 4.0349 | ema 3.5922 | lr 2.00e-04 | grad_norm 0.74 | 16,443 tok/s
+epoch 0 step 4250 | loss 3.5375 | ema 3.5963 | lr 2.00e-04 | grad_norm 0.64 | 16,466 tok/s
+epoch 0 step 4260 | loss 3.4734 | ema 3.5924 | lr 2.00e-04 | grad_norm 0.73 | 16,404 tok/s
+epoch 0 step 4270 | loss 3.8248 | ema 3.6037 | lr 2.00e-04 | grad_norm 0.83 | 16,442 tok/s
+epoch 0 step 4280 | loss 3.2203 | ema 3.5956 | lr 2.00e-04 | grad_norm 0.68 | 16,428 tok/s
+epoch 0 step 4290 | loss 3.3112 | ema 3.6037 | lr 2.00e-04 | grad_norm 0.73 | 16,440 tok/s
+epoch 0 step 4300 | loss 3.9128 | ema 3.6046 | lr 2.00e-04 | grad_norm 0.61 | 16,338 tok/s
+epoch 0 step 4310 | loss 3.5267 | ema 3.5971 | lr 2.00e-04 | grad_norm 0.62 | 16,379 tok/s
+epoch 0 step 4320 | loss 4.0841 | ema 3.5955 | lr 2.00e-04 | grad_norm 0.70 | 16,433 tok/s
+epoch 0 step 4330 | loss 3.5864 | ema 3.5992 | lr 2.00e-04 | grad_norm 0.64 | 16,435 tok/s
+epoch 0 step 4340 | loss 3.4265 | ema 3.5982 | lr 2.00e-04 | grad_norm 0.65 | 16,432 tok/s
+epoch 0 step 4350 | loss 3.9861 | ema 3.6007 | lr 2.00e-04 | grad_norm 0.63 | 16,418 tok/s
+epoch 0 step 4360 | loss 3.7132 | ema 3.6089 | lr 2.00e-04 | grad_norm 0.77 | 16,470 tok/s
+epoch 0 step 4370 | loss 3.8199 | ema 3.6148 | lr 2.00e-04 | grad_norm 0.75 | 16,538 tok/s
+epoch 0 step 4380 | loss 3.6251 | ema 3.6106 | lr 2.00e-04 | grad_norm 0.70 | 16,395 tok/s
+epoch 0 step 4390 | loss 3.8517 | ema 3.6063 | lr 2.00e-04 | grad_norm 0.76 | 16,441 tok/s
+epoch 0 step 4400 | loss 3.4611 | ema 3.5924 | lr 2.00e-04 | grad_norm 0.62 | 16,409 tok/s
+epoch 0 step 4410 | loss 3.5838 | ema 3.5834 | lr 2.00e-04 | grad_norm 0.67 | 16,481 tok/s
+epoch 0 step 4420 | loss 3.3882 | ema 3.5817 | lr 2.00e-04 | grad_norm 0.96 | 16,496 tok/s
+epoch 0 step 4430 | loss 3.9160 | ema 3.5864 | lr 2.00e-04 | grad_norm 0.71 | 16,491 tok/s
+epoch 0 step 4440 | loss 3.5773 | ema 3.5782 | lr 2.00e-04 | grad_norm 0.65 | 16,475 tok/s
+epoch 0 step 4450 | loss 3.7940 | ema 3.5819 | lr 2.00e-04 | grad_norm 0.67 | 16,423 tok/s
+epoch 0 step 4460 | loss 3.5198 | ema 3.5662 | lr 2.00e-04 | grad_norm 0.66 | 16,478 tok/s
+epoch 0 step 4470 | loss 3.6052 | ema 3.5649 | lr 2.00e-04 | grad_norm 0.71 | 16,538 tok/s
+epoch 0 step 4480 | loss 3.4882 | ema 3.5646 | lr 2.00e-04 | grad_norm 0.90 | 16,395 tok/s
+epoch 0 step 4490 | loss 3.0108 | ema 3.5568 | lr 2.00e-04 | grad_norm 0.63 | 16,397 tok/s
+epoch 0 step 4500 | loss 3.6245 | ema 3.5369 | lr 2.00e-04 | grad_norm 0.68 | 16,479 tok/s
+epoch 0 step 4510 | loss 3.6232 | ema 3.5284 | lr 2.00e-04 | grad_norm 0.64 | 16,510 tok/s
+epoch 0 step 4520 | loss 3.4603 | ema 3.5379 | lr 2.00e-04 | grad_norm 0.68 | 16,497 tok/s
+epoch 0 step 4530 | loss 3.4495 | ema 3.5277 | lr 2.00e-04 | grad_norm 0.64 | 16,523 tok/s
+epoch 0 step 4540 | loss 3.3907 | ema 3.5242 | lr 2.00e-04 | grad_norm 0.73 | 16,446 tok/s
+epoch 0 step 4550 | loss 3.6355 | ema 3.5490 | lr 2.00e-04 | grad_norm 0.61 | 16,453 tok/s
+epoch 0 step 4560 | loss 3.6910 | ema 3.5541 | lr 2.00e-04 | grad_norm 0.94 | 16,466 tok/s
+epoch 0 step 4570 | loss 3.3011 | ema 3.5555 | lr 2.00e-04 | grad_norm 0.68 | 16,501 tok/s
+epoch 0 step 4580 | loss 3.3110 | ema 3.5657 | lr 2.00e-04 | grad_norm 0.69 | 16,444 tok/s
+epoch 0 step 4590 | loss 3.8600 | ema 3.5758 | lr 2.00e-04 | grad_norm 0.72 | 16,431 tok/s
+epoch 0 step 4600 | loss 4.1233 | ema 3.5880 | lr 2.00e-04 | grad_norm 0.73 | 16,348 tok/s
+epoch 0 step 4610 | loss 3.5334 | ema 3.5812 | lr 2.00e-04 | grad_norm 0.66 | 16,422 tok/s
+epoch 0 step 4620 | loss 3.3274 | ema 3.5706 | lr 2.00e-04 | grad_norm 0.75 | 16,478 tok/s
+epoch 0 step 4630 | loss 3.6948 | ema 3.5671 | lr 2.00e-04 | grad_norm 0.65 | 16,452 tok/s
+epoch 0 step 4640 | loss 3.6971 | ema 3.5699 | lr 2.00e-04 | grad_norm 0.61 | 16,515 tok/s
+epoch 0 step 4650 | loss 3.6481 | ema 3.5753 | lr 2.00e-04 | grad_norm 0.80 | 16,453 tok/s
+epoch 0 step 4660 | loss 3.4796 | ema 3.5761 | lr 2.00e-04 | grad_norm 0.66 | 16,464 tok/s
+epoch 0 step 4670 | loss 3.4112 | ema 3.5653 | lr 2.00e-04 | grad_norm 0.67 | 16,511 tok/s
+epoch 0 step 4680 | loss 3.2073 | ema 3.5507 | lr 2.00e-04 | grad_norm 0.66 | 16,402 tok/s
+epoch 0 step 4690 | loss 3.2320 | ema 3.5463 | lr 2.00e-04 | grad_norm 0.69 | 16,401 tok/s
+epoch 0 step 4700 | loss 3.6053 | ema 3.5453 | lr 2.00e-04 | grad_norm 0.64 | 16,520 tok/s
+epoch 0 step 4710 | loss 3.6790 | ema 3.5507 | lr 2.00e-04 | grad_norm 0.79 | 16,476 tok/s
+epoch 0 step 4720 | loss 3.3449 | ema 3.5454 | lr 2.00e-04 | grad_norm 0.81 | 16,492 tok/s
+epoch 0 step 4730 | loss 3.4996 | ema 3.5496 | lr 2.00e-04 | grad_norm 0.67 | 16,462 tok/s
+epoch 0 step 4740 | loss 3.7375 | ema 3.5501 | lr 2.00e-04 | grad_norm 0.63 | 16,462 tok/s
+epoch 0 step 4750 | loss 3.5048 | ema 3.5472 | lr 2.00e-04 | grad_norm 0.72 | 16,459 tok/s
+epoch 0 step 4760 | loss 3.7062 | ema 3.5330 | lr 2.00e-04 | grad_norm 0.64 | 16,454 tok/s
+epoch 0 step 4770 | loss 3.8220 | ema 3.5458 | lr 2.00e-04 | grad_norm 0.65 | 16,522 tok/s
+epoch 0 step 4780 | loss 3.5653 | ema 3.5500 | lr 2.00e-04 | grad_norm 0.63 | 16,510 tok/s
+epoch 0 step 4790 | loss 3.6034 | ema 3.5563 | lr 2.00e-04 | grad_norm 0.71 | 16,421 tok/s
+epoch 0 step 4800 | loss 3.7775 | ema 3.5513 | lr 2.00e-04 | grad_norm 0.64 | 16,422 tok/s
+epoch 0 step 4810 | loss 3.3088 | ema 3.5562 | lr 2.00e-04 | grad_norm 0.66 | 16,445 tok/s
+epoch 0 step 4820 | loss 3.4397 | ema 3.5489 | lr 2.00e-04 | grad_norm 0.69 | 16,477 tok/s
+epoch 0 step 4830 | loss 3.4972 | ema 3.5370 | lr 2.00e-04 | grad_norm 0.82 | 16,411 tok/s
+epoch 0 step 4840 | loss 3.4610 | ema 3.5355 | lr 2.00e-04 | grad_norm 0.64 | 16,398 tok/s
+epoch 0 step 4850 | loss 3.5374 | ema 3.5231 | lr 2.00e-04 | grad_norm 0.69 | 16,447 tok/s
+epoch 0 step 4860 | loss 3.6078 | ema 3.5273 | lr 2.00e-04 | grad_norm 0.60 | 16,477 tok/s
+epoch 0 step 4870 | loss 3.4856 | ema 3.5245 | lr 2.00e-04 | grad_norm 0.70 | 16,409 tok/s
+epoch 0 step 4880 | loss 3.6941 | ema 3.5372 | lr 2.00e-04 | grad_norm 0.63 | 16,433 tok/s
+epoch 0 step 4890 | loss 3.2991 | ema 3.5247 | lr 2.00e-04 | grad_norm 0.78 | 16,443 tok/s
+epoch 0 step 4900 | loss 3.3355 | ema 3.5149 | lr 2.00e-04 | grad_norm 0.60 | 16,453 tok/s
+epoch 0 step 4910 | loss 3.7459 | ema 3.5243 | lr 2.00e-04 | grad_norm 0.66 | 16,459 tok/s
+epoch 0 step 4920 | loss 3.6469 | ema 3.5300 | lr 2.00e-04 | grad_norm 0.69 | 16,311 tok/s
+epoch 0 step 4930 | loss 3.4532 | ema 3.5419 | lr 2.00e-04 | grad_norm 0.85 | 16,411 tok/s
+epoch 0 step 4940 | loss 3.2057 | ema 3.5298 | lr 2.00e-04 | grad_norm 0.68 | 16,437 tok/s
+epoch 0 step 4950 | loss 3.1577 | ema 3.5153 | lr 2.00e-04 | grad_norm 0.75 | 16,406 tok/s
+epoch 0 step 4960 | loss 3.5614 | ema 3.5160 | lr 2.00e-04 | grad_norm 0.66 | 16,535 tok/s
+epoch 0 step 4970 | loss 3.6289 | ema 3.5102 | lr 2.00e-04 | grad_norm 0.62 | 16,441 tok/s
+epoch 0 step 4980 | loss 3.9172 | ema 3.5076 | lr 2.00e-04 | grad_norm 0.65 | 16,445 tok/s
+epoch 0 step 4990 | loss 3.8349 | ema 3.5179 | lr 2.00e-04 | grad_norm 1.01 | 16,467 tok/s
+epoch 0 step 5000 | loss 3.3732 | ema 3.5218 | lr 2.00e-04 | grad_norm 0.66 | 16,451 tok/s
+===== step 5000 =====
+[日本の首都は] 日本の首都は、観光客が多すぎて日本は観光客も少なくありません。その分、日本は日本にも多いようです。そこで今回は、そんな旅の最中は訪れなかったのが、日本人は多いのでは？
+ということで、このブログの記事は、日本人が観光を楽しんだ理由についてご紹介します。
+特に「日本の大学が世界人口の75%を占める外国人
+[昔々あるところに] 昔々あるところに、オカズが集まったのです。　そこでオナニーの最前列が出来た、
+その場にいた私に、オレは泣き出したのです。そして、二人とも、ずっと泣いているのだと思います。
+自分は、そんなに不思議なことでもないので、もう少し具体的な話にしていきたいです。
+私の場合、普通
+[人工知能とは] 人工知能とは、人間の知性、身体、行動に影響する言語のこと。
+これらには、人間の脳は、人間の身体が作られる神経の構造的な構造はなく、動作、知覚に属する物質と人間の脳に潜在的または生物学的作用があるため、生命や動作や自己の細
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.11s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.11s/it]
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-5000
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.17s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.17s/it]
+Final checkpoint: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/d1024-h8-l16-conv4-learnable-decay-5000/checkpoint-5000
