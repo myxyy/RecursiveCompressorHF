@@ -1,0 +1,25 @@
+[
+  {
+    "prompt": "日本の首都は",
+    "seed": 0,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "max_new_tokens": 8,
+    "generated_tokens": 8,
+    "eos_terminated": false,
+    "token_ids": [
+      5650,
+      25184,
+      23202,
+      44965,
+      3809,
+      26739,
+      22649,
+      28001
+    ],
+    "text": "paper schw Profil将来șiobserv transmit surfaces",
+    "q4_char_bigram_distinct": 1.0,
+    "token_4gram_repeat_fraction": 0.0,
+    "longest_same_token_run": 1
+  }
+]

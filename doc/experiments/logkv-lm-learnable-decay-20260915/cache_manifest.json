@@ -1,0 +1,38 @@
+[
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap",
+    "size": 36639809536,
+    "mtime_ns": 1780328237255355065,
+    "metadata": {
+      "num_samples": 8945266,
+      "context_length": 2048
+    }
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap",
+    "size": 4837376000,
+    "mtime_ns": 1780317408961413494,
+    "metadata": {
+      "num_samples": 1181000,
+      "context_length": 2048
+    }
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/hf_cache/mmap/ctx2048/wiki_en_v5.mmap",
+    "size": 13570191360,
+    "mtime_ns": 1780318971533683474,
+    "metadata": {
+      "num_samples": 3313035,
+      "context_length": 2048
+    }
+  },
+  {
+    "path": "/mnt/raid0/RecursiveCompressor/hf_cache/mmap/ctx2048/minipile_v5.mmap",
+    "size": 3990646784,
+    "mtime_ns": 1780328705137864587,
+    "metadata": {
+      "num_samples": 974279,
+      "context_length": 2048
+    }
+  }
+]

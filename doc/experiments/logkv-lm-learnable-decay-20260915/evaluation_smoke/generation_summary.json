@@ -1,0 +1,11 @@
+[
+  {
+    "limit": 8,
+    "temperature": 0.7,
+    "n": 1,
+    "eos": 0,
+    "mean_length": 8.0,
+    "mean_q4_distinct": 1.0,
+    "q4_below_half": 0
+  }
+]

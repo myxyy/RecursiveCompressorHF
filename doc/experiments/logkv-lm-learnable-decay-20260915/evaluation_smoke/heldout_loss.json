@@ -1,0 +1,23 @@
+[
+  {
+    "mode": "learned",
+    "source": "wiki_ja",
+    "tokens": 2939,
+    "loss": 10.885494470677436,
+    "perplexity": 53396.17913863771
+  },
+  {
+    "mode": "reset_logC",
+    "source": "wiki_ja",
+    "tokens": 2939,
+    "loss": 10.88558896945098,
+    "perplexity": 53401.22525050019
+  },
+  {
+    "mode": "zero",
+    "source": "wiki_ja",
+    "tokens": 2939,
+    "loss": 10.870643594306356,
+    "perplexity": 52609.05826741163
+  }
+]

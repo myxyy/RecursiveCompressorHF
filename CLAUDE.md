@@ -3,6 +3,14 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Authorized 5000-step learned-decay LM campaign (2026-09-15)
+- User requested `train_logkv.py --learnable-decay`,5000 new LM training steps plus head/output analysis. Explicit latest authorization permits all6 GPUs for this LM run; >=8h estimates still require confirmation. This supersedes the previous two-task campaign's no-LM scope only for this new campaign.
+- Branch `adjust-attenuation`, frozen original source `ce360e3`. Standard d1024/H8/ff3072/16layers/C4/ctx2048,conv4/gate/self on,phase off;128 unconstrained beta initialized log4. No source architecture/CLI changes or main merge. Do not resume/overwrite user's separate32-layer run.
+- Six-rank DDP,batch4/accum1,effective24,5000 steps from seed0; original Muon+AdamW lr2e-4,warmup1000. Archive all five1000-step checkpoints; beta every10 steps. Isolate periodic sampling RNG and experiment control/cache sentinels.
+- Actual30-step preflight passed,2.768s/step,18.83GiB allocated on rank0; estimate5.42h including15% margin and1h eval. Evaluation smoke passed (observer output bitexact). Whole cap7.5h from benchmark start; fail-stop/no retries.
+- Train on6 GPUs then evaluate onGPU0:128 unconsumed packed rows, learned vs inference-reset log4/zero loss,16x8 level-attention masses on four examples,18x1024 and3x4096 Japanese generations. Reset coefficients are not retrained baselines; row disjointness is not document deduplication; train loss is rank0, not DDP mean.
+- See `doc/logkv-lm-learnable-decay.md` and `doc/experiments/logkv-lm-learnable-decay-20260915/`. Large artifacts/source/checkpoints in same-named RAID experiments folder. Preserve running scripts; stop at this campaign boundary. Preparation complete, launch pending.
+
 ## Completed learned level-decay comparison (2026-09-15)
 - STARTED2026-09-15 16:43:00 JST on GPUs0/1; supervisor306138, workers306150/306151. First100 metrics AND beta histories bit-match benchmarks; baseline config differs only run_name/learnable_decay/num_params. Branch `adjust-attenuation`, preparation `1762bfb`, frozen source `0e2e949`; main standard unchanged. Completed2026-09-15 19:33:38 JST, execution2.84h/preflight-inclusive2.93h. GPUs released; `launch.json` preserves launch evidence.
 - User authorized existing `--learnable-decay` on standard main CausalConv, fixed M10/P0 Copying and Selective. Keep beta initialized at log C, unconstrained per layer/head; not zero-init. Frozen main source `0e2e949`, no model/CLI changes.

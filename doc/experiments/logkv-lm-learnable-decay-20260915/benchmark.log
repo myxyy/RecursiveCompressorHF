@@ -1,0 +1,94 @@
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+[rank0]:[W915 22:57:00.123667446 ProcessGroupNCCL.cpp:5188] Guessing device ID based on global rank. This can cause a hang if rank to GPU mapping is heterogeneous. You can specify device_id in init_process_group()
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+LogKVLM: 327,392,384 params | d_model=1024 heads=8 d_ff=3072 layers=16 chunk=4 ctx=2048
+world=6 batch/GPU=4 accum=1 -> effective batch 24
+epoch 0 step 10 | loss 10.9253 | ema 10.9109 | lr 2.00e-06 | grad_norm 1.58 | 15,677 tok/s
+epoch 0 step 20 | loss 10.9158 | ema 10.9114 | lr 4.00e-06 | grad_norm 1.55 | 17,674 tok/s
+epoch 0 step 30 | loss 10.8884 | ema 10.9109 | lr 6.00e-06 | grad_norm 1.62 | 17,839 tok/s
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.13s/it]Writing model shards: 100%|██████████| 1/1 [00:02<00:00,  2.13s/it]
+Final checkpoint: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-learnable-decay-20260915/data/checkpoints_logkv/benchmark-30/checkpoint-30
