@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "initial_fp64_equal_with_exact_log_c": true,
+  "initial_max_abs_error": 0.0,
+  "signed_slope_streaming_max_abs_error": 5.551115123125783e-17,
+  "finite_difference_coefficients": 8,
+  "finite_difference_max_abs_error": 6.835795991755322e-11,
+  "scope": "CausalConv plus learned signed head/layer slopes; main model is unmodified."
+}

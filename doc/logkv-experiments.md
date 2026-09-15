@@ -1,5 +1,8 @@
 # LogKV実験記録一覧
 
+2026-09-15、標準CausalConv＋既存`--learnable-decay`による[固定10桁の比較](logkv-learnable-decay.md)を準備。
+GPU0/1、各50k steps、beta初期値log C。事前検証通過、見積もり約4.30時間。最終結果は未確定。
+
 2026-09-14、CausalConvを標準としてmainへマージした（`654f311`）。
 [可変桁M10/16/32/64の追加実験](logkv-variable-memory.md)は19:12 JSTに両50k学習・880セルの評価・監査を完了。
 Copying M10/T131072は238/256完全一致。一方M32/64と未学習M128は両タスクで完全一致0。

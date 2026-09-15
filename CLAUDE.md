@@ -3,6 +3,14 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Active learned level-decay comparison (2026-09-15)
+- User authorized existing `--learnable-decay` on standard main CausalConv, fixed M10/P0 Copying and Selective. Keep beta initialized at log C, unconstrained per layer/head; not zero-init. Frozen main source `0e2e949`, no model/CLI changes.
+- Baseline: completed `logkv-causal-conv-20260914` fixed-decay runs; copy ALL shared untrained weights including convolution, add only16 slopes (5792272 params). Two independent50k tasks, batch64/accum1/T loguniform1..2028, same seeds/best selection/bf16-weight eval,164 cells through T131072 x256.
+- GPU0/1 only; preflight passed,20-step GPU repeats bitexact,300 steps61.4s/57.8s, peak15.85 GiB. Estimated4.30h including preflight. GPU preflight started2026-09-15 16:37:56 JST; hard stop2026-09-16 00:07:56 JST (7.5h). Evaluation and coefficient-update smoke checks passed. Results pending.
+- `doc/logkv-learnable-decay.md` and `doc/experiments/logkv-learnable-decay-20260915/` record the protocol. All large artifacts under `/mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/`. Preserve frozen source and scripts once running; do not restart archived campaigns.
+- Beta telemetry every100 updates; verify master/bf16 checkpoint slopes, sign and per-head changes. Existing learned-bias tensor changes autocast logit addition precision versus fixed scalar bias; document this confound rather than silently changing the option.
+- Standard remains fixed decay. No variable-M, zero-init, fixed amplification, LM run or16M extension queued. Stop after this two-task campaign and its CPU audit.
+
 ## Standard configuration and newly authorized variable-memory study (2026-09-14)
 - COMPLETED2026-09-14 19:12:40 JST: both50k runs,880 best/final cells and CPU audit passed. Execution4.56h, preflight-inclusive4.67h; all GPUs released, nothing else queued. Copying best=final step50000, identical weights/data; M10 T131072 exact238/256, M16 exact1/256. M32/64/128 have no exact strings in any evaluated cell. Selective best48000, M10 T64 exact43/37 (best/final); T131072 exact0/0, digit59.49%/53.24%. Post-completion hashes/recounts passed; see `doc/logkv-variable-memory.md` and `analysis/review.json`.
 - MERGED locally into main at `654f311`; variable task code `90f13b1`. 159 model tests and14 variable-task tests passed, plus CLI default/opt-out checks.
