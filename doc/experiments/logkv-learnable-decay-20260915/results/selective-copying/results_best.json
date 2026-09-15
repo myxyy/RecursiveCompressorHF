@@ -1,0 +1,215 @@
+{
+  "train_max_t": 2028,
+  "samples": 256,
+  "precision": "bf16",
+  "results": {
+    "1": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "2": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "3": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "4": {
+      "token_acc": 0.998828125,
+      "string_acc": 0.9921875,
+      "n": 256
+    },
+    "5": {
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "n": 256
+    },
+    "6": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "7": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "8": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "9": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "10": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "11": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "12": {
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "n": 256
+    },
+    "13": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "14": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "16": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "24": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 256
+    },
+    "32": {
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "n": 256
+    },
+    "48": {
+      "token_acc": 0.99921875,
+      "string_acc": 0.9921875,
+      "n": 256
+    },
+    "64": {
+      "token_acc": 0.996875,
+      "string_acc": 0.96875,
+      "n": 256
+    },
+    "96": {
+      "token_acc": 0.9984375,
+      "string_acc": 0.984375,
+      "n": 256
+    },
+    "128": {
+      "token_acc": 0.999609375,
+      "string_acc": 0.99609375,
+      "n": 256
+    },
+    "192": {
+      "token_acc": 0.995703125,
+      "string_acc": 0.95703125,
+      "n": 256
+    },
+    "256": {
+      "token_acc": 0.98984375,
+      "string_acc": 0.92578125,
+      "n": 256
+    },
+    "384": {
+      "token_acc": 0.996875,
+      "string_acc": 0.96875,
+      "n": 256
+    },
+    "512": {
+      "token_acc": 0.99609375,
+      "string_acc": 0.96484375,
+      "n": 256
+    },
+    "768": {
+      "token_acc": 0.989453125,
+      "string_acc": 0.90625,
+      "n": 256
+    },
+    "1024": {
+      "token_acc": 0.966796875,
+      "string_acc": 0.7421875,
+      "n": 256
+    },
+    "1536": {
+      "token_acc": 0.977734375,
+      "string_acc": 0.828125,
+      "n": 256
+    },
+    "2048": {
+      "token_acc": 0.945703125,
+      "string_acc": 0.6171875,
+      "n": 256
+    },
+    "3072": {
+      "token_acc": 0.87421875,
+      "string_acc": 0.2890625,
+      "n": 256
+    },
+    "4096": {
+      "token_acc": 0.7703125,
+      "string_acc": 0.0546875,
+      "n": 256
+    },
+    "6144": {
+      "token_acc": 0.743359375,
+      "string_acc": 0.05078125,
+      "n": 256
+    },
+    "8192": {
+      "token_acc": 0.675,
+      "string_acc": 0.03125,
+      "n": 256
+    },
+    "12288": {
+      "token_acc": 0.633203125,
+      "string_acc": 0.0078125,
+      "n": 256
+    },
+    "16384": {
+      "token_acc": 0.5796875,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "24576": {
+      "token_acc": 0.585546875,
+      "string_acc": 0.0078125,
+      "n": 256
+    },
+    "32768": {
+      "token_acc": 0.5359375,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "49152": {
+      "token_acc": 0.522265625,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "65536": {
+      "token_acc": 0.4578125,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "98304": {
+      "token_acc": 0.49453125,
+      "string_acc": 0.0,
+      "n": 256
+    },
+    "131072": {
+      "token_acc": 0.46484375,
+      "string_acc": 0.0,
+      "n": 256
+    }
+  },
+  "task": "selective-copying",
+  "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/source/exp/selective-copying/task.py",
+  "task_sha256": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528"
+}

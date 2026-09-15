@@ -1,0 +1,46 @@
+Using checkpoint: model_best
+Loading weights:   0%|          | 0/35 [00:00<?, ?it/s]Loading weights: 100%|██████████| 35/35 [00:00<00:00, 5494.45it/s]
+Evaluating /mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/exp/selective-copying/causal-conv4-learnable-decay-fixed10-20260915/model_best on 41 horizons (T=1..131072), 256 samples each, device=cuda:0
+T=      1 | token 1.0000 | string 1.0000 | 0.6s <= train horizon
+T=      2 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      3 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      4 | token 0.9988 | string 0.9922 | 0.0s <= train horizon
+T=      5 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=      6 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      7 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      8 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=      9 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     10 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     11 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     12 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=     13 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     14 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     16 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     24 | token 1.0000 | string 1.0000 | 0.0s <= train horizon
+T=     32 | token 0.9996 | string 0.9961 | 0.0s <= train horizon
+T=     48 | token 0.9992 | string 0.9922 | 0.0s <= train horizon
+T=     64 | token 0.9969 | string 0.9688 | 0.0s <= train horizon
+T=     96 | token 0.9984 | string 0.9844 | 0.0s <= train horizon
+T=    128 | token 0.9996 | string 0.9961 | 0.1s <= train horizon
+T=    192 | token 0.9957 | string 0.9570 | 0.1s <= train horizon
+T=    256 | token 0.9898 | string 0.9258 | 0.1s <= train horizon
+T=    384 | token 0.9969 | string 0.9688 | 0.2s <= train horizon
+T=    512 | token 0.9961 | string 0.9648 | 0.3s <= train horizon
+T=    768 | token 0.9895 | string 0.9062 | 0.4s <= train horizon
+T=   1024 | token 0.9668 | string 0.7422 | 0.6s <= train horizon
+T=   1536 | token 0.9777 | string 0.8281 | 0.9s <= train horizon
+T=   2048 | token 0.9457 | string 0.6172 | 1.2s
+T=   3072 | token 0.8742 | string 0.2891 | 1.7s
+T=   4096 | token 0.7703 | string 0.0547 | 2.6s
+T=   6144 | token 0.7434 | string 0.0508 | 4.0s
+T=   8192 | token 0.6750 | string 0.0312 | 5.1s
+T=  12288 | token 0.6332 | string 0.0078 | 7.7s
+T=  16384 | token 0.5797 | string 0.0000 | 10.8s
+T=  24576 | token 0.5855 | string 0.0078 | 16.3s
+T=  32768 | token 0.5359 | string 0.0000 | 21.9s
+T=  49152 | token 0.5223 | string 0.0000 | 33.0s
+T=  65536 | token 0.4578 | string 0.0000 | 45.0s
+T=  98304 | token 0.4945 | string 0.0000 | 69.3s
+T= 131072 | token 0.4648 | string 0.0000 | 93.5s
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/exp/selective-copying/causal-conv4-learnable-decay-fixed10-20260915/results.json
+Saved /mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/exp/selective-copying/causal-conv4-learnable-decay-fixed10-20260915/plot.png

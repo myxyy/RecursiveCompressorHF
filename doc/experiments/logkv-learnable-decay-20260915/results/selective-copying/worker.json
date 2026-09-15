@@ -1,0 +1,98 @@
+{
+  "task": "selective-copying",
+  "mode": "selective-copying",
+  "state": "complete",
+  "started": "2026-09-15T07:43:00.562989+00:00",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/train_entry.py",
+        "--run-name",
+        "causal-conv4-learnable-decay-fixed10-20260915",
+        "--arch",
+        "logkv",
+        "--learnable-decay",
+        "--gated-attention",
+        "--self-slot",
+        "--phase-levels",
+        "2",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--conv-kernel-size",
+        "4",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-15T07:43:00.563027+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:22:44.917020+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-15T10:22:44.980211+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:28:07.124261+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/evaluate.py",
+        "--mode",
+        "selective-copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-15T10:28:07.124852+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:33:26.711566+00:00"
+    }
+  ],
+  "first_300_steps_match_benchmark": true,
+  "baseline_config_differences": [
+    "learnable_decay",
+    "num_params",
+    "run_name"
+  ],
+  "weights": {
+    "best": "b58322877e841f9399c1f7b518233f6dee7b57186bc0a246693b5c9e25c5a5f8",
+    "final": "3417b6d724ff1bf2e35f7d58fa8888ab815b09b53cbda7eef38a410229df0692"
+  },
+  "finished": "2026-09-15T10:33:26.763852+00:00"
+}

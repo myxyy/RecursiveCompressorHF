@@ -1,0 +1,91 @@
+{
+  "tasks": [
+    "copying",
+    "selective-copying"
+  ],
+  "state": "complete-awaiting-review",
+  "started": "2026-09-15T07:43:00.473650+00:00",
+  "pid": 306138,
+  "gpu_limit": 2,
+  "gpus": [
+    0,
+    1
+  ],
+  "num_layers": 2,
+  "conv_kernel_size": 4,
+  "learnable_decay": true,
+  "estimated_hours": 4.295039194579477,
+  "time_limit_hours": 7.5,
+  "source_manifest": {
+    "source_commit": "0e2e94985b3f06e48b1cff7971535f5b6b0de598",
+    "files": {
+      "chat_server.py": "5cadce8734e27b30b1a6ff3ef33b3bb9ac986b128d9d5c6948ec98f574ebc56a",
+      "configuration_logkv.py": "40a36e3296bf2c5a16534282995478142b4c5fcca86b668a3bae95110c665c61",
+      "configuration_recursive_compressor.py": "e74eae2220420d2f6da1c014921df1a2ed3d014a876e8eeab2c21d7d45fe1611",
+      "dataset.py": "2909f9944a04f5894f759d0ffa1b4404a8c00197589c967f1da504b8ec0694bf",
+      "exp/copying/evaluate.py": "45dcfa5804c0da20ac6b4047981317d52d03c3974efd33b3effd365e44c0bd7f",
+      "exp/copying/task.py": "03b87b7f8085cbb4575a92f401fb3f7ba9f40ac07b5b80952d3c1a5d5a75fbc4",
+      "exp/copying/test_task.py": "eef7af5c2491c8da679cd8dfb3449000be23a0d8657a77cea2b476f9480de881",
+      "exp/copying/train.py": "77f477f2363992873b766ff2d7a4733abb052bbcbb5f4f103a0ce64c838f10c3",
+      "exp/selective-copying/evaluate.py": "a16ab1c07e6beb20a8693f68124a77c8906d09ed189c139b3f785e611ccb532c",
+      "exp/selective-copying/task.py": "ec3625dd414e016739aa2ca384236c5de549ba0e19d7bc83b046d88eee703528",
+      "exp/selective-copying/test_selective_task.py": "ac860adea415902d48f1aed5864d35de91adec549d58f408acb9e1a20fe8ad9a",
+      "exp/selective-copying/train.py": "b531d192cef01379523b5b24ae44bf6ad6c0cacb1c683340722b2ac8375112a2",
+      "logkv.py": "e2eacad568854c6ea702fa6c050f92e9936bc53f7cbacc56796d5ab2d7d6ad19",
+      "logkv_lm.py": "ecb604597e6a3c30e926f4631102f140575ce5030cb049d208680be3e3c55db4",
+      "predict.py": "7553fa38c36776e3bd80d743732b2e7b5f4a8e7741543275f86a0829de5f0cc7",
+      "predict_logkv.py": "c5dc85c0b9cc9946b4f01aaefa484e658165606e30ce8c38ec619bdb0ec7c359",
+      "predict_stream.py": "0a57807e7f86409e91826bf6b004a9b70e687d0ba0b2b92284574da900cce80d",
+      "pyproject.toml": "2c1ca2a6ac564dec52bb33bcdee8fcf122669ef35ac1dc1c671d691aa60c4497",
+      "recursive_compressor.py": "848369c347e223afc3f4cab4ce39d2583c3efbf897b9a88a036cbf507007c74c",
+      "recursive_compressor_lm.py": "b2aa93e98c853a65b97b2822087a6b39268c0fd16f540e1d05852fc279eff5ce",
+      "recursive_compressor_lm_pipeline.py": "e8c15bd2e88f9fad928c300ea9c4d05c0f7b440e06089efc10c109d10cf6621c",
+      "test_lm.py": "db62261d8516470b897eac913aaa5e4d2d93252c81ab182e638e98ac9ed38cac",
+      "test_logkv.py": "6c78cb408f2539a0df35345108d7f949f9cf7fd183b3fc7c7a4f12d756686f8e",
+      "test_logkv_lm.py": "9136b24d8b83737e9bed22c93f46925c89b6ff83ff042aea1cddaa4753124632",
+      "train_logkv.py": "b913fdfedc53b7e85b3cbbd296f3838d5b3ab4d856bfda96816f4e79e179bd95",
+      "train_pipeline.py": "5ef5ccea611d4cf18bc9d70c9094407d512ddcfe228c05a57f6c7f564b3f1b68",
+      "uv.lock": "22034c2ee77bce6831db6528f45fa5a3b21c4053ee1d0b53aca5d328f777531c",
+      "test_logkv_conv.py": "6d0851048a4202366fa91fefebd2c4181176fa5895dce1020c94e7408a0ed73d"
+    },
+    "architecture": "Unmodified standard main CausalConv with existing --learnable-decay",
+    "baseline_experiment": "logkv-causal-conv-20260914",
+    "changed_from_fixed_decay_source": [
+      "exp/copying/train.py",
+      "train_logkv.py"
+    ]
+  },
+  "source_root": "/mnt/raid0/RecursiveCompressor/experiments/logkv-learnable-decay-20260915/source",
+  "scripts": {
+    "evaluation_smoke.py": "f13c2ac364ca658acde33194aa506c076c0f3d0dd0a8d6808eea5e2c95e5dc1b",
+    "summarize.py": "36cf80d5f3e550004181387985a5fcb658b86e51483e56429582927494d94ce0",
+    "train_entry.py": "6cddd333d51bb3ce619fc742615845ea2193bcd34bf0180044ac0964eb150356",
+    "coefficient_audit.py": "1fe0bdea6c4976ab63ce780b445ea657c0487af73cc8c9a76d2894dafcf5cbd4",
+    "evaluate.py": "d14f8a93c53adb16ce5c7f2d3ec406eadcdd54bc55e911db39906b0ddd34a794",
+    "compare_baseline.py": "d51fc2a49be54ce2356d150b077cb47442fc3683fffc4a2970cabd22157510c0",
+    "run.py": "b8d5a1c44fcbaa8e52e264b47f902b11c3f9d4a66e42c4d4a0d2a4d0130f8fad",
+    "worker.py": "143781036664b1f0b78b3a1d755c15e87c9055f0b4a72f1a393ae393ecd952ce",
+    "fullsize_smoke.py": "5012db3f1fc6e44d63d088dd1747fa9f62a334f623022b6fabf8bdda1516dfd1",
+    "validate.py": "c0d9cad6cd428d7306556c33cb6a7b102bc242f86a2a1bfe916643f720b4eb8d",
+    "common.py": "fd9402e4bd1e01dca5c11f6c4afc9dc1e32a1594fd707e702a83fc06f6152d43",
+    "preflight.py": "176859d67943d87600c643620069abb5f6aa1c3263915619560b4f0faf3455d5"
+  },
+  "prerequisite_hashes": {
+    "preflight.json": "4c752c3f8afa8bc811caf8f43b4486555d40c18109a48aa333f38cb043977070",
+    "validation.json": "b6666747ecbcf1462fc6ed25e40ee93420534031ca14f4dde77c7550914dd223",
+    "evaluation_smoke.json": "ca8bc9c725254b3cb64b4dba433ce4276fa02312cf8c1d02eaaefdff3cb86929",
+    "coefficient_smoke.json": "a482dd6254076cc5072ae47c8baaf2cc527048a821062cc28d883e62138b4dca"
+  },
+  "initial_weights_sha256": "a0ac83d17fa67807eae12512a706554413b8e0bc40934fb43f7a839c29f9ad00",
+  "base_initial_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+  "next_stage_queued": false,
+  "gpu_batch_started": "2026-09-15T07:37:56.769715+00:00",
+  "remaining_hours_at_launch": 7.415625664790471,
+  "workers": {
+    "copying": 306150,
+    "selective-copying": 306151
+  },
+  "finished": "2026-09-15T10:33:38.001186+00:00",
+  "elapsed_hours": 2.8437455280476973,
+  "whole_gpu_batch_hours": 2.9281198620796203
+}

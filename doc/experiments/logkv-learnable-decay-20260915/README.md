@@ -21,4 +21,14 @@ Do not overwrite/restart a completed stage. Preparation and launch status are in
 The standard configuration remains fixed decay; no LM, variable-M, zero-init, fixed amplification
 or16M extension is queued. This checks the existing option, including its autocast bias-arithmetic difference.
 
-Started2026-09-15 16:43:00 JST on GPUs0/1, branch `adjust-attenuation`, preparation `1762bfb`. [Launch audit](launch.json): both first100 metric intervals and coefficient histories bit-match the benchmarks. Expected finish around21:00 JST; hard stop2026-09-16 00:07:56 JST. Results pending.
+Started2026-09-15 16:43:00 JST on GPUs0/1, branch `adjust-attenuation`, preparation `1762bfb`. [Launch audit](launch.json): both first100 metric intervals and coefficient histories bit-match the benchmarks. Completed2026-09-15 19:33:38 JST (2.84h execution;2.93h including preflight), all50k runs/164 cells passed. GPUs released.
+
+
+Post-completion CPU review recounted328 baseline/new cells and checked frozen artifacts,
+checkpoints, paired data and master/bf16 coefficients. Original `results/` and campaign status
+remain immutable historical records; interpretation and plots are in `analysis/` and the report.
+Reproduce the CPU review (requires the archived RAID weights and baseline):
+
+```bash
+OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python doc/experiments/logkv-learnable-decay-20260915/analyze_completed.py
+```

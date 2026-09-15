@@ -1,0 +1,98 @@
+{
+  "task": "copying",
+  "mode": "copying",
+  "state": "complete",
+  "started": "2026-09-15T07:43:00.562004+00:00",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/train_entry.py",
+        "--run-name",
+        "causal-conv4-learnable-decay-fixed10-20260915",
+        "--arch",
+        "logkv",
+        "--learnable-decay",
+        "--gated-attention",
+        "--self-slot",
+        "--phase-levels",
+        "2",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--conv-kernel-size",
+        "4",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-09-15T07:43:00.562043+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:19:16.516170+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/evaluate.py",
+        "--mode",
+        "copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-09-15T10:19:16.581633+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:24:26.220370+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-learnable-decay-20260915/evaluate.py",
+        "--mode",
+        "copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-09-15T10:24:26.221109+00:00",
+      "returncode": 0,
+      "finished": "2026-09-15T10:29:36.728196+00:00"
+    }
+  ],
+  "first_300_steps_match_benchmark": true,
+  "baseline_config_differences": [
+    "learnable_decay",
+    "num_params",
+    "run_name"
+  ],
+  "weights": {
+    "best": "c4cd93ac6e4151d6b4525db383ec3b76180fc5c8911727649a7cad2b70f4f1c0",
+    "final": "c2f487423cb1eebf3375465d549e85ff37813401a96badaa2599ff9014c77ce5"
+  },
+  "finished": "2026-09-15T10:29:36.780755+00:00"
+}
