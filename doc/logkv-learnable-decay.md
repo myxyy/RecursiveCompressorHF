@@ -3,7 +3,11 @@
 2026-09-15、ユーザーの依頼により既存の`--learnable-decay`を用いた
 Copying / Selective Copyingの独立した再学習・評価を実施する。
 モデル本体・通常CLI・標準構成は変更せず、main `0e2e949`のコードを凍結する。
-**状態：事前検証・GPU間再現性・評価器と係数ログの照合を通過。本学習開始前、結果は未確定。**
+**状態：2026-09-15 16:43:00 JSTにGPU0/1で本学習を開始。結果は未確定。**
+両タスクの最初の100 stepsはbenchmarkと指標・β履歴がbit一致した。
+実行設定の対照との差はrun名・learnable_decay・パラメータ数のみ。
+[開始確認](experiments/logkv-learnable-decay-20260915/launch.json)。準備commit `1762bfb`。
+実験記録は`adjust-attenuation`ブランチに保存し、mainの標準は変更していない。終了目安は21時頃。
 
 見積もりは事前GPU確認込み約4.30時間（学習速度に15%の余裕＋評価予算1時間）。
 最大使用メモリ15.85 GiB、300 stepsはCopying61.4秒・Selective57.8秒。

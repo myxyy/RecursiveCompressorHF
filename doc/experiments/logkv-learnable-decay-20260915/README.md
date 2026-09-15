@@ -20,3 +20,5 @@ Large files and frozen runtime live under
 Do not overwrite/restart a completed stage. Preparation and launch status are in the linked report.
 The standard configuration remains fixed decay; no LM, variable-M, zero-init, fixed amplification
 or16M extension is queued. This checks the existing option, including its autocast bias-arithmetic difference.
+
+Started2026-09-15 16:43:00 JST on GPUs0/1, branch `adjust-attenuation`, preparation `1762bfb`. [Launch audit](launch.json): both first100 metric intervals and coefficient histories bit-match the benchmarks. Expected finish around21:00 JST; hard stop2026-09-16 00:07:56 JST. Results pending.

@@ -1,6 +1,6 @@
 # LogKV実験記録一覧
 
-2026-09-15、標準CausalConv＋既存`--learnable-decay`による[固定10桁の比較](logkv-learnable-decay.md)を準備。
+2026-09-15、標準CausalConv＋既存`--learnable-decay`による[固定10桁の比較](logkv-learnable-decay.md)を16:43 JSTに開始。
 GPU0/1、各50k steps、beta初期値log C。事前検証通過、見積もり約4.30時間。最終結果は未確定。
 
 2026-09-14、CausalConvを標準としてmainへマージした（`654f311`）。
