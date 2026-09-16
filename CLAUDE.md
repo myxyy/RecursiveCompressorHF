@@ -3,6 +3,12 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Single-token inference optimization (2026-09-16)
+- `LogKV.predict()` reads the incoming unfinished chunks directly before inserting the current token; only completed chunks propagate upward. It does not call `step()`. Nonempty levels are batched for attention, with per-level value-dtype rounding and >=fp32 statistics. Reduction order/kernel changes mean low-precision outputs are not bit-identical.
+- Hidden format, nonmutation, checkpoint parameters and training `step()` remain compatible. CausalConvBlock/LogKVBlock/LogKVLM have dedicated predict paths; cached one-token HF forward uses predict when gradients are disabled. Multi-token prefill and gradient-enabled forward use step.
+- Validate with `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py test_logkv_predict.py -q`. Independent fp64 reference, base-C carries, mixed step/predict state, bounded storage, backward, CPU/CUDA fp32/bf16/autocast and HF routing are covered. See `doc/logkv-fast-predict.md` and `benchmark_logkv_predict.py`.
+- Standard decay remains fixed by user decision; `--learnable-decay` stays optional. No retraining or main merge is part of this optimization.
+
 ## Completed fixed-decay LM control (2026-09-16)
 - User explicitly requested proposed fixed-decay comparison training and authorized all6 GPUs. One new5000-step run, same source `ce360e3`,327392256 parameters (128 fewer),standard16layers/d1024/ff3072/ctx2048/conv4/gate/self/phase-off. Same seed0, sampler/data, six-rank batch4/accum1, lr/warmup and sample RNG isolation as prior learned run. Do not resume any old run or change main model/CLI.
 - Exact CPU shared-initialization comparison passed; actual training initialization fingerprint must match. Only argument changes versus learned control: learnable_decay/run_name. Existing fixed scalar vs learned fp32 tensor bias under autocast is a documented confound, not silently modified.

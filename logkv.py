@@ -132,9 +132,8 @@ class LogKV(nn.Module):
         using at most C-1 slots per level. One softmax normalizes across
         all levels jointly, plus the current token when self_slot is on.
 
-        step() is the single authoritative implementation (its chunked pass
-        reproduces these semantics exactly — see its docstring); forward is a
-        one-shot step() from empty state. A standalone reference
+        forward is a one-shot step() from empty state; predict() implements
+        the same semantics directly for a single token. A standalone reference
         implementation of the semantics above lives in test_logkv.py.
         """
         v_out, _ = self.step(x)
@@ -356,11 +355,111 @@ class LogKV(nn.Module):
 
     def predict(self, x, hidden=None):
         """Single-token inference: x is (batch_size, d_model), one token
-        without the sequence dimension (same interface as
-        RecursiveCompressorAttention.predict). Returns (out, new_hidden)
-        with out of shape (batch_size, d_model)."""
-        v_out, hidden = self.step(x.unsqueeze(1), hidden)
-        return v_out.squeeze(1), hidden
+        without the sequence dimension. Returns (out, new_hidden).
+
+        The unfinished chunks in the incoming state already partition the
+        entire past. Read them BEFORE inserting this token, then propagate
+        only completed chunks upward (a base-C carry). No sequence indices,
+        slot gathers, or activation checkpointing are needed. State has the
+        same format as step(), and the caller's state is never mutated.
+        """
+        batch_size, dim = x.shape
+        assert dim == self.dim, "Input dimension must match the specified dimension"
+        levels, offset = ([], 0) if hidden is None else hidden
+        if self.phase_emb is not None:
+            x = x + self._phase(offset, 1, x.device).to(x.dtype)
+        q = self._split_heads(self.lq(x).unsqueeze(1))
+        k = self._split_heads(self.lk(x).unsqueeze(1))
+        v = self._split_heads(self.lv(x).unsqueeze(1))
+        if self.k_norm is not None:
+            k = self.k_norm(k)
+        if self.v_norm is not None:
+            v = self.v_norm(v)
+        out = self._predict_attention(q, k, v, levels)
+
+        # Copy containers only. Untouched levels may share immutable tensors
+        # with the input state, including when branching from a prefix.
+        new_levels = [list(level) for level in levels]
+        empty = q.new_empty(q.size(0), 0, self.head_dim)
+        nq, nk, nv = q, k, v
+        i = 0
+        while True:
+            if i == len(new_levels):
+                new_levels.append([nq, nk, nv])
+                break
+            cq, ck, cv = new_levels[i]
+            if cq.size(1):
+                nq = torch.cat((cq, nq), dim=1)
+                nk = torch.cat((ck, nk), dim=1)
+                nv = torch.cat((cv, nv), dim=1)
+            if nq.size(1) < self.chunk_size:
+                new_levels[i] = [nq, nk, nv]
+                break
+            nq, nk, nv = self.compressor(nq, nk, nv)
+            # Compressor returns a view of the last query. Do not retain
+            # storage for the whole completed chunk in the upper level.
+            nq = nq.clone()
+            if self.k_norm is not None:
+                nk = self.k_norm(nk)
+            if self.v_norm is not None:
+                nv = self.v_norm(nv)
+            new_levels[i] = [empty, empty, empty]
+            i += 1
+
+        if self.lg is not None:
+            out = out * torch.sigmoid(self._split_heads(self.lg(x).unsqueeze(1)))
+        out = self.lo(self._merge_heads(out, batch_size).squeeze(1))
+        return out, (new_levels, offset + 1)
+
+    def _predict_attention(self, q, k, v, levels):
+        """Batch the nonempty levels into one small attention operation.
+
+        Keep per-level softmax statistics (including value-dtype rounding)
+        as in _attend_levels, then merge in >= fp32. A single global bf16
+        softmax would change that rounding substantially. Only the order of
+        the final level reduction differs from the chunked online softmax.
+        """
+        active = [(i, ck, cv) for i, (_, ck, cv) in enumerate(levels) if ck.size(1)]
+        if not active:
+            return v if self.self_slot else torch.zeros_like(q)
+        width = max(ck.size(1) for _, ck, _ in active)
+        # (B*H, levels, slots, D); pad only the tiny unfinished chunks.
+        ks = torch.stack([ck if ck.size(1) == width else
+                          torch.nn.functional.pad(ck, (0, 0, 0, width - ck.size(1)))
+                          for _, ck, _ in active], dim=1)
+        vs = torch.stack([cv if cv.size(1) == width else
+                          torch.nn.functional.pad(cv, (0, 0, 0, width - cv.size(1)))
+                          for _, _, cv in active], dim=1)
+        scale = self.head_dim ** -0.5
+        logits = torch.matmul(q[:, None], ks.transpose(-1, -2)).squeeze(-2) * scale
+        acc_dtype = torch.promote_types(logits.dtype, torch.float32)
+        if self.level_decay is not None:
+            slope = self.level_decay.repeat(q.size(0) // self.num_heads)[:, None]
+        biased = []
+        for j, (i, ck, _) in enumerate(active):
+            bias = (self.level_sign * i * math.log(self.chunk_size)
+                    if self.level_decay is None else -i * slope)
+            # Use the same scalar/tensor addition as step(): CPU and CUDA
+            # differ in where scalar bf16 bias rounding happens. These small
+            # slices also avoid per-token host->device index/mask transfers.
+            level_logits = logits[:, j, :ck.size(1)] + bias
+            if ck.size(1) < width:
+                level_logits = torch.nn.functional.pad(
+                    level_logits, (0, width - ck.size(1)), value=float('-inf'))
+            biased.append(level_logits)
+        logits = torch.stack(biased, dim=1).to(acc_dtype)
+        maxima = logits.max(dim=-1).values
+        p = torch.exp(logits - maxima[..., None])
+        denominator = p.sum(dim=-1)
+        numerator = torch.matmul(p.to(vs.dtype).unsqueeze(-2), vs).squeeze(-2).to(acc_dtype)
+        if self.self_slot:
+            self_logit = ((q * k).sum(-1) * scale).to(acc_dtype)
+            maxima = torch.cat((maxima, self_logit), dim=1)
+            denominator = torch.cat((denominator, torch.ones_like(self_logit)), dim=1)
+            numerator = torch.cat((numerator, v.to(acc_dtype)), dim=1)
+        weights = torch.exp(maxima - maxima.max(dim=1, keepdim=True).values)
+        out = (numerator * weights[..., None]).sum(dim=1) / (denominator * weights).sum(dim=1, keepdim=True)
+        return out.to(q.dtype).unsqueeze(1)
 
 
 class FFNSwiGLU(nn.Module):
@@ -412,6 +511,18 @@ class CausalConvBlock(nn.Module):
         new_cache = history[:, -history_size:].clone() if history_size else history[:, :0].clone()
         return x + torch.nn.functional.silu(y), new_cache
 
+    def predict(self, x, cache=None):
+        """One convolution window, with the same immutable cache as step()."""
+        h = self.norm(x).unsqueeze(1)
+        history_size = self.kernel_size - 1
+        if cache is None:
+            cache = h.new_zeros(h.size(0), history_size, h.size(2))
+        if cache.shape != (h.size(0), history_size, h.size(2)):
+            raise ValueError("Invalid causal convolution history shape")
+        history = torch.cat((cache, h), dim=1)
+        y = self.conv(history.transpose(1, 2)).squeeze(-1)
+        return x + torch.nn.functional.silu(y), history[:, 1:].clone()
+
 
 class LogKVBlock(nn.Module):
     """Standard pre-norm transformer block with LogKV attention:
@@ -451,8 +562,10 @@ class LogKVBlock(nn.Module):
 
     def predict(self, x, hidden=None):
         if self.causal_conv is not None:
-            y, hidden = self.step(x.unsqueeze(1), hidden)
-            return y.squeeze(1), hidden
+            conv_cache, hidden = hidden if hidden is not None else (None, None)
+            x, conv_cache = self.causal_conv.predict(x, conv_cache)
         y, hidden = self.attention.predict(self.attention_norm(x), hidden)
         x = x + y
+        if self.causal_conv is not None:
+            hidden = (conv_cache, hidden)
         return x + self.ffn(self.ffn_norm(x)), hidden

@@ -18,6 +18,7 @@ LogKV recursively compresses the sequence chunk by chunk (C = chunk_size) with a
 - The receptive field covers the whole sequence with only O(C·log L) kv entries per attention
 - The sequential-inference hidden state is also O(C·log L·d), logarithmic in sequence length; only the unfinished chunk is retained at each level
 - `forward` / `step` (arbitrary-length chunked processing with hidden-state carry-over) / `predict` (single token) are implemented and tested to agree to machine precision in fp64
+- `predict` uses a dedicated single-token path that reads cached slots directly and compresses only completed chunks. Cached decoding in HF `generate()` uses it automatically. See [timing and numerical checks](doc/logkv-fast-predict.md).
 
 The standard configuration consists of (see [doc/logkv.md](doc/logkv.md) for the experimental record, in Japanese):
 

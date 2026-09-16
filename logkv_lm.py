@@ -61,7 +61,13 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
                          automatically by HF `generate()`.
         attention_mask:  ignored (the hierarchical kv attention is internal).
         """
-        logits, hidden = self.step(input_ids, past_key_values)
+        # Cached one-token generation uses the dedicated decode path. Keep
+        # training and multi-token prefill on the vectorized step path.
+        if input_ids.size(1) == 1 and past_key_values is not None and not torch.is_grad_enabled():
+            logits, hidden = self.predict(input_ids[:, 0], past_key_values)
+            logits = logits.unsqueeze(1)
+        else:
+            logits, hidden = self.step(input_ids, past_key_values)
 
         loss = None
         if labels is not None:
@@ -115,5 +121,8 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
     def predict(self, input_ids, hidden=None):
         """Single-token inference: input_ids is (batch_size,). Returns
         (logits (batch_size, vocab_size), new_hidden)."""
-        logits, hidden = self.step(input_ids.unsqueeze(-1), hidden)
-        return logits.squeeze(1), hidden
+        x = self.embedding(input_ids)
+        hidden = [None] * len(self.layers) if hidden is None else list(hidden)
+        for i, layer in enumerate(self.layers):
+            x, hidden[i] = layer.predict(x, hidden[i])
+        return self.head(self.norm(x)), hidden

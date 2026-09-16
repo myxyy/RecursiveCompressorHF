@@ -153,7 +153,7 @@ phase2・固定レベル減衰を維持した[設計と比較実験](logkv-phase
 
 ## 3. 実装上の知見
 
-### 3.1 step() が唯一の実装、forward/predict は委譲
+### 3.1 step()によるチャンク処理とpredict()による1トークン処理
 
 `step(x, hidden)` は任意長セグメントを **トークンループなし** で一括処理する
 （ループはレベル数 O(log L) のみ）。成立する根拠は次の 3 性質:
@@ -173,8 +173,12 @@ hidden は `(levels, offset)`。`levels[i] = [cur_q, cur_k, cur_v]`
 呼び出し側の hidden は破壊しない。保持する小さなスライスはcloneし、推論時に元セグメント
 全体のストレージを保持し続けないようにする。
 
-forward は `step(x)` の一発呼び出し、`predict(x (B, d), hidden)` は 1 トークン版
-（RecursiveCompressorAttention と同インターフェース）。
+forward は `step(x)` の一発呼び出し。`predict(x (B, d), hidden)` は1トークン専用の
+実装で、更新前の未完成チャンク群を直接参照してattentionを計算した後、現在トークンを
+追加し、完成したチャンクだけを上位へ繰り上げる。`step()`には委譲しない。
+hiddenの形式・意味は共通で、prefill後のpredictや、その後のstepへの切替に変換は不要。
+Block/LMも専用predictを呼び、HF `generate()`のキャッシュ付き1トークンdecode
+（勾配無効時）にも適用する。[実装・速度比較・丸め誤差](logkv-fast-predict.md)。
 
 ### 3.2 等価性の担保
 

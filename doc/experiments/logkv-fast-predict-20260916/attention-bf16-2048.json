@@ -1,0 +1,58 @@
+{
+  "args": {
+    "target": "attention",
+    "device": "cuda:0",
+    "mode": "bfloat16",
+    "checkpoint": null,
+    "prefill": 2048,
+    "tokens": 128,
+    "repeats": 3,
+    "batch_size": 1,
+    "dim": 1024,
+    "heads": 8,
+    "layers": 16,
+    "ff": 3072,
+    "vocab_size": 32000,
+    "output": "doc/experiments/logkv-fast-predict-20260916/attention-bf16-2048.json"
+  },
+  "config": {
+    "dim": 1024,
+    "num_heads": 8,
+    "chunk_size": 4,
+    "self_slot": true,
+    "gated_attention": true
+  },
+  "torch": "2.11.0+cu128",
+  "python": "3.12.3",
+  "checkpoint_sha256": null,
+  "device": "NVIDIA GeForce RTX 3090",
+  "source_sha256": {
+    "logkv.py": "9ab6db330d88efd8df05c364e8be0d8314c3edcb188725f707c3ecbf4aea5690",
+    "logkv_lm.py": "e2582fe59b4fdade9a6ef0765ba5c0e2cb8ba634e6d2c749ef878fbd934cb336",
+    "benchmark_logkv_predict.py": "1bf52c152f092face32256bead6e261b1148999f7740db198a06a696d0fcf809"
+  },
+  "milliseconds_per_token": {
+    "step": [
+      4.166631599218817,
+      4.209596747386968,
+      4.270954712410457
+    ],
+    "predict": [
+      1.0422036066302098,
+      1.0636273182171863,
+      1.0400350220152177
+    ]
+  },
+  "median_ms_per_token": {
+    "step": 4.209596747386968,
+    "predict": 1.0422036066302098
+  },
+  "speedup": 4.039130857547107,
+  "correctness": {
+    "max_abs_error": 0.0009765625,
+    "rmse": 4.356088091418103e-06,
+    "relative_rmse": 4.3035884331285294e-05,
+    "top1_equal": 0,
+    "top1_total": 0
+  }
+}

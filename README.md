@@ -23,6 +23,7 @@ LogKVは、系列をチャンク（C=chunk_size）単位で再帰的にattention
 - 受容野は全系列、attentionあたりのkv数は O(C·log L)
 - 逐次推論の隠れ状態も O(C·log L·d)（系列長に対して対数）。各階層では未完成チャンクだけを保持します
 - `forward` / `step`（隠れ状態持ち回りの任意長チャンク処理）/ `predict`（1トークン）が fp64 で機械精度一致するよう実装・テストされています
+- `predict`は1トークン専用経路で、キャッシュを直接参照し、完成したチャンクだけを圧縮します。HF `generate()`のキャッシュ付きdecodeにも自動適用されます。[速度比較・数値精度](doc/logkv-fast-predict.md)
 
 標準構成は以下の要素からなります（検証記録は [doc/logkv.md](doc/logkv.md)）:
 
