@@ -18,3 +18,7 @@ under autocast differs from the learned tensor bias; this is an option-level com
 
 Artifacts live under `/mnt/raid0/RecursiveCompressor/experiments/logkv-lm-fixed-decay-20260916/`.
 Preserve scripts after launch and do not restart completed stages. Results pending.
+
+Started2026-09-16 10:25:40 JST on6 GPUs. Supervisor1198222/train1198223; preparation `e461e5e`.
+Estimate5.45h,expected finish~16:00 JST; hard stop17:50:59 JST.
+[Campaign status](campaign.json). Results pending.
