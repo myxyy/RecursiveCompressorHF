@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "steps": 5000,
+  "checkpoint_sha256": {
+    "1000": "0e8989996c7130f44adebeabc40543798514f735c0c30c7b0e8230584edc10b1",
+    "2000": "36fdc6394931979facffe3c4994e47ba3ec140aa1a267fb61a656b36420bcf3e",
+    "3000": "ff75cfa9af0fc2b0b46a8619a308a45910f0c4ccd259d9163d5032620387bbe8",
+    "4000": "9b732076ee364a52c1fa1e4bf1627248bd46be38e5be2e5ea66a48dd3b6182e1",
+    "5000": "ed1c8e2e5800a40ca67842870472e6f92144fa8d1c4372b4c39436fc5a1f2095"
+  },
+  "ema_final": {
+    "fixed": 3.525581594620354,
+    "learned": 3.521787108546143
+  },
+  "shared_initial_sha256": "ef4b16cd68ada3bf7e13104e54487681d23379836db741304cff717ed88c8bbc",
+  "paired_evaluation_inputs": true,
+  "original_baseline_hashes_verified": true,
+  "real_query_attention_only": true,
+  "output_hashes": {
+    "heldout_loss.json": "0f994b8c4a94d7f3af1888fc62829315acc1524e9a4bf604f1a9c1685bdac01a",
+    "initialization_audit.json": "6ff9946c57f671a6099f53947e13a38bd31fa38f886cc5cf5076f3f152c7fa66",
+    "run_config.json": "2ea4925d2bb4de3a9d651aadad0404ffef7d65bd8a462347223ae9decbc20752",
+    "comparison.json": "27bbc7663cee80fb17a32cfec240064d6b1efe4039ece4bd65555e60af488ccb",
+    "progress.jsonl": "4e94bcdb5ca70e4e9298023843b99da2612ec1d957413b478222c1ff8a52b9d9",
+    "comparison.png": "28c0fe83c6cdf6fae06bffdf68974a735524fe23a1703a4221dc74877705d496",
+    "training_metrics.json": "4bdfd3799fe6e31906bacf1836bd7398c3e1e4698db7ef19d34e1669ffab16e1",
+    "heldout_manifest.json": "45136d376e05b777db64090065dad83452135a7b9b835049aee2598582eeaa0f",
+    "config-5000.json": "1c368a69160be9ad4232a36b3fae06f4706636badcfa378c983d80c20c36e66e",
+    "config-3000.json": "1c368a69160be9ad4232a36b3fae06f4706636badcfa378c983d80c20c36e66e",
+    "config-1000.json": "1c368a69160be9ad4232a36b3fae06f4706636badcfa378c983d80c20c36e66e",
+    "config-4000.json": "1c368a69160be9ad4232a36b3fae06f4706636badcfa378c983d80c20c36e66e",
+    "config-2000.json": "1c368a69160be9ad4232a36b3fae06f4706636badcfa378c983d80c20c36e66e",
+    "samples.log": "a3388bd8cfb165303effdd8a25d8aafb42316c0da85c383804e548ec7e4400c9",
+    "attention_valid.json": "e39ec5431389e02da5692d3df2c276318f168af61cc672861160fb439d33b6ec",
+    "review.json": "905aac7d18050a3e54192210a9817f79f04285e7f0482d76225ce3ecee0dfd71",
+    "generations.json": "28e337124fca2eb62ee3dc06e8cdc8185bdc582b1b839c9d43774a6c3211836e",
+    "generation_summary.json": "aee37a5ab65bac6a00f77a317ec34b152275e6487b35dd269edabfc20fa29e63",
+    "train.log": "c4dad924d5d5d0d3a1a1fbe96cfe80a88fe5471a55a38e34ecd23d0b5dcee8ab"
+  }
+}

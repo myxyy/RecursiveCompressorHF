@@ -1,0 +1,136 @@
+{
+  "fixed_overall": [
+    0.2690845898483366,
+    0.1836334123844505,
+    0.11454444280477785,
+    0.06641429786387376,
+    0.04920159064017855,
+    0.011083591375476584,
+    0.30603807520173126
+  ],
+  "learned_overall": [
+    0.24859805378237215,
+    0.18423986900060982,
+    0.12379804833103815,
+    0.07824909788047939,
+    0.06370150763033496,
+    0.015952871519137064,
+    0.2854605520979353
+  ],
+  "increased_level2plus_heads": 124,
+  "same_head_mass_pearson": 0.9870915846605871,
+  "layer_rows": [
+    {
+      "layer": 1,
+      "fixed_self": 0.9356531892031466,
+      "learned_self": 0.9282547424091484,
+      "fixed_level2plus": 0.003395294958945613,
+      "learned_level2plus": 0.00682826787887271
+    },
+    {
+      "layer": 2,
+      "fixed_self": 0.49891170007386154,
+      "learned_self": 0.47145644244477225,
+      "fixed_level2plus": 0.08117526634299757,
+      "learned_level2plus": 0.11345763486974023
+    },
+    {
+      "layer": 3,
+      "fixed_self": 0.3550547079180469,
+      "learned_self": 0.333364339176679,
+      "fixed_level2plus": 0.19334994792816013,
+      "learned_level2plus": 0.22341070572530422
+    },
+    {
+      "layer": 4,
+      "fixed_self": 0.2895302421355981,
+      "learned_self": 0.25646308910789184,
+      "fixed_level2plus": 0.235083068287213,
+      "learned_level2plus": 0.29176955322823617
+    },
+    {
+      "layer": 5,
+      "fixed_self": 0.20960400845955818,
+      "learned_self": 0.18854605884486736,
+      "fixed_level2plus": 0.3416940943804829,
+      "learned_level2plus": 0.3818460360907792
+    },
+    {
+      "layer": 6,
+      "fixed_self": 0.20846029965369917,
+      "learned_self": 0.186055036845372,
+      "fixed_level2plus": 0.3238976252428411,
+      "learned_level2plus": 0.36536576514011154
+    },
+    {
+      "layer": 7,
+      "fixed_self": 0.18720053890652263,
+      "learned_self": 0.1688894249733115,
+      "fixed_level2plus": 0.37799394672622705,
+      "learned_level2plus": 0.41591557744714613
+    },
+    {
+      "layer": 8,
+      "fixed_self": 0.22182167293679614,
+      "learned_self": 0.20329477574403904,
+      "fixed_level2plus": 0.3070350384540257,
+      "learned_level2plus": 0.344714626889653
+    },
+    {
+      "layer": 9,
+      "fixed_self": 0.199660669306933,
+      "learned_self": 0.18246075824356628,
+      "fixed_level2plus": 0.3201350441064415,
+      "learned_level2plus": 0.35855722406525664
+    },
+    {
+      "layer": 10,
+      "fixed_self": 0.1857882400596619,
+      "learned_self": 0.16757408885135927,
+      "fixed_level2plus": 0.34628658401863444,
+      "learned_level2plus": 0.39561722548351286
+    },
+    {
+      "layer": 11,
+      "fixed_self": 0.23076485513659023,
+      "learned_self": 0.21789133386563575,
+      "fixed_level2plus": 0.27083782072844326,
+      "learned_level2plus": 0.3024376515068195
+    },
+    {
+      "layer": 12,
+      "fixed_self": 0.23787903559743528,
+      "learned_self": 0.22223652898000135,
+      "fixed_level2plus": 0.24731042348338245,
+      "learned_level2plus": 0.2855576846899477
+    },
+    {
+      "layer": 13,
+      "fixed_self": 0.24912696448275617,
+      "learned_self": 0.22890475277762504,
+      "fixed_level2plus": 0.23228428509691146,
+      "learned_level2plus": 0.2820558475501888
+    },
+    {
+      "layer": 14,
+      "fixed_self": 0.2756891335057329,
+      "learned_self": 0.2497952854139903,
+      "fixed_level2plus": 0.20339086238883125,
+      "learned_level2plus": 0.2660052903842253
+    },
+    {
+      "layer": 15,
+      "fixed_self": 0.29626169031647864,
+      "learned_self": 0.2715837662400792,
+      "fixed_level2plus": 0.2048161470987404,
+      "learned_level2plus": 0.2535721869008615
+    },
+    {
+      "layer": 16,
+      "fixed_self": 0.31520225553488146,
+      "learned_self": 0.2905984096486276,
+      "fixed_level2plus": 0.1712173137066304,
+      "learned_level2plus": 0.22011312792517834
+    }
+  ]
+}

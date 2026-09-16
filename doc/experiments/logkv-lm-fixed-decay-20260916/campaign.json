@@ -1,5 +1,5 @@
 {
-  "state": "running",
+  "state": "complete-awaiting-review",
   "started": "2026-09-16T01:25:40.676386+00:00",
   "pid": 1198222,
   "gpu_limit": 6,
@@ -135,7 +135,44 @@
         "--no-prefault"
       ],
       "started": "2026-09-16T01:25:40.677533+00:00",
-      "pid": 1198223
+      "pid": 1198223,
+      "returncode": 0,
+      "finished": "2026-09-16T05:36:43.708379+00:00"
+    },
+    {
+      "stage": "evaluate",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-lm-fixed-decay-20260916/evaluate.py"
+      ],
+      "started": "2026-09-16T05:36:43.709916+00:00",
+      "pid": 1467681,
+      "returncode": 0,
+      "finished": "2026-09-16T05:56:56.209604+00:00"
+    },
+    {
+      "stage": "attention",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-lm-fixed-decay-20260916/attention_valid.py"
+      ],
+      "started": "2026-09-16T05:56:56.210941+00:00",
+      "pid": 1490221,
+      "returncode": 0,
+      "finished": "2026-09-16T05:57:26.391305+00:00"
+    },
+    {
+      "stage": "summarize",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-lm-fixed-decay-20260916/summarize.py"
+      ],
+      "started": "2026-09-16T05:57:26.392657+00:00",
+      "pid": 1490797,
+      "returncode": 0,
+      "finished": "2026-09-16T05:57:38.286145+00:00"
     }
-  ]
+  ],
+  "finished": "2026-09-16T05:57:38.288423+00:00",
+  "elapsed_hours": 4.532670032845603
 }

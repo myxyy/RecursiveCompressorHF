@@ -1,0 +1,30 @@
+[
+  {
+    "mode": "fixed",
+    "source": "wiki_ja",
+    "tokens": 52389,
+    "loss": 3.2609334287405147,
+    "perplexity": 26.07386388103642
+  },
+  {
+    "mode": "fixed",
+    "source": "wiki_en",
+    "tokens": 52669,
+    "loss": 3.4079250768657405,
+    "perplexity": 30.202511309453843
+  },
+  {
+    "mode": "fixed",
+    "source": "cc100_ja",
+    "tokens": 53766,
+    "loss": 3.4718278636491773,
+    "perplexity": 32.19553774659837
+  },
+  {
+    "mode": "fixed",
+    "source": "minipile",
+    "tokens": 54119,
+    "loss": 4.3320058537229125,
+    "perplexity": 76.09677258032599
+  }
+]
