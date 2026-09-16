@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "seed": 0,
+  "shared_initial_sha256": "ef4b16cd68ada3bf7e13104e54487681d23379836db741304cff717ed88c8bbc",
+  "shared_tensors": 243,
+  "removed_parameters": 128,
+  "fixed_num_params": 327392256,
+  "learned_num_params": 327392384,
+  "caveat": "Same shared weights exactly. Initial outputs need not match under autocast because original fixed scalar and learned tensor bias have different arithmetic precision."
+}

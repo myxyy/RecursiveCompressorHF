@@ -1,0 +1,9 @@
+[
+  {
+    "mode": "fixed",
+    "source": "wiki_ja",
+    "tokens": 2939,
+    "loss": 10.885567300698513,
+    "perplexity": 53400.06812510558
+  }
+]

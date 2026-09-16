@@ -1,0 +1,17 @@
+Loading weights:   0%|          | 0/243 [00:00<?, ?it/s]Loading weights: 100%|██████████| 243/243 [00:00<00:00, 4659.91it/s]
+Dataset type: pretrain
+Loading wikimedia/wikipedia (ja)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-fixed-decay-20260916/data/hf_cache/mmap/ctx2048/wiki_ja_v5.mmap
+  Samples: 1181000
+Loading wikimedia/wikipedia (en)...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-fixed-decay-20260916/data/hf_cache/mmap/ctx2048/wiki_en_v5.mmap
+  Samples: 3313035
+Loading hotchpotch/cc100-ja-documents...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-fixed-decay-20260916/data/hf_cache/mmap/ctx2048/cc100_ja_v5.mmap
+  Samples: 8945266
+Loading JeanKaddour/minipile...
+  Using cache: /mnt/raid0/RecursiveCompressor/experiments/logkv-lm-fixed-decay-20260916/data/hf_cache/mmap/ctx2048/minipile_v5.mmap
+  Samples: 974279
+Total samples: 14413580
+generated 1 / 1 8
+Evaluation complete

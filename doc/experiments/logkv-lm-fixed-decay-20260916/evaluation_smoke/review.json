@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "step": 30,
+  "elapsed_seconds": 4.7932034828700125,
+  "weights_sha256": "568edf2a9cd53b907d89436bb2c0f0e3a14405177c6f64b06b7a02f94c0821ae",
+  "heldout_disjoint": true,
+  "generation_count": 1,
+  "precision": "fp32 weights + bf16 autocast; original fixed scalar bias",
+  "caveat": "Independent fixed-decay training control; scalar/tensor bias arithmetic differs under autocast from learned option.",
+  "hashes": {
+    "generations.json": "93dbe1795950a38cfc3bc393100e1977d55e366c2be0009b851bf9c8841081fd",
+    "heldout_manifest.json": "45136d376e05b777db64090065dad83452135a7b9b835049aee2598582eeaa0f",
+    "heldout_loss.json": "7748a343d3b18d7016603f0653847700a46f69046ac94d76705fab0ec224ef23",
+    "generation_summary.json": "441677baadf314b6d39ef0f38d60655039194c9881c4052ed95d47dac3121cd9"
+  }
+}

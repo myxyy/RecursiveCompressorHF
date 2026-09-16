@@ -3,6 +3,12 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## Authorized fixed-decay LM control (2026-09-16)
+- User explicitly requested proposed fixed-decay comparison training and authorized all6 GPUs. One new5000-step run, same source `ce360e3`,327392256 parameters (128 fewer),standard16layers/d1024/ff3072/ctx2048/conv4/gate/self/phase-off. Same seed0, sampler/data, six-rank batch4/accum1, lr/warmup and sample RNG isolation as prior learned run. Do not resume any old run or change main model/CLI.
+- Exact CPU shared-initialization comparison passed; actual training initialization fingerprint must match. Only argument changes versus learned control: learnable_decay/run_name. Existing fixed scalar vs learned fp32 tensor bias under autocast is a documented confound, not silently modified.
+- Reuse same128 unseen rows and21 generation settings. Corrected attention uses only valid query positions on128 rows; never use old PAD-contaminated baseline attention. Source/checkpoint/baseline result hashes and prediction metrics audited automatically after completion.
+- See `doc/logkv-lm-fixed-decay.md` and `doc/experiments/logkv-lm-fixed-decay-20260916/`. RAID folder matches experiment name. Preflight30 steps on6GPU plus evaluation/observer smoke; estimate~5.5h. Confirm >=8h; whole cap7.5h from GPU preflight. Train6GPU then evaluateGPU0 then CPU audit; stop at boundary, no retries/new campaign. Preparation in progress, launch pending.
+
 ## Completed 5000-step learned-decay LM campaign (2026-09-16)
 - User requested `train_logkv.py --learnable-decay`,5000 new LM training steps plus head/output analysis. Explicit latest authorization permits all6 GPUs for this LM run; >=8h estimates still require confirmation. This supersedes the previous two-task campaign's no-LM scope only for this new campaign.
 - Branch `adjust-attenuation`, frozen original source `ce360e3`. Standard d1024/H8/ff3072/16layers/C4/ctx2048,conv4/gate/self on,phase off;128 unconstrained beta initialized log4. No source architecture/CLI changes or main merge. Do not resume/overwrite user's separate32-layer run.
