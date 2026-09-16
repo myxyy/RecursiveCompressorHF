@@ -69,6 +69,21 @@ just resume         # Resume
 just save-and-exit  # Save a checkpoint and exit -> resume with --resume latest
 ```
 
+### Pipeline-parallel training
+
+Use `train_logkv_pipeline.py` to split one LogKV model across GPUs:
+
+```bash
+uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+    --run-name pipeline-base --batch-size 12 --n-microbatches 12 --grad-accum 2 \
+    --stage-layer-split 2,2,3,3,3,3
+```
+
+The effective batch here is 24, without multiplying by GPU count. Each checkpoint exports
+`$DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-{step}/model` in standard LogKV HF format,
+including the tokenizer. Pass that directory to `predict_stream.py --model-dir`.
+See [pipeline training, resume and memory requirements](doc/logkv-pipeline.md) (Japanese).
+
 ### Text generation
 
 ```bash

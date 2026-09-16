@@ -1,0 +1,26 @@
+{
+  "passed": true,
+  "world_size": 2,
+  "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-pipeline-smoke-20260916-final/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+  "loss_and_gradients_match": true,
+  "global_clip_matches": true,
+  "all_ignored_loss_zero": true,
+  "resume_weights_bit_exact": true,
+  "resume_optimizer_rng_bit_exact": true,
+  "checkpoint_rotation": true,
+  "resume_step": 4,
+  "resume_epoch": 1,
+  "resume_batch_in_epoch": 2,
+  "distributed_samples": true,
+  "changed_split_warm_start": true,
+  "control_save_and_exit": true,
+  "predict_stream_load_and_generate": true,
+  "unit_tests_passed": 230,
+  "reviewed_at": "2026-09-16T23:07:00.422641+09:00",
+  "reviewed_source_sha256": {
+    "train_logkv_pipeline.py": "6966519721f5f02bb90b38c9b81c4a2c14a9def0647e9275b05afa82f4d151b0",
+    "logkv_lm_pipeline.py": "23cb45a384d85fce1d1cec6e91c674d16ecf66b28078a44e427e4e7d420e314e",
+    "train_logkv.py": "98c37006ee3c026bfde99d5c14ca07cada032d11b7f8f0bb42f7ff4401b11d74",
+    "test_logkv_pipeline.py": "821f1e8939c5fb59f563a491bb61adea8c04329bdd019d2163f06cfe612b38ee"
+  }
+}

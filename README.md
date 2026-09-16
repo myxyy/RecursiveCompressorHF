@@ -79,6 +79,21 @@ just resume         # 再開
 just save-and-exit  # チェックポイント保存して終了 → --resume latest で再開
 ```
 
+### 学習（パイプライン並列）
+
+1つのLogKVモデルの層を複数GPUへ分割する場合は`train_logkv_pipeline.py`を使います。
+
+```bash
+uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+    --run-name pipeline-base --batch-size 12 --n-microbatches 12 --grad-accum 2 \
+    --stage-layer-split 2,2,3,3,3,3
+```
+
+この例の有効バッチは24（GPU数は掛けません）。checkpointごとに通常のLogKV形式の
+`$DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-{step}/model`を保存するため、
+`predict_stream.py --model-dir`へそのパスを指定できます。
+再開・層分割・メモリ要件は[パイプライン訓練の説明](doc/logkv-pipeline.md)を参照してください。
+
 ### テキスト生成
 
 ```bash

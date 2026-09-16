@@ -3,6 +3,13 @@
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
+## LogKV pipeline trainer (2026-09-16)
+- `train_logkv_pipeline.py` uses one local `LogKVLMPipelineStage` per GPU and Schedule1F1B. Shared CLI architecture/defaults and Muon/AdamW split come from `train_logkv.py`; DDP behavior is unchanged. Pipeline batch size is shared across ranks: effective batch=batch_size*grad_accum, not multiplied by world size.
+- Token-count-normalized loss across the accumulation group (`scale_grads=False`) and a global cross-stage gradient norm. Per-stage fp32 weights, bf16 autocast by default. Samples use the same distributed stages; no full model on a GPU.
+- Checkpoints under `checkpoints_logkv_pipeline/{run}/checkpoint-{step}/model` are ordinary HF LogKV models plus tokenizer, readable by `predict_stream.py --model-dir`. Rank 0 assembles CPU weights for export. Stage weights/optimizers/RNG and exact epoch/batch cursor are saved separately; only completed directories are resumable.
+- `--resume` requires the same layout/data/batch conditions. Use a new run and `--start-checkpoint` for weights-only transfer or changed stage layout. Run locks and older-checkpoint guards prevent conflicting publication. Cache preparation is flock-serialized before NCCL initialization.
+- 230 model/pipeline tests passed. A tiny offline 2-GPU smoke passed full-model gradient/global-clip parity, bf16 training, bit-exact weights/optimizer/RNG after mid-epoch resume across an epoch boundary, sampling, rotation, warm-start, synchronized save/exit, and predict_stream load+generate. No large-model training/performance campaign was launched. See `doc/logkv-pipeline.md`.
+
 ## Single-token inference optimization (2026-09-16)
 - `LogKV.predict()` reads the incoming unfinished chunks directly before inserting the current token; only completed chunks propagate upward. It does not call `step()`. Nonempty levels are batched for attention, with per-level value-dtype rounding and >=fp32 statistics. Reduction order/kernel changes mean low-precision outputs are not bit-identical.
 - Hidden format, nonmutation, checkpoint parameters and training `step()` remain compatible. CausalConvBlock/LogKVBlock/LogKVLM have dedicated predict paths; cached one-token HF forward uses predict when gradients are disabled. Multi-token prefill and gradient-enabled forward use step.

@@ -14,9 +14,9 @@ Control commands (write to control.cmd file during training, or `just pause` etc
     echo "resume"        > control.cmd   # Resume training
     echo "save_and_exit" > control.cmd   # Save checkpoint and exit
 
-Unlike train_pipeline.py (pipeline parallel for models too big for one GPU),
-LogKVLM fits on a single GPU, so this uses plain data parallelism: every rank
-holds the full model and sees a distinct shard of the data.
+This uses plain data parallelism: every rank holds the full model and sees
+a distinct shard of the data. For larger LogKV models split across GPUs,
+use train_logkv_pipeline.py instead.
 
 To check language acquisition during training, rank 0 periodically generates
 continuations of fixed Japanese prompts (printed and appended to samples.log
@@ -54,7 +54,7 @@ _ADAMW_ONLY_KEYWORDS = ("embedding", "head", "phase_emb")  # phase_emb is 3D (Mu
 SAMPLE_PROMPTS = ["日本の首都は", "昔々あるところに", "人工知能とは"]
 
 
-def parse_args():
+def build_parser():
     p = argparse.ArgumentParser(description="LogKVLM data-parallel training")
     p.add_argument("--run-name", type=str, default="base")
     p.add_argument("--dataset-type", type=str, default="pretrain",
@@ -103,7 +103,11 @@ def parse_args():
                    help="'latest' or a checkpoint dir under checkpoints_logkv/{run_name}")
     p.add_argument("--no-prefault", action="store_true",
                    help="skip memmap prefault (smoke tests)")
-    return p.parse_args()
+    return p
+
+
+def parse_args():
+    return build_parser().parse_args()
 
 
 def get_data_dir():
