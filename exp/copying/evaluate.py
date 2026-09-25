@@ -7,8 +7,8 @@ numerically equivalent to a one-shot forward), so memory stays O(batch x
 chunk) regardless of T and long horizons can use a decent batch size.
 
 Usage:
-    uv run python exp/copying/evaluate.py --run-name base
-    uv run python exp/copying/evaluate.py --run-name base --max-t-exp 17 --samples 256
+    uv run python -m exp.copying.evaluate --run-name base
+    uv run python -m exp.copying.evaluate --run-name base --max-t-exp 17 --samples 256
 
 Outputs (next to the checkpoint): results.json, plot.png
 """
@@ -16,20 +16,17 @@ Outputs (next to the checkpoint): results.json, plot.png
 import argparse
 import json
 import os
-import sys
 import time
 from pathlib import Path
 
 import torch
 from dotenv import load_dotenv
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO_ROOT))
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from models.logkv.modeling import LogKVLM
+from models.recursive_compressor.modeling import RecursiveCompressorLM
+from exp.copying import task as copying_task
 
-from logkv_lm import LogKVLM  # noqa: E402
-from recursive_compressor_lm import RecursiveCompressorLM  # noqa: E402
-from task import MEMORY_LEN, TASK_NAME, make_batch, score_logits  # noqa: E402
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 torch.set_float32_matmul_precision("high")
 
@@ -63,30 +60,30 @@ def build_t_grid(max_exp):
 
 
 @torch.no_grad()
-def eval_horizon(model, T, samples, generator, device, autocast_enabled):
+def eval_horizon(model, T, samples, generator, device, autocast_enabled, task=copying_task):
     """Chunked teacher-forced evaluation at horizon T."""
     token_correct = string_correct = token_n = string_n = 0
-    L = T + 2 * MEMORY_LEN  # T + 20 (MARKER_LEN - 1 + MEMORY_LEN... = task.seq_len_for)
+    L = T + 2 * task.MEMORY_LEN  # T + 20 (MARKER_LEN - 1 + task.MEMORY_LEN... = task.seq_len_for)
     batch = max(1, min(samples, TOKEN_BUDGET // max(1, L)))
     done = 0
     while done < samples:
         b = min(batch, samples - done)
-        input_ids, labels = make_batch(T, b, generator=generator, device='cpu')
+        input_ids, labels = task.make_batch(T, b, generator=generator, device='cpu')
         hidden = None
         last_logits = None
         with torch.autocast(device_type=device.type, dtype=torch.bfloat16,
                             enabled=autocast_enabled):
             for i in range(0, input_ids.size(1), CHUNK_LEN):
-                logits, hidden = model.step(input_ids[:, i:i + CHUNK_LEN].cuda(), hidden)
+                logits, hidden = model.step(input_ids[:, i:i + CHUNK_LEN].to(device), hidden)
                 last_logits = logits.cpu()
-        tok, st, tok_n, st_n = score_logits(last_logits.float(), labels)
+        tok, st, tok_n, st_n = task.score_logits(last_logits.float(), labels)
         token_correct += tok; string_correct += st
         token_n += tok_n; string_n += st_n
         done += b
     return token_correct / token_n, string_correct / string_n
 
 
-def main():
+def main(task=copying_task):
     args = parse_args()
     load_dotenv(REPO_ROOT / ".env")
 
@@ -97,7 +94,7 @@ def main():
         device = torch.device(f"cuda:{spec}" if spec.isdigit() else spec)
 
     data_dir = os.environ.get("DATA_DIR", str(REPO_ROOT / "data"))
-    run_dir = Path(data_dir) / "exp" / TASK_NAME / args.run_name
+    run_dir = Path(data_dir) / "exp" / task.TASK_NAME / args.run_name
     if args.checkpoint == "best":
         model_dir = run_dir / "model_best"
     elif args.checkpoint == "final":
@@ -129,7 +126,7 @@ def main():
     for T in t_grid:
         t0 = time.time()
         tok_acc, str_acc = eval_horizon(model, T, args.samples, generator, device,
-                                        autocast_enabled)
+                                        autocast_enabled, task=task)
         results[T] = {"token_acc": tok_acc, "string_acc": str_acc, "n": args.samples}
         marker = " <= train horizon" if train_max_t and T <= train_max_t else ""
         print(f"T={T:>7} | token {tok_acc:.4f} | string {str_acc:.4f} | "

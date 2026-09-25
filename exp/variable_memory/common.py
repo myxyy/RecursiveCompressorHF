@@ -2,13 +2,11 @@
 import hashlib
 import json
 from pathlib import Path
-import sys
 
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from configuration_logkv import LogKVConfig
-from logkv_lm import LogKVLM
+from models.logkv.configuration import LogKVConfig
+from models.logkv.modeling import LogKVLM
 from exp.variable_memory.task import make_batch, score
 
 MODES = ("causal-conv4",)

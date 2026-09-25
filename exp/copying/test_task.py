@@ -3,14 +3,11 @@
 Run: uv run pytest exp/copying/test_task.py -v
 """
 
-import sys
-from pathlib import Path
 
 import pytest
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from task import (  # noqa: E402
+from exp.copying.task import (
     BLANK, MARKER, MEMORY_LEN, MARKER_LEN, VOCAB_SIZE,
     make_batch, mask_non_answer, score_logits, seq_len_for,
 )

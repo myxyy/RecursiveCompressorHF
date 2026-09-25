@@ -36,3 +36,7 @@ torchaudio = [{ index = "pytorch-cu128" }]
 dev = [
     "pytest>=9.0.2",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "exp"]
+pythonpath = ["."]

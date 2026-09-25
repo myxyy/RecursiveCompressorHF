@@ -1,19 +1,25 @@
 # CLAUDE.md
 
+## Repository layout (2026-09-25)
+- Models: `models/logkv/` and `models/recursive_compressor/`. Shared data: `data_pipeline/`.
+- Entrypoints: `training/`, `inference/`, `benchmarks/`; use `python -m` or `torchrun --module` from the repository root.
+- Tests: `tests/` and `exp/` (`uv run pytest`). Selective source package: `exp/selective_copying`; artifact task name stays `selective-copying`.
+- Historical reports and `doc/experiments/` retain original paths and hashes. Reproduce with their original commit/frozen source. See `doc/repository-layout.md`.
+
 ## Project Overview
 Python ML project: a language model with a custom hierarchical-kv-compression architecture (**LogKV**, the current main line). The previous recursive-compression architecture (RecursiveCompressor) is retained as legacy. Uses HuggingFace (PreTrainedModel), PyTorch DDP, and uv for package management.
 
 ## LogKV pipeline trainer (2026-09-16)
-- `train_logkv_pipeline.py` uses one local `LogKVLMPipelineStage` per GPU and Schedule1F1B. Shared CLI architecture/defaults and Muon/AdamW split come from `train_logkv.py`; DDP behavior is unchanged. Pipeline batch size is shared across ranks: effective batch=batch_size*grad_accum, not multiplied by world size.
+- `training/train_logkv_pipeline.py` uses one local `LogKVLMPipelineStage` per GPU and Schedule1F1B. Shared CLI architecture/defaults and Muon/AdamW split come from `training/train_logkv.py`; DDP behavior is unchanged. Pipeline batch size is shared across ranks: effective batch=batch_size*grad_accum, not multiplied by world size.
 - Token-count-normalized loss across the accumulation group (`scale_grads=False`) and a global cross-stage gradient norm. Per-stage fp32 weights, bf16 autocast by default. Samples use the same distributed stages; no full model on a GPU.
-- Checkpoints under `checkpoints_logkv_pipeline/{run}/checkpoint-{step}/model` are ordinary HF LogKV models plus tokenizer, readable by `predict_stream.py --model-dir`. Rank 0 assembles CPU weights for export. Stage weights/optimizers/RNG and exact epoch/batch cursor are saved separately; only completed directories are resumable.
+- Checkpoints under `checkpoints_logkv_pipeline/{run}/checkpoint-{step}/model` are ordinary HF LogKV models plus tokenizer, readable by `python -m inference.predict_stream --model-dir`. Rank 0 assembles CPU weights for export. Stage weights/optimizers/RNG and exact epoch/batch cursor are saved separately; only completed directories are resumable.
 - `--resume` requires the same layout/data/batch conditions. Use a new run and `--start-checkpoint` for weights-only transfer or changed stage layout. Run locks and older-checkpoint guards prevent conflicting publication. Cache preparation is flock-serialized before NCCL initialization.
 - 230 model/pipeline tests passed. A tiny offline 2-GPU smoke passed full-model gradient/global-clip parity, bf16 training, bit-exact weights/optimizer/RNG after mid-epoch resume across an epoch boundary, sampling, rotation, warm-start, synchronized save/exit, and predict_stream load+generate. No large-model training/performance campaign was launched. See `doc/logkv-pipeline.md`.
 
 ## Single-token inference optimization (2026-09-16)
 - `LogKV.predict()` reads the incoming unfinished chunks directly before inserting the current token; only completed chunks propagate upward. It does not call `step()`. Nonempty levels are batched for attention, with per-level value-dtype rounding and >=fp32 statistics. Reduction order/kernel changes mean low-precision outputs are not bit-identical.
 - Hidden format, nonmutation, checkpoint parameters and training `step()` remain compatible. CausalConvBlock/LogKVBlock/LogKVLM have dedicated predict paths; cached one-token HF forward uses predict when gradients are disabled. Multi-token prefill and gradient-enabled forward use step.
-- Validate with `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py test_logkv_predict.py -q`. Independent fp64 reference, base-C carries, mixed step/predict state, bounded storage, backward, CPU/CUDA fp32/bf16/autocast and HF routing are covered. See `doc/logkv-fast-predict.md` and `benchmark_logkv_predict.py`.
+- Validate with `OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py tests/logkv/test_logkv_conv.py tests/logkv/test_logkv_predict.py -q`. Independent fp64 reference, base-C carries, mixed step/predict state, bounded storage, backward, CPU/CUDA fp32/bf16/autocast and HF routing are covered. See `doc/logkv-fast-predict.md` and `benchmarks/benchmark_logkv_predict.py`.
 - Standard decay remains fixed by user decision; `--learnable-decay` stays optional. No retraining or main merge is part of this optimization.
 
 ## Completed fixed-decay LM control (2026-09-16)
@@ -96,38 +102,38 @@ Python ML project: a language model with a custom hierarchical-kv-compression ar
 - CPU analysis code and plots are in `doc/experiments/logkv-no-position-3layer-20260913/analyze_completed.py` and `analysis/`. Original campaign scripts and hash-indexed result artifacts stay frozen. Proposed denser boundary/hidden-state diagnostics are not executed or queued.
 
 ### LogKV (main)
-- `logkv.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends only to completed sub-units in its current block (c < j); these disjoint intervals partition the entire past. All levels share one softmax (at most C−1 slots per level). See `logkv-refine.drawio.png` and `doc/logkv.md` §6.17. Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.
-- `logkv_lm.py` - LogKVLM language model (PreTrainedModel + generate; `past_key_values` carries the opaque per-layer hidden list).
-- `configuration_logkv.py` - LogKVConfig.
-- `train_logkv.py` - **DDP data-parallel** training (the model fits on one GPU). Muon + AdamW, bf16 autocast, control.cmd, `--resume latest` (skips consumed data, absolute `--max-steps`, EMA carry-over), periodic Japanese sample generations to `samples.log`.
-- `predict_logkv.py` - Text generation for LogKV checkpoints.
-- `exp/copying/`, `exp/selective-copying/` - Copy Memory Problem / Selective Copying suites (`--arch logkv` supported; selective wraps copying via task-module injection).
+- `models/logkv/attention.py` - Core module. Per level i (sub-unit = C^i tokens), each query attends only to completed sub-units in its current block (c < j); these disjoint intervals partition the entire past. All levels share one softmax (at most C−1 slots per level). See `logkv-refine.drawio.png` and `doc/logkv.md` §6.17. Compression is attention pooling with the chunk-last query. Has `forward`/`step`/`predict` (fp64 machine-precision equivalent) plus `LogKVBlock` (pre-norm attention+FFNSwiGLU) and options: `phase_emb`/`phase_levels`, `gated_attention`, `self_slot`, `learnable_decay`, `kv_norm`, `v_norm_only`, `level_amplify`.
+- `models/logkv/modeling.py` - LogKVLM language model (PreTrainedModel + generate; `past_key_values` carries the opaque per-layer hidden list).
+- `models/logkv/configuration.py` - LogKVConfig.
+- `training/train_logkv.py` - **DDP data-parallel** training (the model fits on one GPU). Muon + AdamW, bf16 autocast, control.cmd, `--resume latest` (skips consumed data, absolute `--max-steps`, EMA carry-over), periodic Japanese sample generations to `samples.log`.
+- `inference/predict_logkv.py` - Text generation for LogKV checkpoints.
+- `exp/copying/`, `exp/selective_copying/` - Copy Memory Problem / Selective Copying suites (`--arch logkv` supported; selective passes its task module explicitly to the shared runner).
 - `doc/logkv-experiments.md` - Index of all experiment reports, including experimental-branch positional encodings. Those reports do not imply their optional implementations are present on main.
 - `doc/logkv.md` - **The design/experiment record for LogKV. Read this first for any LogKV work.**
 
 ### Shared
-- `dataset.py` - Data pipeline with memmap caching. Tokenizes HF datasets, packs short documents into context-length sequences.
-- `predict.py` / `predict_stream.py` - Generation / interactive streaming REPL. `_load_model` picks the architecture from config.json's `model_type` ("logkv" → LogKVLM); also detects legacy pipeline checkpoints (`full_model.pt`).
-- `chat_server.py` - Chat web UI (legacy-model era; decaying repetition penalty, reset/interrupt).
+- `data_pipeline/dataset.py` - Data pipeline with memmap caching. Tokenizes HF datasets, packs short documents into context-length sequences.
+- `inference/predict.py` / `inference/predict_stream.py` - Generation / interactive streaming REPL. `_load_model` picks the architecture from config.json's `model_type` ("logkv" → LogKVLM); also detects legacy pipeline checkpoints (`full_model.pt`).
+- `inference/chat_server.py` - Chat web UI (legacy-model era; decaying repetition penalty, reset/interrupt).
 
 ### Legacy (RecursiveCompressor)
-- `recursive_compressor.py`, `recursive_compressor_lm.py`, `recursive_compressor_lm_pipeline.py`, `configuration_recursive_compressor.py`, `train_pipeline.py` (6-GPU pipeline parallel, Schedule1F1B). History: `doc/copying-memory-branch-changes.md`; full experiment logs under `doc/instruction-for-claude/`.
+- `models/recursive_compressor/attention.py`, `models/recursive_compressor/modeling.py`, `models/recursive_compressor/pipeline.py`, `models/recursive_compressor/configuration.py`, `training/train_pipeline.py` (6-GPU pipeline parallel, Schedule1F1B). History: `doc/copying-memory-branch-changes.md`; full experiment logs under `doc/instruction-for-claude/`.
 
 ## Commands
 ```bash
 uv sync                                                # Install dependencies
-uv run pytest test_logkv.py test_logkv_lm.py -v        # LogKV tests
-uv run pytest test_lm.py -v                            # Legacy tests
+uv run pytest tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py -v        # LogKV tests
+uv run pytest tests/legacy/test_lm.py -v                            # Legacy tests
 
 # LogKV standard-config training (DDP, 6 GPUs)
-uv run torchrun --nproc_per_node=6 train_logkv.py --run-name <name> \
+uv run torchrun --nproc_per_node=6 --module training.train_logkv --run-name <name> \
     --conv-kernel-size 4 --gated-attention --self-slot
 
-uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-<step>/model \
+uv run python -m inference.predict_logkv --model-dir $DATA_DIR/checkpoints_logkv/<name>/checkpoint-<step>/model \
     --max-new-tokens 1024 --temperature 0.7 --top-p 0.9
-uv run python predict_stream.py --model-dir /path/to/checkpoint --temperature 0.7 --top-p 0.9
+uv run python -m inference.predict_stream --model-dir /path/to/checkpoint --temperature 0.7 --top-p 0.9
 
-uv run torchrun --nproc_per_node=6 train_pipeline.py   # legacy pipeline-parallel training
+uv run torchrun --nproc_per_node=6 --module training.train_pipeline   # legacy pipeline-parallel training
 ```
 
 ## Training Control

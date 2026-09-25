@@ -6,8 +6,8 @@ no epochs). T is sampled uniformly per step (fixed within a batch, so no
 padding is needed).
 
 Usage:
-    uv run python exp/copying/train.py --run-name base
-    uv run python exp/copying/train.py --run-name small --max-t 44 --steps 3000
+    uv run python -m exp.copying.train --run-name base
+    uv run python -m exp.copying.train --run-name small --max-t 44 --steps 3000
 
 Outputs (under $DATA_DIR/exp/copying/{run_name}/):
     model/            save_pretrained checkpoint (+ run_config.json)
@@ -18,22 +18,19 @@ import argparse
 import json
 import math
 import os
-import sys
 import time
 from pathlib import Path
 
 import torch
 from dotenv import load_dotenv
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(REPO_ROOT))
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from models.logkv.configuration import LogKVConfig
+from models.recursive_compressor.configuration import RecursiveCompressorConfig
+from models.logkv.modeling import LogKVLM
+from models.recursive_compressor.modeling import RecursiveCompressorLM
+from exp.copying import task as copying_task
 
-from configuration_logkv import LogKVConfig  # noqa: E402
-from configuration_recursive_compressor import RecursiveCompressorConfig  # noqa: E402
-from logkv_lm import LogKVLM  # noqa: E402
-from recursive_compressor_lm import RecursiveCompressorLM  # noqa: E402
-from task import TASK_NAME, VOCAB_SIZE, make_batch, mask_non_answer, score_logits  # noqa: E402
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 torch.set_float32_matmul_precision("high")
 
@@ -103,7 +100,7 @@ def resolve_device(spec):
 
 
 @torch.no_grad()
-def quick_eval(model, device, ts, samples, generator, autocast_dtype):
+def quick_eval(model, device, ts, samples, generator, autocast_dtype, task=copying_task):
     """簡易評価: 各Tでstring accuracyを返す (訓練中の進捗確認用)。
     チャンク分割step推論 (evaluate.pyと同方式)。大きいTの一発forwardは
     メモリ・CUDAカーネル形状制限 (invalid configuration) を踏むため。"""
@@ -118,7 +115,7 @@ def quick_eval(model, device, ts, samples, generator, autocast_dtype):
         done = 0
         while done < samples:
             b = min(bs, samples - done)
-            input_ids, labels = make_batch(T, b, generator=generator, device=device)
+            input_ids, labels = task.make_batch(T, b, generator=generator, device=device)
             hidden = None
             last_logits = None
             with torch.autocast(device_type=device.type, dtype=autocast_dtype,
@@ -126,7 +123,7 @@ def quick_eval(model, device, ts, samples, generator, autocast_dtype):
                 for i in range(0, input_ids.size(1), CHUNK_LEN):
                     logits, hidden = model.step(input_ids[:, i:i + CHUNK_LEN], hidden)
                     last_logits = logits
-            _, sc, _, sn = score_logits(last_logits.float(), labels)
+            _, sc, _, sn = task.score_logits(last_logits.float(), labels)
             string_correct += sc; n += sn
             done += b
         out[T] = string_correct / n
@@ -134,20 +131,20 @@ def quick_eval(model, device, ts, samples, generator, autocast_dtype):
     return out
 
 
-def main():
+def main(task=copying_task):
     args = parse_args()
     load_dotenv(REPO_ROOT / ".env")
     device = resolve_device(args.device)
 
     data_dir = os.environ.get("DATA_DIR", str(REPO_ROOT / "data"))
-    run_dir = Path(data_dir) / "exp" / TASK_NAME / args.run_name
+    run_dir = Path(data_dir) / "exp" / task.TASK_NAME / args.run_name
     run_dir.mkdir(parents=True, exist_ok=True)
 
     torch.manual_seed(args.seed)
 
     if args.arch == "logkv":
         config = LogKVConfig(
-            vocab_size=VOCAB_SIZE,
+            vocab_size=task.VOCAB_SIZE,
             d_model=args.d_model,
             num_heads=args.num_heads,
             d_ff=args.d_ff,
@@ -167,7 +164,7 @@ def main():
         model = LogKVLM(config).to(device)
     else:
         config = RecursiveCompressorConfig(
-            vocab_size=VOCAB_SIZE,
+            vocab_size=task.VOCAB_SIZE,
             d_model=args.d_model,
             num_heads=args.num_heads,
             d_ff=args.d_ff,
@@ -226,15 +223,15 @@ def main():
         # the effective batch is identical to a single batch_size-sized batch.
         loss = 0.0
         for _ in range(args.grad_accum):
-            input_ids, labels = make_batch(T, micro_bs, generator=data_gen, device=device)
+            input_ids, labels = task.make_batch(T, micro_bs, generator=data_gen, device=device)
             if args.loss_positions == "answer":
-                labels = mask_non_answer(labels)
+                labels = task.mask_non_answer(labels)
             with torch.autocast(device_type=device.type, dtype=autocast_dtype,
                                 enabled=device.type == "cuda"):
                 out = model(input_ids, labels=labels)
             (out.loss / args.grad_accum).backward()
             loss += out.loss.item() / args.grad_accum
-            tok, st, tok_n, st_n = score_logits(out.logits.float(), labels)
+            tok, st, tok_n, st_n = task.score_logits(out.logits.float(), labels)
             interval_tok += tok; interval_tok_n += tok_n
             interval_str += st; interval_str_n += st_n
         torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -265,7 +262,7 @@ def main():
                                "token_acc": tok_acc, "ema_loss": ema_loss}, f, indent=2)
 
         if args.eval_interval and step % args.eval_interval == 0:
-            accs = quick_eval(model, device, eval_ts, 64, eval_gen, autocast_dtype)
+            accs = quick_eval(model, device, eval_ts, 64, eval_gen, autocast_dtype, task=task)
             msg = " ".join(f"T={t}:{a:.3f}" for t, a in accs.items())
             log_f.write(json.dumps({"step": step, "quick_eval": accs}) + "\n"); log_f.flush()
             print(f"  quick_eval (string acc): {msg}", flush=True)

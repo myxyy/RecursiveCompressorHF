@@ -4,13 +4,11 @@ import hashlib
 import numpy as np
 import time
 from pathlib import Path
-import sys
 
 import torch
 
-sys.path.insert(0,str(Path(__file__).resolve().parents[2]))
 from exp.variable_memory.common import MEMORIES, evaluate_cell, atomic_json
-from logkv_lm import LogKVLM
+from models.logkv.modeling import LogKVLM
 
 
 def grid():

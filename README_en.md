@@ -2,6 +2,8 @@ English | [日本語](README.md)
 
 # RecursiveCompressor / LogKV
 
+Code is organized into packages by purpose. Run the commands below from the repository root. See the [directory layout and migration guide](doc/repository-layout.md) for old paths and historical experiment reproduction.
+
 See the [experiment index](doc/logkv-experiments.md) for comparisons, evaluation artifacts and reproduction commits (in Japanese).
 
 The standard training configuration now uses width4 CausalConv before each block attention, with phase embeddings off and gate/self slot on. These are the new-training CLI defaults; use `--conv-kernel-size 0`, `--no-gated-attention` and `--no-self-slot` for ablations.
@@ -53,7 +55,7 @@ cp .env.example .env
 ### Training (DDP data parallel)
 
 ```bash
-uv run torchrun --nproc_per_node=6 train_logkv.py \
+uv run torchrun --nproc_per_node=6 --module training.train_logkv \
     --run-name myrun --conv-kernel-size 4 --gated-attention --self-slot
 ```
 
@@ -71,62 +73,65 @@ just save-and-exit  # Save a checkpoint and exit -> resume with --resume latest
 
 ### Pipeline-parallel training
 
-Use `train_logkv_pipeline.py` to split one LogKV model across GPUs:
+Use `training/train_logkv_pipeline.py` to split one LogKV model across GPUs:
 
 ```bash
-uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
     --run-name pipeline-base --batch-size 12 --n-microbatches 12 --grad-accum 2 \
     --stage-layer-split 2,2,3,3,3,3
 ```
 
 The effective batch here is 24, without multiplying by GPU count. Each checkpoint exports
 `$DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-{step}/model` in standard LogKV HF format,
-including the tokenizer. Pass that directory to `predict_stream.py --model-dir`.
+including the tokenizer. Pass that directory to `python -m inference.predict_stream --model-dir`.
 See [pipeline training, resume and memory requirements](doc/logkv-pipeline.md) (Japanese).
 
 ### Text generation
 
 ```bash
 # One-shot generation
-uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/myrun/checkpoint-5000/model \
+uv run python -m inference.predict_logkv --model-dir $DATA_DIR/checkpoints_logkv/myrun/checkpoint-5000/model \
     --max-new-tokens 1024 --temperature 0.7 --top-p 0.9 "日本の首都は"
 
 # Interactive streaming (architecture auto-detected from config.json)
-uv run python predict_stream.py --model-dir /path/to/checkpoint \
+uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
     --context-length 4096 --temperature 0.7 --top-p 0.9
 ```
 
 ### Tests and basic experiments
 
 ```bash
-uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV (incl. fp64 machine-precision equivalence)
-uv run pytest test_lm.py -v                       # legacy architecture
+uv run pytest tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py -v   # LogKV (incl. fp64 machine-precision equivalence)
+uv run pytest tests/legacy/test_lm.py -v                       # legacy architecture
 
 # Copy Memory Problem / Selective Copying (long-range memory benchmarks)
-uv run python exp/copying/train.py --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
+uv run python -m exp.copying.train --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
-uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
+uv run python -m exp.copying.evaluate --run-name myrun --max-t-exp 17
 ```
 
 ## Files
 
 | File | Description |
 |---|---|
-| `logkv.py` | LogKV architecture (`forward`/`step`/`predict`, LogKVBlock) |
-| `logkv_lm.py` | Language model LogKVLM (extends PreTrainedModel) |
-| `configuration_logkv.py` | Model config (extends PretrainedConfig) |
-| `train_logkv.py` | DDP data-parallel training (Muon + AdamW, bfloat16 autocast) |
-| `predict_logkv.py` | Text generation (LogKV) |
-| `predict.py` / `predict_stream.py` | Generation / interactive streaming (auto-detects old vs new architecture) |
-| `dataset.py` | HF dataset loading, tokenization, memmap caching |
-| `test_logkv.py` / `test_logkv_lm.py` | LogKV tests |
-| `exp/copying/`, `exp/selective-copying/` | Long-range memory experiment suites |
+| `models/logkv/attention.py` | LogKV architecture (`forward`/`step`/`predict`, LogKVBlock) |
+| `models/logkv/modeling.py` | Language model LogKVLM (extends PreTrainedModel) |
+| `models/logkv/configuration.py` | Model config (extends PretrainedConfig) |
+| `training/train_logkv.py` | DDP data-parallel training (Muon + AdamW, bfloat16 autocast) |
+| `inference/predict_logkv.py` | Text generation (LogKV) |
+| `inference/predict.py` / `inference/predict_stream.py` | Generation / interactive streaming (auto-detects old vs new architecture) |
+| `data_pipeline/dataset.py` | HF dataset loading, tokenization, memmap caching |
+| `tests/logkv/test_logkv.py` / `tests/logkv/test_logkv_lm.py` | LogKV tests |
+| `exp/copying/`, `exp/selective_copying/` | Long-range memory experiment suites |
 | `doc/logkv.md` | Design and experimental findings for LogKV (Japanese) |
+| `models/logkv/pipeline.py` / `training/train_logkv_pipeline.py` | LogKV pipeline parallelism |
+| `models/recursive_compressor/` / `training/train_pipeline.py` | Legacy architecture and training |
+| `tests/` / `benchmarks/` | Tests and inference benchmarks |
 | `.env.example` | Environment template |
 
 ### Legacy architecture (RecursiveCompressor)
 
-The previous implementation — inter-chunk information transfer through recursive compression/decompression — is kept: `recursive_compressor.py` / `recursive_compressor_lm.py` / `recursive_compressor_lm_pipeline.py` / `configuration_recursive_compressor.py` / `train_pipeline.py` (6-GPU pipeline parallel: `uv run torchrun --nproc_per_node=6 train_pipeline.py`). See [doc/copying-memory-branch-changes.md](doc/copying-memory-branch-changes.md) for its history (Japanese).
+The previous implementation — inter-chunk information transfer through recursive compression/decompression — is kept: `models/recursive_compressor/attention.py` / `models/recursive_compressor/modeling.py` / `models/recursive_compressor/pipeline.py` / `models/recursive_compressor/configuration.py` / `training/train_pipeline.py` (6-GPU pipeline parallel: `uv run torchrun --nproc_per_node=6 --module training.train_pipeline`). See [doc/copying-memory-branch-changes.md](doc/copying-memory-branch-changes.md) for its history (Japanese).
 
 ## Training datasets
 

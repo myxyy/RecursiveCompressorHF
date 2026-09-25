@@ -4,11 +4,9 @@ import json
 import math
 import time
 from pathlib import Path
-import sys
 
 import torch
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from exp.variable_memory.common import MODES, MEMORIES, initialize, evaluate_cell, atomic_json
 from exp.variable_memory.task import make_batch, score
 

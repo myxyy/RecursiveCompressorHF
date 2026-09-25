@@ -1,11 +1,10 @@
-import importlib.util
-from pathlib import Path
+import importlib
 
 import pytest
 import torch
 
-from configuration_logkv import LogKVConfig
-from logkv_lm import LogKVLM
+from models.logkv.configuration import LogKVConfig
+from models.logkv.modeling import LogKVLM
 from exp.variable_memory.task import make_batch, score
 from exp.variable_memory.common import evaluate_cell, cell_seed
 from exp.variable_memory.evaluate import grid
@@ -26,9 +25,7 @@ def test_task_order_and_boundaries(task,memory,horizon,prefix):
 
 @pytest.mark.parametrize("task", ["copying","selective-copying"])
 def test_original_task_exactly_reproduced(task):
-    path=Path(__file__).resolve().parents[1]/task/"task.py"
-    spec=importlib.util.spec_from_file_location("original_task",path)
-    module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    module = importlib.import_module("exp." + task.replace("-", "_") + ".task")
     for t in [1,64]:
         expected=module.make_batch(t,4,generator=torch.Generator().manual_seed(5))
         actual=make_batch(task,10,t,0,4,torch.Generator().manual_seed(5))

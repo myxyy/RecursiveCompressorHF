@@ -1,11 +1,14 @@
 # LogKV アーキテクチャ 知見まとめ
 
+現行コードは用途別パッケージに移動しました。[配置・起動方法](repository-layout.md)を参照してください。
+本文中の過去の実験コマンドやパスは実行当時のものです。
+
 `logkv` ブランチで開発中の新アーキテクチャ **LogKV** について、設計・実装・
-実験から得られた知見の記録。実装は [logkv.py](../logkv.py)（`LogKV` /
-`LogKVBlock`）、[logkv_lm.py](../logkv_lm.py)（`LogKVLM`）、
-[configuration_logkv.py](../configuration_logkv.py)、訓練は
-[train_logkv.py](../train_logkv.py)、生成は [predict_logkv.py](../predict_logkv.py)、
-テストは [test_logkv.py](../test_logkv.py) / [test_logkv_lm.py](../test_logkv_lm.py)。
+実験から得られた知見の記録。実装は [logkv.py](../models/logkv/attention.py)（`LogKV` /
+`LogKVBlock`）、[logkv_lm.py](../models/logkv/modeling.py)（`LogKVLM`）、
+[configuration_logkv.py](../models/logkv/configuration.py)、訓練は
+[train_logkv.py](../training/train_logkv.py)、生成は [predict_logkv.py](../inference/predict_logkv.py)、
+テストは [test_logkv.py](../tests/logkv/test_logkv.py) / [test_logkv_lm.py](../tests/logkv/test_logkv_lm.py)。
 
 **現在の実装は重複なし構造**（2026-09-06、[logkv-refine.drawio.png](../logkv-refine.drawio.png)、
 §6.17）。§2–3の仕様は更新済み。§4–6.16の実験結果・構成選択は従来の重複あり構造
@@ -183,7 +186,7 @@ Block/LMも専用predictを呼び、HF `generate()`のキャッシュ付き1ト�
 ### 3.2 等価性の担保
 
 forward が step 委譲になると step==forward のテストが自明化するため、当初の並列実装
-（レベル構築 → ブロック整列 gather）を [test_logkv.py](../test_logkv.py) の
+（レベル構築 → ブロック整列 gather）を [test_logkv.py](../tests/logkv/test_logkv.py) の
 `reference_forward` に独立オラクルとして保持している。step / 分割 step / 1 トークン
 predict 連鎖は fp64 で参照実装と **機械精度（<1e-12）** で一致する。意味論を変更する
 とき（レベル減衰など）は参照実装にも同じ変更を入れる。

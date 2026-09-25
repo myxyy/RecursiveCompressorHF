@@ -2,6 +2,8 @@
 
 # RecursiveCompressor / LogKV
 
+コードは用途別のパッケージへ整理しました。以下のコマンドはリポジトリルートで実行します。旧パスとの対応と過去の実験の再現方法は[ディレクトリ構成](doc/repository-layout.md)を参照してください。
+
 各方式の比較と再現用commitは[実験記録一覧](doc/logkv-experiments.md)にまとめています。
 標準CausalConvでの[可変桁実験](doc/logkv-variable-memory.md)も完了しました。可変桁で学習したCopyingは
 10桁・T=131,072で238/256例が完全一致しましたが、32・64桁は全評価セルで完全一致に届きませんでした。
@@ -63,7 +65,7 @@ cp .env.example .env
 ### 学習（DDPデータ並列）
 
 ```bash
-uv run torchrun --nproc_per_node=6 train_logkv.py \
+uv run torchrun --nproc_per_node=6 --module training.train_logkv \
     --run-name myrun --conv-kernel-size 4 --gated-attention --self-slot
 ```
 
@@ -81,62 +83,68 @@ just save-and-exit  # チェックポイント保存して終了 → --resume la
 
 ### 学習（パイプライン並列）
 
-1つのLogKVモデルの層を複数GPUへ分割する場合は`train_logkv_pipeline.py`を使います。
+1つのLogKVモデルの層を複数GPUへ分割する場合は`training/train_logkv_pipeline.py`を使います。
 
 ```bash
-uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
     --run-name pipeline-base --batch-size 12 --n-microbatches 12 --grad-accum 2 \
     --stage-layer-split 2,2,3,3,3,3
 ```
 
 この例の有効バッチは24（GPU数は掛けません）。checkpointごとに通常のLogKV形式の
 `$DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-{step}/model`を保存するため、
-`predict_stream.py --model-dir`へそのパスを指定できます。
+`python -m inference.predict_stream --model-dir`へそのパスを指定できます。
 再開・層分割・メモリ要件は[パイプライン訓練の説明](doc/logkv-pipeline.md)を参照してください。
 
 ### テキスト生成
 
 ```bash
 # 1回生成
-uv run python predict_logkv.py --model-dir $DATA_DIR/checkpoints_logkv/myrun/checkpoint-5000/model \
+uv run python -m inference.predict_logkv --model-dir $DATA_DIR/checkpoints_logkv/myrun/checkpoint-5000/model \
     --max-new-tokens 1024 --temperature 0.7 --top-p 0.9 "日本の首都は"
 
 # 対話的にストリーム生成（config.json からアーキテクチャを自動判別）
-uv run python predict_stream.py --model-dir /path/to/checkpoint \
+uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
     --context-length 4096 --temperature 0.7 --top-p 0.9
 ```
 
 ### テスト・基礎実験
 
 ```bash
-uv run pytest test_logkv.py test_logkv_lm.py -v   # LogKV（fp64機械精度の等価性検証を含む）
-uv run pytest test_lm.py -v                       # 旧アーキテクチャ
+uv run pytest tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py -v   # LogKV（fp64機械精度の等価性検証を含む）
+uv run pytest tests/legacy/test_lm.py -v                       # 旧アーキテクチャ
 
 # Copy Memory Problem / Selective Copying（長距離記憶の基礎検証）
-uv run python exp/copying/train.py --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
+uv run python -m exp.copying.train --arch logkv --conv-kernel-size 4 --gated-attention --self-slot \
     --run-name myrun --t-dist loguniform
-uv run python exp/copying/evaluate.py --run-name myrun --max-t-exp 17
+uv run python -m exp.copying.evaluate --run-name myrun --max-t-exp 17
+uv run python -m exp.selective_copying.train --arch logkv --run-name selective --t-dist loguniform
+uv run python -m exp.selective_copying.evaluate --run-name selective --max-t-exp 17
 ```
 
 ## ファイル構成
 
 | ファイル | 説明 |
 |---|---|
-| `logkv.py` | LogKVアーキテクチャ本体（`forward`/`step`/`predict`、LogKVBlock） |
-| `logkv_lm.py` | 言語モデル LogKVLM（PreTrainedModel継承） |
-| `configuration_logkv.py` | モデル設定（PretrainedConfig継承） |
-| `train_logkv.py` | DDPデータ並列学習スクリプト（Muon + AdamW、bfloat16 autocast） |
-| `predict_logkv.py` | テキスト生成（LogKV用） |
-| `predict.py` / `predict_stream.py` | テキスト生成・対話的ストリーム生成（新旧アーキ自動判別） |
-| `dataset.py` | HFデータセット読み込み・トークナイズ・memmapキャッシュ |
-| `test_logkv.py` / `test_logkv_lm.py` | LogKVのテスト |
-| `exp/copying/`, `exp/selective-copying/` | 長距離記憶の基礎実験一式 |
+| `models/logkv/attention.py` | LogKVアーキテクチャ本体（`forward`/`step`/`predict`、LogKVBlock） |
+| `models/logkv/modeling.py` | 言語モデル LogKVLM（PreTrainedModel継承） |
+| `models/logkv/configuration.py` | モデル設定（PretrainedConfig継承） |
+| `training/train_logkv.py` | DDPデータ並列学習スクリプト（Muon + AdamW、bfloat16 autocast） |
+| `inference/predict_logkv.py` | テキスト生成（LogKV用） |
+| `inference/predict.py` / `inference/predict_stream.py` | テキスト生成・対話的ストリーム生成（新旧アーキ自動判別） |
+| `data_pipeline/dataset.py` | HFデータセット読み込み・トークナイズ・memmapキャッシュ |
+| `tests/logkv/test_logkv.py` / `tests/logkv/test_logkv_lm.py` | LogKVのテスト |
+| `exp/copying/`, `exp/selective_copying/` | 長距離記憶の基礎実験一式 |
 | `doc/logkv.md` | LogKVの設計・実験の知見まとめ |
+| `models/logkv/pipeline.py` / `training/train_logkv_pipeline.py` | LogKVパイプライン並列 |
+| `models/recursive_compressor/` / `training/train_pipeline.py` | 旧アーキテクチャ・訓練 |
+| `tests/` | モデル・データ処理のテスト |
+| `benchmarks/` | 推論速度のベンチマーク |
 | `.env.example` | 環境設定例 |
 
 ### 旧アーキテクチャ（RecursiveCompressor）
 
-再帰的な圧縮・展開でチャンク間の情報伝達を行う旧実装も残っています: `recursive_compressor.py` / `recursive_compressor_lm.py` / `recursive_compressor_lm_pipeline.py` / `configuration_recursive_compressor.py` / `train_pipeline.py`（6GPUパイプライン並列、`uv run torchrun --nproc_per_node=6 train_pipeline.py`）。経緯は [doc/copying-memory-branch-changes.md](doc/copying-memory-branch-changes.md) を参照してください。
+再帰的な圧縮・展開でチャンク間の情報伝達を行う旧実装も残っています: `models/recursive_compressor/attention.py` / `models/recursive_compressor/modeling.py` / `models/recursive_compressor/pipeline.py` / `models/recursive_compressor/configuration.py` / `training/train_pipeline.py`（6GPUパイプライン並列、`uv run torchrun --nproc_per_node=6 --module training.train_pipeline`）。経緯は [doc/copying-memory-branch-changes.md](doc/copying-memory-branch-changes.md) を参照してください。
 
 ## 学習データセット
 

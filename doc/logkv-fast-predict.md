@@ -48,7 +48,7 @@ with torch.inference_mode():
 ```bash
 CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   .venv/bin/python -m pytest \
-  test_logkv.py test_logkv_lm.py test_logkv_conv.py test_logkv_predict.py -q
+  tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py tests/logkv/test_logkv_conv.py tests/logkv/test_logkv_predict.py -q
 ```
 
 - 独立した`reference_forward`とのfp64一致（既存の`<1e-12`検査を含む）、C=2/3/4、H=1/4、各種オプション。
@@ -58,7 +58,7 @@ CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
 
 ## 速度比較の条件
 
-ベンチマークは[benchmark_logkv_predict.py](../benchmark_logkv_predict.py)。
+ベンチマークは[benchmarks/benchmark_logkv_predict.py](../benchmarks/benchmark_logkv_predict.py)。
 RTX 3090 1台、batch=1、C=4、d1024/H8、gate/self slot有効。
 LMは直近の固定減衰5000-step重み（16層、ff3072、Conv幅4）をそのままロードする。
 通常の訓練や生成品質評価ではなく、同じprefill状態から同じランダム入力列128トークンを処理する
@@ -108,12 +108,12 @@ teacher-forcingであり、自由生成の一致率・生成品質・Copyingの�
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  .venv/bin/python benchmark_logkv_predict.py \
+  .venv/bin/python -m benchmarks.benchmark_logkv_predict \
   --target attention --mode bfloat16 --prefill 2048 --tokens 128 --repeats 3
 
 # 実際に比較するローカルの学習済みモデルを指定する。
 CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  .venv/bin/python benchmark_logkv_predict.py \
+  .venv/bin/python -m benchmarks.benchmark_logkv_predict \
   --target lm --checkpoint /path/to/checkpoint-5000/model \
   --mode autocast --prefill 2048 --tokens 128 --repeats 3
 ```

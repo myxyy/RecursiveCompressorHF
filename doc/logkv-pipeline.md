@@ -1,8 +1,8 @@
 # LogKVのパイプライン並列訓練
 
-`train_logkv_pipeline.py`は`train_pipeline.py`の`Schedule1F1B`を参考にした、LogKV用の
+`training/train_logkv_pipeline.py`は`training/train_pipeline.py`の`Schedule1F1B`を参考にした、LogKV用の
 パイプライン並列trainer。1 GPUに1ステージを配置する。
-通常の`train_logkv.py`とモデル構造・設定オプション・Muon/AdamWの振り分け・linear warmupを共有する。
+通常の`training/train_logkv.py`とモデル構造・設定オプション・Muon/AdamWの振り分け・linear warmupを共有する。
 既定はConv幅4、gate/self slotあり、phaseなし、固定減衰。
 
 ## 訓練と生成
@@ -10,7 +10,7 @@
 `.env`の`DATA_DIR`を設定してから実行する。以下は6GPU、標準16層の例。
 
 ```bash
-uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
   --run-name pipeline-base \
   --batch-size 12 --n-microbatches 12 --grad-accum 2 \
   --num-layers 16 --stage-layer-split 2,2,3,3,3,3 \
@@ -47,12 +47,12 @@ $DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-5000/
 `DATA_DIR`がshell変数にも設定されている場合の例：
 
 ```bash
-uv run python predict_stream.py \
+uv run python -m inference.predict_stream \
   --model-dir "$DATA_DIR/checkpoints_logkv_pipeline/pipeline-base/checkpoint-5000/model" \
   --device 0 --precision bf16
 ```
 
-`predict_stream.py`の変更は不要。`config.json`の`model_type=logkv`によって通常のLogKVLMとして読む。
+`inference/predict_stream.py`の変更は不要。`config.json`の`model_type=logkv`によって通常のLogKVLMとして読む。
 訓練を分散できても、この生成CLIは統合したモデル全体を指定デバイスにロードする。
 大きいモデルの推論にはその分のVRAM、または`--device cpu --precision fp32`を使うメモリが必要。
 
@@ -62,7 +62,7 @@ uv run python predict_stream.py \
 `--max-steps`は再開後の追加数ではなく絶対ステップ数。
 
 ```bash
-uv run torchrun --standalone --nproc_per_node=6 train_logkv_pipeline.py \
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
   --run-name pipeline-base \
   --batch-size 12 --n-microbatches 12 --grad-accum 2 \
   --stage-layer-split 2,2,3,3,3,3 \
@@ -121,18 +121,18 @@ microbatchごとの平均を単純平均しないため、instructの応答長�
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  .venv/bin/python -m pytest test_logkv.py test_logkv_lm.py test_logkv_conv.py \
-  test_logkv_predict.py test_logkv_pipeline.py -q
+  .venv/bin/python -m pytest tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py tests/logkv/test_logkv_conv.py \
+  tests/logkv/test_logkv_predict.py tests/logkv/test_logkv_pipeline.py -q
 
 # 空の保存先を指定。人工データ・小さいモデルだけの統合テスト。
 CUDA_VISIBLE_DEVICES=0,1 CUBLAS_WORKSPACE_CONFIG=:4096:8 \
   OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   .venv/bin/python -m torch.distributed.run --standalone --nproc_per_node=2 \
-  test_logkv_pipeline.py --distributed-smoke /mnt/raid0/RecursiveCompressor/pipeline-smoke-new
+  --module tests.logkv.test_logkv_pipeline --distributed-smoke /mnt/raid0/RecursiveCompressor/pipeline-smoke-new
 ```
 
 2GPUの統合テストでは、不均一なマスクを含む全モデルとのloss/勾配比較、global clipping、
 bf16での訓練・分散サンプル生成、epoch途中から再開して境界を越えたときの重み・optimizer・乱数のbit一致、
 checkpointローテーション、層配分変更時の重み引継ぎ、save_and_exit、
-保存したモデルの`predict_stream.py`経由の読込・生成を確認した。
+保存したモデルの`inference/predict_stream.py`経由の読込・生成を確認した。
 大規模LLMの本学習・スループット評価はこの実装確認には含めていない。
