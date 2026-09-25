@@ -113,6 +113,9 @@ def main(task=copying_task):
     dtype = torch.bfloat16 if args.precision == "bf16" else torch.float32
     model_type = json.loads((model_dir / "config.json").read_text()).get("model_type")
     model_cls = LogKVLM if model_type == "logkv" else RecursiveCompressorLM
+    if model_type == "mamba2_copying":
+        from models.mamba2.modeling import Mamba2LM
+        model_cls = Mamba2LM
     model = model_cls.from_pretrained(model_dir).to(device=device, dtype=dtype)
     model.eval()
     autocast_enabled = device.type == "cuda" and args.precision == "bf16"

@@ -43,6 +43,10 @@ def _load_model(model_dir, device, dtype=torch.bfloat16):
         from models.logkv.modeling import LogKVLM
         return LogKVLM.from_pretrained(model_dir).to(dtype=dtype, device=device)
 
+    if model_type == "mamba2_copying":
+        from models.mamba2.modeling import Mamba2LM
+        return Mamba2LM.from_pretrained(model_dir).to(dtype=dtype, device=device)
+
     if os.path.exists(full_model_pt):
         config = RecursiveCompressorConfig.from_pretrained(model_dir)
         model = RecursiveCompressorLM(config)

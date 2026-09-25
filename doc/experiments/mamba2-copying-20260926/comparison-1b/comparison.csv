@@ -1,0 +1,150 @@
+model,checkpoint,T,samples,string_acc,token_acc
+LogKV (1b),unspecified,1,8,1.0,1.0
+LogKV (1b),unspecified,2,8,1.0,1.0
+LogKV (1b),unspecified,3,8,1.0,1.0
+LogKV (1b),unspecified,4,8,1.0,1.0
+LogKV (1b),unspecified,5,8,1.0,1.0
+LogKV (1b),unspecified,6,8,1.0,1.0
+LogKV (1b),unspecified,7,8,1.0,1.0
+LogKV (1b),unspecified,8,8,1.0,1.0
+LogKV (1b),unspecified,9,8,1.0,1.0
+LogKV (1b),unspecified,10,8,1.0,1.0
+LogKV (1b),unspecified,11,8,1.0,1.0
+LogKV (1b),unspecified,12,8,1.0,1.0
+LogKV (1b),unspecified,13,8,1.0,1.0
+LogKV (1b),unspecified,14,8,1.0,1.0
+LogKV (1b),unspecified,16,8,1.0,1.0
+LogKV (1b),unspecified,24,8,1.0,1.0
+LogKV (1b),unspecified,32,8,1.0,1.0
+LogKV (1b),unspecified,48,8,1.0,1.0
+LogKV (1b),unspecified,64,8,1.0,1.0
+LogKV (1b),unspecified,96,8,1.0,1.0
+LogKV (1b),unspecified,128,8,1.0,1.0
+LogKV (1b),unspecified,192,8,1.0,1.0
+LogKV (1b),unspecified,256,8,1.0,1.0
+LogKV (1b),unspecified,384,8,1.0,1.0
+LogKV (1b),unspecified,512,8,1.0,1.0
+LogKV (1b),unspecified,768,8,1.0,1.0
+LogKV (1b),unspecified,1024,8,1.0,1.0
+LogKV (1b),unspecified,1536,8,1.0,1.0
+LogKV (1b),unspecified,2048,8,1.0,1.0
+LogKV (1b),unspecified,3072,8,1.0,1.0
+LogKV (1b),unspecified,4096,8,1.0,1.0
+LogKV (1b),unspecified,6144,8,1.0,1.0
+LogKV (1b),unspecified,8192,8,1.0,1.0
+LogKV (1b),unspecified,12288,8,1.0,1.0
+LogKV (1b),unspecified,16384,8,1.0,1.0
+LogKV (1b),unspecified,24576,8,1.0,1.0
+LogKV (1b),unspecified,32768,8,1.0,1.0
+LogKV (1b),unspecified,49152,8,1.0,1.0
+LogKV (1b),unspecified,65536,8,1.0,1.0
+LogKV (1b),unspecified,98304,8,1.0,1.0
+LogKV (1b),unspecified,131072,8,1.0,1.0
+LogKV (1b),unspecified,196608,8,1.0,1.0
+LogKV (1b),unspecified,262144,8,1.0,1.0
+LogKV (1b),unspecified,393216,8,1.0,1.0
+LogKV (1b),unspecified,524288,8,1.0,1.0
+LogKV (1b),unspecified,786432,8,1.0,1.0
+LogKV (1b),unspecified,1048576,8,1.0,1.0
+LogKV (1b),unspecified,1572864,8,1.0,1.0
+LogKV (1b),unspecified,2097152,8,1.0,1.0
+LogKV (1b),unspecified,3145728,8,1.0,1.0
+LogKV (1b),unspecified,4194304,8,1.0,1.0
+LogKV (1b),unspecified,6291456,8,1.0,1.0
+LogKV (1b),unspecified,8388608,8,1.0,1.0
+LogKV (1b),unspecified,12582912,8,1.0,1.0
+LogKV (1b),unspecified,16777216,8,1.0,1.0
+LogKV (1b),unspecified,25165824,8,1.0,1.0
+LogKV (1b),unspecified,33554432,8,1.0,1.0
+LogKV (1b),unspecified,50331648,8,1.0,1.0
+LogKV (1b),unspecified,67108864,8,1.0,1.0
+LogKV (1b),unspecified,100663296,8,1.0,1.0
+LogKV (1b),unspecified,134217728,8,1.0,1.0
+LogKV (1b),unspecified,201326592,8,1.0,1.0
+LogKV (1b),unspecified,268435456,8,1.0,1.0
+LogKV (1b),unspecified,402653184,8,1.0,1.0
+LogKV (1b),unspecified,536870912,8,1.0,1.0
+LogKV (1b),unspecified,805306368,8,1.0,1.0
+LogKV (1b),unspecified,1073741824,8,1.0,1.0
+Mamba-2,best,1,256,1.0,1.0
+Mamba-2,best,2,256,1.0,1.0
+Mamba-2,best,3,256,1.0,1.0
+Mamba-2,best,4,256,1.0,1.0
+Mamba-2,best,5,256,1.0,1.0
+Mamba-2,best,6,256,1.0,1.0
+Mamba-2,best,7,256,1.0,1.0
+Mamba-2,best,8,256,1.0,1.0
+Mamba-2,best,9,256,1.0,1.0
+Mamba-2,best,10,256,1.0,1.0
+Mamba-2,best,11,256,1.0,1.0
+Mamba-2,best,12,256,1.0,1.0
+Mamba-2,best,13,256,1.0,1.0
+Mamba-2,best,14,256,1.0,1.0
+Mamba-2,best,16,256,1.0,1.0
+Mamba-2,best,24,256,1.0,1.0
+Mamba-2,best,32,256,1.0,1.0
+Mamba-2,best,48,256,1.0,1.0
+Mamba-2,best,64,256,1.0,1.0
+Mamba-2,best,96,256,1.0,1.0
+Mamba-2,best,128,256,1.0,1.0
+Mamba-2,best,192,256,1.0,1.0
+Mamba-2,best,256,256,1.0,1.0
+Mamba-2,best,384,256,1.0,1.0
+Mamba-2,best,512,256,1.0,1.0
+Mamba-2,best,768,256,1.0,1.0
+Mamba-2,best,1024,256,1.0,1.0
+Mamba-2,best,1536,256,1.0,1.0
+Mamba-2,best,2048,256,1.0,1.0
+Mamba-2,best,3072,256,1.0,1.0
+Mamba-2,best,4096,256,0.99609375,0.999609375
+Mamba-2,best,6144,256,0.6015625,0.954296875
+Mamba-2,best,8192,256,0.10546875,0.82890625
+Mamba-2,best,12288,256,0.0078125,0.633203125
+Mamba-2,best,16384,256,0.0,0.429296875
+Mamba-2,best,24576,256,0.0,0.256640625
+Mamba-2,best,32768,256,0.0,0.1453125
+Mamba-2,best,49152,256,0.0,0.13046875
+Mamba-2,best,65536,256,0.0,0.1265625
+Mamba-2,best,98304,256,0.0,0.126953125
+Mamba-2,best,131072,256,0.0,0.13359375
+Mamba-2,final,1,256,1.0,1.0
+Mamba-2,final,2,256,1.0,1.0
+Mamba-2,final,3,256,1.0,1.0
+Mamba-2,final,4,256,1.0,1.0
+Mamba-2,final,5,256,1.0,1.0
+Mamba-2,final,6,256,1.0,1.0
+Mamba-2,final,7,256,1.0,1.0
+Mamba-2,final,8,256,1.0,1.0
+Mamba-2,final,9,256,1.0,1.0
+Mamba-2,final,10,256,1.0,1.0
+Mamba-2,final,11,256,1.0,1.0
+Mamba-2,final,12,256,1.0,1.0
+Mamba-2,final,13,256,1.0,1.0
+Mamba-2,final,14,256,1.0,1.0
+Mamba-2,final,16,256,1.0,1.0
+Mamba-2,final,24,256,1.0,1.0
+Mamba-2,final,32,256,1.0,1.0
+Mamba-2,final,48,256,1.0,1.0
+Mamba-2,final,64,256,1.0,1.0
+Mamba-2,final,96,256,1.0,1.0
+Mamba-2,final,128,256,1.0,1.0
+Mamba-2,final,192,256,1.0,1.0
+Mamba-2,final,256,256,1.0,1.0
+Mamba-2,final,384,256,1.0,1.0
+Mamba-2,final,512,256,1.0,1.0
+Mamba-2,final,768,256,1.0,1.0
+Mamba-2,final,1024,256,1.0,1.0
+Mamba-2,final,1536,256,1.0,1.0
+Mamba-2,final,2048,256,1.0,1.0
+Mamba-2,final,3072,256,1.0,1.0
+Mamba-2,final,4096,256,0.99609375,0.999609375
+Mamba-2,final,6144,256,0.68359375,0.963671875
+Mamba-2,final,8192,256,0.15234375,0.846484375
+Mamba-2,final,12288,256,0.0,0.621484375
+Mamba-2,final,16384,256,0.0,0.503125
+Mamba-2,final,24576,256,0.0,0.37109375
+Mamba-2,final,32768,256,0.0,0.340234375
+Mamba-2,final,49152,256,0.0,0.2984375
+Mamba-2,final,65536,256,0.0,0.175
+Mamba-2,final,98304,256,0.0,0.11328125
+Mamba-2,final,131072,256,0.0,0.12265625

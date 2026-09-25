@@ -1,0 +1,342 @@
+{
+  "train_max_t": 2028,
+  "samples": 8,
+  "precision": "bf16",
+  "results": {
+    "1": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "2": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "3": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "4": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "5": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "6": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "7": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "8": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "9": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "10": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "11": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "12": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "13": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "14": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "16": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "24": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "32": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "48": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "64": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "96": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "128": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "192": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "256": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "384": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "512": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "768": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "1024": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "1536": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "2048": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "3072": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "4096": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "6144": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "8192": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "12288": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "16384": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "24576": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "32768": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "49152": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "65536": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "98304": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "131072": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "196608": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "262144": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "393216": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "524288": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "786432": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "1048576": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "1572864": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "2097152": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "3145728": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "4194304": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "6291456": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "8388608": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "12582912": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "16777216": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "25165824": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "33554432": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "50331648": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "67108864": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "100663296": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "134217728": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "201326592": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "268435456": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "402653184": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "536870912": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "805306368": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    },
+    "1073741824": {
+      "token_acc": 1.0,
+      "string_acc": 1.0,
+      "n": 8
+    }
+  }
+}

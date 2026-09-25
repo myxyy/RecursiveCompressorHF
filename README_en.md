@@ -133,6 +133,8 @@ uv run python -m exp.copying.evaluate --run-name myrun --max-t-exp 17
 
 The previous implementation — inter-chunk information transfer through recursive compression/decompression — is kept: `models/recursive_compressor/attention.py` / `models/recursive_compressor/modeling.py` / `models/recursive_compressor/pipeline.py` / `models/recursive_compressor/configuration.py` / `training/train_pipeline.py` (6-GPU pipeline parallel: `uv run torchrun --nproc_per_node=6 --module training.train_pipeline`). See [doc/copying-memory-branch-changes.md](doc/copying-memory-branch-changes.md) for its history (Japanese).
 
+The optional `mamba2` extra adds an official Mamba-2 baseline for fixed-ten-digit Copying (`--arch mamba2`). Install it with `uv sync --extra mamba2`. See the [implementation and experiment protocol](doc/mamba2-copying.md). The 50k-step run is complete: both Mamba-2 checkpoints achieved 256/256 exact matches at all evaluated horizons through T=3,072, but 0/256 at T=131,072, where LogKV achieved 256/256 on the same examples.
+
 ## Training datasets
 
 Selected with `--dataset-type`:

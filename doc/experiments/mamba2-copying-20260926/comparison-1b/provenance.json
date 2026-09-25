@@ -1,0 +1,26 @@
+{
+  "created": "2026-09-26",
+  "files": {
+    "logkv-results.json": {
+      "source": "/mnt/raid0/RecursiveCompressor/exp/copying/1b/results.json",
+      "sha256": "b698a31e0ab2731ae44b882906b7bfc97e05f4b8fb8b6a8c2a075d5a9f21088c"
+    },
+    "logkv-run_config.json": {
+      "source": "/mnt/raid0/RecursiveCompressor/exp/copying/1b/run_config.json",
+      "sha256": "603dc8fcc755739041c15770b0c57845f3af3033517fe49dc6cd86eb27056271"
+    },
+    "logkv-best.json": {
+      "source": "/mnt/raid0/RecursiveCompressor/exp/copying/1b/best.json",
+      "sha256": "755181d97595d13b08d008dd09ad1eb04e35a38c25b8cfab10e1dbaeddaf9664"
+    },
+    "../results/metrics.json": {
+      "source": "doc/experiments/mamba2-copying-20260926/results/metrics.json",
+      "sha256": "5dc45cebd44ce3a583d54c5da0c96453f9615bc7ef2add776101fddb4b96ca9a"
+    }
+  },
+  "logkv_evaluation_checkpoint": "not recorded in results.json; best.json does not identify the evaluated checkpoint",
+  "logkv_evaluation_seed": "not recorded",
+  "logkv_predictions": "not provided; aggregate metrics only",
+  "paired_examples_between_runs": "not established",
+  "scope": "Plot existing recorded evaluations only; no new GPU evaluation. Embedded logkv_* fields in Mamba metrics refer to a different historical control and are not used."
+}

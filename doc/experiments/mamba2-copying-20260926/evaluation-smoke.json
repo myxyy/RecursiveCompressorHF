@@ -1,0 +1,9 @@
+{
+  "checkpoint_purpose": "300-step preflight only, not final task results",
+  "cells": 41,
+  "max_T": 131072,
+  "samples": 8,
+  "state_bytes_per_example": 1063936,
+  "seconds": 36.067396150901914,
+  "precision": "bf16 weights and autocast"
+}

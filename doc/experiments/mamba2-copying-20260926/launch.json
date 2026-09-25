@@ -1,0 +1,18 @@
+{
+  "started": "2026-09-25T15:17:35.519623+00:00",
+  "pid": 3763507,
+  "command": [
+    "/home/myxy/RecursiveCompressor/.venv/bin/python",
+    "-m",
+    "exp.mamba2_copying.campaign",
+    "run",
+    "--root",
+    "/mnt/raid0/RecursiveCompressor/experiments/mamba2-copying-20260926-run"
+  ],
+  "root": "/mnt/raid0/RecursiveCompressor/experiments/mamba2-copying-20260926-run",
+  "gpus": [
+    0
+  ],
+  "estimated_hours": 2.004281075729264,
+  "deadline_unix": 1790376328.1752267
+}

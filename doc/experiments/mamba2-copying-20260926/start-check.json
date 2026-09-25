@@ -1,0 +1,15 @@
+{
+  "checked_step": 1600,
+  "preflight_first300_bit_exact": false,
+  "latest_training_metrics": {
+    "step": 1600,
+    "loss": 5.836097625433467e-05,
+    "ema_loss": 0.0016497340329383874,
+    "token_acc": 1.0,
+    "string_acc": 1.0,
+    "lr": 0.0003,
+    "elapsed_sec": 99.6
+  },
+  "state": "running",
+  "source_unchanged": true
+}

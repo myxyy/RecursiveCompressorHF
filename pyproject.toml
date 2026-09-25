@@ -22,6 +22,12 @@ dependencies = [
     "websockets>=16.0",
 ]
 
+[project.optional-dependencies]
+mamba2 = [
+    "apache-tvm-ffi==0.1.6",
+    "mamba-ssm",
+]
+
 [[tool.uv.index]]
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
@@ -31,6 +37,7 @@ explicit = true
 torch = [{ index = "pytorch-cu128" }]
 torchvision = [{ index = "pytorch-cu128" }]
 torchaudio = [{ index = "pytorch-cu128" }]
+mamba-ssm = { git = "https://github.com/state-spaces/mamba.git", rev = "e9594ce1c732d97440f0332fdc43170a2294dbfa" }
 
 [dependency-groups]
 dev = [

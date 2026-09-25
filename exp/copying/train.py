@@ -38,9 +38,9 @@ torch.set_float32_matmul_precision("high")
 def parse_args():
     p = argparse.ArgumentParser(description="Copy task training")
     p.add_argument("--run-name", type=str, required=True)
-    p.add_argument("--arch", choices=["recursive", "logkv"], default="recursive",
-                   help="recursive=RecursiveCompressorLM / logkv=LogKVLM "
-                        "(compress-size/retrieve-sizeはlogkvでは無視)")
+    p.add_argument("--arch", choices=["recursive", "logkv", "mamba2"], default="recursive",
+                   help="recursive=RecursiveCompressorLM / logkv=LogKVLM / mamba2=official Mamba-2 "
+                        "(mamba2は専用--mamba-*、d-model、num-layersを使用)")
     p.add_argument("--phase-emb", action="store_true",
                    help="logkv: 学習可能位相埋め込み(位置のC進数桁)を有効化")
     p.add_argument("--phase-levels", type=int, default=16,
@@ -77,6 +77,13 @@ def parse_args():
     p.add_argument("--chunk-size", type=int, default=4)
     p.add_argument("--compress-size", type=int, default=1)
     p.add_argument("--retrieve-size", type=int, default=4)
+    p.add_argument("--mamba-d-state", type=int, default=128)
+    p.add_argument("--mamba-d-conv", type=int, default=4)
+    p.add_argument("--mamba-expand", type=int, default=2)
+    p.add_argument("--mamba-headdim", type=int, default=64)
+    p.add_argument("--mamba-ngroups", type=int, default=1)
+    p.add_argument("--mamba-scan-chunk-size", type=int, default=256,
+                   help="Mamba-2 SSD kernel tile size; does not limit memory horizon")
     p.add_argument("--loss-positions", choices=["all", "answer"], default="all",
                    help="all=全位置CE (CKConv等の既存研究と同じ) / answer=末尾10位置のみ")
     p.add_argument("--t-dist", choices=["uniform", "loguniform"], default="uniform",
@@ -162,6 +169,17 @@ def main(task=copying_task):
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)
+    elif args.arch == "mamba2":
+        from models.mamba2.configuration import Mamba2Config
+        from models.mamba2.modeling import Mamba2LM
+        config = Mamba2Config(
+            vocab_size=task.VOCAB_SIZE, d_model=args.d_model, num_layers=args.num_layers,
+            d_state=args.mamba_d_state, d_conv=args.mamba_d_conv,
+            expand=args.mamba_expand, headdim=args.mamba_headdim,
+            ngroups=args.mamba_ngroups, scan_chunk_size=args.mamba_scan_chunk_size,
+            pad_token_id=None, bos_token_id=None, eos_token_id=None,
+        )
+        model = Mamba2LM(config).to(device)
     else:
         config = RecursiveCompressorConfig(
             vocab_size=task.VOCAB_SIZE,
@@ -229,6 +247,8 @@ def main(task=copying_task):
             with torch.autocast(device_type=device.type, dtype=autocast_dtype,
                                 enabled=device.type == "cuda"):
                 out = model(input_ids, labels=labels)
+            if not torch.isfinite(out.loss):
+                raise FloatingPointError(f"Nonfinite loss at step {step}, T={T}")
             (out.loss / args.grad_accum).backward()
             loss += out.loss.item() / args.grad_accum
             tok, st, tok_n, st_n = task.score_logits(out.logits.float(), labels)

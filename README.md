@@ -122,10 +122,16 @@ uv run python -m exp.selective_copying.train --arch logkv --run-name selective -
 uv run python -m exp.selective_copying.evaluate --run-name selective --max-t-exp 17
 ```
 
+Mamba-2による固定10桁Copyingの比較用に、`--arch mamba2`を追加しました。
+公式実装への依存は`uv sync --extra mamba2`で導入します。50k-stepの比較評価は完了し、
+Mamba-2は評価したT≤3,072の全点で完全一致、T=131,072ではbest/finalとも0/256でした
+（同じ評価例のLogKVは256/256）。[実装・比較結果](doc/mamba2-copying.md)。
+
 ## ファイル構成
 
 | ファイル | 説明 |
 |---|---|
+| `models/mamba2/` | 公式Mamba-2を使うCopying比較モデル（optional extra） |
 | `models/logkv/attention.py` | LogKVアーキテクチャ本体（`forward`/`step`/`predict`、LogKVBlock） |
 | `models/logkv/modeling.py` | 言語モデル LogKVLM（PreTrainedModel継承） |
 | `models/logkv/configuration.py` | モデル設定（PretrainedConfig継承） |

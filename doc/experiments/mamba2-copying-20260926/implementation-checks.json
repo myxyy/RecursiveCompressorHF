@@ -1,0 +1,12 @@
+{
+  "mamba2_tests_passed": 7,
+  "existing_regression_tests_passed": 333,
+  "regression_note": "332 passed on first run; sampling test assumed no random early EOS. Disabled EOS for that fixed-eight-step sampling test and its focused rerun passed.",
+  "gpu_tests": "Official initial weights exact, fp32/bf16 outputs, arbitrary chunk boundaries, fp32 gradients, CPU fp64 state/gradient equivalence, nonmutation, bounded state storage, save/load, cached HF generation",
+  "training_result_status": "running; no final accuracy claims",
+  "source_record": "preflight.json",
+  "gpu_limit": 2,
+  "training_gpus": [
+    0
+  ]
+}

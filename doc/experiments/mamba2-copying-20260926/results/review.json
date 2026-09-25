@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "cells": 82,
+  "training_steps": 50000,
+  "best_step": 36300,
+  "final_step": 50000,
+  "training_seconds": 2539.0,
+  "execution_seconds": 2782.189461,
+  "preflight_inclusive_hours": 0.8082281427913242,
+  "regenerated_targets_match": true,
+  "paired_logkv_targets_match": true,
+  "checkpoint_hashes_verified": true,
+  "local_and_upstream_sources_verified": true,
+  "predictions_and_margins_recounted": true,
+  "state_bytes_per_example": 1063936,
+  "source_manifest_sha256": "412d47f8fcbdece5eb5b6b868f298e3f70c46850004620c38c98a6886ff924d5",
+  "result_sha256": {
+    "best": "8b47fefa249c722cd5e257bb7e9979d1ae0a48f6d195067faa3b2e84076819a4",
+    "final": "a7c89f2c4347f60423b8a837944deba9e433ccbb032ae9f7e58caf92d832d0a3"
+  },
+  "baseline_metrics_sha256": "f9f88bf55c076aeb7589967553d792b18d8285d7a61ee814f188cd277b73347d",
+  "evaluation_seconds": {
+    "best": 116.98429775284603,
+    "final": 95.87392575945705
+  },
+  "final_training_metrics": {
+    "step": 50000,
+    "loss": 2.642193486224187e-08,
+    "ema_loss": 2.9035801298987945e-08,
+    "token_acc": 1.0,
+    "string_acc": 1.0,
+    "lr": 0.0003,
+    "elapsed_sec": 2539.0
+  },
+  "new_gpu_work": false
+}

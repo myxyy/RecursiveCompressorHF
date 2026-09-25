@@ -153,6 +153,7 @@ class TestRecursiveCompressorLM:
         out = model.generate(
             prompt, max_new_tokens=8,
             do_sample=True, temperature=0.8, top_p=0.9,
+            eos_token_id=None,  # Test sampling for eight steps, without random early EOS.
         )
         assert out.shape == (1, 12)
 
@@ -713,4 +714,3 @@ class TestDataFormatting:
 
         ds = MemmapDataset(cache_path, pad_token_id=0)
         assert len(ds) == 3
-
