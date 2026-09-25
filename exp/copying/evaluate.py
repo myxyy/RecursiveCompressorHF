@@ -71,14 +71,14 @@ def eval_horizon(model, T, samples, generator, device, autocast_enabled):
     done = 0
     while done < samples:
         b = min(batch, samples - done)
-        input_ids, labels = make_batch(T, b, generator=generator, device=device)
+        input_ids, labels = make_batch(T, b, generator=generator, device='cpu')
         hidden = None
         last_logits = None
         with torch.autocast(device_type=device.type, dtype=torch.bfloat16,
                             enabled=autocast_enabled):
             for i in range(0, input_ids.size(1), CHUNK_LEN):
-                logits, hidden = model.step(input_ids[:, i:i + CHUNK_LEN], hidden)
-                last_logits = logits
+                logits, hidden = model.step(input_ids[:, i:i + CHUNK_LEN].cuda(), hidden)
+                last_logits = logits.cpu()
         tok, st, tok_n, st_n = score_logits(last_logits.float(), labels)
         token_correct += tok; string_correct += st
         token_n += tok_n; string_n += st_n
