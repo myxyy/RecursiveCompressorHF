@@ -1,0 +1,22 @@
+{
+  "started": "2026-09-27T16:14:16.225923+00:00",
+  "pid": 2048350,
+  "command": [
+    "/home/myxy/RecursiveCompressor/.venv/bin/python",
+    "/home/myxy/RecursiveCompressor/doc/experiments/mamba2-logkv-hybrid-20260928/run_and_analyze.py"
+  ],
+  "gpus": {
+    "copying": 0,
+    "selective-copying": 1
+  },
+  "estimated_hours": {
+    "copying": 4.69729779779911,
+    "selective-copying": 4.741174525419871
+  },
+  "deadline_unix": {
+    "copying": 1790550633.364011,
+    "selective-copying": 1790550633.3365397
+  },
+  "root": "/mnt/raid0/RecursiveCompressor/experiments/mamba2-logkv-hybrid-20260928-run",
+  "base_commit": "4d2d7f04d0140ba6be2ecd2e5cbd85946a7aea9b"
+}

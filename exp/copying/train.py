@@ -38,9 +38,8 @@ torch.set_float32_matmul_precision("high")
 def parse_args():
     p = argparse.ArgumentParser(description="Copy task training")
     p.add_argument("--run-name", type=str, required=True)
-    p.add_argument("--arch", choices=["recursive", "logkv", "mamba2"], default="recursive",
-                   help="recursive=RecursiveCompressorLM / logkv=LogKVLM / mamba2=official Mamba-2 "
-                        "(mamba2は専用--mamba-*、d-model、num-layersを使用)")
+    p.add_argument("--arch", choices=["recursive", "logkv", "mamba2", "mamba2-logkv"], default="recursive",
+                   help="recursive / logkv / official mamba2 / mamba2-logkv hybrid")
     p.add_argument("--phase-emb", action="store_true",
                    help="logkv: 学習可能位相埋め込み(位置のC進数桁)を有効化")
     p.add_argument("--phase-levels", type=int, default=16,
@@ -58,8 +57,8 @@ def parse_args():
                    help="vのみRMSNorm(kは非正規化)。kv_normの希釈補正をkeyノルム符号化を保ったまま適用")
     p.add_argument("--self-slot", action=argparse.BooleanOptionalAction, default=True,
                    help="クエリ自身のトークンのk/vを1スロット追加 (通常のcausal maskと同じ意味論)")
-    p.add_argument("--conv-kernel-size", type=int, default=4,
-                   help="logkv: attention前のcausal depthwise convolution幅（既定4、0で無効）")
+    p.add_argument("--conv-kernel-size", type=int, default=None,
+                   help="LogKVのcausal convolution幅（既定4、hybridでは既定0のみ対応）")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -78,6 +77,8 @@ def parse_args():
     p.add_argument("--compress-size", type=int, default=1)
     p.add_argument("--retrieve-size", type=int, default=4)
     p.add_argument("--mamba-d-state", type=int, default=128)
+    p.add_argument("--mamba-num-layers", type=int, default=2,
+                   help="mamba2-logkv: prefix Mamba-2 layers; --num-layers sets LogKV layers")
     p.add_argument("--mamba-d-conv", type=int, default=4)
     p.add_argument("--mamba-expand", type=int, default=2)
     p.add_argument("--mamba-headdim", type=int, default=64)
@@ -95,7 +96,10 @@ def parse_args():
     p.add_argument("--eval-interval", type=int, default=5000,
                    help="訓練中の簡易汎化チェック間隔 (0で無効)")
     p.add_argument("--save-interval", type=int, default=10000)
-    return p.parse_args()
+    args = p.parse_args()
+    if args.conv_kernel_size is None:
+        args.conv_kernel_size = 0 if args.arch == "mamba2-logkv" else 4
+    return args
 
 
 def resolve_device(spec):
@@ -169,17 +173,30 @@ def main(task=copying_task):
             pad_token_id=None, bos_token_id=None, eos_token_id=None,
         )
         model = LogKVLM(config).to(device)
-    elif args.arch == "mamba2":
+    elif args.arch in ("mamba2", "mamba2-logkv"):
         from models.mamba2.configuration import Mamba2Config
         from models.mamba2.modeling import Mamba2LM
-        config = Mamba2Config(
-            vocab_size=task.VOCAB_SIZE, d_model=args.d_model, num_layers=args.num_layers,
+        config_cls, model_cls, extra = Mamba2Config, Mamba2LM, {}
+        if args.arch == "mamba2-logkv":
+            from models.mamba2_logkv.configuration import Mamba2LogKVConfig
+            from models.mamba2_logkv.modeling import Mamba2LogKVLM
+            config_cls, model_cls = Mamba2LogKVConfig, Mamba2LogKVLM
+            extra = dict(num_logkv_layers=args.num_layers, num_heads=args.num_heads,
+                         d_ff=args.d_ff, chunk_size=args.chunk_size,
+                         conv_kernel_size=args.conv_kernel_size, phase_emb=args.phase_emb,
+                         phase_levels=args.phase_levels, learnable_decay=args.learnable_decay,
+                         gated_attention=args.gated_attention, self_slot=args.self_slot,
+                         kv_norm=args.kv_norm, level_amplify=args.level_amplify,
+                         v_norm_only=args.v_norm_only)
+        config = config_cls(
+            vocab_size=task.VOCAB_SIZE, d_model=args.d_model,
+            num_layers=args.mamba_num_layers if args.arch == "mamba2-logkv" else args.num_layers,
             d_state=args.mamba_d_state, d_conv=args.mamba_d_conv,
             expand=args.mamba_expand, headdim=args.mamba_headdim,
             ngroups=args.mamba_ngroups, scan_chunk_size=args.mamba_scan_chunk_size,
-            pad_token_id=None, bos_token_id=None, eos_token_id=None,
+            pad_token_id=None, bos_token_id=None, eos_token_id=None, **extra,
         )
-        model = Mamba2LM(config).to(device)
+        model = model_cls(config).to(device)
     else:
         config = RecursiveCompressorConfig(
             vocab_size=task.VOCAB_SIZE,

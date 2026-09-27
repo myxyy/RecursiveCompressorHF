@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "cells": 82,
+  "best_step": 49800,
+  "final_step": 50000,
+  "paired_targets_verified": true,
+  "placements_verified": true,
+  "sources_weights_predictions_verified": true,
+  "source_manifest_sha256": "7d7c846cd6c70ec9f9f0c2cc8ab2d44f3ace77c25bf535dadf767b499119aa68",
+  "result_sha256": {
+    "best": "cf1d183ae93b695933c8ab8e4a0a325db2af155ac6f0f7e59929382260ea8607",
+    "final": "55b174546611433c82757954b841326192bbe273ee9c17fb843fcdeb7abd2b22"
+  },
+  "state_formula_verified": true,
+  "logkv_metrics_sha256": "f9f88bf55c076aeb7589967553d792b18d8285d7a61ee814f188cd277b73347d",
+  "mamba_metrics_sha256": "6e2d3484a2fa742d8bd12e7558fb6fe284748089c1144f4588ad0abbcdc64d04",
+  "final_training_metrics": {
+    "step": 50000,
+    "loss": 0.0036752582527697086,
+    "ema_loss": 0.008442841168920375,
+    "token_acc": 0.97896875,
+    "string_acc": 0.84609375,
+    "lr": 0.0003,
+    "elapsed_sec": 10855.2
+  },
+  "gpu_work": false
+}

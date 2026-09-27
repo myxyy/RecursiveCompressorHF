@@ -1,0 +1,11 @@
+{
+  "passed": true,
+  "tasks": [
+    "copying",
+    "selective-copying"
+  ],
+  "horizons_per_task": 41,
+  "samples_per_horizon": 256,
+  "paired_logkv_targets": true,
+  "selective_positions_match": true
+}

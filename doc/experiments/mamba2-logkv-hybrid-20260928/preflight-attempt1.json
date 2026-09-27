@@ -1,0 +1,7 @@
+{
+  "root": "/mnt/raid0/RecursiveCompressor/experiments/mamba2-logkv-hybrid-20260928-preflight-attempt1",
+  "copying": "300 steps and 41 x 8 smoke completed",
+  "selective-copying": "training failed: CUDA OOM with 4.24 GiB reserved but unallocated",
+  "resolution": "Set PYTORCH_ALLOC_CONF=expandable_segments:True in both tasks and repeat preflight with unchanged model, batch and data settings",
+  "main_training_launched": false
+}

@@ -130,6 +130,10 @@ Mamba-2は評価したT≤3,072の全点で完全一致、T=131,072ではbest/fi
 best/finalとも評価したT≤2,048で全例完全一致し、標準LogKVを大きく上回りました。
 一方、T=131,072では両モデルとも完全一致0/256で、桁精度はLogKVが上回りました。
 
+Mamba-2の後段にLogKVを置く[ハイブリッドモデル](doc/mamba2-logkv-hybrid.md)も追加しました。
+`--arch mamba2-logkv`で使用できます。両タスクの50k-step比較は完了しましたが、
+今回の直列構成ではLogKV単体の長距離Copyingを維持できず、Selective Copyingの外挿改善も得られませんでした。
+
 ## ファイル構成
 
 | ファイル | 説明 |

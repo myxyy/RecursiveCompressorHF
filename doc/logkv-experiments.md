@@ -1,5 +1,9 @@
 # LogKV実験記録一覧
 
+2026-09-28 04:29:24 JST、[Mamba-2＋LogKVハイブリッド比較](mamba2-logkv-hybrid.md)が完了。
+各50k steps・164セルを監査。前段Mamba-2 2層＋LogKV 2層、LogKV側convなしの直列構成では、
+Copyingの長距離保持を維持できず、Selectiveの外挿改善も得られなかった。GPU解放済み。
+
 2026-09-28 00:51:32 JST、[Mamba-2 Selective Copying比較](mamba2-selective-copying.md)の学習・評価・解析が完了。
 固定10桁・50k steps・82セル。best/finalともT≤2,048の評価点で256/256、T131072は0/256。
 訓練範囲付近はLogKVより高精度、長距離の桁精度はLogKVが上回った。GPU解放済み。

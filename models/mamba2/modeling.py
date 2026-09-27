@@ -38,6 +38,11 @@ class Mamba2LM(PreTrainedModel, GenerationMixin):
         return self.lm_head
 
     def step(self, input_ids, hidden=None, *, reference=False):
+        x, states = self.step_features(input_ids, hidden, reference=reference)
+        return self.lm_head(x), states
+
+    def step_features(self, input_ids, hidden=None, *, reference=False):
+        """Official backbone features with differentiable streaming state."""
         if input_ids.ndim != 2 or input_ids.shape[1] < 1:
             raise ValueError("input_ids must have shape (batch, positive length)")
         if hidden is None:
@@ -61,7 +66,7 @@ class Mamba2LM(PreTrainedModel, GenerationMixin):
             x = self.backbone.norm_f(x)
         else:
             x = rms_norm(x, self.backbone.norm_f.weight, self.backbone.norm_f.eps)
-        return self.lm_head(x), states
+        return x, states
 
     def forward(self, input_ids, labels=None, past_key_values=None, use_cache=False, **kwargs):
         if past_key_values is None and not use_cache and input_ids.is_cuda:

@@ -1,0 +1,10 @@
+{
+  "tests_passed": 13,
+  "cli_defaults_preserved": true,
+  "gpu_devices_used": [
+    0
+  ],
+  "model_parameters": 9221728,
+  "logkv_conv_removed": true,
+  "fullsize_smoke": "fullsize-smoke.json"
+}

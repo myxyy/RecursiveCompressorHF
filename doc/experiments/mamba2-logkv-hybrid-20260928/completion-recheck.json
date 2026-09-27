@@ -1,0 +1,9 @@
+{
+  "checked_at": "2026-09-27T19:33:04.242012+00:00",
+  "cpu_analyzer_exit_code": 0,
+  "cells": 164,
+  "current_sources_match_frozen": true,
+  "archive_predictions_match_original": true,
+  "all_gpus_idle_at_check": true,
+  "additional_gpu_work": false
+}

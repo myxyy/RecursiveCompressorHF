@@ -1,0 +1,594 @@
+{
+  "copying": {
+    "best": [
+      {
+        "T": 1,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          6,
+          6,
+          2,
+          5,
+          2,
+          7,
+          7,
+          6,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 2048,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          1,
+          3,
+          8,
+          8,
+          8,
+          5,
+          8,
+          5,
+          1,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 4096,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          6
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          7,
+          4,
+          7,
+          6,
+          2,
+          5,
+          7,
+          1,
+          1,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 8192,
+        "digit_errors": [
+          11,
+          27,
+          40,
+          138,
+          33,
+          51,
+          190,
+          135,
+          181,
+          173
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          8,
+          8,
+          2,
+          2,
+          2,
+          6,
+          1,
+          3,
+          5,
+          6
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 131072,
+        "digit_errors": [
+          223,
+          214,
+          229,
+          230,
+          226,
+          216,
+          233,
+          230,
+          231,
+          236
+        ],
+        "unique_prediction_strings": 2,
+        "most_common_prediction": [
+          7,
+          2,
+          2,
+          4,
+          2,
+          2,
+          1,
+          7,
+          4,
+          6
+        ],
+        "most_common_prediction_count": 223
+      }
+    ],
+    "final": [
+      {
+        "T": 1,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          6,
+          6,
+          2,
+          5,
+          2,
+          7,
+          7,
+          6,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 2048,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          1,
+          3,
+          8,
+          8,
+          8,
+          5,
+          8,
+          5,
+          1,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 4096,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          6
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          7,
+          4,
+          7,
+          6,
+          2,
+          5,
+          7,
+          1,
+          1,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 8192,
+        "digit_errors": [
+          11,
+          27,
+          40,
+          138,
+          33,
+          51,
+          190,
+          135,
+          181,
+          173
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          8,
+          8,
+          2,
+          2,
+          2,
+          6,
+          1,
+          3,
+          5,
+          6
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 131072,
+        "digit_errors": [
+          223,
+          214,
+          229,
+          230,
+          226,
+          216,
+          233,
+          230,
+          231,
+          236
+        ],
+        "unique_prediction_strings": 2,
+        "most_common_prediction": [
+          7,
+          2,
+          2,
+          4,
+          2,
+          2,
+          1,
+          7,
+          4,
+          6
+        ],
+        "most_common_prediction_count": 223
+      }
+    ]
+  },
+  "selective-copying": {
+    "best": [
+      {
+        "T": 1,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          6,
+          6,
+          2,
+          5,
+          2,
+          7,
+          7,
+          6,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 2048,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          2,
+          6,
+          5,
+          3,
+          6,
+          4,
+          3,
+          2,
+          8,
+          6
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 4096,
+        "digit_errors": [
+          0,
+          8,
+          3,
+          10,
+          33,
+          47,
+          33,
+          1,
+          2,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          7,
+          6,
+          4,
+          2,
+          7,
+          4,
+          7,
+          1,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 8192,
+        "digit_errors": [
+          1,
+          58,
+          80,
+          136,
+          162,
+          171,
+          139,
+          26,
+          17,
+          3
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          2,
+          5,
+          7,
+          7,
+          7,
+          1,
+          2,
+          8,
+          7,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 131072,
+        "digit_errors": [
+          118,
+          226,
+          227,
+          226,
+          219,
+          218,
+          219,
+          219,
+          222,
+          194
+        ],
+        "unique_prediction_strings": 129,
+        "most_common_prediction": [
+          1,
+          1,
+          8,
+          8,
+          1,
+          6,
+          4,
+          4,
+          1,
+          8
+        ],
+        "most_common_prediction_count": 39
+      }
+    ],
+    "final": [
+      {
+        "T": 1,
+        "digit_errors": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          7,
+          0,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          6,
+          6,
+          2,
+          5,
+          2,
+          7,
+          7,
+          6,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 2048,
+        "digit_errors": [
+          3,
+          0,
+          0,
+          0,
+          2,
+          12,
+          32,
+          13,
+          0,
+          0
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          2,
+          6,
+          5,
+          3,
+          6,
+          3,
+          4,
+          2,
+          8,
+          6
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 4096,
+        "digit_errors": [
+          36,
+          10,
+          14,
+          18,
+          47,
+          85,
+          99,
+          40,
+          4,
+          1
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          3,
+          7,
+          6,
+          4,
+          2,
+          7,
+          7,
+          7,
+          1,
+          3
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 8192,
+        "digit_errors": [
+          91,
+          66,
+          127,
+          146,
+          174,
+          204,
+          185,
+          139,
+          30,
+          23
+        ],
+        "unique_prediction_strings": 256,
+        "most_common_prediction": [
+          7,
+          5,
+          7,
+          7,
+          7,
+          1,
+          2,
+          6,
+          7,
+          7
+        ],
+        "most_common_prediction_count": 1
+      },
+      {
+        "T": 131072,
+        "digit_errors": [
+          123,
+          221,
+          223,
+          226,
+          212,
+          215,
+          214,
+          223,
+          219,
+          210
+        ],
+        "unique_prediction_strings": 138,
+        "most_common_prediction": [
+          7,
+          7,
+          6,
+          8,
+          2,
+          2,
+          6,
+          6,
+          1,
+          8
+        ],
+        "most_common_prediction_count": 24
+      }
+    ]
+  }
+}

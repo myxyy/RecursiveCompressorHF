@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "num_params": 9221728,
+  "batch_size": 64,
+  "T": 2028,
+  "steps": 2,
+  "peak_allocated_bytes": 20677343232,
+  "seconds": 76.68813133239746,
+  "loss": 0.03673864156007767
+}

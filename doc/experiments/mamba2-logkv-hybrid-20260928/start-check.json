@@ -1,0 +1,33 @@
+{
+  "checked_at": "2026-09-27T16:15:30.542276+00:00",
+  "tasks": {
+    "copying": {
+      "observed_step": 100,
+      "last_metrics": {
+        "step": 100,
+        "loss": 0.9198049306869507,
+        "ema_loss": 1.1400625901288073,
+        "token_acc": 0.11796875,
+        "string_acc": 0.0,
+        "lr": 2.9999999999999997e-05,
+        "elapsed_sec": 40.1
+      },
+      "frozen_source_verified": true,
+      "config_matches_preflight": true
+    },
+    "selective-copying": {
+      "observed_step": 200,
+      "last_metrics": {
+        "step": 200,
+        "loss": 0.9557815790176392,
+        "ema_loss": 0.6676441786495357,
+        "token_acc": 0.157703125,
+        "string_acc": 0.0,
+        "lr": 5.9999999999999995e-05,
+        "elapsed_sec": 57.4
+      },
+      "frozen_source_verified": true,
+      "config_matches_preflight": true
+    }
+  }
+}

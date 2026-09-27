@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "seconds": 18.286163091659546,
+  "cells": [
+    {
+      "T": 2048,
+      "batch": 253,
+      "peak_allocated_bytes": 11624577536
+    },
+    {
+      "T": 8192,
+      "batch": 63,
+      "peak_allocated_bytes": 11624577536
+    }
+  ]
+}

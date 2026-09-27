@@ -135,6 +135,8 @@ The previous implementation — inter-chunk information transfer through recursi
 
 The optional `mamba2` extra adds an official Mamba-2 baseline for fixed-ten-digit Copying (`--arch mamba2`). Install it with `uv sync --extra mamba2`. See the [implementation and experiment protocol](doc/mamba2-copying.md). The 50k-step run is complete: both Mamba-2 checkpoints achieved 256/256 exact matches at all evaluated horizons through T=3,072, but 0/256 at T=131,072, where LogKV achieved 256/256 on the same examples.
 
+A serial [Mamba-2 + LogKV hybrid](doc/mamba2-logkv-hybrid.md) is available with `--arch mamba2-logkv`; both fixed-ten-digit experiments are complete. This serial configuration did not preserve standalone LogKV's long-range Copying performance or improve Selective Copying extrapolation.
+
 ## Training datasets
 
 Selected with `--dataset-type`:
