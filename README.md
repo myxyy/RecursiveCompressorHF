@@ -126,6 +126,9 @@ Mamba-2による固定10桁Copyingの比較用に、`--arch mamba2`を追加し�
 公式実装への依存は`uv sync --extra mamba2`で導入します。50k-stepの比較評価は完了し、
 Mamba-2は評価したT≤3,072の全点で完全一致、T=131,072ではbest/finalとも0/256でした
 （同じ評価例のLogKVは256/256）。[実装・比較結果](doc/mamba2-copying.md)。
+同じMamba-2による[Selective Copying比較](doc/mamba2-selective-copying.md)も完了しました。
+best/finalとも評価したT≤2,048で全例完全一致し、標準LogKVを大きく上回りました。
+一方、T=131,072では両モデルとも完全一致0/256で、桁精度はLogKVが上回りました。
 
 ## ファイル構成
 

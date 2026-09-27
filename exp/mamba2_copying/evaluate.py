@@ -8,11 +8,12 @@ import time
 import torch
 
 from exp.copying.evaluate import build_t_grid
-from exp.copying import task
+from exp.copying import task as copying_task
+from exp.selective_copying import task as selective_task
 from models.mamba2.modeling import Mamba2LM
 
 
-def evaluate(model_dir, samples=256, max_exp=17):
+def evaluate(model_dir, samples=256, max_exp=17, task=copying_task):
     device = torch.device('cuda:0')
     model = Mamba2LM.from_pretrained(model_dir).to(device=device, dtype=torch.bfloat16).eval()
     generator = torch.Generator().manual_seed(12345)
@@ -55,7 +56,7 @@ def evaluate(model_dir, samples=256, max_exp=17):
             print(f'T={horizon} exact={cell["string_correct"]}/{samples} '
                   f'tokens={cell["token_correct"]}/{samples*10} seconds={cell["seconds"]:.2f}', flush=True)
     weights = {p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in model_dir.glob('*.safetensors')}
-    return dict(model_dir=str(model_dir), precision='bf16 weights and autocast',
+    return dict(model_dir=str(model_dir), task=task.TASK_NAME, precision='bf16 weights and autocast',
                 seed=12345, checkpoint_sha256=weights, cells=cells)
 
 
@@ -65,9 +66,11 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     p.add_argument('--samples', type=int, default=256)
     p.add_argument('--max-exp', type=int, default=17)
+    p.add_argument('--task', choices=['copying', 'selective-copying'], default='copying')
     args = p.parse_args()
     torch.set_float32_matmul_precision('high')
-    result = evaluate(args.model_dir,args.samples,args.max_exp)
+    task = copying_task if args.task == 'copying' else selective_task
+    result = evaluate(args.model_dir,args.samples,args.max_exp,task=task)
     args.output.parent.mkdir(parents=True,exist_ok=True)
     args.output.write_text(json.dumps(result,indent=2)+'\n')
 

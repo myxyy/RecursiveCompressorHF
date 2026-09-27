@@ -1,5 +1,9 @@
 # LogKV実験記録一覧
 
+2026-09-28 00:51:32 JST、[Mamba-2 Selective Copying比較](mamba2-selective-copying.md)の学習・評価・解析が完了。
+固定10桁・50k steps・82セル。best/finalともT≤2,048の評価点で256/256、T131072は0/256。
+訓練範囲付近はLogKVより高精度、長距離の桁精度はLogKVが上回った。GPU解放済み。
+
 2026-09-26 01:03:57 JST、[公式Mamba-2との固定10桁Copying比較](mamba2-copying.md)が完了。
 50k steps・82セルを監査。best/finalとも評価したT≤3,072で256/256、T131072は0/256。
 同じ評価例のLogKVは全41点256/256。本実行46.4分、GPU解放済み。

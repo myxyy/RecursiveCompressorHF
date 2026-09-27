@@ -1,0 +1,15 @@
+{
+  "frozen_source_verified": true,
+  "preflight_and_main_config_match": true,
+  "baseline_82_cells_recounted": true,
+  "observed_step": 500,
+  "last_metrics": {
+    "step": 500,
+    "loss": 0.06388173252344131,
+    "ema_loss": 0.345917785297114,
+    "token_acc": 0.352296875,
+    "string_acc": 0.0,
+    "lr": 0.00015,
+    "elapsed_sec": 43.3
+  }
+}

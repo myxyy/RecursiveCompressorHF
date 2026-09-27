@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "horizons": 41,
+  "samples_per_horizon": 256,
+  "baseline_targets_positions_memory_match": true,
+  "copying_default_preserved": true,
+  "baseline_digits_sha256": "8926057e771588d1756bd0273e2128424c0a9f809d9bba8cfc55ab03bca84f07"
+}

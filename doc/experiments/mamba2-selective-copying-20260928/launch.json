@@ -1,0 +1,14 @@
+{
+  "started": "2026-09-27T15:04:46.192616+00:00",
+  "pid": 1974559,
+  "command": [
+    "/home/myxy/RecursiveCompressor/.venv/bin/python",
+    "/home/myxy/RecursiveCompressor/doc/experiments/mamba2-selective-copying-20260928/run_and_analyze.py"
+  ],
+  "gpus": [
+    0
+  ],
+  "estimated_hours": 1.4692061237494152,
+  "deadline_unix": 1790548286.5904322,
+  "root": "/mnt/raid0/RecursiveCompressor/experiments/mamba2-selective-copying-20260928-run"
+}

@@ -1,4 +1,4 @@
-"""One Copying run, followed by best/final evaluation; no automatic extra runs.
+"""One Copying or Selective Copying run with best/final evaluation.
 
 Preflight measures the actual 300-step task trajectory. A launch requires its
 source hashes to match and a total estimate below eight hours. A subprocess
@@ -65,8 +65,9 @@ def execute(command, log, cwd, env, deadline):
         raise RuntimeError(f'Child exited {code}; inspect {log}')
 
 
-def train_command(name, steps):
-    return [sys.executable,'-m','exp.copying.train','--arch','mamba2','--run-name',name,
+def train_command(name, steps, task='copying'):
+    module = 'exp.copying.train' if task == 'copying' else 'exp.selective_copying.train'
+    return [sys.executable,'-m',module,'--arch','mamba2','--run-name',name,
             '--d-model','512','--num-layers','2','--mamba-d-state','128',
             '--mamba-headdim','64','--mamba-d-conv','4','--mamba-expand','2',
             '--mamba-scan-chunk-size','256','--max-t','2028','--t-dist','loguniform',
@@ -79,16 +80,17 @@ def main():
     p=argparse.ArgumentParser()
     p.add_argument('mode',choices=['preflight','run'])
     p.add_argument('--root',type=Path,required=True)
+    p.add_argument('--task',choices=['copying','selective-copying'],default='copying')
     args=p.parse_args()
     root=args.root.resolve()
     root.mkdir(parents=True,exist_ok=True)
     env=environment(root)
     record=root/'preflight.json'
     if args.mode=='preflight':
-        if record.exists() or (root/'exp/copying/preflight').exists():
+        if record.exists() or (root/'exp'/args.task/'preflight').exists():
             raise FileExistsError('Use a fresh campaign root for a new preflight')
         start=time.time()
-        info=dict(started=stamp(),started_unix=start,deadline_unix=start+7.5*3600,
+        info=dict(task=args.task,started=stamp(),started_unix=start,deadline_unix=start+7.5*3600,
                   source=hashes(REPO),base_commit=subprocess.check_output(['git','rev-parse','HEAD'],cwd=REPO,text=True).strip())
         info['packages'] = {name:importlib.metadata.version(name) for name in
                             ['torch','transformers','mamba-ssm','triton','einops','apache-tvm-ffi']}
@@ -100,9 +102,9 @@ def main():
             str(path):hashlib.sha256(upstream.locate_file(path).read_bytes()).hexdigest()
             for path in upstream.files if str(path).endswith('.py')
         }
-        command=train_command('preflight',300)
+        command=train_command('preflight',300,args.task)
         execute(command,root/'preflight-train.log',REPO,env,info['deadline_unix'])
-        records=[json.loads(line) for line in (root/'exp/copying/preflight/train_log.jsonl').read_text().splitlines()]
+        records=[json.loads(line) for line in (root/'exp'/args.task/'preflight/train_log.jsonl').read_text().splitlines()]
         seconds_per_step=(records[-1]['elapsed_sec']-records[0]['elapsed_sec'])/200
         # Includes compilation/preflight, 30% training margin and 30 min evaluation reserve.
         info.update(seconds_per_step=seconds_per_step,
@@ -112,10 +114,14 @@ def main():
         print(json.dumps(info,indent=2),flush=True)
         return
     info=json.loads(record.read_text())
+    if info.get('task','copying') != args.task:
+        raise ValueError('Task differs from the preflight task')
     if info['estimated_hours']>=8:
         raise RuntimeError('Estimate >=8h: user confirmation is required before launch')
     if hashes(REPO)!=info['source']:
         raise RuntimeError('Sources changed since preflight; revalidate before launch')
+    if time.time()+info['seconds_per_step']*50000*1.3+1800 > info['deadline_unix']:
+        raise RuntimeError('Insufficient time remaining before the campaign deadline')
     status_path=root/'campaign.json'
     if status_path.exists():
         raise FileExistsError('A campaign has already been launched in this directory')
@@ -124,16 +130,16 @@ def main():
         dest=snapshot/name
         dest.parent.mkdir(parents=True,exist_ok=True)
         shutil.copy2(REPO/name,dest)
-    status=dict(state='training',started=stamp(),pid=os.getpid(),gpus=[0],
-                preflight=info,train_command=train_command('mamba2',50000))
+    status=dict(state='training',task=args.task,started=stamp(),pid=os.getpid(),gpus=[0],
+                preflight=info,train_command=train_command('mamba2',50000,args.task))
     write(status_path,status)
     try:
         execute(status['train_command'],root/'train.log',snapshot,env,info['deadline_unix'])
-        log=root/'exp/copying/mamba2/train_log.jsonl'
+        log=root/'exp'/args.task/'mamba2/train_log.jsonl'
         records=[json.loads(line) for line in log.read_text().splitlines()]
         if len(records)!=500 or records[-1]['step']!=50000:
             raise RuntimeError('Incomplete training log')
-        previous=[json.loads(line) for line in (root/'exp/copying/preflight/train_log.jsonl').read_text().splitlines()]
+        previous=[json.loads(line) for line in (root/'exp'/args.task/'preflight/train_log.jsonl').read_text().splitlines()]
         keys=['step','loss','ema_loss','token_acc','string_acc','lr']
         status['preflight_replay_exact']=all(all(a[k]==b[k] for k in keys) for a,b in zip(previous,records))
         # Report nondeterministic GPU kernel differences; never silently assert bit parity.
@@ -141,12 +147,13 @@ def main():
             status['state']='evaluating-'+kind
             write(status_path,status)
             command=[sys.executable,'-m','exp.mamba2_copying.evaluate',
-                     '--model-dir',str(root/'exp/copying/mamba2'/subdir),
+                     '--model-dir',str(root/'exp'/args.task/'mamba2'/subdir),'--task',args.task,
                      '--output',str(root/'results'/f'{kind}.json')]
             execute(command,root/f'evaluate-{kind}.log',snapshot,env,info['deadline_unix'])
         # Independently recount every prediction, and check paired samples and bounded cache.
         best=json.loads((root/'results/best.json').read_text())
         final=json.loads((root/'results/final.json').read_text())
+        assert best['task']==final['task']==args.task
         assert len(best['cells'])==len(final['cells'])==41
         for a,b in zip(best['cells'],final['cells']):
             assert a['T']==b['T'] and a['targets']==b['targets']
