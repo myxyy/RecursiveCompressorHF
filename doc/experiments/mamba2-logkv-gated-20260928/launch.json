@@ -1,0 +1,22 @@
+{
+  "started": "2026-09-27T19:48:40.781800+00:00",
+  "pid": 2274875,
+  "command": [
+    "/home/myxy/RecursiveCompressor/.venv/bin/python",
+    "/home/myxy/RecursiveCompressor/doc/experiments/mamba2-logkv-gated-20260928/run_and_analyze.py"
+  ],
+  "gpus": {
+    "copying": 0,
+    "selective-copying": 1
+  },
+  "estimated_hours": {
+    "copying": 4.851537530091074,
+    "selective-copying": 4.977215367952983
+  },
+  "deadline_unix": {
+    "copying": 1790563476.0554128,
+    "selective-copying": 1790563476.0334756
+  },
+  "root": "/mnt/raid0/RecursiveCompressor/experiments/mamba2-logkv-gated-20260928-run",
+  "base_commit": "da7c8de9eb195c62bac17ec7507265cc4300aa3a"
+}

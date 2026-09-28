@@ -38,8 +38,8 @@ torch.set_float32_matmul_precision("high")
 def parse_args():
     p = argparse.ArgumentParser(description="Copy task training")
     p.add_argument("--run-name", type=str, required=True)
-    p.add_argument("--arch", choices=["recursive", "logkv", "mamba2", "mamba2-logkv"], default="recursive",
-                   help="recursive / logkv / official mamba2 / mamba2-logkv hybrid")
+    p.add_argument("--arch", choices=["recursive", "logkv", "mamba2", "mamba2-logkv", "mamba2-logkv-gated"], default="recursive",
+                   help="recursive / logkv / mamba2 / serial mamba2-logkv / gated mamba2-logkv-gated")
     p.add_argument("--phase-emb", action="store_true",
                    help="logkv: 学習可能位相埋め込み(位置のC進数桁)を有効化")
     p.add_argument("--phase-levels", type=int, default=16,
@@ -58,7 +58,7 @@ def parse_args():
     p.add_argument("--self-slot", action=argparse.BooleanOptionalAction, default=True,
                    help="クエリ自身のトークンのk/vを1スロット追加 (通常のcausal maskと同じ意味論)")
     p.add_argument("--conv-kernel-size", type=int, default=None,
-                   help="LogKVのcausal convolution幅（既定4、hybridでは既定0のみ対応）")
+                   help="LogKVのcausal convolution幅（既定4、直列mamba2-logkvのみ既定0）")
     p.add_argument("--max-t", type=int, default=2028,
                    help="訓練時のTの上限 (T ~ U[1, max_t]、系列長は T+20)")
     p.add_argument("--steps", type=int, default=50000)
@@ -153,8 +153,17 @@ def main(task=copying_task):
 
     torch.manual_seed(args.seed)
 
-    if args.arch == "logkv":
-        config = LogKVConfig(
+    if args.arch in ("logkv", "mamba2-logkv-gated"):
+        config_cls, model_cls, extra = LogKVConfig, LogKVLM, {}
+        if args.arch == "mamba2-logkv-gated":
+            from models.mamba2_logkv_gated.configuration import GatedMambaLogKVConfig
+            from models.mamba2_logkv_gated.modeling import GatedMambaLogKVLM
+            config_cls, model_cls = GatedMambaLogKVConfig, GatedMambaLogKVLM
+            extra = dict(num_mamba_layers=args.mamba_num_layers, d_state=args.mamba_d_state,
+                         d_conv=args.mamba_d_conv, expand=args.mamba_expand,
+                         headdim=args.mamba_headdim, ngroups=args.mamba_ngroups,
+                         scan_chunk_size=args.mamba_scan_chunk_size)
+        config = config_cls(
             vocab_size=task.VOCAB_SIZE,
             d_model=args.d_model,
             num_heads=args.num_heads,
@@ -170,9 +179,9 @@ def main(task=copying_task):
             v_norm_only=args.v_norm_only,
             self_slot=args.self_slot,
             conv_kernel_size=args.conv_kernel_size,
-            pad_token_id=None, bos_token_id=None, eos_token_id=None,
+            pad_token_id=None, bos_token_id=None, eos_token_id=None, **extra,
         )
-        model = LogKVLM(config).to(device)
+        model = model_cls(config).to(device)
     elif args.arch in ("mamba2", "mamba2-logkv"):
         from models.mamba2.configuration import Mamba2Config
         from models.mamba2.modeling import Mamba2LM
@@ -284,6 +293,8 @@ def main(task=copying_task):
             rec = {"step": step, "loss": loss, "ema_loss": ema_loss,
                    "token_acc": tok_acc, "string_acc": str_acc, "lr": lr,
                    "elapsed_sec": round(elapsed, 1)}
+            if args.arch == "mamba2-logkv-gated":
+                rec['mamba_gate'] = model.gate_metrics()
             log_f.write(json.dumps(rec) + "\n"); log_f.flush()
             print(f"step {step}/{args.steps} | loss {ema_loss:.4f} | "
                   f"tok_acc {tok_acc:.4f} | str_acc {str_acc:.4f} | "

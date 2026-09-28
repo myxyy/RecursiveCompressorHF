@@ -137,6 +137,8 @@ The optional `mamba2` extra adds an official Mamba-2 baseline for fixed-ten-digi
 
 A serial [Mamba-2 + LogKV hybrid](doc/mamba2-logkv-hybrid.md) is available with `--arch mamba2-logkv`; both fixed-ten-digit experiments are complete. This serial configuration did not preserve standalone LogKV's long-range Copying performance or improve Selective Copying extrapolation.
 
+A [gated Mamba-2 input branch](doc/mamba2-logkv-gated.md) preserves the standard LogKV embedding, CausalConv and untied head (`--arch mamba2-logkv-gated`). Both 50k-step experiments are complete. Copying reached 256/256 at every tested horizon through T=4,096 for best/final, but 0/256 from T=12,288 onward. Selective Copying reached 256/256 through T=1,536 with best, but both checkpoints scored 0/256 from T=8,192 onward. This configuration did not preserve standard LogKV's long-range Copying or surpass standalone Mamba-2's Selective extrapolation.
+
 ## Training datasets
 
 Selected with `--dataset-type`:

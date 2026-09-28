@@ -1,0 +1,45 @@
+{
+  "checked_at": "2026-09-27T19:50:18.032683+00:00",
+  "tasks": {
+    "copying": {
+      "observed_step": 200,
+      "last_metrics": {
+        "step": 200,
+        "loss": 0.4772813320159912,
+        "ema_loss": 0.72116672579133,
+        "token_acc": 0.183578125,
+        "string_acc": 0.0,
+        "lr": 5.9999999999999995e-05,
+        "elapsed_sec": 67.3,
+        "mamba_gate": {
+          "min": -0.003918720409274101,
+          "max": 0.0038858959451317787,
+          "mean": -2.5034460122697055e-06,
+          "abs_mean": 0.0009946045465767384
+        }
+      },
+      "frozen_source_verified": true,
+      "config_matches_preflight": true
+    },
+    "selective-copying": {
+      "observed_step": 300,
+      "last_metrics": {
+        "step": 300,
+        "loss": 0.023909781128168106,
+        "ema_loss": 0.4872713980481367,
+        "token_acc": 0.224390625,
+        "string_acc": 0.0,
+        "lr": 8.999999999999999e-05,
+        "elapsed_sec": 85.1,
+        "mamba_gate": {
+          "min": -0.008149177767336369,
+          "max": 0.006775334943085909,
+          "mean": 4.903142689727247e-05,
+          "abs_mean": 0.0014877980574965477
+        }
+      },
+      "frozen_source_verified": true,
+      "config_matches_preflight": true
+    }
+  }
+}

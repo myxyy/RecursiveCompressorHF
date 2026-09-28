@@ -134,6 +134,12 @@ Mamba-2の後段にLogKVを置く[ハイブリッドモデル](doc/mamba2-logkv-
 `--arch mamba2-logkv`で使用できます。両タスクの50k-step比較は完了しましたが、
 今回の直列構成ではLogKV単体の長距離Copyingを維持できず、Selective Copyingの外挿改善も得られませんでした。
 
+標準LogKVのCausalConvと入力経路を残す[ゲート付きMamba-2枝](doc/mamba2-logkv-gated.md)を追加し、
+両タスクの50k-step比較を完了しました（`--arch mamba2-logkv-gated`）。
+Copyingはbest/finalともT4,096まで全評価点256/256ですが、T12,288以降は0/256。
+SelectiveはbestがT1,536まで全評価点256/256、T8,192以降はbest/finalとも0/256で、
+標準LogKVの長距離Copying維持とMamba-2単体を超えるSelective外挿の両立には至りませんでした。
+
 ## ファイル構成
 
 | ファイル | 説明 |

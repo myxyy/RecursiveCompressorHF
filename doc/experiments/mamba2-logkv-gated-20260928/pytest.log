@@ -1,0 +1,11 @@
+...................                                                      [100%]
+=============================== warnings summary ===============================
+tests/mamba2/test_gated.py::test_save_load_generate_and_invalid_state
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyPacked has no __module__ attribute
+
+tests/mamba2/test_gated.py::test_save_load_generate_and_invalid_state
+  <frozen importlib._bootstrap>:488: DeprecationWarning: builtin type SwigPyObject has no __module__ attribute
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+19 passed, 2 warnings in 35.23s
+sys:1: DeprecationWarning: builtin type swigvarlink has no __module__ attribute

@@ -1,0 +1,8 @@
+{
+  "tests_passed": 20,
+  "fullsize_smoke": "fullsize-smoke.json",
+  "zero_gate_cpu_output_and_initialization_exact": true,
+  "zero_gate_gpu_bf16_autocast_exact": true,
+  "gate_and_branch_gradients_checked": true,
+  "opened_gate_chunk_gradients_save_load_generate_checked": true
+}

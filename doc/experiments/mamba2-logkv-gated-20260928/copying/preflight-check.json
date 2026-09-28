@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "smoke_cells": 41,
+  "samples": 8,
+  "state_formula_verified": true,
+  "gate_weight_log_evaluation_match": true,
+  "paired_control_targets_41x256": true,
+  "selective_positions_verified": false
+}
