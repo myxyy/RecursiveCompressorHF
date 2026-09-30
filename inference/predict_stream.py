@@ -7,7 +7,8 @@ Usage:
         --context-length 1024 --temperature 0.8 --top-p 0.9
 
 Reads prompts interactively from stdin and prints generated tokens
-as they are produced.
+as they are produced. A terminal status bar shows generated tokens and average
+tok/s (including prefill), reset per prompt. Disable with --no-status-bar.
 
 Commands at the prompt:
     exit                     - quit
@@ -24,7 +25,9 @@ Input editing:
 """
 
 import argparse
+import os
 import signal
+import sys
 import time
 import torch
 from prompt_toolkit import PromptSession
@@ -67,11 +70,83 @@ def _make_prompt_session():
 torch.set_float32_matmul_precision("high")
 
 
-def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos):
+class _GenerationStatus:
+    """Reserve the terminal's last row while streaming into its scroll region."""
+
+    def __init__(self, enabled=True):
+        self.output = sys.stdout
+        self.enabled = enabled and self.output.isatty() and os.environ.get("TERM") != "dumb"
+        self.size = None
+        self.tokens = 0
+        self.started = time.perf_counter()
+        self.last_refresh = float("-inf")
+
+    def _resize(self):
+        try:
+            size = os.get_terminal_size(self.output.fileno())
+        except (OSError, ValueError):
+            return False
+        if size.lines < 3 or size.columns < 2:
+            return False
+        if size != self.size:
+            # Changing the scroll region homes the cursor. Resume above the bar.
+            self.output.write(f"\033[1;{size.lines - 1}r\033[{size.lines - 1};1H")
+            self.size = size
+        return True
+
+    def refresh(self, force=False):
+        now = time.perf_counter()
+        if not self.enabled or (not force and now - self.last_refresh < 0.1):
+            return
+        if not self._resize():
+            return
+        elapsed = now - self.started
+        rate = self.tokens / elapsed if elapsed > 0 else 0.0
+        label = f" {self.tokens:,} tokens | {rate:.2f} tok/s | {elapsed:.1f}s "
+        # ASCII label; leave the last column unused to avoid automatic wrapping.
+        label = label[:self.size.columns - 1].ljust(self.size.columns - 1)
+        self.output.write(f"\0337\033[{self.size.lines};1H\033[2K\033[7m{label}\033[0m\0338")
+        self.output.flush()
+        self.last_refresh = now
+
+    def write(self, text):
+        if self.enabled:
+            self._resize()
+        self.output.write(text)
+        self.output.flush()
+
+    def close(self):
+        if self.size is not None:
+            # Restore normal scrolling even if generate raises or is interrupted.
+            self.output.write(f"\0337\033[r\033[{self.size.lines};1H\033[2K\0338")
+            self.output.flush()
+            self.size = None
+
+
+class _StatusTextStreamer(TextStreamer):
+    """Count generated token IDs, including hidden special tokens, not text chunks."""
+
+    def __init__(self, tokenizer, status, **kwargs):
+        super().__init__(tokenizer, **kwargs)
+        self.status = status
+        self._received_prompt = False
+
+    def put(self, value):
+        is_prompt = not self._received_prompt
+        super().put(value)
+        self._received_prompt = True
+        if not is_prompt:
+            self.status.tokens += value.numel()
+        self.status.refresh()
+
+    def on_finalized_text(self, text, stream_end=False):
+        self.status.write(text + ("\n" if stream_end else ""))
+
+
+def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos, status_bar=True):
     """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds, interrupted).
     SIGINT (Ctrl+C) during generation flips a stopping criterion flag, so generation
     halts cleanly after the next token without raising KeyboardInterrupt."""
-    streamer = TextStreamer(tokenizer, skip_prompt=False, skip_special_tokens=skip_special_tokens)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
     prompt_len = input_ids.size(1)
 
@@ -81,8 +156,10 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
         stopper.interrupted = True
 
     old_handler = signal.signal(signal.SIGINT, _on_sigint)
+    status = _GenerationStatus(enabled=status_bar)
+    streamer = _StatusTextStreamer(tokenizer, status, skip_prompt=False, skip_special_tokens=skip_special_tokens)
     try:
-        start_time = time.time()
+        status.refresh(force=True)
         with torch.no_grad():
             output_ids = model.generate(
                 input_ids,
@@ -95,9 +172,12 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
                 stopping_criteria=StoppingCriteriaList([stopper]),
                 eos_token_id=tokenizer.eos_token_id if stop_on_eos else None,
             )
-        elapsed = time.time() - start_time
+        elapsed = time.perf_counter() - status.started
+        status.tokens = output_ids.size(1) - prompt_len
+        status.refresh(force=True)
     finally:
         signal.signal(signal.SIGINT, old_handler)
+        status.close()
 
     num_generated = output_ids.size(1) - prompt_len
     return num_generated, elapsed, stopper.interrupted
@@ -110,6 +190,8 @@ def main():
     parser.add_argument("--temperature", type=float, default=1.0, help="サンプリング温度")
     parser.add_argument("--top-p", type=float, default=1.0, help="top-p (nucleus) サンプリング閾値 (1.0で無効)")
     parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
+    parser.add_argument("--status-bar", action=argparse.BooleanOptionalAction, default=True,
+                        help="端末下部に生成トークン数・平均tok/sを表示（既定ON、プロンプト処理時間を含む）")
     parser.add_argument("--device", type=str, default=None,
                         help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
@@ -182,6 +264,7 @@ def main():
             state["context_length"], state["temperature"], state["top_p"], device,
             state["skip_special_tokens"],
             state["stop_on_eos"],
+            status_bar=args.status_bar,
         )
         if interrupted:
             print("\n[interrupted]")

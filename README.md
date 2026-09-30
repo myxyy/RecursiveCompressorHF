@@ -108,6 +108,11 @@ uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
     --context-length 4096 --temperature 0.7 --top-p 0.9
 ```
 
+ストリーム生成中は端末最下行に `128 tokens | 42.50 tok/s | 3.0s` のようなステータスバーを表示します。
+トークン数は今回の入力プロンプトを除いた生成分（非表示のEOS等も含む）、tok/sはプロンプト処理を含む
+生成開始からの平均速度です。入力ごとにリセットし、終了・Ctrl+C時は従来の最終集計を残します。
+`--no-status-bar`で無効化できます。リダイレクト時や`TERM=dumb`ではバーを表示しません。
+
 ### テスト・基礎実験
 
 ```bash

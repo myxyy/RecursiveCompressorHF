@@ -98,6 +98,12 @@ uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
     --context-length 4096 --temperature 0.7 --top-p 0.9
 ```
 
+During streaming, a bottom status bar shows e.g. `128 tokens | 42.50 tok/s | 3.0s`.
+The count excludes prompt tokens and includes generated special tokens even when hidden.
+Throughput is the average since generation started, including prompt processing. Counters reset
+for each prompt; completion or Ctrl+C keeps the final summary. Use `--no-status-bar` to disable
+the bar. Redirected output and `TERM=dumb` automatically omit it.
+
 ### Tests and basic experiments
 
 ```bash
