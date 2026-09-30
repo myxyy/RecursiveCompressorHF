@@ -18,6 +18,8 @@ Commands at the prompt:
     skip-special-tokens [true/false] - show or set whether to skip special tokens in output
     stop-on-eos [true/false] - show or set whether to stop generation on EOS token
     ignore-eos [on/off]      - exclude EOS tokens from generation (default off)
+    penalty-add [val]        - repetition penalty increment (0..2, default 0 = off)
+    penalty-decay [val]      - retained penalty per generated token (0..1, default 0)
 
 Input editing:
     Enter                    - submit
@@ -33,7 +35,7 @@ import time
 import torch
 from prompt_toolkit import PromptSession
 from prompt_toolkit.key_binding import KeyBindings
-from transformers import StoppingCriteria, StoppingCriteriaList, TextStreamer
+from transformers import LogitsProcessor, LogitsProcessorList, StoppingCriteria, StoppingCriteriaList, TextStreamer
 
 from inference.predict import _DTYPES, _load_model, _load_tokenizer
 
@@ -144,21 +146,62 @@ class _StatusTextStreamer(TextStreamer):
         self.status.write(text + ("\n" if stream_end else ""))
 
 
-def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos, status_bar=True, ignore_eos=False):
+class _DecayingRepetitionPenalty(LogitsProcessor):
+    """Subtract a generated-token-only, exponentially decaying FP32 penalty.
+
+    HF calls this before temperature/top-p processing. Consume newly generated
+    IDs on the next call; the prompt never contributes. Each generation owns a
+    fresh instance, since predict_stream does not retain conversation state.
+    """
+
+    def __init__(self, prompt_length, penalty_add, penalty_decay, eos_ids):
+        self.processed = prompt_length
+        self.add = penalty_add
+        self.decay = penalty_decay
+        self.eos_ids = list(eos_ids)
+        self.penalty = None
+
+    def __call__(self, input_ids, scores):
+        if self.penalty is None:
+            self.penalty = torch.zeros_like(scores, dtype=torch.float32)
+        for position in range(self.processed, input_ids.shape[1]):
+            self.penalty.mul_(self.decay)
+            token = input_ids[:, position:position + 1]
+            self.penalty.scatter_add_(1, token, torch.full_like(token, self.add, dtype=torch.float32))
+            # EOS can still stop generation; ignore-eos separately excludes it.
+            self.penalty[:, self.eos_ids] = 0
+        self.processed = input_ids.shape[1]
+        return scores.float() - self.penalty
+
+
+def _eos_token_ids(model, tokenizer):
+    config = model.generation_config
+    result = set()
+    for ids in (tokenizer.eos_token_id, config.eos_token_id, config.forced_eos_token_id):
+        if ids is not None:
+            result.update(ids if isinstance(ids, (list, tuple)) else [ids])
+    return sorted(result)
+
+
+def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos, status_bar=True, ignore_eos=False, penalty_add=0.0, penalty_decay=0.0):
     """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds, interrupted).
     SIGINT (Ctrl+C) during generation flips a stopping criterion flag, so generation
     halts cleanly after the next token without raising KeyboardInterrupt."""
+    penalty_add = _parse_penalty_add(penalty_add)
+    penalty_decay = _parse_penalty_decay(penalty_decay)
     generation_kwargs = {}
     if ignore_eos:
         # Keep any existing suppression and cover models with multiple EOS IDs.
         config = model.generation_config
         suppressed = set(config.suppress_tokens or [])
-        for ids in (tokenizer.eos_token_id, config.eos_token_id, config.forced_eos_token_id):
-            if ids is not None:
-                suppressed.update(ids if isinstance(ids, (list, tuple)) else [ids])
+        suppressed.update(_eos_token_ids(model, tokenizer))
         generation_kwargs.update(suppress_tokens=sorted(suppressed), forced_eos_token_id=None)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
     prompt_len = input_ids.size(1)
+    if penalty_add > 0:
+        generation_kwargs['logits_processor'] = LogitsProcessorList([
+            _DecayingRepetitionPenalty(prompt_len, penalty_add, penalty_decay,
+                                       _eos_token_ids(model, tokenizer))])
 
     stopper = _InterruptStoppingCriteria()
 
@@ -202,6 +245,20 @@ def _parse_bool(value):
     raise ValueError("Use on/off or true/false")
 
 
+def _parse_penalty_add(value):
+    value = float(value)
+    if not 0 <= value <= 2:
+        raise ValueError("penalty-add must be between 0 and 2")
+    return value
+
+
+def _parse_penalty_decay(value):
+    value = float(value)
+    if not 0 <= value <= 1:
+        raise ValueError("penalty-decay must be between 0 and 1")
+    return value
+
+
 def main():
     parser = argparse.ArgumentParser(description="Stream text generation with RecursiveCompressorLM")
     parser.add_argument("--model-dir", type=str, required=True, help="モデルディレクトリ")
@@ -213,6 +270,10 @@ def main():
                         help="端末下部に生成トークン数・平均tok/sを表示（既定ON、プロンプト処理時間を含む）")
     parser.add_argument("--ignore-eos", action="store_true",
                         help="EOSトークンを生成候補から除外（対話中にignore-eos on/offで変更可能）")
+    parser.add_argument("--penalty-add", type=_parse_penalty_add, default=0.0,
+                        help="出力トークンのlogitペナルティ加算量（0～2、既定0で無効）")
+    parser.add_argument("--penalty-decay", type=_parse_penalty_decay, default=0.0,
+                        help="各生成トークンでのペナルティ保持率（0～1、既定0）")
     parser.add_argument("--device", type=str, default=None,
                         help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
@@ -240,11 +301,14 @@ def main():
         "skip_special_tokens": True,
         "stop_on_eos": True,
         "ignore_eos": args.ignore_eos,
+        "penalty_add": args.penalty_add,
+        "penalty_decay": args.penalty_decay,
     }
 
     print(f"Device: {device}, precision: {args.precision}, context_length: {state['context_length']}, "
-          f"temperature: {state['temperature']}, top_p: {state['top_p']}, ignore_eos: {state['ignore_eos']}")
-    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]', 'skip-special-tokens [true/false]', 'stop-on-eos [true/false]', 'ignore-eos [on/off]'")
+          f"temperature: {state['temperature']}, top_p: {state['top_p']}, ignore_eos: {state['ignore_eos']}, "
+          f"penalty_add: {state['penalty_add']:g}, penalty_decay: {state['penalty_decay']:g}")
+    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]', 'skip-special-tokens [true/false]', 'stop-on-eos [true/false]', 'ignore-eos [on/off]', 'penalty-add [0..2]', 'penalty-decay [0..1]'")
     print("Input: Enter to submit, Alt+Enter (or Esc then Enter) for newline")
 
     commands = {
@@ -254,6 +318,8 @@ def main():
         "skip-special-tokens": ("skip_special_tokens", _parse_bool),
         "stop-on-eos": ("stop_on_eos", _parse_bool),
         "ignore-eos": ("ignore_eos", _parse_bool),
+        "penalty-add": ("penalty_add", _parse_penalty_add),
+        "penalty-decay": ("penalty_decay", _parse_penalty_decay),
     }
 
     session = _make_prompt_session()
@@ -289,6 +355,8 @@ def main():
             state["stop_on_eos"],
             status_bar=args.status_bar,
             ignore_eos=state["ignore_eos"],
+            penalty_add=state["penalty_add"],
+            penalty_decay=state["penalty_decay"],
         )
         if interrupted:
             print("\n[interrupted]")

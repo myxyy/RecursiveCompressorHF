@@ -109,6 +109,14 @@ Use `ignore-eos off` to restore normal sampling, or `ignore-eos` to show the set
 start with `--ignore-eos` to enable it). Unlike `stop-on-eos off`, this prevents EOS generation
 itself. Turning it off restores the existing `stop-on-eos` behavior.
 
+The decaying repetition penalty uses the same rule as `chat_server.py`. Set `penalty-add 0.5`
+and `penalty-decay 0.9` interactively, or pass `--penalty-add 0.5 --penalty-decay 0.9` at startup.
+Omit the value to display the current setting. After each generated token, multiply all penalties
+by the decay factor and add the increment to that token; subtract penalties before temperature
+scaling. Prompt tokens and EOS receive no increment. Add ranges from 0 to 2 (0 disables it),
+decay from 0 to 1 (0 remembers only the last token; 1 never decays); both default to 0.
+Penalty history resets per prompt. This works with `ignore-eos` enabled.
+
 ### Tests and basic experiments
 
 ```bash

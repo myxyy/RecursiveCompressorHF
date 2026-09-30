@@ -171,3 +171,76 @@ def test_ignore_eos_repl_toggle(monkeypatch, capsys):
     output = capsys.readouterr().out
     assert 'ignore-eos = False' in output
     assert "Invalid value for ignore-eos: 'invalid'" in output
+
+
+@pytest.mark.parametrize('decay', [0., .5, 1.])
+def test_repetition_penalty_matches_weighted_history(decay):
+    processor = stream._DecayingRepetitionPenalty(3, .7, decay, [8, 9])
+    prompt = [3, 3, 4]
+    generated = [3, 4, 3, 9, 8, 4]
+    scores = torch.arange(10, dtype=torch.float32)[None]
+    for count in range(len(generated) + 1):
+        actual = processor(torch.tensor([prompt + generated[:count]]), scores)
+        expected = scores.clone()
+        for age, token in enumerate(reversed(generated[:count])):
+            if token not in [8, 9]:
+                expected[0, token] -= .7 * decay ** age
+        torch.testing.assert_close(actual, expected)
+    # Processing the same prefix twice must not age or add penalties twice.
+    torch.testing.assert_close(processor(torch.tensor([prompt + generated]), scores), actual)
+
+
+def test_penalty_sampling_before_temperature_and_top_p(capsys):
+    from models.logkv.configuration import LogKVConfig
+    from models.logkv.modeling import LogKVLM
+
+    model = LogKVLM(LogKVConfig(vocab_size=10, d_model=16, num_heads=4,
+                               d_ff=32, num_layers=1, eos_token_id=9,
+                               bos_token_id=None, pad_token_id=0)).eval()
+
+    def prefer_repetition(module, args, result):
+        result.logits.fill_(-100.)
+        result.logits[..., 3] = .4
+        result.logits[..., 4] = 0.
+        result.logits[..., 9] = 1000.  # ignore-eos must remain effective.
+
+    hook = model.register_forward_hook(prefer_repetition)
+    try:
+        # Same prompt twice also checks that penalty history resets each time.
+        for add in [1., 1., 0.]:
+            count, _, _ = stream.stream_generate(
+                model, Tokenizer(), 'prompt', 8, .1, .1, 'cpu', False, True,
+                status_bar=False, ignore_eos=True, penalty_add=add, penalty_decay=.5)
+            assert count == 6
+            expected = '問\n' + ('答え\n' * 3 if add else '答' * 6) + '\n'
+            assert capsys.readouterr().out == expected
+    finally:
+        hook.remove()
+
+
+def test_penalty_cli_and_repl(monkeypatch, capsys):
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(stream.sys, 'argv', ['predict_stream', '--model-dir', 'unused',
+                                           '--device', 'cpu', '--penalty-add', '.5',
+                                           '--penalty-decay', '.9'])
+    monkeypatch.setattr(stream, '_load_model', lambda *a, **kw: SimpleNamespace(
+        eval=lambda: None, parameters=lambda: []))
+    monkeypatch.setattr(stream, '_load_tokenizer', lambda _: Tokenizer())
+    prompts = iter(['penalty-add', 'penalty-decay', 'first', 'penalty-add 1',
+                    'penalty-decay .5', 'second', 'penalty-add nan', 'penalty-decay 1.1',
+                    'third', 'penalty-add 0', 'fourth', 'exit'])
+    monkeypatch.setattr(stream, '_make_prompt_session', lambda: SimpleNamespace(prompt=lambda _: next(prompts)))
+    settings = []
+
+    def generate(*args, **kwargs):
+        settings.append((kwargs['penalty_add'], kwargs['penalty_decay']))
+        return 1, 1., False
+
+    monkeypatch.setattr(stream, 'stream_generate', generate)
+    stream.main()
+    assert settings == [(.5, .9), (1., .5), (1., .5), (0., .5)]
+    output = capsys.readouterr().out
+    assert 'penalty-add = 0.5' in output and 'penalty-decay = 0.9' in output
+    assert "Invalid value for penalty-add: 'nan'" in output
+    assert "Invalid value for penalty-decay: '1.1'" in output

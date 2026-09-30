@@ -118,6 +118,14 @@ uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
 `stop-on-eos off`はEOSの生成を許したまま停止を無効にする設定です。
 `ignore-eos on`の間はEOSの除外が優先され、offに戻すと元の`stop-on-eos`設定が適用されます。
 
+`chat_server.py`と同じ方式の反復ペナルティも指定できます。
+対話中に`penalty-add 0.5`、`penalty-decay 0.9`のように設定し、値を省略すると現在値を表示します。
+起動時の`--penalty-add 0.5 --penalty-decay 0.9`にも対応します。
+生成トークンごとに全ペナルティを`penalty-decay`倍し、出たトークンに`penalty-add`を加算して、
+次回の温度調整前のlogitから引きます。入力プロンプトとEOSには加算しません。
+加算量は0～2（0で無効）、保持率は0～1（0で直前トークンのみ、1で減衰なし）、両方の既定値は0です。
+各プロンプトでペナルティ履歴をリセットします。`ignore-eos`と併用できます。
+
 ### テスト・基礎実験
 
 ```bash
