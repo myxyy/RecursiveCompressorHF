@@ -112,3 +112,62 @@ def test_status_rate_throttle_resize_and_disable(monkeypatch):
     disabled.write('plain')
     disabled.close()
     assert output.getvalue() == 'plain'
+
+
+def test_ignore_eos_in_real_generate_and_restore(capsys):
+    from models.logkv.configuration import LogKVConfig
+    from models.logkv.modeling import LogKVLM
+
+    model = LogKVLM(LogKVConfig(vocab_size=10, d_model=16, num_heads=4,
+                               d_ff=32, num_layers=1, eos_token_id=[8, 9],
+                               bos_token_id=None, pad_token_id=0)).eval()
+    model.generation_config.suppress_tokens = [4]
+    model.generation_config.forced_eos_token_id = 9
+    original_config = model.generation_config.to_dict()
+
+    def prefer_eos(module, args, result):
+        result.logits.fill_(-1000.)
+        # EOS wins unless excluded. Then existing suppression must still exclude 4.
+        for token, score in [(9, 1000.), (8, 900.), (4, 800.), (3, 0.)]:
+            result.logits[..., token] = score
+
+    hook = model.register_forward_hook(prefer_eos)
+    try:
+        for ignore, stop, expected_count, expected_text in [
+            (True, True, 6, '問\n答答答答答答\n'),
+            (True, False, 6, '問\n答答答答答答\n'),
+            (False, True, 1, '問\n<eos>\n'),
+            (False, False, 6, '問\n' + '<eos>' * 6 + '\n'),
+        ]:
+            count, _, interrupted = stream.stream_generate(
+                model, Tokenizer(), 'prompt', 8, 1., 1., 'cpu', False, stop,
+                status_bar=False, ignore_eos=ignore)
+            assert count == expected_count and not interrupted
+            assert capsys.readouterr().out == expected_text
+            assert model.generation_config.to_dict() == original_config
+    finally:
+        hook.remove()
+
+
+def test_ignore_eos_repl_toggle(monkeypatch, capsys):
+    from types import SimpleNamespace
+
+    monkeypatch.setattr(stream.sys, 'argv', ['predict_stream', '--model-dir', 'unused', '--device', 'cpu'])
+    monkeypatch.setattr(stream, '_load_model', lambda *a, **kw: SimpleNamespace(
+        eval=lambda: None, parameters=lambda: []))
+    monkeypatch.setattr(stream, '_load_tokenizer', lambda _: Tokenizer())
+    prompts = iter(['ignore-eos', 'ignore-eos on', 'first', 'ignore-eos invalid',
+                    'second', 'ignore-eos off', 'third', 'exit'])
+    monkeypatch.setattr(stream, '_make_prompt_session', lambda: SimpleNamespace(prompt=lambda _: next(prompts)))
+    flags = []
+
+    def generate(*args, **kwargs):
+        flags.append(kwargs['ignore_eos'])
+        return 1, 1., False
+
+    monkeypatch.setattr(stream, 'stream_generate', generate)
+    stream.main()
+    assert flags == [True, True, False]
+    output = capsys.readouterr().out
+    assert 'ignore-eos = False' in output
+    assert "Invalid value for ignore-eos: 'invalid'" in output

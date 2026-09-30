@@ -113,6 +113,11 @@ uv run python -m inference.predict_stream --model-dir /path/to/checkpoint \
 生成開始からの平均速度です。入力ごとにリセットし、終了・Ctrl+C時は従来の最終集計を残します。
 `--no-status-bar`で無効化できます。リダイレクト時や`TERM=dumb`ではバーを表示しません。
 
+対話中に`ignore-eos on`を入力するとEOSを生成候補から除外し、長さの上限またはCtrl+Cまで生成します。
+`ignore-eos off`で解除、`ignore-eos`だけで現在値を確認できます（既定off、起動時は`--ignore-eos`）。
+`stop-on-eos off`はEOSの生成を許したまま停止を無効にする設定です。
+`ignore-eos on`の間はEOSの除外が優先され、offに戻すと元の`stop-on-eos`設定が適用されます。
+
 ### テスト・基礎実験
 
 ```bash

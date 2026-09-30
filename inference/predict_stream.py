@@ -17,6 +17,7 @@ Commands at the prompt:
     context-length [val]     - show or set max total token length
     skip-special-tokens [true/false] - show or set whether to skip special tokens in output
     stop-on-eos [true/false] - show or set whether to stop generation on EOS token
+    ignore-eos [on/off]      - exclude EOS tokens from generation (default off)
 
 Input editing:
     Enter                    - submit
@@ -143,10 +144,19 @@ class _StatusTextStreamer(TextStreamer):
         self.status.write(text + ("\n" if stream_end else ""))
 
 
-def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos, status_bar=True):
+def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p, device, skip_special_tokens, stop_on_eos, status_bar=True, ignore_eos=False):
     """Run generate() with TextStreamer. Returns (num_generated, elapsed_seconds, interrupted).
     SIGINT (Ctrl+C) during generation flips a stopping criterion flag, so generation
     halts cleanly after the next token without raising KeyboardInterrupt."""
+    generation_kwargs = {}
+    if ignore_eos:
+        # Keep any existing suppression and cover models with multiple EOS IDs.
+        config = model.generation_config
+        suppressed = set(config.suppress_tokens or [])
+        for ids in (tokenizer.eos_token_id, config.eos_token_id, config.forced_eos_token_id):
+            if ids is not None:
+                suppressed.update(ids if isinstance(ids, (list, tuple)) else [ids])
+        generation_kwargs.update(suppress_tokens=sorted(suppressed), forced_eos_token_id=None)
     input_ids = tokenizer.encode(prompt, return_tensors="pt").to(device)
     prompt_len = input_ids.size(1)
 
@@ -170,7 +180,8 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
                 pad_token_id=tokenizer.pad_token_id or tokenizer.eos_token_id,
                 streamer=streamer,
                 stopping_criteria=StoppingCriteriaList([stopper]),
-                eos_token_id=tokenizer.eos_token_id if stop_on_eos else None,
+                eos_token_id=tokenizer.eos_token_id if stop_on_eos and not ignore_eos else None,
+                **generation_kwargs,
             )
         elapsed = time.perf_counter() - status.started
         status.tokens = output_ids.size(1) - prompt_len
@@ -183,6 +194,14 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
     return num_generated, elapsed, stopper.interrupted
 
 
+def _parse_bool(value):
+    if value.lower() in ("true", "1", "yes", "on"):
+        return True
+    if value.lower() in ("false", "0", "no", "off"):
+        return False
+    raise ValueError("Use on/off or true/false")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Stream text generation with RecursiveCompressorLM")
     parser.add_argument("--model-dir", type=str, required=True, help="モデルディレクトリ")
@@ -192,6 +211,8 @@ def main():
     parser.add_argument("--precision", choices=["bf16", "fp32"], default="bf16", help="推論精度")
     parser.add_argument("--status-bar", action=argparse.BooleanOptionalAction, default=True,
                         help="端末下部に生成トークン数・平均tok/sを表示（既定ON、プロンプト処理時間を含む）")
+    parser.add_argument("--ignore-eos", action="store_true",
+                        help="EOSトークンを生成候補から除外（対話中にignore-eos on/offで変更可能）")
     parser.add_argument("--device", type=str, default=None,
                         help="使用デバイス。例: 0, cuda:3, cpu。未指定なら自動 (cuda:0 / cpu)")
     args = parser.parse_args()
@@ -218,19 +239,21 @@ def main():
         "top_p": args.top_p,
         "skip_special_tokens": True,
         "stop_on_eos": True,
+        "ignore_eos": args.ignore_eos,
     }
 
     print(f"Device: {device}, precision: {args.precision}, context_length: {state['context_length']}, "
-          f"temperature: {state['temperature']}, top_p: {state['top_p']}")
-    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]', 'skip-special-tokens [true/false]', 'stop-on-eos [true/false]'")
+          f"temperature: {state['temperature']}, top_p: {state['top_p']}, ignore_eos: {state['ignore_eos']}")
+    print("Commands: 'exit', 'temperature [val]', 'top-p [val]', 'context-length [val]', 'skip-special-tokens [true/false]', 'stop-on-eos [true/false]', 'ignore-eos [on/off]'")
     print("Input: Enter to submit, Alt+Enter (or Esc then Enter) for newline")
 
     commands = {
         "temperature": ("temperature", float),
         "top-p": ("top_p", float),
         "context-length": ("context_length", int),
-        "skip-special-tokens": ("skip_special_tokens", lambda x: x.lower() in ("true", "1", "yes", "on")),
-        "stop-on-eos": ("stop_on_eos", lambda x: x.lower() in ("true", "1", "yes", "on")),
+        "skip-special-tokens": ("skip_special_tokens", _parse_bool),
+        "stop-on-eos": ("stop_on_eos", _parse_bool),
+        "ignore-eos": ("ignore_eos", _parse_bool),
     }
 
     session = _make_prompt_session()
@@ -265,6 +288,7 @@ def main():
             state["skip_special_tokens"],
             state["stop_on_eos"],
             status_bar=args.status_bar,
+            ignore_eos=state["ignore_eos"],
         )
         if interrupted:
             print("\n[interrupted]")

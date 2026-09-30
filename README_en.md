@@ -104,6 +104,11 @@ Throughput is the average since generation started, including prompt processing.
 for each prompt; completion or Ctrl+C keeps the final summary. Use `--no-status-bar` to disable
 the bar. Redirected output and `TERM=dumb` automatically omit it.
 
+Enter `ignore-eos on` to exclude EOS from sampling and continue until the length limit or Ctrl+C.
+Use `ignore-eos off` to restore normal sampling, or `ignore-eos` to show the setting (default off;
+start with `--ignore-eos` to enable it). Unlike `stop-on-eos off`, this prevents EOS generation
+itself. Turning it off restores the existing `stop-on-eos` behavior.
+
 ### Tests and basic experiments
 
 ```bash
