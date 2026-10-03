@@ -3,6 +3,11 @@
 現行コードは用途別パッケージに移動しました。[配置・起動方法](repository-layout.md)を参照してください。
 本文中の過去の実験コマンドやパスは実行当時のものです。
 
+現行の標準構成をまとめた16:9の解説図：
+[PNG（3840×2160）](figures/logkv-overview.png) / [SVG](figures/logkv-overview.svg)。
+モデル全体、階層からの読み出し、再帰圧縮を1枚で示しています。
+[再生成用スクリプト](figures/render_logkv_overview.py)も収録しています。
+
 `logkv` ブランチで開発中の新アーキテクチャ **LogKV** について、設計・実装・
 実験から得られた知見の記録。実装は [logkv.py](../models/logkv/attention.py)（`LogKV` /
 `LogKVBlock`）、[logkv_lm.py](../models/logkv/modeling.py)（`LogKVLM`）、
