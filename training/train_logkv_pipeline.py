@@ -12,6 +12,7 @@ from datetime import timedelta
 import fcntl
 import itertools
 import json
+import math
 import os
 from pathlib import Path
 import random
@@ -89,6 +90,12 @@ def exclusive_run(run_dir):
 def log(message):
     if dist.get_rank() == 0:
         print(message, flush=True)
+
+
+def format_eta(seconds):
+    """Round remaining time up to minutes; allow runs longer than 24 hours."""
+    hours, minutes = divmod(max(0, math.ceil(seconds / 60)), 60)
+    return f'{hours}h{minutes:02d}m'
 
 
 def checkpoints(run_dir):
@@ -384,6 +391,11 @@ def _train(args, dataset, tokenizer):
     usable_batches = updates_per_epoch * args.grad_accum
     if not 0 <= state['batch_in_epoch'] < usable_batches or state['batch_in_epoch'] % args.grad_accum:
         raise ValueError('Invalid checkpoint data cursor')
+    remaining_updates = max(0, (args.num_epochs - state['epoch']) * updates_per_epoch
+                            - state['batch_in_epoch'] // args.grad_accum)
+    total_steps = state['step'] + remaining_updates
+    if args.max_steps:
+        total_steps = min(total_steps, args.max_steps)
     total_params = torch.tensor(sum(p.numel() for p in stage.parameters()), device=device)
     dist.all_reduce(total_params)
     log(f'LogKV pipeline: {total_params.item():,} params; stages={world}; '
@@ -398,7 +410,8 @@ def _train(args, dataset, tokenizer):
     writer = SummaryWriter(str(Path(get_data_dir()) / 'tensorboard' / 'logkv-pipeline' / args.run_name),
                            purge_step=state['step'] + 1 if resume else None) if rank == 0 else None
     run_dir.mkdir(parents=True, exist_ok=True)
-    tick, logged_steps = time.monotonic(), 0
+    tick = eta_start = time.monotonic()
+    initial_step, logged_steps = state['step'], 0
     try:
         while state['epoch'] < args.num_epochs and (not args.max_steps or state['step'] < args.max_steps):
             epoch = state['epoch']
@@ -406,13 +419,19 @@ def _train(args, dataset, tokenizer):
             iterator = iter(loader)
             while state['epoch'] == epoch:
                 cmd = control_command(args.control_file, device)
+                pause_start = None
                 if cmd == CMD_PAUSE:
+                    pause_start = time.monotonic()
                     log(f'Training paused; write resume or save_and_exit to {args.control_file}')
                 while cmd == CMD_PAUSE:
                     time.sleep(1)
                     next_cmd = control_command(args.control_file, device)
                     if next_cmd in (CMD_RESUME, CMD_SAVE_AND_EXIT):
                         cmd = next_cmd
+                if pause_start is not None:
+                    paused = time.monotonic() - pause_start
+                    tick += paused
+                    eta_start += paused
                 if cmd == CMD_RESUME:
                     log('Training resumed')
                 if cmd == CMD_SAVE_AND_EXIT:
@@ -440,9 +459,12 @@ def _train(args, dataset, tokenizer):
                         writer.add_scalar(f'train/{key}', value, state['step'])
                 logged_steps += 1
                 if state['step'] % args.log_interval == 0:
-                    throughput = logged_steps * (args.context_length - 1) * args.batch_size * args.grad_accum / (time.monotonic() - tick)
-                    log(f"epoch {epoch} step {state['step']} | loss {loss:.6f} | ema {state['ema_loss']:.6f} | "
-                        f'lr {lr:.2e} | grad_norm {grad_norm:.4f} | {throughput:,.0f} tok/s')
+                    now = time.monotonic()
+                    throughput = logged_steps * (args.context_length - 1) * args.batch_size * args.grad_accum / (now - tick)
+                    seconds_per_step = (now - eta_start) / (state['step'] - initial_step)
+                    eta = format_eta(max(0, total_steps - state['step']) * seconds_per_step)
+                    log(f"epoch {epoch} step {state['step']}/{total_steps} | loss {loss:.6f} | ema {state['ema_loss']:.6f} | "
+                        f'lr {lr:.2e} | grad_norm {grad_norm:.4f} | {throughput:,.0f} tok/s | ETA {eta}')
                     tick, logged_steps = time.monotonic(), 0
                 if args.sample_interval and state['step'] % args.sample_interval == 0:
                     generate_samples(stage, tokenizer, device, state['step'], run_dir / 'samples.log',

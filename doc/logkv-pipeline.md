@@ -86,6 +86,19 @@ checkpointから後続checkpointを上書きすることは拒否する。分岐
 
 ## 制御と記録
 
+訓練ログは総更新回数と残り時間を表示する。
+
+```text
+epoch 0 step 150130/9999999 | loss 2.447287 | ema 2.575506 | lr 5.00e-05 | grad_norm 0.9325 | 3,051 tok/s | ETA 9999h59m
+```
+
+分母はデータ量・`--num-epochs`・有効バッチサイズから決まる更新回数を、
+`--max-steps`が指定されていればその絶対ステップ数で制限した値。
+再開時もcheckpointのstepと残りデータ位置から終了stepを計算する。
+ETAは今回の起動後の平均step時間と残りstep数から見積もり、分単位で切り上げる（完了時`0h00m`）。
+再開前の停止時間と`pause`の待機時間は除外し、起動後に実施したサンプル生成・checkpoint保存の時間は含む。
+最終checkpoint保存の残り時間は別途見積もらない。
+
 `just pause`、`just resume`、`just save-and-exit`は既存trainerと同様に使える。
 複数runを起動する場合は`--control-file /path/to/that-run.cmd`で制御ファイルを分けられる。
 `pause`中にも`save_and_exit`を受け付ける。
