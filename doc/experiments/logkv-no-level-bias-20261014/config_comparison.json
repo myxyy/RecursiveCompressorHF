@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "tasks": {
+    "copying": {
+      "effective_changes": [
+        "run_name",
+        "no_level_bias"
+      ],
+      "all_config_differences": [
+        "mamba_d_conv",
+        "mamba_d_state",
+        "mamba_expand",
+        "mamba_headdim",
+        "mamba_ngroups",
+        "mamba_num_layers",
+        "mamba_scan_chunk_size",
+        "no_level_bias",
+        "run_name"
+      ],
+      "new_mamba_flags_unused": true
+    },
+    "selective-copying": {
+      "effective_changes": [
+        "run_name",
+        "no_level_bias"
+      ],
+      "all_config_differences": [
+        "mamba_d_conv",
+        "mamba_d_state",
+        "mamba_expand",
+        "mamba_headdim",
+        "mamba_ngroups",
+        "mamba_num_layers",
+        "mamba_scan_chunk_size",
+        "no_level_bias",
+        "run_name"
+      ],
+      "new_mamba_flags_unused": true
+    }
+  }
+}

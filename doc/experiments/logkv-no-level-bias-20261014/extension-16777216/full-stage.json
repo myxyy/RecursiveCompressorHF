@@ -1,0 +1,53 @@
+{
+  "stage": "full",
+  "started": "2026-10-14T05:47:50.194212+00:00",
+  "pid": 3472615,
+  "gpus": [
+    0,
+    1
+  ],
+  "commands": [
+    {
+      "checkpoint": "best",
+      "gpu": 0,
+      "pid": 3472617,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/extension-16777216/evaluate.py",
+        "full",
+        "--checkpoint",
+        "best"
+      ]
+    },
+    {
+      "checkpoint": "final",
+      "gpu": 1,
+      "pid": 3472618,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/extension-16777216/evaluate.py",
+        "full",
+        "--checkpoint",
+        "final"
+      ]
+    }
+  ],
+  "state": "complete",
+  "projected_full_seconds_with_margin": 614.7470614796039,
+  "preflight_hashes": {
+    "best": "f85d07e65c568776b1484e3485f69de3d22345ce648799298b9993ff544fd0d8",
+    "final": "7f408ad0435d1d1c06bedb1f469366a0b97334d32543b8aabec4f5e7cd2a3488"
+  },
+  "timeout_seconds": 1800,
+  "scripts": {
+    "review.py": "6aaf9d162a911423897b29f4f803937ae9d783e08ea7bef74712dfd420730d51",
+    "evaluate.py": "f3185247fdd95b7e3a70649c81377e72e599426fd0553c8da70cc73cfd24ed39",
+    "stage.py": "e8c1b32f90b4fcf25100603aec0779a03c244925d2c3a9e8d67b99113495d140"
+  },
+  "completed": "2026-10-14T05:55:40.235896+00:00",
+  "elapsed_seconds": 470.0396491740248,
+  "returncodes": [
+    0,
+    0
+  ]
+}

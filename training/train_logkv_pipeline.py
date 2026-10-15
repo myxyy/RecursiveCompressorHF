@@ -31,7 +31,7 @@ from torch.utils.tensorboard import SummaryWriter
 from models.logkv.configuration import LogKVConfig
 from data_pipeline.dataset import prepare_all_datasets
 from models.logkv.pipeline import LogKVLMPipelineStage, export_model
-from training.train_logkv import (build_parser, get_data_dir, split_params_for_muon,
+from training.train_logkv import (build_parser, get_data_dir, split_params_for_muon, load_checkpoint_config,
                          SAMPLE_PROMPTS, _CMD_MAP, CMD_NONE, CMD_PAUSE,
                          CMD_RESUME, CMD_SAVE_AND_EXIT)
 
@@ -124,6 +124,24 @@ def resume_directory(spec, run_dir):
         return found[-1]
     path = Path(spec)
     return path if path.is_dir() else Path(run_dir) / path
+
+
+def model_config(args, tokenizer, source=None):
+    """Resolve new-run CLI settings or saved settings, without changing old configs."""
+    if source:
+        config = load_checkpoint_config(source, no_level_bias=args.no_level_bias,
+                                        resume=bool(args.resume))
+    else:
+        names = ['d_model', 'num_heads', 'd_ff', 'chunk_size', 'num_layers', 'phase_emb',
+                 'phase_levels', 'learnable_decay', 'no_level_bias', 'gated_attention', 'kv_norm',
+                 'level_amplify', 'v_norm_only', 'self_slot', 'conv_kernel_size']
+        config = LogKVConfig(**{key: getattr(args, key) for key in names},
+            vocab_size=tokenizer.vocab_size, pad_token_id=tokenizer.pad_token_id,
+            bos_token_id=tokenizer.bos_token_id, eos_token_id=tokenizer.eos_token_id)
+    if (config.vocab_size, config.pad_token_id, config.bos_token_id, config.eos_token_id) != (
+            tokenizer.vocab_size, tokenizer.pad_token_id, tokenizer.bos_token_id, tokenizer.eos_token_id):
+        raise ValueError('Dataset tokenizer does not match checkpoint vocabulary/special tokens')
+    return config
 
 
 class EpochCursorSampler(Sampler):
@@ -355,19 +373,11 @@ def _train(args, dataset, tokenizer):
         if resume.resolve() != existing[-1].resolve():
             raise ValueError('Output run already has other/later checkpoints; use a new run-name')
     source = model_directory(resume or args.start_checkpoint) if (resume or args.start_checkpoint) else None
+    config = model_config(args, tokenizer, source)
     if source:
-        config = LogKVConfig.from_pretrained(source, local_files_only=True)
-        log(f'Architecture loaded from {source}; model architecture CLI flags are ignored')
-    else:
-        names = ['d_model', 'num_heads', 'd_ff', 'chunk_size', 'num_layers', 'phase_emb',
-                 'phase_levels', 'learnable_decay', 'gated_attention', 'kv_norm',
-                 'level_amplify', 'v_norm_only', 'self_slot', 'conv_kernel_size']
-        config = LogKVConfig(**{key: getattr(args, key) for key in names},
-            vocab_size=tokenizer.vocab_size, pad_token_id=tokenizer.pad_token_id,
-            bos_token_id=tokenizer.bos_token_id, eos_token_id=tokenizer.eos_token_id)
-    if (config.vocab_size, config.pad_token_id, config.bos_token_id, config.eos_token_id) != (
-            tokenizer.vocab_size, tokenizer.pad_token_id, tokenizer.bos_token_id, tokenizer.eos_token_id):
-        raise ValueError('Dataset tokenizer does not match checkpoint vocabulary/special tokens')
+        log(f'Architecture loaded from {source}; only --no-level-bias on weights-only starts can override it')
+    log(f'Level bias: no_level_bias={config.no_level_bias}, '
+        f'learnable_decay={config.learnable_decay}, level_amplify={config.level_amplify}')
     infos = LogKVLMPipelineStage.split_config(config.num_layers, world, args.stage_layer_split)
     stage = LogKVLMPipelineStage(config, **infos[rank]).to(device).train()
     optimizers = make_optimizers(stage, args.lr)

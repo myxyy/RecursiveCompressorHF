@@ -1,0 +1,104 @@
+{
+  "task": "copying",
+  "mode": "copying",
+  "state": "complete",
+  "started": "2026-10-14T01:16:47.745342+00:00",
+  "commands": [
+    {
+      "stage": "train",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/train_entry.py",
+        "--run-name",
+        "causal-conv4-no-level-bias-fixed10-20261014",
+        "--arch",
+        "logkv",
+        "--no-level-bias",
+        "--gated-attention",
+        "--self-slot",
+        "--phase-levels",
+        "2",
+        "--t-dist",
+        "loguniform",
+        "--max-t",
+        "2028",
+        "--steps",
+        "50000",
+        "--batch-size",
+        "64",
+        "--grad-accum",
+        "1",
+        "--lr",
+        "0.0003",
+        "--warmup",
+        "1000",
+        "--d-model",
+        "512",
+        "--num-heads",
+        "8",
+        "--d-ff",
+        "1024",
+        "--num-layers",
+        "2",
+        "--conv-kernel-size",
+        "4",
+        "--chunk-size",
+        "4",
+        "--loss-positions",
+        "all",
+        "--seed",
+        "0",
+        "--device",
+        "0"
+      ],
+      "started": "2026-10-14T01:16:47.745385+00:00",
+      "returncode": 0,
+      "finished": "2026-10-14T03:53:19.786662+00:00"
+    },
+    {
+      "stage": "best",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/evaluate.py",
+        "--mode",
+        "copying",
+        "--checkpoint",
+        "best"
+      ],
+      "started": "2026-10-14T03:53:19.851121+00:00",
+      "returncode": 0,
+      "finished": "2026-10-14T03:58:32.363012+00:00"
+    },
+    {
+      "stage": "final",
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/evaluate.py",
+        "--mode",
+        "copying",
+        "--checkpoint",
+        "final"
+      ],
+      "started": "2026-10-14T03:58:32.363610+00:00",
+      "returncode": 0,
+      "finished": "2026-10-14T04:03:44.619344+00:00"
+    }
+  ],
+  "first_300_steps_match_benchmark": true,
+  "baseline_config_differences": [
+    "mamba_d_conv",
+    "mamba_d_state",
+    "mamba_expand",
+    "mamba_headdim",
+    "mamba_ngroups",
+    "mamba_num_layers",
+    "mamba_scan_chunk_size",
+    "no_level_bias",
+    "run_name"
+  ],
+  "weights": {
+    "best": "07d5d37d51c3f15685f4354b26f2e33da9bc37890f24f4428501aa38fd1f8c70",
+    "final": "847902e3eb082a653faf5a3e21cc62cef998cbb38f2cfb0eab0c9f9ef192cf18"
+  },
+  "finished": "2026-10-14T04:03:44.671308+00:00"
+}

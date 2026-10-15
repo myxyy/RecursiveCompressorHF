@@ -70,13 +70,16 @@ def build_parser():
     p.add_argument("--phase-levels", type=int, default=2,
                    help="位相埋め込みの桁数(周期C^n)。小さいほど外挿・エイリアシング耐性が"
                         "高い(doc/logkv.md §6.5、Copying/Selective検証はn=2を推奨)")
-    p.add_argument("--learnable-decay", action="store_true",
+    level_bias = p.add_mutually_exclusive_group()
+    level_bias.add_argument("--learnable-decay", action="store_true",
                    help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
+    level_bias.add_argument("--no-level-bias", action="store_true",
+                   help="レベルlogitバイアスを学習不能な0に固定する（既定は固定減衰）")
     p.add_argument("--gated-attention", action=argparse.BooleanOptionalAction, default=True,
                    help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--kv-norm", action="store_true",
                    help="k/vにhead_dim単位のRMSNormを射影直後と各圧縮後に適用し全レベルを同一スケールにする")
-    p.add_argument("--level-amplify", action="store_true",
+    level_bias.add_argument("--level-amplify", action="store_true",
                    help="レベルバイアスの符号を反転し +i*log C (増幅) にする (§6.10の希釈補正側)")
     p.add_argument("--v-norm-only", action="store_true",
                    help="vのみRMSNorm(kは非正規化)。kv_normの希釈補正をkeyノルム符号化を保ったまま適用")
@@ -108,6 +111,18 @@ def build_parser():
 
 def parse_args():
     return build_parser().parse_args()
+
+
+def load_checkpoint_config(source, *, no_level_bias=False, resume=False):
+    """Preserve checkpoint semantics; allow fixed-zero opt-in on weights-only starts."""
+    config = LogKVConfig.from_pretrained(source, local_files_only=True)
+    if no_level_bias and not config.no_level_bias:
+        if resume:
+            raise ValueError('--no-level-bias conflicts with the resumed checkpoint; '
+                             'use pipeline --start-checkpoint with a new --run-name to change the bias')
+        # Revalidate mutually exclusive bias settings; do not drop learned parameters.
+        config = LogKVConfig.from_dict({**config.to_dict(), 'no_level_bias': True})
+    return config
 
 
 def get_data_dir():
@@ -243,6 +258,7 @@ def main():
         phase_emb=args.phase_emb,
         phase_levels=args.phase_levels,
         learnable_decay=args.learnable_decay,
+        no_level_bias=args.no_level_bias,
         gated_attention=args.gated_attention,
         kv_norm=args.kv_norm,
         level_amplify=args.level_amplify,
@@ -265,7 +281,9 @@ def main():
             name = names[-1]
         ckpt_dir = name if os.path.isabs(name) else os.path.join(run_dir, name)
         log(f"Resuming from {ckpt_dir}")
-        model = LogKVLM.from_pretrained(os.path.join(ckpt_dir, "model")).to(device)
+        model_dir = os.path.join(ckpt_dir, "model")
+        saved_config = load_checkpoint_config(model_dir, no_level_bias=args.no_level_bias, resume=True)
+        model = LogKVLM.from_pretrained(model_dir, config=saved_config).to(device)
         resume_state = torch.load(os.path.join(ckpt_dir, "trainer_state.pt"),
                                   map_location="cpu", weights_only=False)
         start_step = resume_state["step"]

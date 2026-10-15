@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "tests_passed": 228,
+  "tests_skipped": 6,
+  "log_sha256": "73666d12939bfc6013e6c9152a295d09bcba9752fa943b6bdfe644facc639a21",
+  "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' .venv/bin/python -m pytest tests/logkv/test_no_level_bias.py tests/logkv/test_logkv.py tests/logkv/test_logkv_lm.py tests/logkv/test_logkv_conv.py tests/logkv/test_logkv_predict.py tests/logkv/test_logkv_pipeline.py -q",
+  "tolerance_note": "FP64 save/load changes tensor layout; logits checked at 1e-12 instead of bitwise equality."
+}

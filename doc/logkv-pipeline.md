@@ -56,6 +56,49 @@ uv run python -m inference.predict_stream \
 訓練を分散できても、この生成CLIは統合したモデル全体を指定デバイスにロードする。
 大きいモデルの推論にはその分のVRAM、または`--device cpu --precision fp32`を使うメモリが必要。
 
+## 固定0レベルバイアス
+
+新規訓練の起動引数に `--no-level-bias` を追加すると、レベルごとの `-i * log(C)` を
+学習不能な0に固定する。`--learnable-decay` のゼロ初期化とは異なり、係数パラメータを追加しない。
+通常のDDP版 `training.train_logkv` でも同じオプションを使える。
+
+```bash
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
+  --run-name pipeline-zero-bias \
+  --batch-size 12 --n-microbatches 12 --grad-accum 2 \
+  --num-layers 16 --stage-layer-split 2,2,3,3,3,3 \
+  --no-level-bias
+```
+
+フラグ省略時の新規訓練は従来どおり固定減衰。
+設定は `model/config.json` の `no_level_bias` に保存され、export後の
+`inference.predict_stream` も自動で同じ設定を使用する。
+`--learnable-decay` / `--level-amplify` との同時指定は拒否する。
+
+既存checkpointにこの設定項目がない場合は `False` として読み、従来の演算を維持する。
+重みの名前・形状・optimizerのパラメータ構成は変更しない。
+`--resume` は保存済みのバイアス設定を採用するため、固定0のrunを再開するときに
+フラグを付け直す必要はない。標準の固定減衰checkpointに `--resume --no-level-bias` を指定して
+演算だけを変更することは拒否する。
+
+標準の固定減衰モデルから**重みだけを引き継いで**固定0の別実験を開始する場合は、
+新しいrun-nameで以下を指定する（batch・層分割等は必要に応じて指定）：
+
+```bash
+uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pipeline \
+  --run-name pipeline-zero-bias-warm \
+  --start-checkpoint /path/to/standard-checkpoint/model \
+  --no-level-bias
+```
+
+この場合、元のcheckpointは変更せず、新しいrunのstep・optimizer・データ位置は最初から始める。
+読み込み元が学習可能減衰または固定増幅の構成なら、この固定0への上書きは拒否する。
+
+2026-10-14の追加検証：CPU回帰44件と2GPUの小規模統合テストが通過。
+旧config（`no_level_bias`項目なし）の読み込み、固定0の保存・export・推論、
+フラグなし再開での重み/optimizer/RNGの完全一致を確認した。
+[検証記録](experiments/logkv-pipeline-zero-bias-20261014/review.json)。
+
 ## 再開・重みだけの引継ぎ
 
 同じrun-name、層分割、batch/accum/microbatch、context、seed、precision、dataset条件を指定して再開する。
@@ -72,6 +115,7 @@ uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pi
 checkpointには次に消費するepochとepoch内batch位置を保存する。epoch境界でも消費済みサンプルを
 再読せず、全体のoptimizer step数からepoch内位置を推測しない。
 モデル構造はcheckpointのconfigを採用するため、resume時のモデル構造CLI引数は使わない。
+ただし `--no-level-bias` と保存済み設定が矛盾する場合は、意図しない比較条件を避けるためエラーにする。
 `--lr`と`--warmup`は指定値を使い、保存したstepからLRを計算する。
 
 GPU数や層配分を変える場合、または通常のDDP版LogKVから引き継ぐ場合は、

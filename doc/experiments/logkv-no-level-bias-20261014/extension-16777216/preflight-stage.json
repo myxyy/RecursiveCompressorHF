@@ -1,0 +1,47 @@
+{
+  "stage": "preflight",
+  "started": "2026-10-14T05:46:44.754881+00:00",
+  "pid": 3471420,
+  "gpus": [
+    0,
+    1
+  ],
+  "commands": [
+    {
+      "checkpoint": "best",
+      "gpu": 0,
+      "pid": 3471426,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/extension-16777216/evaluate.py",
+        "preflight",
+        "--checkpoint",
+        "best"
+      ]
+    },
+    {
+      "checkpoint": "final",
+      "gpu": 1,
+      "pid": 3471427,
+      "command": [
+        "/home/myxy/RecursiveCompressor/.venv/bin/python",
+        "/home/myxy/RecursiveCompressor/doc/experiments/logkv-no-level-bias-20261014/extension-16777216/evaluate.py",
+        "preflight",
+        "--checkpoint",
+        "final"
+      ]
+    }
+  ],
+  "state": "complete",
+  "timeout_seconds": 300,
+  "scripts": {
+    "evaluate.py": "f3185247fdd95b7e3a70649c81377e72e599426fd0553c8da70cc73cfd24ed39",
+    "stage.py": "e8c1b32f90b4fcf25100603aec0779a03c244925d2c3a9e8d67b99113495d140"
+  },
+  "completed": "2026-10-14T05:47:20.760790+00:00",
+  "elapsed_seconds": 36.00565783001366,
+  "returncodes": [
+    0,
+    0
+  ]
+}

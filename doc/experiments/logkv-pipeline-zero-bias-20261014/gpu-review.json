@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "no_level_bias": true,
+  "world_size": 2,
+  "final_checkpoint": "/mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+  "loss_and_gradients_match": true,
+  "global_clip_matches": true,
+  "all_ignored_loss_zero": true,
+  "resume_weights_bit_exact": true,
+  "resume_optimizer_rng_bit_exact": true,
+  "checkpoint_rotation": true,
+  "resume_step": 4,
+  "resume_epoch": 1,
+  "resume_batch_in_epoch": 2,
+  "distributed_samples": true,
+  "changed_split_warm_start": true,
+  "control_save_and_exit": true,
+  "predict_stream_load_and_generate": true
+}

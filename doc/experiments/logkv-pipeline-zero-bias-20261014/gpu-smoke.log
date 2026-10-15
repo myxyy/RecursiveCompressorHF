@@ -1,0 +1,74 @@
+/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/autograd/graph.py:869: UserWarning: Attempting to run cuBLAS, but there was no current CUDA context! Attempting to set the primary context... (Triggered internally at /pytorch/aten/src/ATen/cuda/CublasHandlePool.cpp:335.)
+  return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+PASS: full-model loss/gradients, global clipping, all-ignored labels
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[2, 1]; effective batch=8; precision=bf16
+epoch 0 step 1/4 | loss 3.479355 | ema 3.479355 | lr 1.00e-04 | grad_norm 1.2177 | 124 tok/s | ETA 0h01m
+/home/myxy/RecursiveCompressor/.venv/lib/python3.12/site-packages/torch/distributed/c10d_logger.py:83: UserWarning: barrier(): using the device under current context. You can specify `device_id` in `init_process_group` to mute this warning.
+  return func(*args, **kwargs)
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 414.05it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/full/checkpoint-1/model
+[rank1]:[W1014 15:27:43.899259875 ProcessGroupNCCL.cpp:4094] Warning: An unbatched P2P op (send/recv) was called on this ProcessGroup with size 2.  In lazy initialization mode, this will result in a new 2-rank NCCL communicator to be created. (function operator())
+epoch 0 step 2/4 | loss 3.459211 | ema 3.479153 | lr 2.00e-04 | grad_norm 1.4382 | 308 tok/s | ETA 0h01m
+[rank0]:[W1014 15:27:43.915863351 ProcessGroupNCCL.cpp:4094] Warning: An unbatched P2P op (send/recv) was called on this ProcessGroup with size 2.  In lazy initialization mode, this will result in a new 2-rank NCCL communicator to be created. (function operator())
+===== step 2 =====
+[日本の首都は] t5 t27
+[昔々あるところに] t5 t7
+[人工知能とは] t5 t29
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 649.07it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/full/checkpoint-2/model
+epoch 0 step 3/4 | loss 3.462644 | ema 3.478988 | lr 2.00e-04 | grad_norm 1.3686 | 193 tok/s | ETA 0h01m
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 747.25it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/full/checkpoint-3/model
+epoch 1 step 4/4 | loss 3.474865 | ema 3.478947 | lr 2.00e-04 | grad_norm 1.3314 | 340 tok/s | ETA 0h00m
+===== step 4 =====
+[日本の首都は] t8 t15
+[昔々あるところに] t15 t17
+[人工知能とは] t9 t14
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 735.20it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/full/checkpoint-4/model
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[2, 1]; effective batch=8; precision=bf16
+epoch 0 step 1/2 | loss 3.479355 | ema 3.479355 | lr 1.00e-04 | grad_norm 1.2177 | 368 tok/s | ETA 0h01m
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 715.02it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-1/model
+epoch 0 step 2/2 | loss 3.459211 | ema 3.479153 | lr 2.00e-04 | grad_norm 1.4382 | 331 tok/s | ETA 0h00m
+===== step 2 =====
+[日本の首都は] t5 t27
+[昔々あるところに] t5 t7
+[人工知能とは] t5 t29
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 667.35it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-2/model
+Architecture loaded from /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-2/model; only --no-level-bias on weights-only starts can override it
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[2, 1]; effective batch=8; precision=bf16
+epoch 0 step 3/4 | loss 3.462644 | ema 3.478988 | lr 2.00e-04 | grad_norm 1.3686 | 345 tok/s | ETA 0h01m
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 643.99it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-3/model
+epoch 1 step 4/4 | loss 3.474865 | ema 3.478947 | lr 2.00e-04 | grad_norm 1.3314 | 339 tok/s | ETA 0h00m
+===== step 4 =====
+[日本の首都は] t8 t15
+[昔々あるところに] t15 t17
+[人工知能とは] t9 t14
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 672.06it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-4/model
+Architecture loaded from /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-4/model; only --no-level-bias on weights-only starts can override it
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[2, 1]; effective batch=8; precision=bf16
+PASS: bf16 training, distributed samples, bit-exact mid-epoch resume across epoch boundary
+Architecture loaded from /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-4/model; only --no-level-bias on weights-only starts can override it
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+Architecture loaded from /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/full/checkpoint-4/model; only --no-level-bias on weights-only starts can override it
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[1, 2]; effective batch=8; precision=bf16
+epoch 0 step 1/1 | loss 3.467690 | ema 3.467690 | lr 1.00e-04 | grad_norm 1.2716 | 327 tok/s | ETA 0h00m
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 662.71it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/warm/checkpoint-1/model
+Level bias: no_level_bias=True, learnable_decay=False, level_amplify=False
+LogKV pipeline: 10,160 params; stages=2; layers=[2, 1]; effective batch=8; precision=bf16
+Writing model shards:   0%|          | 0/1 [00:00<?, ?it/s]Writing model shards: 100%|██████████| 1/1 [00:00<00:00, 668.73it/s]
+Saved /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/controlled/checkpoint-0/model
+Loading weights:   0%|          | 0/48 [00:00<?, ?it/s]Loading weights: 100%|██████████| 48/48 [00:00<00:00, 4958.66it/s]
+You are using a model of type `logkv` to instantiate a model of type ``. This may be expected if you are loading a checkpoint that shares a subset of the architecture (e.g., loading a `sam2_video` checkpoint into `Sam2Model`), but is otherwise not supported and can yield errors. Please verify that the checkpoint is compatible with the model you are instantiating.
+t4 t5 t16 t29
+PASS: warm start with new split, synchronized save/exit, predict_stream load+generate

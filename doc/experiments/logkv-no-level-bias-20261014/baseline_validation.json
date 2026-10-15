@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "baseline_review_sha256": "fee680705cc9d2cfd283107c4045449beff3eca6578b64259f5f0464bdf49728",
+  "artifact_hashes_verified": 41,
+  "task_generator_parity_horizons": [
+    1,
+    3,
+    16,
+    2028,
+    131072
+  ],
+  "samples": 8,
+  "seed": 12345
+}

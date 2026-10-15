@@ -1,5 +1,12 @@
 # LogKV実験記録一覧
 
+2026-10-14 13:08:46 JST、[固定0レベルバイアスのCopying / Selective比較](logkv-no-level-bias.md)が完了。
+各50k steps・164セル、GPU解放済み。実測2.93時間（事前確認込み）。
+Copying best/finalはT131,072で256/256、ただし全41点ではbest 2例、final 19例の誤答。
+Selective同Tは固定減衰0/0から18/12例へ改善、桁精度は78.12%/75.00%。
+新旧328セル・8 checkpointを再監査。追加依頼のCopying T16,777,216評価も14:55 JSTに完了し、
+best/finalとも8/8完全一致、最小margin10.3046875/6.546875。同じ8列でのprobe、GPU解放・監査済み。
+
 2026-09-28 08:11:19 JST、[標準LogKV＋ゲート付きMamba-2枝](mamba2-logkv-gated.md)が完了。
 固定10桁Copying / Selectiveを各50k steps、計164セルを再監査。GPU解放済み。
 Copyingはbest/finalともT4,096まで全評価点256/256、T12,288以降0/256。

@@ -24,17 +24,19 @@ class Compressor(nn.Module):
 class LogKV(nn.Module):
     def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False,
-                 level_amplify=False, v_norm_only=False, self_slot=False):
+                 level_amplify=False, v_norm_only=False, self_slot=False, no_level_bias=False):
         super(LogKV, self).__init__()
         assert chunk_size >= 2, "chunk_size must be at least 2"
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
         assert not (level_amplify and learnable_decay), "level_amplify is a fixed-bias variant"
+        if no_level_bias and (learnable_decay or level_amplify):
+            raise ValueError('no_level_bias cannot be combined with learned decay or amplification')
         # Sign of the fixed level bias: -1 = decay (level-i slots get -i*log C,
         # retained coarse-level penalty), +1 = amplify (+i*log C,
         # compensating the 1/C**i value dilution of mixed pooling; see
         # doc/logkv.md §6.10 — which regime applies depends on pooling
         # sharpness, so both are kept as options).
-        self.level_sign = 1.0 if level_amplify else -1.0
+        self.level_sign = 0.0 if no_level_bias else (1.0 if level_amplify else -1.0)
         # self_slot: add one extra slot per query holding the CURRENT token's
         # own k/v (bias 0, like level 0). Without it a query only sees strictly
         # past slots, so the softmax has no "attend to nothing / to myself"
@@ -533,11 +535,11 @@ class LogKVBlock(nn.Module):
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False, level_amplify=False,
-                 v_norm_only=False, self_slot=False, conv_kernel_size=0):
+                 v_norm_only=False, self_slot=False, conv_kernel_size=0, no_level_bias=False):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
-                               gated_attention, kv_norm, level_amplify, v_norm_only, self_slot)
+                               gated_attention, kv_norm, level_amplify, v_norm_only, self_slot, no_level_bias)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
         if not isinstance(conv_kernel_size, int) or conv_kernel_size < 0:

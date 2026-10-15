@@ -1,0 +1,41 @@
+{
+  "passed": true,
+  "checked_at": "2026-10-14T06:29:14.130881+00:00",
+  "cpu_tests_passed": 44,
+  "cpu_command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' .venv/bin/python -m pytest tests/logkv/test_no_level_bias.py tests/logkv/test_logkv_pipeline.py tests/logkv/test_logkv_lm.py -q",
+  "gpu_command": "CUDA_VISIBLE_DEVICES=0,1 CUBLAS_WORKSPACE_CONFIG=:4096:8 OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m torch.distributed.run --standalone --nproc_per_node=2 --module tests.logkv.test_logkv_pipeline --distributed-smoke /mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014 --no-level-bias",
+  "gpu_review": {
+    "passed": true,
+    "no_level_bias": true,
+    "world_size": 2,
+    "final_checkpoint": "/mnt/raid0/RecursiveCompressor/pipeline-zero-bias-smoke-20261014/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+    "loss_and_gradients_match": true,
+    "global_clip_matches": true,
+    "all_ignored_loss_zero": true,
+    "resume_weights_bit_exact": true,
+    "resume_optimizer_rng_bit_exact": true,
+    "checkpoint_rotation": true,
+    "resume_step": 4,
+    "resume_epoch": 1,
+    "resume_batch_in_epoch": 2,
+    "distributed_samples": true,
+    "changed_split_warm_start": true,
+    "control_save_and_exit": true,
+    "predict_stream_load_and_generate": true
+  },
+  "legacy_missing_config_field_tested": true,
+  "legacy_weights_unchanged_on_warm_start": true,
+  "fixed_decay_resume_rejects_zero_override": true,
+  "zero_resume_without_cli_flag": true,
+  "production_training_started": false,
+  "source_hashes": {
+    "training/train_logkv.py": "b34b0cef2d41de967f5ba8929fbfc8e16211404109f1b07eb13df289a36d7f94",
+    "training/train_logkv_pipeline.py": "978692138c594eb3ffe16958b228861adbf96d301b12a3e04006098a44035ffe",
+    "tests/logkv/test_no_level_bias.py": "87a7344aa9ad3cc36170e614496d154862281a2268d678eef071746c64e7bc74",
+    "tests/logkv/test_logkv_pipeline.py": "aef2561813ed81fc3daafca7dfdd606b16cef5d9b9edbb6922fcf3747891d6a6",
+    "models/logkv/configuration.py": "63ce8c9aa391f95da0fa0a2eb6da63cdc467d7c4048d4bce5d5188795a5f4d6f",
+    "models/logkv/attention.py": "5fccfa7ec8563fd5d90c29c0da8ce2a8b720b556613b3efffdbd517ef4ccc70b",
+    "models/logkv/modeling.py": "b642843856d6bd15da72f96e8b55ab0548a3931eb8c51a519f866a9932cf6347",
+    "models/logkv/pipeline.py": "1e9dda317e327e5a78618c9001e9aa2b73d2cc53576f198b878abeed0211763f"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "task": "selective-copying",
+  "task_path": "/mnt/raid0/RecursiveCompressor/experiments/logkv-no-level-bias-20261014/source/exp/selective_copying/task.py",
+  "task_sha256": "ed263c064196b82da32bb138717b4ea3892ff8eebe3a02b4b797790267cf1d05",
+  "initial_weights_identical": true,
+  "initial_weights_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+  "shared_two_layer_initial_weights_identical": true,
+  "base_initial_sha256": "67eda48099dab1a373190ef0e0a947b316eed15ee82f4daaf50ecb3afbef520e",
+  "num_layers": 2,
+  "conv_kernel_size": 4,
+  "no_level_bias": true,
+  "learnable_decay": false,
+  "num_params": 5792256,
+  "deterministic_algorithms": true,
+  "cublas_workspace_config": ":4096:8",
+  "visible_gpu": "1",
+  "torch_version": "2.11.0+cu128",
+  "cuda_version": "12.8",
+  "device_name": "NVIDIA GeForce RTX 3090",
+  "rng_sha256": "706fbb93825ef63dcf04904a8a4712fcded346ee84ab0e6313aef282c4597822"
+}

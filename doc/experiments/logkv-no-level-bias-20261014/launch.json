@@ -1,0 +1,33 @@
+{
+  "passed": true,
+  "checked": "2026-10-14T01:17:48.925277+00:00",
+  "state": "running",
+  "supervisor": 3177386,
+  "workers": {
+    "copying": 3177389,
+    "selective-copying": 3177390
+  },
+  "started_jst": "2026-10-14T10:16:47.655227+09:00",
+  "deadline_jst": "2026-10-14T17:42:50.257126+09:00",
+  "gpu_limit": 2,
+  "gpus": [
+    0,
+    1
+  ],
+  "estimated_hours": 4.327292692352224,
+  "checks": {
+    "copying": {
+      "passed": true,
+      "first_steps_matching_benchmark": 200,
+      "latest_recorded_step": 200,
+      "initialization_audit_sha256": "c2e46849f27b9b5035d1a91cf01335016732600ccb444b1ce0a4306519551a78"
+    },
+    "selective-copying": {
+      "passed": true,
+      "first_steps_matching_benchmark": 200,
+      "latest_recorded_step": 200,
+      "initialization_audit_sha256": "f8887f2fb9d7a91f763883f61b064f73d6fcb68b61ab250fd16215adddc2ca00"
+    }
+  },
+  "source_and_scripts_unchanged": true
+}

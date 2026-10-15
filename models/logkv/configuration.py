@@ -31,6 +31,7 @@ class LogKVConfig(PretrainedConfig):
         pad_token_id=None,
         bos_token_id=1,
         eos_token_id=2,
+        no_level_bias=False,
         **kwargs,
     ):
         self.d_model = d_model
@@ -41,6 +42,9 @@ class LogKVConfig(PretrainedConfig):
         self.phase_emb = phase_emb
         self.phase_levels = phase_levels
         self.learnable_decay = learnable_decay
+        if no_level_bias and (learnable_decay or level_amplify):
+            raise ValueError('no_level_bias cannot be combined with learned decay or amplification')
+        self.no_level_bias = no_level_bias
         self.gated_attention = gated_attention
         self.kv_norm = kv_norm
         self.level_amplify = level_amplify

@@ -47,6 +47,8 @@ def parse_args():
                         "出現する範囲に制限すると域外でも未学習ベクトルを踏まない")
     p.add_argument("--learnable-decay", action="store_true",
                    help="レベル減衰の係数(初期値log C)をヘッド・層ごとに学習可能にする")
+    p.add_argument("--no-level-bias", action="store_true",
+                   help="logkv: レベルlogitバイアスを学習不能な0に固定する")
     p.add_argument("--gated-attention", action=argparse.BooleanOptionalAction, default=True,
                    help="attention出力にsigmoidゲート(recursive_compressorのGatedAttention相当)を掛ける")
     p.add_argument("--kv-norm", action="store_true",
@@ -97,6 +99,8 @@ def parse_args():
                    help="訓練中の簡易汎化チェック間隔 (0で無効)")
     p.add_argument("--save-interval", type=int, default=10000)
     args = p.parse_args()
+    if args.no_level_bias and (args.arch != 'logkv' or args.learnable_decay or args.level_amplify):
+        p.error('--no-level-bias requires --arch logkv without --learnable-decay/--level-amplify')
     if args.conv_kernel_size is None:
         args.conv_kernel_size = 0 if args.arch == "mamba2-logkv" else 4
     return args
@@ -173,6 +177,7 @@ def main(task=copying_task):
             phase_emb=args.phase_emb,
             phase_levels=args.phase_levels,
             learnable_decay=args.learnable_decay,
+            no_level_bias=args.no_level_bias,
             gated_attention=args.gated_attention,
             kv_norm=args.kv_norm,
             level_amplify=args.level_amplify,

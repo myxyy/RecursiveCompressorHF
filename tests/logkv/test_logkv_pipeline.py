@@ -173,7 +173,7 @@ def test_cli_shared_architecture_and_checkpoints(tmp_path):
     assert [p.name for p in checkpoints(tmp_path)] == ['checkpoint-9', 'checkpoint-11']
 
 
-def distributed_smoke(root):
+def distributed_smoke(root, no_level_bias=False):
     """Tiny offline GPU training: gradients, bf16, resume, export, controls."""
     from inference.predict_stream import _load_model, _load_tokenizer, stream_generate
     root = Path(root).resolve()
@@ -227,9 +227,13 @@ def distributed_smoke(root):
             '--num-workers', '0', '--checkpoint-interval', '1', '--max-checkpoints', '2',
             '--warmup', '2', '--log-interval', '1', '--sample-interval', '2',
             '--sample-max-new-tokens', '2', '--control-file', str(root / 'control.cmd')]
+        if no_level_bias:
+            common.append('--no-level-bias')
+        # A resumed zero-bias run must keep its saved semantics without the flag.
+        resume_common = [arg for arg in common if arg != '--no-level-bias']
         final = train(parse_args(common + ['--run-name', 'full', '--max-steps', '4']), dataset, tk)
         train(parse_args(common + ['--run-name', 'resumed', '--max-steps', '2']), dataset, tk)
-        resumed = train(parse_args(common + ['--run-name', 'resumed', '--max-steps', '4', '--resume', 'latest']), dataset, tk)
+        resumed = train(parse_args(resume_common + ['--run-name', 'resumed', '--max-steps', '4', '--resume', 'latest']), dataset, tk)
         a = torch.load(final / f'stage_{rank}.pt', weights_only=True, map_location='cpu')['model']
         b = torch.load(resumed / f'stage_{rank}.pt', weights_only=True, map_location='cpu')['model']
         for name in a:
@@ -261,12 +265,16 @@ def distributed_smoke(root):
         if rank == 0:
             model_dir = str(resumed / 'model')
             loaded = _load_model(model_dir, torch.device('cpu'), torch.float32).eval()
+            assert loaded.config.no_level_bias == no_level_bias
+            assert all(layer.attention.level_sign == (0 if no_level_bias else -1)
+                       for layer in loaded.layers)
             loaded_tk = _load_tokenizer(model_dir)
             count, _, interrupted = stream_generate(loaded, loaded_tk, 't4 t5', 5, 1., .95,
                                                     torch.device('cpu'), True, False)
             assert count == 3 and not interrupted
             (root / 'review.json').write_text(json.dumps(dict(
-                passed=True, world_size=dist.get_world_size(), final_checkpoint=str(resumed),
+                passed=True, no_level_bias=no_level_bias,
+                world_size=dist.get_world_size(), final_checkpoint=str(resumed),
                 loss_and_gradients_match=True, global_clip_matches=True,
                 all_ignored_loss_zero=True, resume_weights_bit_exact=True,
                 resume_optimizer_rng_bit_exact=True, checkpoint_rotation=True,
@@ -283,4 +291,6 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--distributed-smoke', required=True)
-    distributed_smoke(parser.parse_args().distributed_smoke)
+    parser.add_argument('--no-level-bias', action='store_true')
+    args = parser.parse_args()
+    distributed_smoke(args.distributed_smoke, no_level_bias=args.no_level_bias)
