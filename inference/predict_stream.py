@@ -7,7 +7,7 @@ Usage:
         --context-length 1024 --temperature 0.8 --top-p 0.9
 
 Reads prompts interactively from stdin and prints generated tokens
-as they are produced. A terminal status bar shows generated tokens and average
+as they are produced. A terminal status bar shows input+output tokens and average
 tok/s (including prefill), reset per prompt. Disable with --no-status-bar.
 
 Commands at the prompt:
@@ -76,10 +76,11 @@ torch.set_float32_matmul_precision("high")
 class _GenerationStatus:
     """Reserve the terminal's last row while streaming into its scroll region."""
 
-    def __init__(self, enabled=True):
+    def __init__(self, enabled=True, input_tokens=0):
         self.output = sys.stdout
         self.enabled = enabled and self.output.isatty() and os.environ.get("TERM") != "dumb"
         self.size = None
+        self.input_tokens = input_tokens
         self.tokens = 0
         self.started = time.perf_counter()
         self.last_refresh = float("-inf")
@@ -105,7 +106,7 @@ class _GenerationStatus:
             return
         elapsed = now - self.started
         rate = self.tokens / elapsed if elapsed > 0 else 0.0
-        label = f" {self.tokens:,} tokens | {rate:.2f} tok/s | {elapsed:.1f}s "
+        label = f" {self.input_tokens:,}+{self.tokens:,} tokens | {rate:.2f} tok/s | {elapsed:.1f}s "
         # ASCII label; leave the last column unused to avoid automatic wrapping.
         label = label[:self.size.columns - 1].ljust(self.size.columns - 1)
         self.output.write(f"\0337\033[{self.size.lines};1H\033[2K\033[7m{label}\033[0m\0338")
@@ -209,7 +210,7 @@ def stream_generate(model, tokenizer, prompt, context_length, temperature, top_p
         stopper.interrupted = True
 
     old_handler = signal.signal(signal.SIGINT, _on_sigint)
-    status = _GenerationStatus(enabled=status_bar)
+    status = _GenerationStatus(enabled=status_bar, input_tokens=prompt_len)
     streamer = _StatusTextStreamer(tokenizer, status, skip_prompt=False, skip_special_tokens=skip_special_tokens)
     try:
         status.refresh(force=True)
