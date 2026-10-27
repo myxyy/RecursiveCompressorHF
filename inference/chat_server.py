@@ -79,8 +79,8 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_even
                    penalty=None, penalty_add=0.0, penalty_decay=0.0):
     """Run one turn in Llama 2 format. Each turn is wrapped as
     `<s>[INST]q[/INST]a</s>` so the input here is `<s>[INST]q[/INST]` and
-    generation stops at EOS. The EOS is fed through `step` before stopping so
-    the next turn's input cleanly begins with `<s>[INST]...`.
+    generation stops at EOS. Prefill uses `step`; single tokens, including EOS,
+    use `predict` so the next turn's input cleanly begins with `<s>[INST]...`.
 
     cancel_event: optional threading.Event; when set, generation stops early
     (checked before the prompt step and each token). The returned hidden is
@@ -122,8 +122,8 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_even
         next_id = _sample_token(next_logits, temperature, top_p,
                                 penalty if use_penalty else None)
         if next_id == state.eos_id:
-            _, hidden = state.model.step(
-                torch.tensor([[next_id]], dtype=torch.long, device=state.device), hidden
+            _, hidden = state.model.predict(
+                torch.tensor([next_id], dtype=torch.long, device=state.device), hidden
             )
             reason = "eos"
             break
@@ -132,15 +132,15 @@ def _generate_turn(hidden, query_text, temperature, top_p, on_token, cancel_even
             penalty[next_id] += penalty_add
         on_token(next_id)
         num_generated += 1
-        logits, hidden = state.model.step(
-            torch.tensor([[next_id]], dtype=torch.long, device=state.device), hidden
+        logits, hidden = state.model.predict(
+            torch.tensor([next_id], dtype=torch.long, device=state.device), hidden
         )
-        next_logits = logits[0, -1, :]
+        next_logits = logits[0]
     else:
         # Hit the per-turn cap without emitting EOS. Inject one so the running
         # token stream stays in `<s>[INST]q[/INST]a</s><s>...` shape.
-        _, hidden = state.model.step(
-            torch.tensor([[state.eos_id]], dtype=torch.long, device=state.device), hidden
+        _, hidden = state.model.predict(
+            torch.tensor([state.eos_id], dtype=torch.long, device=state.device), hidden
         )
 
     return hidden, reason, num_generated
