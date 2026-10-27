@@ -36,6 +36,13 @@ from training.train_logkv import (build_parser, get_data_dir, split_params_for_m
                          CMD_RESUME, CMD_SAVE_AND_EXIT)
 
 
+INSTRUCT_SAMPLE_PROMPTS = [
+    '日本の首都はどこですか？',
+    '昔々あるところに、で始まる短い物語を書いてください。',
+    '人工知能とは何か、わかりやすく説明してください。',
+]
+
+
 def parse_args(argv=None):
     p = build_parser()
     p.description = 'LogKVLM pipeline parallel training (one stage per GPU)'
@@ -281,7 +288,8 @@ def control_command(path, device):
 
 
 @torch.no_grad()
-def generate_samples(stage, tokenizer, device, step, path, max_new_tokens, precision):
+def generate_samples(stage, tokenizer, device, step, path, max_new_tokens, precision,
+                     dataset_type='pretrain'):
     """Sequential inference across the same stages; no full GPU model needed."""
     rank, world = dist.get_rank(), dist.get_world_size()
     lines = [f'===== step {step} =====']
@@ -291,9 +299,18 @@ def generate_samples(stage, tokenizer, device, step, path, max_new_tokens, preci
         with torch.random.fork_rng(devices=[device.index]), torch.autocast(
                 device.type, dtype=torch.bfloat16, enabled=precision == 'bf16'):
             torch.manual_seed(12345 + step)
-            for prompt in SAMPLE_PROMPTS:
-                ids = tokenizer(prompt, return_tensors='pt').input_ids.to(device)
-                tokens, hidden = ids[0].tolist(), None
+            prompts = INSTRUCT_SAMPLE_PROMPTS if dataset_type == 'instruct' else SAMPLE_PROMPTS
+            for prompt in prompts:
+                if dataset_type == 'instruct':
+                    # Match the prompt prefix used by the dataset and chat server.
+                    prompt_ids = [tokenizer.bos_token_id] + tokenizer.encode(
+                        f'[INST]{prompt}[/INST]', add_special_tokens=False)
+                    ids = torch.tensor([prompt_ids], dtype=torch.long, device=device)
+                    tokens = []
+                else:
+                    ids = tokenizer(prompt, return_tensors='pt').input_ids.to(device)
+                    tokens = ids[0].tolist()
+                hidden = None
                 for t in range(max_new_tokens):
                     single = t > 0
                     shape = (1, stage.config.d_model) if single else (1, ids.size(1), stage.config.d_model)
@@ -317,7 +334,11 @@ def generate_samples(stage, tokenizer, device, step, path, max_new_tokens, preci
                     if token.item() == tokenizer.eos_token_id:
                         break
                 if rank == 0:
-                    lines.append(f'[{prompt}] {tokenizer.decode(tokens, skip_special_tokens=True)}')
+                    text = tokenizer.decode(tokens, skip_special_tokens=True)
+                    if dataset_type == 'instruct':
+                        lines.append(f'[user] {prompt}\n[assistant] {text}')
+                    else:
+                        lines.append(f'[{prompt}] {text}')
     finally:
         stage.train(training)
     if rank == 0:
@@ -478,7 +499,7 @@ def _train(args, dataset, tokenizer):
                     tick, logged_steps = time.monotonic(), 0
                 if args.sample_interval and state['step'] % args.sample_interval == 0:
                     generate_samples(stage, tokenizer, device, state['step'], run_dir / 'samples.log',
-                                     args.sample_max_new_tokens, args.precision)
+                                     args.sample_max_new_tokens, args.precision, args.dataset_type)
                 if state['step'] % args.checkpoint_interval == 0:
                     save_checkpoint(run_dir, stage, optimizers, tokenizer, state, args.max_checkpoints)
                 if args.max_steps and state['step'] >= args.max_steps:

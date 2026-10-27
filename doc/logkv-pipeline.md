@@ -151,6 +151,9 @@ ETAは今回の起動後の平均step時間と残りstep数から見積もり、
 同じパイプラインで生成するため、サンプル生成時にも全モデルを1 GPUへ集めない。
 既定80トークン、`--sample-max-new-tokens`で変更可能。samplingの乱数は訓練から分離し、
 結果はrun内の`samples.log`へ記録する。
+`--dataset-type instruct`では質問・依頼文を`<s>[INST]質問[/INST]`の形式で入力し、
+ログには`[user]`と`[assistant]`を分けて回答を記録する。
+`pretrain`では従来の文頭プロンプトから続きを生成する。
 TensorBoardは`$DATA_DIR/tensorboard/logkv-pipeline/{run-name}`。
 
 checkpointは全rankの保存とCPUでのHF形式への統合が完了してから公開する。
