@@ -182,8 +182,9 @@ hidden は `(levels, offset)`。`levels[i] = [cur_q, cur_k, cur_v]`
 全体のストレージを保持し続けないようにする。
 
 forward は全系列用の専用経路で、空キャッシュとの連結や次回用hiddenの保存を省く。
-slot選択・全階層共通softmax・attention再計算はstepと共有する。
-[実装・検証・速度比較](logkv-stateless-forward.md)。
+全階層共通softmax・attention再計算はstepと共有する。
+全系列では同じブロック内のクエリがK/Vを共有する行列積を使い、クエリごとのK/V展開を省く。
+[状態保存の削減](logkv-stateless-forward.md)と[行列積の再構成・検証](logkv-grouped-forward.md)。
 `predict(x (B, d), hidden)` は1トークン専用の
 実装で、更新前の未完成チャンク群を直接参照してattentionを計算した後、現在トークンを
 追加し、完成したチャンクだけを上位へ繰り上げる。`step()`には委譲しない。

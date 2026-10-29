@@ -174,7 +174,7 @@ class LogKV(nn.Module):
             nq = nq.reshape(q.size(0), n_chunks, self.head_dim)
             nk = nk.reshape(q.size(0), n_chunks, self.head_dim)
             nv = nv.reshape(q.size(0), n_chunks, self.head_dim)
-        out = self._attend_contexts(q, k, v, ctxs, offset=0)
+        out = self._attend_full_contexts(q, k, v, ctxs)
         if self.lg is not None:
             out = out * torch.sigmoid(self._split_heads(self.lg(x)))
         return self.lo(self._merge_heads(out, batch_size))
@@ -320,7 +320,19 @@ class LogKV(nn.Module):
             v_out = self._attend_levels(q_new, n_levels, scale, *flat)
         return v_out
 
-    def _attend_levels(self, q, n_levels, scale, *flat):
+    def _attend_full_contexts(self, q, k, v, ctxs):
+        """Whole-sequence attention with shared K/V per aligned query block."""
+        if not ctxs and not self.self_slot:
+            return torch.zeros_like(q)
+        flat = tuple(k_ctx for _, k_ctx, _ in ctxs) + tuple(v_ctx for _, _, v_ctx in ctxs)
+        if self.self_slot:
+            flat += (k, v)
+        args = (q, len(ctxs), self.head_dim ** -0.5, *flat)
+        if self.recompute_attention and torch.is_grad_enabled() and q.requires_grad:
+            return checkpoint(self._attend_levels, *args, grouped=True, use_reentrant=False)
+        return self._attend_levels(*args, grouped=True)
+
+    def _attend_levels(self, q, n_levels, scale, *flat, grouped=False):
         """Online softmax over levels: each level contributes its slot-local
         max m_i, denominator l_i and value numerator acc_i (relative to
         m_i); these are merged with the standard rescaling so the result
@@ -329,8 +341,11 @@ class LogKV(nn.Module):
         concatenation."""
         C = self.chunk_size
         k_ctxs, v_ctxs = flat[:n_levels], flat[n_levels:2 * n_levels]
-        locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:4 * n_levels]
-        self_kv = flat[4 * n_levels:]   # (k_self, v_self) when self_slot, else ()
+        if grouped:
+            self_kv = flat[2 * n_levels:]
+        else:
+            locals_, invalids = flat[2 * n_levels:3 * n_levels], flat[3 * n_levels:4 * n_levels]
+            self_kv = flat[4 * n_levels:]   # (k_self, v_self) when self_slot, else ()
         if self.level_decay is not None:
             # rows of q are batch-major then head (see _split_heads):
             # row b*H + h -> head h
@@ -343,8 +358,12 @@ class LogKV(nn.Module):
             # no longer a correction for cross-level multiplicity. Its quality
             # under the refined layout needs fresh training experiments.
             level_bias = self.level_sign * i * math.log(C) if self.level_decay is None else -i * slope
-            m_i, l_i, acc_i = self._level_attention(
-                q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
+            if grouped:
+                m_i, l_i, acc_i = self._grouped_level_attention(
+                    q, k_ctxs[i], v_ctxs[i], C ** i, level_bias, scale)
+            else:
+                m_i, l_i, acc_i = self._level_attention(
+                    q, k_ctxs[i], v_ctxs[i], locals_[i], invalids[i], level_bias, scale)
             if m is None:
                 m, l, acc = m_i, l_i, acc_i
             else:
@@ -377,6 +396,54 @@ class LogKV(nn.Module):
         # positions with no valid kv at all (sequence start) -> zero output
         l_safe = torch.where(l > 0, l, torch.ones_like(l))
         return (acc / l_safe[..., None]).to(q.dtype)
+
+    def _grouped_level_attention(self, q, k, v, sub_len, level_bias, scale):
+        """Batched QK/PV matmuls; each group shares at most C-1 K/V slots.
+
+        Pad Q only when this adds at most 25% of its length. Otherwise split
+        off the last incomplete block: at the top level, unbounded padding
+        could multiply query storage. Near-aligned lengths use one matmul pair.
+        K/V padding covers only the last group; no per-query K/V gather.
+        """
+        batch_heads, length, dim = q.shape
+        C = self.chunk_size
+        block_len = C * sub_len
+        full, tail = divmod(length, block_len)
+        groups = full + bool(tail)
+        padding = groups * C - k.size(1)
+        if padding:
+            k = torch.nn.functional.pad(k, (0, 0, 0, padding))
+            v = torch.nn.functional.pad(v, (0, 0, 0, padding))
+        k = k.reshape(batch_heads, groups, C, dim)[:, :, :C - 1]
+        v = v.reshape(batch_heads, groups, C, dim)[:, :, :C - 1]
+        bias = level_bias[:, None] if isinstance(level_bias, torch.Tensor) else level_bias
+
+        def attend(query, keys, values):
+            logits = torch.matmul(query, keys.transpose(-1, -2)) * scale + bias
+            positions = torch.arange(query.size(-2), device=q.device) // sub_len
+            invalid = torch.arange(C - 1, device=q.device)[None, :] >= positions[:, None]
+            logits = logits.masked_fill(invalid, float('-inf'))
+            acc_dtype = torch.promote_types(logits.dtype, torch.float32)
+            m = logits.max(dim=-1).values.to(acc_dtype)
+            m_safe = torch.where(m == float('-inf'), torch.zeros_like(m), m)
+            p = torch.exp(logits.to(acc_dtype) - m_safe[..., None])
+            l = p.sum(dim=-1)
+            acc = torch.matmul(p.to(values.dtype), values).to(acc_dtype)
+            return m.flatten(1), l.flatten(1), acc.flatten(1, 2)
+
+        query_padding = groups * block_len - length
+        if query_padding <= length // 4:
+            if query_padding:
+                q = torch.nn.functional.pad(q, (0, 0, 0, query_padding))
+            stats = attend(q.reshape(batch_heads, groups, block_len, dim), k, v)
+            return tuple(t[:, :length] for t in stats) if query_padding else stats
+        if full:
+            stats = attend(q[:, :full * block_len].reshape(batch_heads, full, block_len, dim),
+                           k[:, :full], v[:, :full])
+        if tail:
+            last = attend(q[:, full * block_len:].unsqueeze(1), k[:, full:], v[:, full:])
+            return tuple(torch.cat((a, b), dim=1) for a, b in zip(stats, last)) if full else last
+        return stats
 
     @staticmethod
     def _level_attention(q, k_ctx, v_ctx, local, invalid, level_bias, scale):

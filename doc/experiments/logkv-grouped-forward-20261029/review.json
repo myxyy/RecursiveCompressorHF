@@ -1,0 +1,72 @@
+{
+  "logkv_validation_passed": true,
+  "date_jst": "2026-10-29",
+  "baseline_commit": "9610511ab3bc191883e23d6f57973abc7c64f89e",
+  "cpu_tests": {
+    "passed": 489,
+    "skipped": 21,
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' .venv/bin/python -m pytest -q"
+  },
+  "cuda_forward_tests": {
+    "passed": 91,
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=0 .venv/bin/python -m pytest tests/logkv/test_logkv_grouped_forward.py tests/logkv/test_logkv_forward.py -q"
+  },
+  "mamba_cuda_additional_test": {
+    "status": "blocked_by_environment",
+    "test": "tests/mamba2/test_gated.py::test_zero_gate_gpu_autocast_matches_logkv",
+    "error": "Triton cuda_utils.c compilation: fatal error: Python.h: No such file or directory",
+    "cpu_zero_gate_exact_match_passed": true
+  },
+  "distributed": {
+    "fixed": {
+      "passed": true,
+      "no_level_bias": false,
+      "world_size": 2,
+      "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-grouped-forward-20261029-hcmGcM/fixed/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+      "loss_and_gradients_match": true,
+      "global_clip_matches": true,
+      "all_ignored_loss_zero": true,
+      "resume_weights_bit_exact": true,
+      "resume_optimizer_rng_bit_exact": true,
+      "checkpoint_rotation": true,
+      "resume_step": 4,
+      "resume_epoch": 1,
+      "resume_batch_in_epoch": 2,
+      "distributed_samples": true,
+      "changed_split_warm_start": true,
+      "control_save_and_exit": true,
+      "predict_stream_load_and_generate": true
+    },
+    "zero": {
+      "passed": true,
+      "no_level_bias": true,
+      "world_size": 2,
+      "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-grouped-forward-20261029-hcmGcM/zero/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+      "loss_and_gradients_match": true,
+      "global_clip_matches": true,
+      "all_ignored_loss_zero": true,
+      "resume_weights_bit_exact": true,
+      "resume_optimizer_rng_bit_exact": true,
+      "checkpoint_rotation": true,
+      "resume_step": 4,
+      "resume_epoch": 1,
+      "resume_batch_in_epoch": 2,
+      "distributed_samples": true,
+      "changed_split_warm_start": true,
+      "control_save_and_exit": true,
+      "predict_stream_load_and_generate": true
+    }
+  },
+  "measured_source_directory": "/mnt/raid0/RecursiveCompressor/experiments/logkv-grouped-forward-20261029-hcmGcM/measured-source",
+  "measured_hashes_verified": true,
+  "current_attention_executable_ast_matches_measured": true,
+  "postmeasurement_attention_change": "Docstring clarification only; bounded query padding was already measured.",
+  "prototype_source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-grouped-forward-20261029-hcmGcM/prototype-split-tail/attention.py",
+  "production_training_started": false,
+  "source_sha256": {
+    "models/logkv/attention.py": "01feb5c8fcab9433883d438c927011df01cb67e5c557a9384671b6b5101f28b7",
+    "models/mamba2_logkv_gated/modeling.py": "4667669a39f86eea12374c6923d4537989b0b153a73e2dfbe27f6a28da741a08",
+    "tests/logkv/test_logkv_grouped_forward.py": "8278340aefc909bc87d1e5debb6a9aba230226170ede3f8766b99332bc043619",
+    "benchmarks/benchmark_logkv_forward.py": "66ad5dce3e645392562916e659cb53ce62bf756d73f322be1ab5288c1d9bcf02"
+  }
+}

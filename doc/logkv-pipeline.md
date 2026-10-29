@@ -7,7 +7,8 @@
 
 訓練時のBlockは、次回用hiddenを作らない専用forwardを使用する。
 起動引数の追加は不要。サンプル生成はstep/predictで状態を引き継ぐ。
-[専用forwardの検証・計測結果](logkv-stateless-forward.md)を参照。
+[状態保存削減の検証](logkv-stateless-forward.md)、
+[K/Vを共有する行列積への変更と計測結果](logkv-grouped-forward.md)を参照。
 
 ## 訓練と生成
 

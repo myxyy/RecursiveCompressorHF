@@ -1,4 +1,4 @@
-"""Compare old and stateless training forwards using identical synthetic data.
+"""Compare training forwards using identical synthetic data.
 
 Single block: python -m benchmarks.benchmark_logkv_forward --target block
 Pipeline: torchrun --standalone --nproc_per_node=2 --module
@@ -34,12 +34,17 @@ def execution_path(kind):
         if kind == 'step':
             stack.enter_context(patch.object(LogKV, 'forward', lambda self, x: self.step(x)[0]))
             stack.enter_context(patch.object(CausalConvBlock, 'forward', lambda self, x: self.step(x)[0]))
+        elif kind == 'stateless':
+            stack.enter_context(patch.object(LogKV, '_attend_full_contexts',
+                lambda self, q, k, v, ctxs: self._attend_contexts(q, k, v, ctxs, offset=0)))
         yield
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--target', choices=['block', 'pipeline'], default='block')
+    parser.add_argument('--baseline', choices=['step', 'stateless'], default='step',
+                        help='step: original streaming path; stateless: stage-1 forward with gathers')
     parser.add_argument('--dim', type=int, default=512)
     parser.add_argument('--heads', type=int, default=8)
     parser.add_argument('--ff', type=int, default=1536)
@@ -54,6 +59,7 @@ def main():
     parser.add_argument('--no-level-bias', action='store_true')
     parser.add_argument('--output', type=Path, required=True)
     args = parser.parse_args()
+    modes = [args.baseline, 'forward']
     if min(args.dim, args.heads, args.ff, args.layers, args.vocab, args.length,
            args.batch_size, args.microbatches, args.warmup, args.repeats, args.iterations) < 1:
         parser.error('counts must be positive')
@@ -105,7 +111,7 @@ def main():
         # with exactly the same parameters and deterministic supplied data.
         checks = {}
         reference = None
-        for kind in ['step', 'forward']:
+        for kind in modes:
             with execution_path(kind):
                 loss = float(run())
             grads = {name: p.grad.detach().float().cpu().clone()
@@ -126,14 +132,14 @@ def main():
                     torch.testing.assert_close(grads[name], reference[name], atol=2e-3, rtol=.05)
         del grads, reference
 
-        for kind in ['step', 'forward']:
+        for kind in modes:
             with execution_path(kind):
                 for _ in range(args.warmup):
                     run()
-        times = dict(step=[], forward=[])
-        peaks = dict(step=[], forward=[])
+        times = {kind: [] for kind in modes}
+        peaks = {kind: [] for kind in modes}
         for repeat in range(args.repeats):
-            for kind in (['step', 'forward'] if repeat % 2 == 0 else ['forward', 'step']):
+            for kind in (modes if repeat % 2 == 0 else modes[::-1]):
                 model.zero_grad(set_to_none=True)
                 if args.target == 'block':
                     x.grad = None
@@ -165,7 +171,7 @@ def main():
                           world_size=world, precision='fp32 master + bf16 autocast',
                           scope='forward/backward/zero_grad; no optimizer update or I/O', ranks=ranks,
                           median_ms={k: statistics.median(v) for k, v in times.items()})
-            result['speedup'] = result['median_ms']['step'] / result['median_ms']['forward']
+            result['speedup'] = result['median_ms'][args.baseline] / result['median_ms']['forward']
             result['source_sha256'] = {p: hashlib.sha256(Path(p).read_bytes()).hexdigest() for p in [
                 'models/logkv/attention.py', 'models/logkv/modeling.py',
                 'models/logkv/pipeline.py', 'training/train_logkv_pipeline.py', __file__]}

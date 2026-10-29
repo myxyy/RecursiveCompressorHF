@@ -46,8 +46,13 @@ class GatedMambaLogKVLM(LogKVLM):
         return self.head(self.norm(x)), {'mamba': mamba_state, 'logkv': next_logkv}
 
     def forward(self, input_ids, labels=None, past_key_values=None, use_cache=False, **kwargs):
-        if past_key_values is None and not use_cache and input_ids.is_cuda:
-            x = self._fuse(input_ids, self.mamba.backbone(input_ids))
+        if past_key_values is None and not use_cache:
+            # Use the same stateless LogKV blocks as the standalone LM on
+            # CPU too, preserving exact zero-gate equivalence. The official
+            # Mamba backbone remains the CUDA training path.
+            features = (self.mamba.backbone(input_ids) if input_ids.is_cuda else
+                        self.mamba.step_features(input_ids)[0])
+            x = self._fuse(input_ids, features)
             for layer in self.layers:
                 x = layer(x)
             logits, hidden = self.head(self.norm(x)), None
