@@ -1,0 +1,64 @@
+{
+  "passed": true,
+  "date_jst": "2026-10-29",
+  "baseline_commit": "cde0f037a582aabf2e85ae6764b20f38d5c02337",
+  "cpu_tests": {
+    "passed": 447,
+    "skipped": 21,
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' .venv/bin/python -m pytest -q"
+  },
+  "cuda_tests": {
+    "passed": 102,
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES=0 .venv/bin/python -m pytest tests/logkv/test_logkv_forward.py tests/logkv/test_logkv_predict.py -q"
+  },
+  "distributed": {
+    "fixed": {
+      "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-stateless-forward-20261029/pipeline-fixed-MJanYO/review.json",
+      "passed": true,
+      "no_level_bias": false,
+      "world_size": 2,
+      "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-stateless-forward-20261029/pipeline-fixed-MJanYO/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+      "loss_and_gradients_match": true,
+      "global_clip_matches": true,
+      "all_ignored_loss_zero": true,
+      "resume_weights_bit_exact": true,
+      "resume_optimizer_rng_bit_exact": true,
+      "checkpoint_rotation": true,
+      "resume_step": 4,
+      "resume_epoch": 1,
+      "resume_batch_in_epoch": 2,
+      "distributed_samples": true,
+      "changed_split_warm_start": true,
+      "control_save_and_exit": true,
+      "predict_stream_load_and_generate": true
+    },
+    "zero": {
+      "source": "/mnt/raid0/RecursiveCompressor/experiments/logkv-stateless-forward-20261029/pipeline-zero-SSK4tO/review.json",
+      "passed": true,
+      "no_level_bias": true,
+      "world_size": 2,
+      "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-stateless-forward-20261029/pipeline-zero-SSK4tO/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+      "loss_and_gradients_match": true,
+      "global_clip_matches": true,
+      "all_ignored_loss_zero": true,
+      "resume_weights_bit_exact": true,
+      "resume_optimizer_rng_bit_exact": true,
+      "checkpoint_rotation": true,
+      "resume_step": 4,
+      "resume_epoch": 1,
+      "resume_batch_in_epoch": 2,
+      "distributed_samples": true,
+      "changed_split_warm_start": true,
+      "control_save_and_exit": true,
+      "predict_stream_load_and_generate": true
+    }
+  },
+  "benchmark_sources_verified": true,
+  "production_training_started": false,
+  "source_sha256": {
+    "models/logkv/attention.py": "c5be78e6b85350def4fd06e345a8970bd0ff0f660ceace1566c32a1b79be0d29",
+    "models/logkv/modeling.py": "c3099392fa75752beb380a44117511a784cae9332eb15befb27b4d794b3ffcb7",
+    "tests/logkv/test_logkv_forward.py": "212565cb83bf5231a3c79c093b52d7d5391e0dcf2df5ef8f5b03c12c532f9f4d",
+    "benchmarks/benchmark_logkv_forward.py": "427edb1c1a375f3a8c7c7489b302e66834c237d350db64973b41ed9358e53995"
+  }
+}

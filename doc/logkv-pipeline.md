@@ -5,6 +5,10 @@
 通常の`training/train_logkv.py`とモデル構造・設定オプション・Muon/AdamWの振り分け・linear warmupを共有する。
 既定はConv幅4、gate/self slotあり、phaseなし、固定減衰。
 
+訓練時のBlockは、次回用hiddenを作らない専用forwardを使用する。
+起動引数の追加は不要。サンプル生成はstep/predictで状態を引き継ぐ。
+[専用forwardの検証・計測結果](logkv-stateless-forward.md)を参照。
+
 ## 訓練と生成
 
 `.env`の`DATA_DIR`を設定してから実行する。以下は6GPU、標準16層の例。

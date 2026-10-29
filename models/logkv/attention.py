@@ -134,12 +134,50 @@ class LogKV(nn.Module):
         using at most C-1 slots per level. One softmax normalizes across
         all levels jointly, plus the current token when self_slot is on.
 
-        forward is a one-shot step() from empty state; predict() implements
-        the same semantics directly for a single token. A standalone reference
+        forward builds the hierarchy without retaining streaming state;
+        predict() implements the same semantics directly for a single token.
+        A standalone reference
         implementation of the semantics above lives in tests/logkv/test_logkv.py.
         """
-        v_out, _ = self.step(x)
-        return v_out
+        batch_size, seq_len, dim = x.shape
+        assert dim == self.dim, "Input dimension must match the specified dimension"
+        if self.phase_emb is not None:
+            x = x + self._phase(0, seq_len, x.device).to(x.dtype)[None]
+        q = self._split_heads(self.lq(x))
+        k = self._split_heads(self.lk(x))
+        v = self._split_heads(self.lv(x))
+        if self.k_norm is not None:
+            k = self.k_norm(k)
+        if self.v_norm is not None:
+            v = self.v_norm(v)
+
+        # Each level starts at absolute index zero. Keep only the contexts
+        # needed by attention: no empty-state concatenations or tail clones.
+        ctxs = []
+        nq, nk, nv = q, k, v
+        C = self.chunk_size
+        while nq.size(1) > 0:
+            ctxs.append((0, nk, nv))
+            n_chunks = nq.size(1) // C
+            if not n_chunks:
+                break
+            comp_len = n_chunks * C
+            shape = (q.size(0) * n_chunks, C, self.head_dim)
+            nq, nk, nv = self.compressor(
+                nq[:, :comp_len].reshape(shape),
+                nk[:, :comp_len].reshape(shape),
+                nv[:, :comp_len].reshape(shape))
+            if self.k_norm is not None:
+                nk = self.k_norm(nk)
+            if self.v_norm is not None:
+                nv = self.v_norm(nv)
+            nq = nq.reshape(q.size(0), n_chunks, self.head_dim)
+            nk = nk.reshape(q.size(0), n_chunks, self.head_dim)
+            nv = nv.reshape(q.size(0), n_chunks, self.head_dim)
+        out = self._attend_contexts(q, k, v, ctxs, offset=0)
+        if self.lg is not None:
+            out = out * torch.sigmoid(self._split_heads(self.lg(x)))
+        return self.lo(self._merge_heads(out, batch_size))
 
     def step(self, x, hidden=None):
         """Chunked sequential forward: processes an arbitrary-length segment
@@ -186,7 +224,6 @@ class LogKV(nn.Module):
         C = self.chunk_size
         batch_size, seq_len, d_model = q_new.size()
         x = q_new  # for dtype/device
-        scale = d_model ** -0.5
 
         if hidden is None:
             levels, offset = [], 0
@@ -242,9 +279,17 @@ class LogKV(nn.Module):
             base = offset // (C ** i2) - m
             ctxs.append((base, cur_k, cur_v))
 
-        # ---- (B) attention for all queries of the segment at once ----
+        out = self._attend_contexts(q_new, k_new, v_new, ctxs, offset)
+        return out, (levels, offset + seq_len)
+
+    def _attend_contexts(self, q_new, k_new, v_new, ctxs, offset):
+        """Shared slot selection, joint softmax and backward recomputation."""
+        C = self.chunk_size
+        batch_size, seq_len, d_model = q_new.shape
+        x = q_new
+        scale = d_model ** -0.5
         if not ctxs and not self.self_slot:
-            return torch.zeros_like(q_new), (levels, offset + seq_len)
+            return torch.zeros_like(q_new)
 
         s_abs = offset + torch.arange(seq_len, device=x.device)  # (seq_len,)
         c_idx = torch.arange(C - 1, device=x.device)
@@ -273,7 +318,7 @@ class LogKV(nn.Module):
                                use_reentrant=False)
         else:
             v_out = self._attend_levels(q_new, n_levels, scale, *flat)
-        return v_out, (levels, offset + seq_len)
+        return v_out
 
     def _attend_levels(self, q, n_levels, scale, *flat):
         """Online softmax over levels: each level contributes its slot-local
@@ -495,7 +540,12 @@ class CausalConvBlock(nn.Module):
         self.conv = nn.Conv1d(dim, dim, kernel_size, groups=dim)
 
     def forward(self, x):
-        return self.step(x)[0]
+        if x.size(1) == 0:
+            return x
+        h = self.norm(x).transpose(1, 2)
+        h = torch.nn.functional.pad(h, (self.kernel_size - 1, 0))
+        y = self.conv(h).transpose(1, 2)
+        return x + torch.nn.functional.silu(y)
 
     def step(self, x, cache=None):
         h = self.norm(x)

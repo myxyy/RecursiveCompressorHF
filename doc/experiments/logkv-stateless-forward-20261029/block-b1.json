@@ -1,0 +1,86 @@
+{
+  "arguments": {
+    "target": "block",
+    "dim": 1024,
+    "heads": 8,
+    "ff": 3072,
+    "layers": 4,
+    "vocab": 1024,
+    "length": 2047,
+    "batch_size": 1,
+    "microbatches": 4,
+    "warmup": 3,
+    "repeats": 7,
+    "iterations": 3,
+    "no_level_bias": false,
+    "output": "doc/experiments/logkv-stateless-forward-20261029/block-b1.json"
+  },
+  "torch_version": "2.11.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "world_size": 1,
+  "precision": "fp32 master + bf16 autocast",
+  "scope": "forward/backward/zero_grad; no optimizer update or I/O",
+  "ranks": [
+    {
+      "rank": 0,
+      "checks": {
+        "step_loss": 1.170180320739746,
+        "forward_loss": 1.170180320739746,
+        "gradient_max_abs_difference": 7.62939453125e-06,
+        "gradient_relative_l2_difference": 0.0008868081633740741
+      },
+      "milliseconds": {
+        "step": [
+          32.91422899928875,
+          40.99457533448003,
+          42.46234066279916,
+          45.58930133741038,
+          42.8643050060297,
+          40.57829999752963,
+          41.302117004912965
+        ],
+        "forward": [
+          35.81937466515228,
+          42.50333533855155,
+          40.70194533172374,
+          39.59733066343082,
+          41.435995003363736,
+          42.456422660810254,
+          44.59930166679745
+        ]
+      },
+      "peak_allocated_mib": {
+        "step": [
+          539.26806640625,
+          539.26806640625,
+          539.26806640625,
+          539.26806640625,
+          539.26806640625,
+          539.26806640625,
+          539.26806640625
+        ],
+        "forward": [
+          531.28369140625,
+          531.28369140625,
+          531.28369140625,
+          531.28369140625,
+          531.28369140625,
+          531.28369140625,
+          531.28369140625
+        ]
+      }
+    }
+  ],
+  "median_ms": {
+    "step": 41.302117004912965,
+    "forward": 41.435995003363736
+  },
+  "speedup": 0.9967690410610411,
+  "source_sha256": {
+    "models/logkv/attention.py": "c5be78e6b85350def4fd06e345a8970bd0ff0f660ceace1566c32a1b79be0d29",
+    "models/logkv/modeling.py": "c3099392fa75752beb380a44117511a784cae9332eb15befb27b4d794b3ffcb7",
+    "models/logkv/pipeline.py": "1e9dda317e327e5a78618c9001e9aa2b73d2cc53576f198b878abeed0211763f",
+    "training/train_logkv_pipeline.py": "493d86c7adb621fd7a2431a34ddf139c1a3e7b86bf6e66a7a4264bc25a8d1f46",
+    "/home/myxy/RecursiveCompressor/benchmarks/benchmark_logkv_forward.py": "427edb1c1a375f3a8c7c7489b302e66834c237d350db64973b41ed9358e53995"
+  }
+}

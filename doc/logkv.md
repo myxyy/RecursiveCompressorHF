@@ -181,7 +181,10 @@ hidden は `(levels, offset)`。`levels[i] = [cur_q, cur_k, cur_v]`
 呼び出し側の hidden は破壊しない。保持する小さなスライスはcloneし、推論時に元セグメント
 全体のストレージを保持し続けないようにする。
 
-forward は `step(x)` の一発呼び出し。`predict(x (B, d), hidden)` は1トークン専用の
+forward は全系列用の専用経路で、空キャッシュとの連結や次回用hiddenの保存を省く。
+slot選択・全階層共通softmax・attention再計算はstepと共有する。
+[実装・検証・速度比較](logkv-stateless-forward.md)。
+`predict(x (B, d), hidden)` は1トークン専用の
 実装で、更新前の未完成チャンク群を直接参照してattentionを計算した後、現在トークンを
 追加し、完成したチャンクだけを上位へ繰り上げる。`step()`には委譲しない。
 hiddenの形式・意味は共通で、prefill後のpredictや、その後のstepへの切替に変換は不要。

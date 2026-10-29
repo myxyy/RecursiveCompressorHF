@@ -61,9 +61,14 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
                          automatically by HF `generate()`.
         attention_mask:  ignored (the hierarchical kv attention is internal).
         """
-        # Cached one-token generation uses the dedicated decode path. Keep
-        # training and multi-token prefill on the vectorized step path.
-        if input_ids.size(1) == 1 and past_key_values is not None and not torch.is_grad_enabled():
+        # Ordinary training needs no streaming state. Cached prefill and
+        # decode retain their step/predict paths and opaque state format.
+        if past_key_values is None and not use_cache:
+            x = self.embedding(input_ids)
+            for layer in self.layers:
+                x = layer(x)
+            logits, hidden = self.head(self.norm(x)), None
+        elif input_ids.size(1) == 1 and past_key_values is not None and not torch.is_grad_enabled():
             logits, hidden = self.predict(input_ids[:, 0], past_key_values)
             logits = logits.unsqueeze(1)
         else:

@@ -232,8 +232,8 @@ def test_chunked_step_large_awkward_splits(chunk_size):
 # ---------------------------------------------------------------------------
 # Standalone reference implementation of the refined LogKV semantics:
 # build all levels via recursive compression, then gather only completed
-# sub-units in the query's own block. forward() delegates to step(), so equivalence
-# tests would be tautological without this independent oracle.
+# sub-units in the query's own block. Keep this oracle independent of both
+# stateless forward() and streaming step().
 # ---------------------------------------------------------------------------
 
 def reference_forward(m, x):

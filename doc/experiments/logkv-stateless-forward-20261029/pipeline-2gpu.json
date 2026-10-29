@@ -1,0 +1,135 @@
+{
+  "arguments": {
+    "target": "pipeline",
+    "dim": 512,
+    "heads": 8,
+    "ff": 1536,
+    "layers": 4,
+    "vocab": 1024,
+    "length": 2047,
+    "batch_size": 4,
+    "microbatches": 4,
+    "warmup": 3,
+    "repeats": 7,
+    "iterations": 3,
+    "no_level_bias": false,
+    "output": "doc/experiments/logkv-stateless-forward-20261029/pipeline-2gpu.json"
+  },
+  "torch_version": "2.11.0+cu128",
+  "gpu": "NVIDIA GeForce RTX 3090",
+  "world_size": 2,
+  "precision": "fp32 master + bf16 autocast",
+  "scope": "forward/backward/zero_grad; no optimizer update or I/O",
+  "ranks": [
+    {
+      "rank": 0,
+      "checks": {
+        "step_loss": 7.032860279083252,
+        "forward_loss": 7.032860279083252,
+        "gradient_max_abs_difference": 0.000396728515625,
+        "gradient_relative_l2_difference": 0.007421847850313229
+      },
+      "milliseconds": {
+        "step": [
+          309.5795586608195,
+          314.0259570015284,
+          352.7531020032863,
+          296.9422016661459,
+          290.7875476715465,
+          296.86296799142536,
+          298.77445767245564
+        ],
+        "forward": [
+          337.8588103320605,
+          304.39337066491134,
+          285.6279563372179,
+          287.44687300059013,
+          284.82437500497326,
+          285.46404200217995,
+          289.75062300257076
+        ]
+      },
+      "peak_allocated_mib": {
+        "step": [
+          567.796875,
+          567.79736328125,
+          567.79736328125,
+          567.79736328125,
+          567.79736328125,
+          567.79736328125,
+          567.79736328125
+        ],
+        "forward": [
+          551.24462890625,
+          551.24462890625,
+          551.24462890625,
+          551.24462890625,
+          551.24462890625,
+          551.24462890625,
+          551.24462890625
+        ]
+      }
+    },
+    {
+      "rank": 1,
+      "checks": {
+        "step_loss": 7.032860279083252,
+        "forward_loss": 7.032860279083252,
+        "gradient_max_abs_difference": 1.9073486328125e-05,
+        "gradient_relative_l2_difference": 0.0025876583677391886
+      },
+      "milliseconds": {
+        "step": [
+          309.5795586608195,
+          314.0259570015284,
+          352.7531020032863,
+          296.9422016661459,
+          290.7875476715465,
+          296.86296799142536,
+          298.77445767245564
+        ],
+        "forward": [
+          337.8588103320605,
+          304.39337066491134,
+          285.6279563372179,
+          287.44687300059013,
+          284.82437500497326,
+          285.46404200217995,
+          289.75062300257076
+        ]
+      },
+      "peak_allocated_mib": {
+        "step": [
+          390.74853515625,
+          390.7490234375,
+          390.7490234375,
+          390.7490234375,
+          390.7490234375,
+          390.7490234375,
+          390.7490234375
+        ],
+        "forward": [
+          382.630859375,
+          382.630859375,
+          382.630859375,
+          382.630859375,
+          382.630859375,
+          382.630859375,
+          382.630859375
+        ]
+      }
+    }
+  ],
+  "median_ms": {
+    "step": 298.77445767245564,
+    "forward": 287.44687300059013
+  },
+  "speedup": 1.0394075766197055,
+  "source_sha256": {
+    "models/logkv/attention.py": "c5be78e6b85350def4fd06e345a8970bd0ff0f660ceace1566c32a1b79be0d29",
+    "models/logkv/modeling.py": "c3099392fa75752beb380a44117511a784cae9332eb15befb27b4d794b3ffcb7",
+    "models/logkv/pipeline.py": "1e9dda317e327e5a78618c9001e9aa2b73d2cc53576f198b878abeed0211763f",
+    "training/train_logkv_pipeline.py": "493d86c7adb621fd7a2431a34ddf139c1a3e7b86bf6e66a7a4264bc25a8d1f46",
+    "/home/myxy/RecursiveCompressor/benchmarks/benchmark_logkv_forward.py": "427edb1c1a375f3a8c7c7489b302e66834c237d350db64973b41ed9358e53995"
+  }
+}
