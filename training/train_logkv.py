@@ -64,6 +64,10 @@ def build_parser():
     p.add_argument("--num-heads", type=int, default=8)
     p.add_argument("--d-ff", type=int, default=3072)
     p.add_argument("--chunk-size", type=int, default=4)
+    p.add_argument("--compression-query", choices=['last', 'next'], default=None,
+                   help="圧縮Query: last=区間末尾、next=区間直後（新規学習はlast、未指定時はcheckpoint設定を保持）")
+    p.add_argument("--compression-key", choices=['attention', 'mean'], default=None,
+                   help="Key圧縮: attention=Attention重み付き平均、mean=算術平均（新規学習はattention）")
     p.add_argument("--num-layers", type=int, default=16)
     p.add_argument("--phase-emb", action="store_true",
                    help="学習可能位相埋め込み(位置のC進数桁)を有効化")
@@ -113,16 +117,39 @@ def parse_args():
     return build_parser().parse_args()
 
 
-def load_checkpoint_config(source, *, no_level_bias=False, resume=False):
-    """Preserve checkpoint semantics; allow fixed-zero opt-in on weights-only starts."""
+def load_checkpoint_config(source, *, no_level_bias=False, level_amplify=False,
+                           compression_query=None, compression_key=None,
+                           learnable_decay=False, resume=False):
+    """Keep saved settings unless a supported weights-only override is explicit."""
     config = LogKVConfig.from_pretrained(source, local_files_only=True)
+    values = config.to_dict()
+    if no_level_bias and level_amplify:
+        raise ValueError('no_level_bias cannot be combined with amplification')
+    for name, value in [('compression_query', compression_query),
+                        ('compression_key', compression_key)]:
+        if value is not None and value != getattr(config, name):
+            if resume:
+                option = '--' + name.replace('_', '-')
+                raise ValueError(f'{option} conflicts with the resumed checkpoint; '
+                                 'use pipeline --start-checkpoint with a new --run-name')
+            values[name] = value
+    if learnable_decay and not config.learnable_decay:
+        raise ValueError('--learnable-decay conflicts with the checkpoint; '
+                         'adding learned decay parameters on checkpoint load is not supported')
     if no_level_bias and not config.no_level_bias:
         if resume:
             raise ValueError('--no-level-bias conflicts with the resumed checkpoint; '
                              'use pipeline --start-checkpoint with a new --run-name to change the bias')
         # Revalidate mutually exclusive bias settings; do not drop learned parameters.
-        config = LogKVConfig.from_dict({**config.to_dict(), 'no_level_bias': True})
-    return config
+        values['no_level_bias'] = True
+    if level_amplify and not config.level_amplify:
+        if resume:
+            raise ValueError('--level-amplify conflicts with the resumed checkpoint; '
+                             'use pipeline --start-checkpoint with a new --run-name')
+        if config.learnable_decay:
+            raise ValueError('--level-amplify cannot replace learned decay parameters on checkpoint load')
+        values.update(level_amplify=True, no_level_bias=False)
+    return LogKVConfig.from_dict(values)
 
 
 def get_data_dir():
@@ -265,6 +292,8 @@ def main():
         v_norm_only=args.v_norm_only,
         self_slot=args.self_slot,
         conv_kernel_size=args.conv_kernel_size,
+        compression_query=args.compression_query or 'last',
+        compression_key=args.compression_key or 'attention',
         pad_token_id=tokenizer.pad_token_id,
         bos_token_id=tokenizer.bos_token_id,
         eos_token_id=tokenizer.eos_token_id,
@@ -282,7 +311,10 @@ def main():
         ckpt_dir = name if os.path.isabs(name) else os.path.join(run_dir, name)
         log(f"Resuming from {ckpt_dir}")
         model_dir = os.path.join(ckpt_dir, "model")
-        saved_config = load_checkpoint_config(model_dir, no_level_bias=args.no_level_bias, resume=True)
+        saved_config = load_checkpoint_config(model_dir, no_level_bias=args.no_level_bias,
+            level_amplify=args.level_amplify, learnable_decay=args.learnable_decay,
+            compression_query=args.compression_query, compression_key=args.compression_key,
+            resume=True)
         model = LogKVLM.from_pretrained(model_dir, config=saved_config).to(device)
         resume_state = torch.load(os.path.join(ckpt_dir, "trainer_state.pt"),
                                   map_location="cpu", weights_only=False)
@@ -296,6 +328,9 @@ def main():
         f"layers={args.num_layers} chunk={args.chunk_size} ctx={args.context_length}")
     log(f"world={world_size} batch/GPU={args.batch_size} accum={args.grad_accum} "
         f"-> effective batch {world_size * args.batch_size * args.grad_accum}")
+    log(f"Compression: query={model.config.compression_query}, key={model.config.compression_key}; "
+        f"level_amplify={model.config.level_amplify}, no_level_bias={model.config.no_level_bias}, "
+        f"learnable_decay={model.config.learnable_decay}")
 
     ddp_model = DDP(model, device_ids=[local_rank])
 

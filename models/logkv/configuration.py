@@ -32,6 +32,8 @@ class LogKVConfig(PretrainedConfig):
         bos_token_id=1,
         eos_token_id=2,
         no_level_bias=False,
+        compression_query="last",
+        compression_key="attention",
         **kwargs,
     ):
         self.d_model = d_model
@@ -42,6 +44,8 @@ class LogKVConfig(PretrainedConfig):
         self.phase_emb = phase_emb
         self.phase_levels = phase_levels
         self.learnable_decay = learnable_decay
+        if level_amplify and learnable_decay:
+            raise ValueError('level_amplify cannot be combined with learned decay')
         if no_level_bias and (learnable_decay or level_amplify):
             raise ValueError('no_level_bias cannot be combined with learned decay or amplification')
         self.no_level_bias = no_level_bias
@@ -50,6 +54,12 @@ class LogKVConfig(PretrainedConfig):
         self.level_amplify = level_amplify
         self.v_norm_only = v_norm_only
         self.self_slot = self_slot
+        if compression_query not in ('last', 'next'):
+            raise ValueError("compression_query must be 'last' or 'next'")
+        if compression_key not in ('attention', 'mean'):
+            raise ValueError("compression_key must be 'attention' or 'mean'")
+        self.compression_query = compression_query
+        self.compression_key = compression_key
         if not isinstance(conv_kernel_size, int) or conv_kernel_size < 0:
             raise ValueError("conv_kernel_size must be a nonnegative integer (0 disables convolution)")
         self.conv_kernel_size = conv_kernel_size

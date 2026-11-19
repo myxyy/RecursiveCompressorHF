@@ -96,6 +96,16 @@ uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pi
 `python -m inference.predict_stream --model-dir`へそのパスを指定できます。
 再開・層分割・メモリ要件は[パイプライン訓練の説明](doc/logkv-pipeline.md)を参照してください。
 
+通常のDDP版とpipeline版の両方で、以下を追加すると区間直後のQuery・Key平均・固定増幅で訓練できます。
+
+```text
+--compression-query next --compression-key mean --level-amplify
+```
+
+既定は従来の区間末尾Query・AttentionによるKey圧縮・固定減衰です。
+既存モデルから方式を変更する場合は、新しいrun名でpipelineの`--start-checkpoint`と組み合わせます。
+[訓練コマンド・設定の保存と再開・検証方法](doc/logkv-compression-options.md)を参照してください。
+
 ### テキスト生成
 
 ```bash

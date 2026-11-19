@@ -10,6 +10,11 @@
 [状態保存削減の検証](logkv-stateless-forward.md)、
 [K/Vを共有する行列積への変更と計測結果](logkv-grouped-forward.md)を参照。
 
+`--compression-query next --compression-key mean --level-amplify`で、区間直後のQueryによる
+Value圧縮・Keyの算術平均・代表トークン数の増幅補正を組み合わせて訓練できる。
+通常のDDP trainerも対応し、既定方式は従来の`last` / `attention` / 固定減衰のまま。
+[圧縮オプションとcheckpoint切り替え](logkv-compression-options.md)を参照。
+
 ## 訓練と生成
 
 `.env`の`DATA_DIR`を設定してから実行する。以下は6GPU、標準16層の例。
@@ -120,7 +125,8 @@ uv run torchrun --standalone --nproc_per_node=6 --module training.train_logkv_pi
 checkpointには次に消費するepochとepoch内batch位置を保存する。epoch境界でも消費済みサンプルを
 再読せず、全体のoptimizer step数からepoch内位置を推測しない。
 モデル構造はcheckpointのconfigを採用するため、resume時のモデル構造CLI引数は使わない。
-ただし `--no-level-bias` と保存済み設定が矛盾する場合は、意図しない比較条件を避けるためエラーにする。
+ただし圧縮Query・Key、`--no-level-bias`、`--level-amplify`、`--learnable-decay`を明示して
+保存済み設定と矛盾する場合は、意図しない比較条件を避けるためエラーにする。
 `--lr`と`--warmup`は指定値を使い、保存したstepからLRを計算する。
 
 GPU数や層配分を変える場合、または通常のDDP版LogKVから引き継ぐ場合は、
@@ -129,6 +135,8 @@ GPU数や層配分を変える場合、または通常のDDP版LogKVから引き
 この場合は重みのみをロードし、step・optimizer・データ位置は最初から開始する。
 HF safetensors形式（shard分割を含む）を読む。
 `--resume`と`--start-checkpoint`は同時に指定できない。
+`--start-checkpoint`では圧縮Query・Keyの明示指定と、固定バイアスから`--level-amplify`への
+切り替えも可能。未指定の圧縮設定は保存済み設定を保持する。
 
 新規訓練で既存checkpointのあるrunを使うこと、同じrunへの二重起動、同じ出力runの古い
 checkpointから後続checkpointを上書きすることは拒否する。分岐させる場合は新しいrun-nameを使う。

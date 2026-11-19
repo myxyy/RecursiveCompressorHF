@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-20",
+  "base_commit": "02abb4f803ca85db5a01a17acc3394e8b44f8bb2",
+  "artifact_directory": "/mnt/raid0/RecursiveCompressor/experiments/logkv-compression-20261120-I7tGZ9",
+  "cpu": {
+    "command": "OMP_NUM_THREADS=1 MKL_NUM_THREADS=1 CUDA_VISIBLE_DEVICES='' uv run --no-sync python -m pytest -q --junitxml=/tmp/logkv-compression-cpu-20261120.xml",
+    "passed": 561,
+    "skipped": 21,
+    "failures": 0,
+    "errors": 0,
+    "report": "/mnt/raid0/RecursiveCompressor/experiments/logkv-compression-20261120-I7tGZ9/cpu-pytest.xml"
+  },
+  "pipeline": {
+    "passed": true,
+    "no_level_bias": false,
+    "level_amplify": true,
+    "compression_query": "next",
+    "compression_key": "mean",
+    "world_size": 2,
+    "final_checkpoint": "/mnt/raid0/RecursiveCompressor/experiments/logkv-compression-20261120-I7tGZ9/pipeline-next-mean/checkpoints_logkv_pipeline/resumed/checkpoint-4",
+    "loss_and_gradients_match": true,
+    "global_clip_matches": true,
+    "all_ignored_loss_zero": true,
+    "resume_weights_bit_exact": true,
+    "resume_optimizer_rng_bit_exact": true,
+    "checkpoint_rotation": true,
+    "resume_step": 4,
+    "resume_epoch": 1,
+    "resume_batch_in_epoch": 2,
+    "distributed_samples": true,
+    "changed_split_warm_start": true,
+    "control_save_and_exit": true,
+    "predict_stream_load_and_generate": true
+  },
+  "pipeline_report_sha256": "208cf87e05baec9af0f8b1c752b9ede3aa89da3967c67aacd7675d0ba8a07e79",
+  "source_sha256": {
+    "models/logkv/attention.py": "4cb61c21c1a5e158bdaf0b95895f5f1bbd4bdb00222d3c0b16c0b11a0ddab671",
+    "models/logkv/configuration.py": "ece2a226c7d7a3e2462e7cc75f95db8f25120eaf264d64ba2b0429f169fc1ad1",
+    "models/logkv/modeling.py": "c9f3eb532fd4005785e25c878d15a09f565314fe9b4a833205b5a5b9670a4007",
+    "models/logkv/pipeline.py": "78d7a9865c4bced570734015641a23d28212a018a0771ea108ae99739ea5a2ee",
+    "training/train_logkv.py": "74f575e1286ddd80e2d146104dc85614a17018b85951b574e81488655218b89a",
+    "training/train_logkv_pipeline.py": "9388b4171f1bdb8e34c98fce0904f23452265ac1a359b6295388239647e16e0c",
+    "tests/logkv/test_logkv_compression.py": "97ff3590b9d6244ef436da72ae96476f0b36be215f5a8112881d487ad9e85b64",
+    "tests/logkv/test_logkv_compression_config.py": "02c408254d82b3173afc0b165297ee2afdb060bf12aa0658d7d96d7ea113865b",
+    "tests/logkv/test_logkv_pipeline.py": "45c2aac4c75e919d658cc788f166f8b6d675712636c0416f8bd42dc84d5b8e67"
+  },
+  "scope": "Small synthetic verification only; no quality or throughput experiment, no existing run resumed."
+}

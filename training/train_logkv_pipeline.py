@@ -137,12 +137,18 @@ def model_config(args, tokenizer, source=None):
     """Resolve new-run CLI settings or saved settings, without changing old configs."""
     if source:
         config = load_checkpoint_config(source, no_level_bias=args.no_level_bias,
+                                        level_amplify=args.level_amplify,
+                                        learnable_decay=args.learnable_decay,
+                                        compression_query=args.compression_query,
+                                        compression_key=args.compression_key,
                                         resume=bool(args.resume))
     else:
         names = ['d_model', 'num_heads', 'd_ff', 'chunk_size', 'num_layers', 'phase_emb',
                  'phase_levels', 'learnable_decay', 'no_level_bias', 'gated_attention', 'kv_norm',
                  'level_amplify', 'v_norm_only', 'self_slot', 'conv_kernel_size']
         config = LogKVConfig(**{key: getattr(args, key) for key in names},
+            compression_query=args.compression_query or 'last',
+            compression_key=args.compression_key or 'attention',
             vocab_size=tokenizer.vocab_size, pad_token_id=tokenizer.pad_token_id,
             bos_token_id=tokenizer.bos_token_id, eos_token_id=tokenizer.eos_token_id)
     if (config.vocab_size, config.pad_token_id, config.bos_token_id, config.eos_token_id) != (
@@ -396,7 +402,9 @@ def _train(args, dataset, tokenizer):
     source = model_directory(resume or args.start_checkpoint) if (resume or args.start_checkpoint) else None
     config = model_config(args, tokenizer, source)
     if source:
-        log(f'Architecture loaded from {source}; only --no-level-bias on weights-only starts can override it')
+        log(f'Architecture loaded from {source}; explicit compression/fixed-bias overrides '
+            'are allowed on weights-only starts')
+    log(f'Compression: query={config.compression_query}, key={config.compression_key}')
     log(f'Level bias: no_level_bias={config.no_level_bias}, '
         f'learnable_decay={config.learnable_decay}, level_amplify={config.level_amplify}')
     infos = LogKVLMPipelineStage.split_config(config.num_layers, world, args.stage_layer_split)

@@ -20,7 +20,8 @@ class LogKVLM(PreTrainedModel, GenerationMixin):
             LogKVBlock(config.d_model, config.chunk_size, config.d_ff, config.num_heads,
                        config.phase_emb, config.phase_levels, config.learnable_decay,
                        config.gated_attention, config.kv_norm, config.level_amplify,
-                       config.v_norm_only, config.self_slot, config.conv_kernel_size, config.no_level_bias)
+                       config.v_norm_only, config.self_slot, config.conv_kernel_size, config.no_level_bias,
+                       compression_query=config.compression_query, compression_key=config.compression_key)
             for _ in range(config.num_layers)
         ])
         self.norm = nn.RMSNorm(config.d_model)

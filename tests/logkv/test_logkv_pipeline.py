@@ -173,7 +173,8 @@ def test_cli_shared_architecture_and_checkpoints(tmp_path):
     assert [p.name for p in checkpoints(tmp_path)] == ['checkpoint-9', 'checkpoint-11']
 
 
-def distributed_smoke(root, no_level_bias=False):
+def distributed_smoke(root, no_level_bias=False, compression_query='last',
+                      compression_key='attention', level_amplify=False):
     """Tiny offline GPU training: gradients, bf16, resume, export, controls."""
     from inference.predict_stream import _load_model, _load_tokenizer, stream_generate
     root = Path(root).resolve()
@@ -188,12 +189,20 @@ def distributed_smoke(root, no_level_bias=False):
     try:
         # Full-model reference exists only for this tiny numerical test.
         torch.manual_seed(51)
-        full = LogKVLM(config()).to(device)
-        stage = LogKVLMPipelineStage(config(), **LogKVLMPipelineStage.split_config(3, 2)[rank]).to(device)
+        cfg = config()
+        cfg.compression_query, cfg.compression_key = compression_query, compression_key
+        if no_level_bias or level_amplify:
+            cfg.learnable_decay = False
+            cfg.no_level_bias, cfg.level_amplify = no_level_bias, level_amplify
+        if compression_query == 'next':
+            cfg.chunk_size = 4
+        length = 17 if compression_query == 'next' else 8
+        full = LogKVLM(cfg).to(device)
+        stage = LogKVLMPipelineStage(cfg, **LogKVLMPipelineStage.split_config(3, 2)[rank]).to(device)
         stage.load_from_full_model(full.state_dict())
         generator = torch.Generator().manual_seed(52)
-        ids = torch.randint(4, 32, (8, 8), generator=generator)
-        labels = torch.randint(4, 32, (8, 8), generator=generator)
+        ids = torch.randint(4, 32, (8, length), generator=generator)
+        labels = torch.randint(4, 32, (8, length), generator=generator)
         labels[:2] = -100
         labels[4:, :6] = -100  # Deliberately unequal valid-token counts.
         batches = [(ids[:4], labels[:4]), (ids[4:], labels[4:])]
@@ -217,20 +226,23 @@ def distributed_smoke(root, no_level_bias=False):
             print('PASS: full-model loss/gradients, global clipping, all-ignored labels', flush=True)
 
         tk = tokenizer()
-        ids = torch.randint(4, 32, (24, 8), generator=generator)
-        labels = torch.randint(4, 32, (24, 8), generator=generator)
+        ids = torch.randint(4, 32, (24, length), generator=generator)
+        labels = torch.randint(4, 32, (24, length), generator=generator)
         labels[::3, :5] = -100
         dataset = TensorDataset(ids, labels)
-        common = ['--context-length', '9', '--d-model', '16', '--d-ff', '32',
+        common = ['--context-length', str(length + 1), '--d-model', '16', '--d-ff', '32',
             '--num-heads', '2', '--num-layers', '3', '--batch-size', '4',
             '--n-microbatches', '2', '--grad-accum', '2', '--num-epochs', '2',
             '--num-workers', '0', '--checkpoint-interval', '1', '--max-checkpoints', '2',
             '--warmup', '2', '--log-interval', '1', '--sample-interval', '2',
             '--sample-max-new-tokens', '2', '--control-file', str(root / 'control.cmd')]
+        # Saved compression/bias settings must survive resume with no flags.
+        resume_common = common.copy()
+        common += ['--compression-query', compression_query, '--compression-key', compression_key]
         if no_level_bias:
             common.append('--no-level-bias')
-        # A resumed zero-bias run must keep its saved semantics without the flag.
-        resume_common = [arg for arg in common if arg != '--no-level-bias']
+        if level_amplify:
+            common.append('--level-amplify')
         final = train(parse_args(common + ['--run-name', 'full', '--max-steps', '4']), dataset, tk)
         train(parse_args(common + ['--run-name', 'resumed', '--max-steps', '2']), dataset, tk)
         resumed = train(parse_args(resume_common + ['--run-name', 'resumed', '--max-steps', '4', '--resume', 'latest']), dataset, tk)
@@ -266,14 +278,20 @@ def distributed_smoke(root, no_level_bias=False):
             model_dir = str(resumed / 'model')
             loaded = _load_model(model_dir, torch.device('cpu'), torch.float32).eval()
             assert loaded.config.no_level_bias == no_level_bias
-            assert all(layer.attention.level_sign == (0 if no_level_bias else -1)
+            assert loaded.config.level_amplify == level_amplify
+            assert loaded.config.compression_query == compression_query
+            assert loaded.config.compression_key == compression_key
+            assert all(layer.attention.level_sign == (0 if no_level_bias else 1 if level_amplify else -1)
                        for layer in loaded.layers)
+            assert all(layer.attention.compression_query == compression_query and
+                       layer.attention.compression_key == compression_key for layer in loaded.layers)
             loaded_tk = _load_tokenizer(model_dir)
             count, _, interrupted = stream_generate(loaded, loaded_tk, 't4 t5', 5, 1., .95,
                                                     torch.device('cpu'), True, False)
             assert count == 3 and not interrupted
             (root / 'review.json').write_text(json.dumps(dict(
-                passed=True, no_level_bias=no_level_bias,
+                passed=True, no_level_bias=no_level_bias, level_amplify=level_amplify,
+                compression_query=compression_query, compression_key=compression_key,
                 world_size=dist.get_world_size(), final_checkpoint=str(resumed),
                 loss_and_gradients_match=True, global_clip_matches=True,
                 all_ignored_loss_zero=True, resume_weights_bit_exact=True,
@@ -291,6 +309,12 @@ if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--distributed-smoke', required=True)
-    parser.add_argument('--no-level-bias', action='store_true')
+    bias = parser.add_mutually_exclusive_group()
+    bias.add_argument('--no-level-bias', action='store_true')
+    bias.add_argument('--level-amplify', action='store_true')
+    parser.add_argument('--compression-query', choices=['last', 'next'], default='last')
+    parser.add_argument('--compression-key', choices=['attention', 'mean'], default='attention')
     args = parser.parse_args()
-    distributed_smoke(args.distributed_smoke, no_level_bias=args.no_level_bias)
+    distributed_smoke(args.distributed_smoke, no_level_bias=args.no_level_bias,
+                      compression_query=args.compression_query, compression_key=args.compression_key,
+                      level_amplify=args.level_amplify)

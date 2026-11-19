@@ -5,18 +5,23 @@ import torch.nn as nn
 from torch.utils.checkpoint import checkpoint
 
 class Compressor(nn.Module):
-    def __init__(self):
+    def __init__(self, compression_key='attention'):
         super(Compressor, self).__init__()
+        if compression_key not in ('attention', 'mean'):
+            raise ValueError("compression_key must be 'attention' or 'mean'")
+        self.compression_key = compression_key
 
     def forward(self, q, k, v):
-        batch_size, seq_len, d_model = q.size()
-        assert k.size() == (batch_size, seq_len, d_model), "Key tensor shape must match query tensor shape"
-        assert v.size() == (batch_size, seq_len, d_model), "Value tensor shape must match query tensor shape"
+        batch_size, seq_len, d_model = k.size()
+        assert q.size() in ((batch_size, seq_len, d_model), (batch_size, 1, d_model)), \
+            "Query must contain the chunk queries or one compression query"
+        assert v.size() == k.size(), "Value tensor shape must match key tensor shape"
 
         q_out = q[:, -1, :].unsqueeze(1)  # Take the last query vector and keep the batch dimension
         attention_logits = torch.bmm(q_out, k.transpose(1, 2)) * (d_model ** -0.5)
         attention_weights = torch.softmax(attention_logits, dim=-1)
-        k_out = torch.bmm(attention_weights, k)
+        k_out = (k.mean(dim=1, keepdim=True) if self.compression_key == 'mean'
+                 else torch.bmm(attention_weights, k))
         v_out = torch.bmm(attention_weights, v)
 
         return q_out, k_out, v_out
@@ -24,10 +29,15 @@ class Compressor(nn.Module):
 class LogKV(nn.Module):
     def __init__(self, dim, chunk_size, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False,
-                 level_amplify=False, v_norm_only=False, self_slot=False, no_level_bias=False):
+                 level_amplify=False, v_norm_only=False, self_slot=False, no_level_bias=False,
+                 compression_query='last', compression_key='attention'):
         super(LogKV, self).__init__()
         assert chunk_size >= 2, "chunk_size must be at least 2"
         assert dim % num_heads == 0, "dim must be divisible by num_heads"
+        if compression_query not in ('last', 'next'):
+            raise ValueError("compression_query must be 'last' or 'next'")
+        self.compression_query = compression_query
+        self.compression_key = compression_key
         assert not (level_amplify and learnable_decay), "level_amplify is a fixed-bias variant"
         if no_level_bias and (learnable_decay or level_amplify):
             raise ValueError('no_level_bias cannot be combined with learned decay or amplification')
@@ -94,7 +104,7 @@ class LogKV(nn.Module):
         self.lk = nn.Linear(dim, dim, bias=False)
         self.lv = nn.Linear(dim, dim, bias=False)
         self.lo = nn.Linear(dim, dim, bias=False)
-        self.compressor = Compressor()
+        self.compressor = Compressor(compression_key)
         # Recompute each level's slot gather + partial softmax in backward
         # (activation checkpointing) instead of storing the gathered
         # (B*H, L, C-1, head_dim) slot tensors for every level — the dominant
@@ -158,13 +168,20 @@ class LogKV(nn.Module):
         C = self.chunk_size
         while nq.size(1) > 0:
             ctxs.append((0, nk, nv))
-            n_chunks = nq.size(1) // C
+            # A next-query summary of [a, b) becomes available at q[b].
+            # Select the raw boundary query at EVERY level; shifting the
+            # child query sequence again would incorrectly use q[b + C**i].
+            span = C ** len(ctxs)
+            n_chunks = ((seq_len - 1) // span if self.compression_query == 'next'
+                        else nq.size(1) // C)
             if not n_chunks:
                 break
             comp_len = n_chunks * C
             shape = (q.size(0) * n_chunks, C, self.head_dim)
+            comp_q = (q[:, span::span].reshape(q.size(0) * n_chunks, 1, self.head_dim)
+                      if self.compression_query == 'next' else nq[:, :comp_len].reshape(shape))
             nq, nk, nv = self.compressor(
-                nq[:, :comp_len].reshape(shape),
+                comp_q,
                 nk[:, :comp_len].reshape(shape),
                 nv[:, :comp_len].reshape(shape))
             if self.k_norm is not None:
@@ -188,15 +205,17 @@ class LogKV(nn.Module):
         Key facts making this possible:
         * At level i, q_sub = s // C**i and j = q_sub % C. The selected
           indices are a_c = q_sub - j + c for 0 <= c < j.
-        * Every selected element ends strictly before its query (element
-          a <= q_sub-1 completes at token (a+1)*sub_len - 1 < s), so the
-          whole hierarchy can be updated FIRST and attention computed
-          afterwards for all queries at once without breaking causality.
+        * Every selected interval ends strictly before its query. Its
+          compression query is at (a+1)*sub_len - 1 in last mode, or at
+          (a+1)*sub_len <= s in next mode. Thus the whole hierarchy can be
+          updated FIRST and attention computed afterwards for all queries
+          at once without breaking causality.
         * The current partial chunk plus entries arriving this call cover
           every access; completed previous chunks need no separate cache.
 
         hidden: (levels, offset) — levels[i] = [cur_q, cur_k, cur_v]
-        (incomplete current chunk only;
+        (incomplete current chunk only, except that next-query compression
+        keeps up to C raw tokens until their boundary query arrives;
         heads are folded into the batch dimension, i.e. batch B*H),
         offset = number of tokens processed so far. The caller's hidden is
         not mutated. Returns (out, new_hidden).
@@ -221,6 +240,8 @@ class LogKV(nn.Module):
     def _attend(self, q_new, k_new, v_new, hidden):
         """Hierarchy update + disjoint attention on projected, head-folded
         (B*H, L, head_dim) tensors. See step() for the semantics."""
+        if self.compression_query == 'next':
+            return self._attend_next(q_new, k_new, v_new, hidden)
         C = self.chunk_size
         batch_size, seq_len, d_model = q_new.size()
         x = q_new  # for dtype/device
@@ -279,6 +300,59 @@ class LogKV(nn.Module):
             base = offset // (C ** i2) - m
             ctxs.append((base, cur_k, cur_v))
 
+        out = self._attend_contexts(q_new, k_new, v_new, ctxs, offset)
+        return out, (levels, offset + seq_len)
+
+    def _attend_next(self, q_new, k_new, v_new, hidden):
+        """Vectorized delayed compression, including a pending raw chunk.
+
+        After processing N tokens, level i>=1 has received floor((N-1)/C**i)
+        summaries: q[N] is not available yet. Only level zero delays a
+        carry; the last child's boundary query is also its parent's query.
+        Readout masks exclude each summary before that boundary, including
+        during this batched update, so no future-query information leaks.
+        """
+        C = self.chunk_size
+        batch_size, seq_len, dim = q_new.shape
+        levels, offset = ([], 0) if hidden is None else hidden
+        levels = [list(level) for level in levels]
+        empty = q_new.new_empty(batch_size, 0, dim)
+        nq, nk, nv = q_new, k_new, v_new
+        ctxs = []
+        i = 0
+        while nq.size(1):
+            if i == len(levels):
+                levels.append([empty, empty, empty])
+            cq, ck, cv = levels[i]
+            received = offset if i == 0 else max(offset - 1, 0) // C**i
+            base = received - ck.size(1)
+            all_q = torch.cat((cq, nq), dim=1)
+            all_k = torch.cat((ck, nk), dim=1)
+            all_v = torch.cat((cv, nv), dim=1)
+            ctxs.append((base, all_k, all_v))
+            n_chunks = (all_k.size(1) - (i == 0)) // C
+            if n_chunks:
+                comp_len = n_chunks * C
+                shape = (batch_size * n_chunks, C, dim)
+                comp_q = (all_q[:, C:comp_len + 1:C].reshape(batch_size * n_chunks, 1, dim)
+                          if i == 0 else all_q[:, :comp_len].reshape(shape))
+                nq, nk, nv = self.compressor(comp_q, all_k[:, :comp_len].reshape(shape),
+                                              all_v[:, :comp_len].reshape(shape))
+                if self.k_norm is not None:
+                    nk = self.k_norm(nk)
+                if self.v_norm is not None:
+                    nv = self.v_norm(nv)
+                # Do not pin a full prefill's storage in the persistent state.
+                levels[i] = [t[:, comp_len:].clone() for t in (all_q, all_k, all_v)]
+                nq, nk, nv = (t.reshape(batch_size, n_chunks, dim) for t in (nq, nk, nv))
+            else:
+                levels[i] = [all_q, all_k, all_v]
+                nq = nk = nv = empty
+            i += 1
+        for i2 in range(i, len(levels)):
+            _, ck, cv = levels[i2]
+            received = offset if i2 == 0 else max(offset - 1, 0) // C**i2
+            ctxs.append((received - ck.size(1), ck, cv))
         out = self._attend_contexts(q_new, k_new, v_new, ctxs, offset)
         return out, (levels, offset + seq_len)
 
@@ -471,9 +545,10 @@ class LogKV(nn.Module):
         """Single-token inference: x is (batch_size, d_model), one token
         without the sequence dimension. Returns (out, new_hidden).
 
-        The unfinished chunks in the incoming state already partition the
-        entire past. Read them BEFORE inserting this token, then propagate
-        only completed chunks upward (a base-C carry). No sequence indices,
+        The chunks in the incoming state already partition the entire past.
+        With next-query compression, carry a pending full raw chunk with the
+        current query BEFORE readout; otherwise carry after inserting this
+        token. No sequence indices,
         slot gathers, or activation checkpointing are needed. State has the
         same format as step(), and the caller's state is never mutated.
         """
@@ -489,41 +564,74 @@ class LogKV(nn.Module):
             k = self.k_norm(k)
         if self.v_norm is not None:
             v = self.v_norm(v)
-        out = self._predict_attention(q, k, v, levels)
+        if self.compression_query == 'next':
+            out, new_levels = self._predict_next(q, k, v, levels)
+        else:
+            out = self._predict_attention(q, k, v, levels)
 
-        # Copy containers only. Untouched levels may share immutable tensors
-        # with the input state, including when branching from a prefix.
-        new_levels = [list(level) for level in levels]
-        empty = q.new_empty(q.size(0), 0, self.head_dim)
-        nq, nk, nv = q, k, v
-        i = 0
-        while True:
-            if i == len(new_levels):
-                new_levels.append([nq, nk, nv])
-                break
-            cq, ck, cv = new_levels[i]
-            if cq.size(1):
-                nq = torch.cat((cq, nq), dim=1)
-                nk = torch.cat((ck, nk), dim=1)
-                nv = torch.cat((cv, nv), dim=1)
-            if nq.size(1) < self.chunk_size:
-                new_levels[i] = [nq, nk, nv]
-                break
-            nq, nk, nv = self.compressor(nq, nk, nv)
-            # Compressor returns a view of the last query. Do not retain
-            # storage for the whole completed chunk in the upper level.
-            nq = nq.clone()
-            if self.k_norm is not None:
-                nk = self.k_norm(nk)
-            if self.v_norm is not None:
-                nv = self.v_norm(nv)
-            new_levels[i] = [empty, empty, empty]
-            i += 1
+            # Copy containers only. Untouched levels may share immutable tensors
+            # with the input state, including when branching from a prefix.
+            new_levels = [list(level) for level in levels]
+            empty = q.new_empty(q.size(0), 0, self.head_dim)
+            nq, nk, nv = q, k, v
+            i = 0
+            while True:
+                if i == len(new_levels):
+                    new_levels.append([nq, nk, nv])
+                    break
+                cq, ck, cv = new_levels[i]
+                if cq.size(1):
+                    nq = torch.cat((cq, nq), dim=1)
+                    nk = torch.cat((ck, nk), dim=1)
+                    nv = torch.cat((cv, nv), dim=1)
+                if nq.size(1) < self.chunk_size:
+                    new_levels[i] = [nq, nk, nv]
+                    break
+                nq, nk, nv = self.compressor(nq, nk, nv)
+                # Compressor returns a view of the last query. Do not retain
+                # storage for the whole completed chunk in the upper level.
+                nq = nq.clone()
+                if self.k_norm is not None:
+                    nk = self.k_norm(nk)
+                if self.v_norm is not None:
+                    nv = self.v_norm(nv)
+                new_levels[i] = [empty, empty, empty]
+                i += 1
 
         if self.lg is not None:
             out = out * torch.sigmoid(self._split_heads(self.lg(x).unsqueeze(1)))
         out = self.lo(self._merge_heads(out, batch_size).squeeze(1))
         return out, (new_levels, offset + 1)
+
+    def _predict_next(self, q, k, v, levels):
+        """Carry with the arriving query, read, then buffer the current KV."""
+        new_levels = [list(level) for level in levels]
+        empty = q.new_empty(q.size(0), 0, self.head_dim)
+        if not new_levels:
+            new_levels.append([empty, empty, empty])
+        if new_levels[0][1].size(1) == self.chunk_size:
+            i = 0
+            while True:
+                _, ck, cv = new_levels[i]
+                nq, nk, nv = self.compressor(q, ck, cv)
+                if self.k_norm is not None:
+                    nk = self.k_norm(nk)
+                if self.v_norm is not None:
+                    nv = self.v_norm(nv)
+                new_levels[i] = [empty, empty, empty]
+                i += 1
+                if i == len(new_levels):
+                    new_levels.append([nq.clone(), nk, nv])
+                    break
+                cq, ck, cv = new_levels[i]
+                new_levels[i] = [torch.cat((a, b), dim=1)
+                                 for a, b in zip((cq, ck, cv), (nq, nk, nv))]
+                if new_levels[i][1].size(1) < self.chunk_size:
+                    break
+        out = self._predict_attention(q, k, v, new_levels)
+        new_levels[0] = [torch.cat((a, b), dim=1)
+                         for a, b in zip(new_levels[0], (q, k, v))]
+        return out, new_levels
 
     def _predict_attention(self, q, k, v, levels):
         """Batch the nonempty levels into one small attention operation.
@@ -652,11 +760,13 @@ class LogKVBlock(nn.Module):
 
     def __init__(self, dim, chunk_size, d_ff, num_heads=1, phase_emb=False, phase_levels=16,
                  learnable_decay=False, gated_attention=False, kv_norm=False, level_amplify=False,
-                 v_norm_only=False, self_slot=False, conv_kernel_size=0, no_level_bias=False):
+                 v_norm_only=False, self_slot=False, conv_kernel_size=0, no_level_bias=False,
+                 compression_query='last', compression_key='attention'):
         super(LogKVBlock, self).__init__()
         self.attention_norm = nn.RMSNorm(dim)
         self.attention = LogKV(dim, chunk_size, num_heads, phase_emb, phase_levels, learnable_decay,
-                               gated_attention, kv_norm, level_amplify, v_norm_only, self_slot, no_level_bias)
+                               gated_attention, kv_norm, level_amplify, v_norm_only, self_slot, no_level_bias,
+                               compression_query, compression_key)
         self.ffn_norm = nn.RMSNorm(dim)
         self.ffn = FFNSwiGLU(dim, d_ff)
         if not isinstance(conv_kernel_size, int) or conv_kernel_size < 0:
